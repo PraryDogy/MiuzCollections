@@ -9,9 +9,9 @@ from Utils import ClipBoard
 
 class Prev:
     def __init__(self, src):
-        cfg.ROOT.withdraw()
+        # cfg.ROOT.withdraw()
         newWin = tkinter.Toplevel()
-        newWin.protocol("WM_DELETE_WINDOW", lambda: cfg.ROOT.deiconify())
+        newWin.protocol("WM_DELETE_WINDOW", lambda: newWin.destroy())
 
         newWin.config(bg=cfg.BGCOLOR, padx=15, pady=15)
 
