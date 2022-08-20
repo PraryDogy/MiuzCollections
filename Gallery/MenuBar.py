@@ -17,6 +17,10 @@ class Create:
         filemenu.add_command(label="О программе", command=self.AboutApp)
         filemenu.add_separator()
         filemenu.add_command(label="Выход", command=cfg.ROOT.destroy)
+            
+        cfg.ROOT.createcommand(
+            'tkAboutDialog', 
+            lambda: cfg.ROOT.tk.call('tk::mac::standardAboutPanel'))
 
         cfg.ROOT.config(menu=menubar)
 

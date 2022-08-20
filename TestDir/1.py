@@ -1,10 +1,21 @@
-import subprocess
+from tkinter import *   # Python 3
 
-def write_to_clipboard(output):
-    process = subprocess.Popen(
-        'pbcopy', env={'LANG': 'en_US.UTF-8'}, stdin=subprocess.PIPE)
-    process.communicate(output.encode('utf-8'))
+def new_file():
+    # ...
+    pass
 
-def read_from_clipboard():
-    return subprocess.check_output(
-        'pbpaste', env={'LANG': 'en_US.UTF-8'}).decode('utf-8')
+def about_dialog():
+    root.tk.call('tk::mac::standardAboutPanel')
+
+root = Tk()
+win = Toplevel(root)
+menubar = Menu(win)
+menu_file = Menu(menubar)
+# ...
+menubar.add_cascade(menu=menu_file, label='File')
+# ...
+menu_file.add_command(label='New', command=new_file)
+# ...
+root.createcommand('tkAboutDialog', about_dialog)
+win['menu'] = menubar
+root.mainloop()
