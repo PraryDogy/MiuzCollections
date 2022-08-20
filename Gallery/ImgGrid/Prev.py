@@ -3,110 +3,104 @@ import subprocess
 import tkinter
 
 import cfg
-from PIL import Image, ImageTk
+from PIL import Image, ImageOps, ImageTk
 from Utils import ClipBoard
 
 
 class Prev:
     def __init__(self, src):
-        # cfg.ROOT.withdraw()
-        newWin = tkinter.Toplevel()
-        newWin.protocol("WM_DELETE_WINDOW", lambda: newWin.destroy())
+        self.src = src
+        self.newWin = tkinter.Toplevel()
+        self.newWin.protocol("WM_DELETE_WINDOW", lambda: self.newWin.destroy())
 
-        newWin.config(bg=cfg.BGCOLOR, padx=15, pady=15)
+        self.newWin.config(bg=cfg.BGCOLOR, padx=15, pady=15)
 
-        if os.path.exists(src):
-            self.OpenImg(newWin, src)
+        copyName = self.CopyName()
+        openClose = self.OpenClose()
+        
+        if os.path.exists(self.src):
+            cfg.ROOT.update_idletasks()
+            h = copyName.winfo_reqheight() + openClose.winfo_height()
+            openImg = self.OpenImg(h)
         else:
-            self.ImgError(newWin)
+            openImg = self.ImgError()
 
-        self.CopyName(newWin, src)
-        self.OpenClose(newWin, src)
+        for i in [openImg, copyName, openClose]:
+            i.pack()
 
-        cfg.ROOT.eval(f'tk::PlaceWindow {newWin} center')
-
+        cfg.ROOT.eval(f'tk::PlaceWindow {self.newWin} center')
+        self.newWin.geometry(f'+{self.newWin.winfo_x()}+0')
     
-    def OpenImg(self, newWin, src):
-        img = Image.open(src)
+    def OpenImg(self, h):
+        frame = tkinter.Frame(self.newWin, bg='black')
 
-        w, h = (
-            int(cfg.ROOT.winfo_screenwidth()*0.9), 
-            int(cfg.ROOT.winfo_screenheight()*0.9)
-            )
-        img.thumbnail((w, h))
+        imgSrc = Image.open(self.src)
+        imgCopy= imgSrc.copy()
 
-        img = ImageTk.PhotoImage(img)
-    
-        lbl = tkinter.Label(
-            newWin, bg=cfg.BGCOLOR, 
-            image=img, compound='center')
-        lbl.image = img
-        lbl.pack()
+        h = int(cfg.ROOT.winfo_screenheight()*0.8)-h
+        w = int(cfg.ROOT.winfo_screenwidth()*0.8)
+        imgCopy.thumbnail((w, h))
+
+        imgTk = ImageTk.PhotoImage(imgCopy)
+        label = tkinter.Label(frame, image=imgTk, bg=cfg.BGCOLOR)
+        label.pack(fill='both', expand=True)
+        label.image = imgTk
+
+        return frame
 
 
-    def ImgError(self, newWin):
+    def ImgError(self):
         txt = (
             'Не могу открыть изображение. Возможные причины:'
-
             '\n\nНет подключения к сетевому диску MIUZ,'
             '\nпопробуйте открыть любую папку на сетевом диске.'
-
             '\n\nПопробуйте запустить полное сканирование из настроек.'
-
             '\n'
             )
 
-        lbl = tkinter.Label(
-            newWin, bg=cfg.BGCOLOR, fg=cfg.FONTCOLOR,
+        label = tkinter.Label(
+            self.newWin, bg=cfg.BGCOLOR, fg=cfg.FONTCOLOR,
             text=txt)
-        lbl.pack()
+        return label
 
 
-    def CopyName(self, newWin, src):
-
-        copyNameFrame = tkinter.Frame(newWin, bg=cfg.BGCOLOR)
-        copyNameFrame.pack()
+    def CopyName(self):
+        frame = tkinter.Frame(self.newWin, bg=cfg.BGCOLOR)
 
         showPath = tkinter.Label(
-            copyNameFrame, bg=cfg.BGCOLOR, fg=cfg.FONTCOLOR, 
-            pady=15, padx=10, text=src.replace(cfg.PHOTO_DIR, '')
+            frame, bg=cfg.BGCOLOR, fg=cfg.FONTCOLOR, 
+            pady=15, padx=10, text=self.src.replace(cfg.PHOTO_DIR, '')
             )
         showPath.pack(side='left')
-
-
-        def CopyName(label):
-            label.config(bg=cfg.BGPRESSED)
-            name = src.split('/')[-1].split('.')[0]
-            
-            ClipBoard.copy(name)
-            
-            cfg.ROOT.after(
-                300, lambda: label.config(bg=cfg.BGBUTTON))
-            
-            
-        copyName = tkinter.Label(
-            copyNameFrame, bg=cfg.BGBUTTON, fg=cfg.FONTCOLOR, 
+                        
+        self.copyName = tkinter.Label(
+            frame, bg=cfg.BGBUTTON, fg=cfg.FONTCOLOR, 
             text='Копировать имя файла', padx=10)
-        copyName.pack(side='left')           
-        copyName.bind('<Button-1>', lambda event: CopyName(copyName))
+        self.copyName.pack(side='left')           
+        self.copyName.bind('<Button-1>', lambda event: self.copyToClipboard())
+        return frame
 
 
-    def OpenClose(self, newWin, src):
-        frame = tkinter.Frame(newWin, bg=cfg.BGCOLOR)
-        frame.pack()
+    def copyToClipboard(self):
+        self.copyName.config(bg=cfg.BGPRESSED)
+        name = self.src.split('/')[-1].split('.')[0]
+        ClipBoard.copy(name)
+        cfg.ROOT.after(
+            300, lambda: self.copyName.config(bg=cfg.BGBUTTON))
 
-        if os.path.exists(src):
 
+    def OpenClose(self):
+        frame = tkinter.Frame(self.newWin, bg=cfg.BGCOLOR)
+
+        if os.path.exists(self.src):
             OpenBtn = tkinter.Label(
                 frame, bg=cfg.BGBUTTON, fg=cfg.FONTCOLOR,
                 height=2, width=17, text='Открыть папку')
-
             OpenBtn.bind(
                 '<Button-1>', 
                 lambda event: subprocess.check_output(
-                    ["/usr/bin/open", '/'.join(src.split('/')[:-1])])
+                    ["/usr/bin/open", '/'.join(self.src.split('/')[:-1])])
                     )
-
             OpenBtn.pack(side='left')
 
         betwBtns = tkinter.Frame(
@@ -117,9 +111,6 @@ class Prev:
             frame, bg=cfg.BGBUTTON, fg=cfg.FONTCOLOR, 
             height=2, width=17, text='Закрыть')
 
-        def close():
-            newWin.destroy()
-            cfg.ROOT.deiconify()
-
-        closeBtn.bind('<Button-1>', lambda event: close())
+        closeBtn.bind('<Button-1>', lambda event: self.newWin.destroy())
         closeBtn.pack(side='left')
+        return frame

@@ -23,10 +23,13 @@ FLAG = True
 LIVE_LBL = None
 
 # changeable
-SMB_DIR = '/Volumes/Shares'
+SMB_DIR = '/'
+# SMB_DIR = '/Volumes/Shares'
 SMB_CONN = 'smb://192.168.10.105/Shares'
 
-PHOTO_DIR = '/Volumes/Shares/Marketing/Photo'
+PHOTO_DIR = '/Users/evlosh/Downloads/MiuzGallery/MiuzGallery/TestDir/PhotoDir'
+# PHOTO_DIR = '/Volumes/Shares/Marketing/Photo'
+
 COLL_FOLDER = '_Collections'
 RT_FOLDER = 'Retouch'
 FILE_AGE = 60

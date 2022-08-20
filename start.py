@@ -3,7 +3,7 @@ from DbChecker.DbCheck import Check as DbCheck
 from Gallery.Gui import Create as MainGui
 from NetChecker.NetworkCheck import Check as NetwotkCheck
 from SmbChecker.Gui import Create as SmbGui
-from SmbChecker.SmbCheck import Check as SmbCheck
+from SmbChecker.SmbCheck import Check as SmbCheck   
 from SplashScreen.Gui import Create as SplashScreen
 
 

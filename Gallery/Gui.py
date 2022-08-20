@@ -16,8 +16,6 @@ class Create:
     def __init__(self):
         cfg.ROOT.createcommand(
             'tk::mac::ReopenApplication', cfg.ROOT.deiconify)
-
-        # cfg.ROOT.protocol("WM_DELETE_WINDOW", lambda: exite())
         
         cfg.ROOT.title('MiuzGallery')
         cfg.ROOT.config(bg=cfg.BGCOLOR, padx=15, pady=0)
@@ -41,3 +39,4 @@ class Create:
 
         Geometry()
         cfg.ROOT.eval(f'tk::PlaceWindow {cfg.ROOT} center')
+        cfg.ROOT.geometry(f'+{cfg.ROOT.winfo_x()}+0')
