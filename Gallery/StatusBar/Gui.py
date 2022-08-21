@@ -2,7 +2,7 @@ import tkinter
 from tkinter.ttk import Separator
 
 import cfg
-from Gallery.Settings import Create as SettingsWin
+from Gallery.Settings import GuiMain as Settings
 
 from .ClmnBtnCmd import Cmd as ClmnCmd
 from .GridBtnCmd import Cmd as GridCmd
@@ -28,7 +28,7 @@ class Create:
         settingsBtn = tkinter.Label(
             self.stBar, bg=cfg.BGBUTTON, fg=cfg.FONTCOLOR, 
             width=7, font=('', 10, ''), text='⚙', padx=5)
-        settingsBtn.bind('<Button-1>', lambda event: SettingsWin())
+        settingsBtn.bind('<Button-1>', lambda event: Settings.Create())
         settingsBtn.pack(side='left')
 
         rightSettings = tkinter.Frame(self.stBar, bg=cfg.BGCOLOR, width=15)
