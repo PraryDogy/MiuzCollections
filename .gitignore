@@ -1,5 +1,5 @@
 __pycache__/
-TestDir/PhotoDir/
+SamplePhotos/
 *.pyc
 .DS_Store
 .eggs/
