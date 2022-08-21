@@ -11,25 +11,21 @@ class Create(tkinter.Toplevel):
         Imports: ManageDb from DataBase package."""
 
         tkinter.Toplevel.__init__(
-            self, cfg.ROOT, bg=cfg.BGCOLOR, pady=10)
+            self, cfg.ROOT, bg=cfg.BGCOLOR)
 
         self.resizable(0,0)
         self.attributes('-topmost', 'true')
         self.title('Настройки')
-        self.propagate(0)
-        h = int(cfg.ROOT.winfo_screenheight()*0.6)
-        self.configure(height=h, width=600)
 
         frameL = MyFrame(self)
-        frameL.pack(side='left', padx=10)
+        frameL.pack(side='left', padx=10, pady=10)
 
         frameR = MyFrame(self)
-        frameR.configure(height=500, bg='red')
-        frameR.pack(side='right', padx=10, fill='y')
+        frameR.pack(side='right', padx=10, pady=10, fill='y')
 
         LeftMenu(frameL).pack()
 
-        General(frameR).pack()
+        General(frameR).pack(expand=True, fill='both')
         BelowMenu(frameR).pack(anchor='se')
 
         cfg.ROOT.eval(f'tk::PlaceWindow {self} center') 
@@ -58,7 +54,6 @@ class General(MyFrame):
     def __init__(self, master):
         super().__init__(master)
         FullScan(self)
-        About(self)
 
 
 class BelowMenu(MyFrame):
