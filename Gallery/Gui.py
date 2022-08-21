@@ -1,9 +1,6 @@
-import sys
 import tkinter
 
 import cfg
-import sqlalchemy
-from DataBase.Database import Config, dBase
 from Utils.Manage import Geometry
 
 from .ImgGrid.Gui import Create as ImgGrigGui
