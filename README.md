@@ -1,2 +1,10 @@
 # Miuz-Gallery
-This is test project for Miuz-Diamons
+This is image gallery for Miuz-Diamons.
+Gallery designed for scan specific folders in network server.
+
+Download sample photos with necessary structure:
+https://disk.yandex.ru/d/Vffr_r9q6CybyQ
+
+Change cfg.py:
+SMB_DIR = /
+PHOTO_DIR = /path/to/sample/photos
