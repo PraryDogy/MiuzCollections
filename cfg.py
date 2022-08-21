@@ -27,7 +27,7 @@ SMB_DIR = '/'
 # SMB_DIR = '/Volumes/Shares'
 SMB_CONN = 'smb://192.168.10.105/Shares'
 
-PHOTO_DIR = '/Users/evlosh/Downloads/MiuzGallery/MiuzGallery/TestDir/SamplePhotos'
+PHOTO_DIR = '/Users/evlosh/Downloads/MiuzGallery/MiuzGallery/SamplePhotos'
 # PHOTO_DIR = '/Volumes/Shares/Marketing/Photo'
 
 COLL_FOLDER = '_Collections'
