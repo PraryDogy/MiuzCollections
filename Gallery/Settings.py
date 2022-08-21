@@ -6,32 +6,31 @@ from tkinter.ttk import Separator
 import cfg
 import sqlalchemy
 from DataBase.Database import Config, dBase
+from Utils.Styled import *
 
 
-class Create:
+class Create(tkinter.Toplevel):
     def __init__(self):
-        '''
-        Create tk TopLevel with tkinter.Labels and buttons\n
-        Methods: just run class\n
-        Imports: ManageDb from DataBase package
-        '''
-        self.newWin = tkinter.Toplevel(
-            cfg.ROOT, padx=15, pady=15, bg=cfg.BGCOLOR)
-        self.newWin.resizable(0,0)
-        self.newWin.attributes('-topmost', 'true')
+        """Create tk TopLevel with tkinter.Labels and buttons. 
+        Methods: just run class. 
+        Imports: ManageDb from DataBase package."""
 
-        self.newWin.title('Настройки')
+        tkinter.Toplevel.__init__(self, cfg.ROOT, padx=15, bg=cfg.BGCOLOR)
+        self.resizable(0,0)
+        self.attributes('-topmost', 'true')
+        self.title('Настройки')
 
-        self.ScanFrame()
-        self.ExpertFrame()
-        self.AboutFrame()
-        self.CloseFrame() 
-        cfg.ROOT.eval(f'tk::PlaceWindow {self.newWin} center')        
+        FullScan(self)
+        About(self)
+        Close(self)
+
+        cfg.ROOT.eval(f'tk::PlaceWindow {self} center')        
 
 
-    def ScanFrame(self):
-        scanFrame = tkinter.Frame(self.newWin, bg=cfg.BGCOLOR)
-        scanFrame.pack(anchor='w')
+class FullScan(MyFrame):
+    def __init__(self, master):
+        super().__init__(master)
+        self.pack(anchor='w')
 
         descr = (
             'При запуске программа сканирует и обновляет фото'
@@ -44,71 +43,29 @@ class Create:
             '\nфотографии за все время c 2018 года.'
             )
         
-        descrLabel = tkinter.Label(
-            scanFrame, bg=cfg.BGCOLOR, fg=cfg.FONTCOLOR, 
-            anchor='w', padx=5, text=descr, justify='left')
-        descrLabel.pack(fill='x')
+        descrLabel = MyLabel(self)
+        descrLabel.config(anchor='w', padx=5, text=descr, justify='left')
+        descrLabel.pack(fill='x', pady=10)
 
-        belowDescr = tkinter.Frame(scanFrame, bg=cfg.BGCOLOR, height=10)
-        belowDescr.pack()
-
-
-        def FullScan():
-            query = sqlalchemy.update(Config).where(
-                Config.name=='typeScan').values(value='full')
-            dBase.conn.execute(query)
-            os.execv(sys.executable, ['python'] + sys.argv)
-            
-        scanBtn = tkinter.Label(
-            scanFrame, bg=cfg.BGBUTTON, fg=cfg.FONTCOLOR,
-            height=2, width=17, text='Полное сканирование')
+        scanBtn = MyButton(
+            self, lambda event: self.RunScan(), 'Полное сканирование')
         scanBtn.pack(anchor='center')
-        scanBtn.bind('<Button-1>', lambda event: FullScan())
+        
+        sep = Separator(self, orient='horizontal')
+        sep.pack(fill='x', pady=10)
+    
 
-        belowScan = tkinter.Frame(scanFrame ,height=10, bg=cfg.BGCOLOR)
-        belowScan.pack()
-
-        sep = Separator(scanFrame, orient='horizontal')
-        sep.pack(fill='x')
-
-        belowSep = tkinter.Frame(scanFrame ,height=10, bg=cfg.BGCOLOR)
-        belowSep.pack()      
-
-    def ExpertFrame(self):
-        expFrame = tkinter.Frame(self.newWin, bg=cfg.BGCOLOR)
-        expFrame.pack(anchor='w', fill='x')
-
-        txt = (
-            'Если изменился адрес сетевого диска,'
-            '\nвы можете изменить его в экспертных настройках.')
-
-        descrLabel = tkinter.Label(
-            expFrame, bg=cfg.BGCOLOR, fg=cfg.FONTCOLOR,
-            anchor='w', padx=5, text=txt, justify='left')
-        descrLabel.pack(fill='x')
-
-        belowDescr= tkinter.Frame(expFrame ,height=10, bg=cfg.BGCOLOR)
-        belowDescr.pack()
-
-        expBtn = tkinter.Label(
-            expFrame, bg=cfg.BGBUTTON, fg=cfg.FONTCOLOR,
-            height=2, width=17, text='Режим эксперта')
-        expBtn.pack(anchor='center')
-        expBtn.bind('<Button-1>', lambda event:print('111'))
-
-        belowBtn= tkinter.Frame(expFrame ,height=10, bg=cfg.BGCOLOR)
-        belowBtn.pack()
-
-        sep = Separator(expFrame, orient='horizontal')
-        sep.pack(fill='x')
-
-        belowSep = tkinter.Frame(expFrame ,height=10, bg=cfg.BGCOLOR)
-        belowSep.pack()  
+    def RunScan(self):
+        query = sqlalchemy.update(Config).where(
+            Config.name=='typeScan').values(value='full')
+        dBase.conn.execute(query)
+        os.execv(sys.executable, ['python'] + sys.argv)
 
 
-    def AboutFrame(self):
-        aboutFrame = tkinter.Frame(self.newWin, bg=cfg.BGCOLOR)
-        aboutFrame.pack(anchor='nw')
+class About(MyFrame):
+    def __init__(self, master):
+        super().__init__(master)
+        self.pack(anchor='nw')
 
         descr = (
             'Created by Evgeny Loshkarev'
@@ -117,19 +74,16 @@ class Create:
             '\n'
             )
 
-        createdBy = tkinter.Label(
-            aboutFrame, bg=cfg.BGCOLOR, fg=cfg.FONTCOLOR, 
-            text=descr, justify='left')
+        createdBy = MyLabel(self)
+        createdBy.configure(text=descr, justify='left')
         createdBy.pack()
 
+class Close(MyFrame):
+    def __init__(self, master):
+        super().__init__(master)
+        self.pack(anchor='center', pady=10)
 
-    def CloseFrame(self):
-        closeFrame = tkinter.Frame(self.newWin, bg=cfg.BGCOLOR)
-        closeFrame.pack(anchor='center')
-        
-        closeButton = tkinter.Label(
-            closeFrame, bg=cfg.BGBUTTON, fg=cfg.FONTCOLOR, 
-            height=2, width=17, text='Закрыть')
-        closeButton.bind('<Button-1>', lambda event: self.newWin.destroy())
+        closeButton = MyButton(
+            self, lambda event: master.destroy(), 'Закрыть')
         closeButton.pack()
         
