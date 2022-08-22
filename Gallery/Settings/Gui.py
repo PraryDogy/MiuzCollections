@@ -1,3 +1,4 @@
+import json
 import os
 import sys
 import tkinter
@@ -10,6 +11,7 @@ from Utils.Styled import *
 
 
 class TkObjects:
+    
     genFrame = tkinter.Frame
     expFrame = tkinter.Frame
     
@@ -31,20 +33,24 @@ class Create(tkinter.Toplevel):
         self.resizable(0,0)
         self.attributes('-topmost', 'true')
         self.title('Настройки')
-
+        self.geometry(f'570x650')
+        self.configure(padx=10, pady=10)
+        
+        
         frameL = MyFrame(self)
-        frameL.pack(side='left', padx=10, pady=10)
+        frameL.pack(side='left')
 
         frameR = MyFrame(self)
-        frameR.pack(side='right', padx=10, pady=10)
+        frameR.pack(side='right', fill='both', expand=True)
 
-        LeftMenu(frameL).pack()
+        LeftMenu(frameL).pack(padx=(0, 10))
 
-        General(frameR).pack()
+        General(frameR).pack(fill='both', expand=True)
         Expert(frameR)
         
-        BelowMenu(frameR).pack(anchor='se')
+        BelowMenu(frameR).pack(anchor='se', side='bottom', pady=(10,0))
 
+        cfg.ROOT.update_idletasks()
         cfg.ROOT.eval(f'tk::PlaceWindow {self} center') 
 
 
@@ -53,38 +59,33 @@ class LeftMenu(MyFrame, TkObjects):
         super().__init__(master)
 
         genBtn = MyButton(
-            self, lambda event: self.CloseExp(), 'Основные')
+            self, 
+            lambda event: self.Change(
+                TkObjects.expFrame, TkObjects.genFrame,
+                TkObjects.genBtn, TkObjects.expBtn), 
+            'Основные')
         genBtn.configure(bg=cfg.BGPRESSED)
         genBtn.pack()
 
         expertBtn = MyButton(
-            self, lambda event: self.CloseGen(), 'Эксперт')
+            self, 
+            lambda event: self.Change(
+                TkObjects.genFrame, TkObjects.expFrame,
+                TkObjects.expBtn, TkObjects.genBtn),
+            'Эксперт')
         expertBtn.pack()
 
         TkObjects.genBtn = genBtn
         TkObjects.expBtn = expertBtn
         
-    def CloseGen(self):
-        TkObjects.genFrame.pack_forget()
-        TkObjects.belowMenu.pack_forget()
-        
-        TkObjects.expBtn.configure(bg=cfg.BGPRESSED)
-        TkObjects.genBtn.configure(bg=cfg.BGBUTTON)
-        
-        TkObjects.expFrame.pack(expand=True, fill='both')
-        TkObjects.belowMenu.pack()
+    def Change(self, frameForget, framePack, btnPress, btnUnpress):
+        frameForget.pack_forget()
+        framePack.pack(fill='both', expand=True, side='top')
+
+        btnPress.configure(bg=cfg.BGPRESSED)
+        btnUnpress.configure(bg=cfg.BGBUTTON)
         
 
-    def CloseExp(self):
-        TkObjects.expFrame.pack_forget()
-        TkObjects.belowMenu.pack_forget()
-        
-        TkObjects.genBtn.configure(bg=cfg.BGPRESSED)
-        TkObjects.expBtn.configure(bg=cfg.BGBUTTON)
-        
-        TkObjects.genFrame.pack()
-        TkObjects.belowMenu.pack()
-        
         
 class BelowMenu(MyFrame, TkObjects):
     def __init__(self, master):
@@ -145,10 +146,36 @@ class Expert(tkmacosx.SFrame, TkObjects):
         
         TkObjects.expFrame = self
         
-        
-        for i in range(0, 10):
-            l = tkinter.Label(self, width=10, height=10, text='hello')
-            l.pack(pady=5)
-        
-        h = int(cfg.ROOT.winfo_screenheight()*0.5)
-        self.configure(height=h)
+        with open(os.path.join(cfg.DB_DIR, 'cfg.json'), 'r') as file:
+            data = json.load(file)
+
+    
+        for key, value in data.items():
+            
+            l1 = MyLabel(self)
+            l1.configure(text=key) 
+            l1.pack(pady=(20, 0))
+            
+            ins = tkinter.Entry(
+                self, 
+                bg=cfg.BGBUTTON, 
+                fg=cfg.FONTCOLOR,
+                insertbackground=cfg.FONTCOLOR,
+                selectbackground=cfg.BGPRESSED,
+                highlightthickness=0,
+                bd=0,
+                justify='center'
+                )
+            ins.insert(0, value)
+            ins.pack(fill='x', pady=(0, 5), padx=(0, 10), ipady=3)
+            
+            frameBtns = MyFrame(self)
+            frameBtns.pack(anchor='se')
+            
+            btnCopy = MyButton(frameBtns, '', 'Копировать')
+            btnCopy.configure(height=1, width=9)
+            btnCopy.pack(side='left', padx=(0, 10))
+            
+            btnPaste = MyButton(frameBtns, '', 'Вставить')
+            btnPaste.configure(height=1, width=9)
+            btnPaste.pack(side='right', padx=(0, 10))
