@@ -10,9 +10,7 @@ from SplashScreen.Gui import Create as SplashScreen
 def LoadAll():
     cfg.ROOT.withdraw()
 
-    if not NetwotkCheck():
-        return
-
+    NetwotkCheck()
     DbCheck()
     SmbGui() if not SmbCheck() else SplashScreen()    
     MainGui()

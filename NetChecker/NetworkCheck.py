@@ -1,18 +1,18 @@
 import urllib.request
 
 from .Gui import Create as Gui
-
+from DataBase.Database import dBase, AdminUtils
 
 def Check():
-    '''
-    \ncheck internet connection
-    \nreturn bool
-    \nif False
-    \nrun Gui with error message.
-    '''
+    """Check internet connection. 
+    Create empty database with empty tables if no connection.
+    Returns bool."""
     try:
         urllib.request.urlopen('http://google.com')
-        return True
     except:
-        Gui()
-        return False
+        
+        adm = AdminUtils()
+        adm.Create()
+        adm.FillConfig()
+
+        # Gui()
