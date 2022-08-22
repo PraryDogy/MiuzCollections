@@ -2,6 +2,8 @@ import json
 import os
 import tkinter
 
+# const
+
 APP_VER = '2.6.2'
 DB_VER = '2.6.1'
 DB_DIR = os.path.join(
@@ -19,13 +21,13 @@ ROOT = tkinter.Tk()
 FLAG = True
 LIVE_LBL = None
 
+YADISK_TOKEN = "AQAAAAARTU_6AAgMRGzO_kyAykpGqUubuGuraCg"
+YADISK_DIR = '/miuzgall'
+
 
 """There is default values on 22.08.2022"""
 
-data = {
-    'YADISK_TOKEN': "AQAAAAARTU_6AAgMRGzO_kyAykpGqUubuGuraCg",
-    'YADISK_DIR': '/miuzgall',
-    
+data = {    
     'SMB_DIR': '/Volumes/Shares',
     'SMB_CONN': 'smb://192.168.10.105/Shares',
     
@@ -45,9 +47,6 @@ else:
     with open(os.path.join(DB_DIR, 'cfg.json'), 'w') as file:
         json.dump(data, file, indent=4,)
 
-
-YADISK_TOKEN = data['YADISK_TOKEN']
-YADISK_DIR = data['YADISK_DIR']
 
 # SMB_DIR = '/'
 SMB_DIR = data['SMB_DIR']
