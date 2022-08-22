@@ -2,7 +2,7 @@ import tkinter
 from tkinter.ttk import Separator
 
 import cfg
-from Gallery.Settings import GuiMain as Settings
+from Gallery.Settings import Gui as Settings
 
 from .ClmnBtnCmd import Cmd as ClmnCmd
 from .GridBtnCmd import Cmd as GridCmd
