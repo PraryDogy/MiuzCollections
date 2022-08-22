@@ -2,7 +2,7 @@ import tkinter
 
 import cfg
 
-from Settings.Gui import Create as Settings
+from .Settings.Gui import Create as Settings
 
 
 class Create:
