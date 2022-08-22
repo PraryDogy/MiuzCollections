@@ -1,13 +1,16 @@
+import os
 import tkinter
 import cfg
 
-class TkObjects:
-    genFrame = 'tkinter frame with general settings'
-    expFram = 'tkinter frame with expert settings'
-    genBtn = 'tkinter button'
-    expBtn = 'tkinter button'
+
+p1 = os.listdir('/Volumes/Shares/Marketing/External/Фото_и_видео_Магазинов/Фото_магазинов')
+p2 = os.listdir('/Volumes/Shares/Marketing/External/Фото_и_видео_Магазинов/Фото_магазинов/Retouch')
 
 
-TkObjects.genBtn = 'hi'
-
-print(TkObjects.genBtn)
+final = list()
+for i in p1:
+    final.append(i) if i not in p2 else False
+    
+    
+for i in final:
+    print(i)
