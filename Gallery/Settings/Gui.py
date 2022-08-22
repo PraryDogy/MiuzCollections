@@ -8,6 +8,7 @@ import sqlalchemy
 import tkmacosx
 from DataBase.Database import Config, dBase
 from Utils.Styled import *
+from Utils.ClipBoard import *
 
 from .Descriptions import descriptions
 
@@ -39,27 +40,30 @@ class Create(tkinter.Toplevel):
         self.configure(padx=10, pady=10)
         
         
-        frameL = MyFrame(self)
-        frameL.pack(side='left')
+        frameUp = MyFrame(self)
+        frameUp.pack(fill='both', expand=True)
 
-        frameR = MyFrame(self)
-        frameR.pack(side='right', fill='both', expand=True)
+        frameB = MyFrame(self)
+        frameB.pack()
 
-        LeftMenu(frameL).pack(padx=(0, 10))
+        LeftMenu(frameUp).pack(side='left', padx=(0, 10))
 
-        General(frameR).pack(fill='both', expand=True)
-        Expert(frameR)
+        General(frameUp).pack()
+        Expert(frameUp)
         
-        BelowMenu(frameR).pack(anchor='se', side='bottom', pady=(10,0))
+        BelowMenu(frameB).pack(pady=(10,0))
 
         cfg.ROOT.update_idletasks()
-        cfg.ROOT.eval(f'tk::PlaceWindow {self} center') 
+        x, y = cfg.ROOT.winfo_x(), cfg.ROOT.winfo_y()
+        xx = x + int(cfg.ROOT.winfo_width()/2)-int(self.winfo_width()/2)
+        yy = y + int(cfg.ROOT.winfo_height()/2)-int(self.winfo_height()/2)
+
+        self.geometry(f'+{xx}+{yy}')
 
 
 class LeftMenu(MyFrame, TkObjects):
     def __init__(self, master):
         super().__init__(master)
-
         genBtn = MyButton(
             self, 
             lambda event: self.Change(
@@ -82,11 +86,10 @@ class LeftMenu(MyFrame, TkObjects):
         
     def Change(self, frameForget, framePack, btnPress, btnUnpress):
         frameForget.pack_forget()
-        framePack.pack(fill='both', expand=True, side='top')
+        framePack.pack(fill='both', expand=True)
 
         btnPress.configure(bg=cfg.BGPRESSED)
         btnUnpress.configure(bg=cfg.BGBUTTON)
-        
 
         
 class BelowMenu(MyFrame, TkObjects):
@@ -107,7 +110,7 @@ class General(MyFrame, TkObjects):
     def __init__(self, master):
         super().__init__(master)
         TkObjects.genFrame = self
-
+        
         descr = (
             'При запуске программа сканирует и обновляет фото'
             f'\nза последние {cfg.FILE_AGE} дней.'
@@ -121,7 +124,7 @@ class General(MyFrame, TkObjects):
         
         descrLabel = MyLabel(self)
         descrLabel.config(anchor='w', padx=5, text=descr, justify='left')
-        descrLabel.pack(fill='x')
+        descrLabel.pack()
 
         scanBtn = MyButton(
             self, lambda event: self.RunScan(), 'Полное сканирование')
@@ -176,15 +179,36 @@ class Expert(tkmacosx.SFrame, TkObjects):
             insterts.append(ins)
             
             frameBtns = MyFrame(self)
-            frameBtns.pack(anchor='se')
+            frameBtns.pack()
             
             btnCopy = MyButton(frameBtns, '', 'Копировать')
             btnCopy.configure(height=1, width=9)
+            btnCopy.bind(
+                '<Button-1>', 
+                lambda event, ins=ins, btn=btnCopy: self.CopyIns(ins, btn)
+                )
             btnCopy.pack(side='left', padx=(0, 10))
             
             btnPaste = MyButton(frameBtns, '', 'Вставить')
             btnPaste.configure(height=1, width=9)
+            btnPaste.bind(
+                '<Button-1>', 
+                lambda event, ins=ins, btn=btnPaste: self.PasteIns(ins, btn)
+                )
             btnPaste.pack(side='right', padx=(0, 10))
             
         for a, b in zip(labelsInserts, descriptions):
-            a.configure(text=b, justify='left', wraplength=340, bg='red')
+            a.configure(text=b, justify='left', wraplength=340)
+
+    def CopyIns(self, ins, btn):
+        btn.configure(bg=cfg.BGPRESSED)
+        text = ins.get()
+        copy(text)
+        cfg.ROOT.after(100, lambda: btn.configure(bg=cfg.BGBUTTON))
+    
+    def PasteIns(self, ins, btn):
+        btn.configure(bg=cfg.BGPRESSED)
+        text = paste()
+        ins.delete(0, 'end')
+        ins.insert(0, text)
+        cfg.ROOT.after(100, lambda: btn.configure(bg=cfg.BGBUTTON))
