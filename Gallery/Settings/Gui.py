@@ -9,6 +9,8 @@ import tkmacosx
 from DataBase.Database import Config, dBase
 from Utils.Styled import *
 
+from .Descriptions import descriptions
+
 
 class TkObjects:
     
@@ -149,12 +151,15 @@ class Expert(tkmacosx.SFrame, TkObjects):
         with open(os.path.join(cfg.DB_DIR, 'cfg.json'), 'r') as file:
             data = json.load(file)
 
-    
+        
+        labelsInserts = list()
+        insterts = list()
+        
         for key, value in data.items():
             
-            l1 = MyLabel(self)
-            l1.configure(text=key) 
-            l1.pack(pady=(20, 0))
+            desrc = MyLabel(self)
+            desrc.pack(anchor='w', pady=(30, 0))
+            labelsInserts.append(desrc)
             
             ins = tkinter.Entry(
                 self, 
@@ -168,6 +173,7 @@ class Expert(tkmacosx.SFrame, TkObjects):
                 )
             ins.insert(0, value)
             ins.pack(fill='x', pady=(0, 5), padx=(0, 10), ipady=3)
+            insterts.append(ins)
             
             frameBtns = MyFrame(self)
             frameBtns.pack(anchor='se')
@@ -179,3 +185,6 @@ class Expert(tkmacosx.SFrame, TkObjects):
             btnPaste = MyButton(frameBtns, '', 'Вставить')
             btnPaste.configure(height=1, width=9)
             btnPaste.pack(side='right', padx=(0, 10))
+            
+        for a, b in zip(labelsInserts, descriptions):
+            a.configure(text=b, justify='left', wraplength=340, bg='red')
