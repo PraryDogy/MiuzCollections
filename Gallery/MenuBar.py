@@ -2,7 +2,7 @@ import tkinter
 
 import cfg
 
-from .Settings import GuiGeneral
+from Settings.Gui import Create as Settings
 
 
 class Create:
@@ -12,7 +12,7 @@ class Create:
         menubar.add_cascade(label="Меню", menu=filemenu)
 
         filemenu.add_command(
-            label='Настройки', command=lambda: GuiGeneral.OpenSettings())
+            label='Настройки', command=lambda: Settings())
         filemenu.add_command(label="Поддержка", command=self.Descr)
         filemenu.add_command(label="О программе", command=self.AboutApp)
         filemenu.add_separator()
