@@ -38,7 +38,6 @@ data = {
     }
         
 if os.path.exists(os.path.join(DB_DIR, 'cfg.json')):
-    
     with open(os.path.join(DB_DIR, 'cfg.json'), 'r') as file:
         data = json.load(file)
         
