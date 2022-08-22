@@ -27,7 +27,11 @@ def LoadThumbs(currColl):
     getColls = sqlalchemy.select(Thumbs.collection)
     collsNames = dBase.conn.execute(getColls).fetchall()
     collsNames = set(i[0] for i in collsNames)
-    currColl = [i for i in collsNames if currColl in i][0]
+    try:
+        currColl = [i for i in collsNames if currColl in i][0]
+    except IndexError:
+        print(traceback.format_exc())
+        currColl = 'noCollection'
 
     query = sqlalchemy.select(img, Thumbs.src).where(
         Thumbs.collection==currColl).order_by(
