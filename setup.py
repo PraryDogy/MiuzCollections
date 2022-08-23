@@ -9,7 +9,7 @@ from cfg import APP_VER
 
 
 APP = ['start.py']
-DATA_FILES = []
+DATA_FILES = ['/Users/Loshkarev/Documents/Разное/Miuz Gallery/MiuzGallery/Gallery/Settings/upd.jpg']
 OPTIONS = {
     'iconfile': 'icon.icns',
     'plist': {
