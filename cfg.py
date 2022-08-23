@@ -4,7 +4,7 @@ import tkinter
 
 # const
 
-APP_VER = '2.6.2'
+APP_VER = '2.7.0'
 DB_VER = '2.6.1'
 DB_DIR = os.path.join(
     os.path.expanduser('~'), 
@@ -27,7 +27,7 @@ YADISK_DIR = '/miuzgall'
 
 """There is default values on 22.08.2022"""
 
-data = {    
+defaults = {    
     'SMB_DIR': '/Volumes/Shares',
     'SMB_CONN': 'smb://192.168.10.105/Shares',
     
@@ -45,8 +45,8 @@ if os.path.exists(os.path.join(DB_DIR, 'cfg.json')):
         
 else:
     with open(os.path.join(DB_DIR, 'cfg.json'), 'w') as file:
-        json.dump(data, file, indent=4,)
-
+        json.dump(defaults, file, indent=4,)
+        data = defaults
 
 # SMB_DIR = '/'
 SMB_DIR = data['SMB_DIR']
