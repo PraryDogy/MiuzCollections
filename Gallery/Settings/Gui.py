@@ -19,11 +19,10 @@ class TkObjects:
     
     genFrame = tkinter.Frame
     expFrame = tkinter.Frame
-    
     genBtn = tkinter.Button
     expBtn = tkinter.Button
-
     belowMenu = tkinter.Frame
+    inserts = list()
 
 
 class Create(tkinter.Toplevel):
@@ -34,7 +33,8 @@ class Create(tkinter.Toplevel):
 
         tkinter.Toplevel.__init__(
             self, cfg.ROOT, bg=cfg.BGCOLOR)
-
+        cfg.ROOT.eval(f'tk::PlaceWindow {self} center')
+        
         self.resizable(0,0)
         self.attributes('-topmost', 'true')
         self.title('Настройки')
@@ -99,14 +99,29 @@ class BelowMenu(MyFrame, TkObjects):
         TkObjects.belowMenu = self
         
         buttonOk = MyButton(
-            self, lambda event: self.winfo_toplevel().destroy(), 'Ok')
+            self, lambda event: self.saveIns(), 'Сохранить')
         buttonOk.pack(side='left', padx=10)
 
         buttonCancel = MyButton(
-            self, lambda event: self.winfo_toplevel().destroy(), 'Cancel')
+            self, lambda event: self.winfo_toplevel().destroy(), 'Отмена')
         buttonCancel.pack(side='left')
-        
+    
+    def saveIns(self):
+        with open(os.path.join(cfg.DB_DIR, 'cfg.json'), 'r') as file:
+            data = json.load(file)
 
+        try:
+            newValues = [i.get() for i in TkObjects.inserts]
+            for key, ins in zip(data, newValues):
+                data[key] = ins
+            with open(os.path.join(cfg.DB_DIR, 'cfg.json'), 'w') as file:
+                json.dump(data, file, indent=4)
+            self.winfo_toplevel().destroy()
+        
+        except tkinter.TclError:
+            self.winfo_toplevel().destroy()
+
+        
 class General(MyFrame, TkObjects):
     def __init__(self, master):
         super().__init__(master)
@@ -191,7 +206,6 @@ class Expert(tkmacosx.SFrame, TkObjects):
             data = json.load(file)
         
         labelsInserts = list()
-        insterts = list()
         
         for key, value in data.items():
             
@@ -213,7 +227,7 @@ class Expert(tkmacosx.SFrame, TkObjects):
                 )
             ins.insert(0, value)
             ins.pack(fill='x', pady=(0, 10), padx=(5, 15))
-            insterts.append(ins)
+            TkObjects.inserts.append(ins)
             
             frameBtns = MyFrame(self)
             frameBtns.pack()
@@ -234,9 +248,32 @@ class Expert(tkmacosx.SFrame, TkObjects):
                 )
             btnPaste.pack(side='right', padx=(0, 10))
             
-        for a, b in zip(labelsInserts, descriptions):
-            a.configure(text=b, justify='left', wraplength=340)
+        for ins, descr in zip(labelsInserts, descriptions):
+            ins.configure(text=descr, justify='left', wraplength=340)
 
+        restoreBtn = MyButton(self, '', 'По умолчанию')
+        restoreBtn.configure(height=1, width=15)
+        restoreBtn.bind(
+            '<Button-1>', 
+            lambda event, btn=restoreBtn: self.Restore(btn)
+            )
+        restoreBtn.pack(pady=(20, 15))
+        
+    def Restore(self, btn):
+        btn.configure(bg=cfg.BGPRESSED)
+        data = cfg.defaults
+        with open(os.path.join(cfg.DB_DIR, 'cfg.json'), 'w') as file:
+            json.dump(data, file, indent=4)
+        
+        cfg.ROOT.after(100, lambda: btn.configure(bg=cfg.BGBUTTON))
+        
+        with open(os.path.join(cfg.DB_DIR, 'cfg.json'), 'r') as file:
+            data = json.load(file)
+        
+        for item, ins in zip(data.values(), TkObjects.inserts):
+            ins.delete(0, 'end')
+            ins.insert(0, item)
+                
     def CopyIns(self, ins, btn):
         btn.configure(bg=cfg.BGPRESSED)
         text = ins.get()
