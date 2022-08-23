@@ -6,10 +6,13 @@
 
 from setuptools import setup
 from cfg import APP_VER
-
+import os
 
 APP = ['start.py']
-DATA_FILES = ['/Users/Loshkarev/Documents/Разное/Miuz Gallery/MiuzGallery/Gallery/Settings/upd.jpg']
+DATA_FILES = [os.path.join(
+    os.path.dirname(__file__), 
+    'Gallery/Settings/upd.jpg')
+              ]
 OPTIONS = {
     'iconfile': 'icon.icns',
     'plist': {
