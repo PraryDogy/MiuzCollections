@@ -5,20 +5,10 @@ from Utils import Main as Utils
 
 
 def UpdateColl():
-    
     cfg.FLAG = True
-    
-    q = sqlalchemy.select(Config.value).where(Config.name=='currColl')
-    res = dBase.conn.execute(q).first()[0]
+    Utils.CollsUpd().CollsUpd()
+    Utils.RtUpd().RtAgedUpd()
 
-    if 'noCollection' in res:
-        Utils.CollsUpd().CollsUpd()
-        Utils.RtUpd().RtAgedUpd()
-        
-        
-    else:
-        Utils.CollsUpd().CollsCurrUpd()
-        
 
 def Skip(topLevel):
     topLevel.destroy()
