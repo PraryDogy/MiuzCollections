@@ -4,7 +4,7 @@ import tkinter
 
 # const
 
-APP_VER = '2.7.0'
+APP_VER = '2.7.0кь'
 DB_VER = '2.6.1'
 DB_DIR = os.path.join(
     os.path.expanduser('~'), 
