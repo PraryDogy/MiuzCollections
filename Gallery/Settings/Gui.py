@@ -110,16 +110,15 @@ class BelowMenu(MyFrame, TkObjects):
         with open(os.path.join(cfg.DB_DIR, 'cfg.json'), 'r') as file:
             data = json.load(file)
 
-        try:
-            newValues = [i.get() for i in TkObjects.inserts]
-            for key, ins in zip(data, newValues):
-                data[key] = ins
-            with open(os.path.join(cfg.DB_DIR, 'cfg.json'), 'w') as file:
-                json.dump(data, file, indent=4)
-            self.winfo_toplevel().destroy()
-        
-        except tkinter.TclError:
-            self.winfo_toplevel().destroy()
+        newValues = [i.get() for i in TkObjects.inserts]
+        for key, ins in zip(data, newValues):
+            data[key] = ins
+            
+        with open(os.path.join(cfg.DB_DIR, 'cfg.json'), 'w') as file:
+            json.dump(data, file, indent=4)
+            
+        TkObjects.inserts = list()
+        self.winfo_toplevel().destroy()
 
         
 class General(MyFrame, TkObjects):
