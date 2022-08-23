@@ -2,13 +2,15 @@ import json
 import os
 import sys
 import tkinter
+from tkinter.ttk import Separator
 
 import cfg
 import sqlalchemy
 import tkmacosx
 from DataBase.Database import Config, dBase
-from Utils.Styled import *
+from PIL import Image, ImageOps, ImageTk
 from Utils.ClipBoard import *
+from Utils.Styled import *
 
 from .Descriptions import descriptions
 
@@ -39,7 +41,6 @@ class Create(tkinter.Toplevel):
         self.geometry(f'570x650')
         self.configure(padx=10, pady=10)
         
-        
         frameUp = MyFrame(self)
         frameUp.pack(fill='both', expand=True)
 
@@ -48,7 +49,7 @@ class Create(tkinter.Toplevel):
 
         LeftMenu(frameUp).pack(side='left', padx=(0, 10))
 
-        General(frameUp).pack()
+        General(frameUp).pack(fill='both', expand=True)
         Expert(frameUp)
         
         BelowMenu(frameB).pack(pady=(10,0))
@@ -111,28 +112,63 @@ class General(MyFrame, TkObjects):
         super().__init__(master)
         TkObjects.genFrame = self
         
-        descr = (
+        txt1 = (
             'При запуске программа сканирует и обновляет фото'
-            f'\nза последние {cfg.FILE_AGE} дней.'
+            f'\nвсех коллекций за последние {cfg.FILE_AGE} дней.'
             
             '\n\nНажмите "Обновить", чтобы обновить фотографии'
             '\nтекущей коллекции за все время с 2018 года.'
-            
-            '\n\nНажмите "Полное сканирование", чтобы обновить все'
-            '\nфотографии за все время c 2018 года.'
             )
         
         descrLabel = MyLabel(self)
-        descrLabel.config(anchor='w', padx=5, text=descr, justify='left')
-        descrLabel.pack()
+        descrLabel.config(
+            anchor='w', padx=5, text=txt1, justify='left')
+        descrLabel.pack(pady=(30, 0))
 
+        pathh = os.path.join(os.path.dirname(__file__), 'upd.jpg')
+        imgSrc = Image.open(pathh)
+        imgCopy= imgSrc.copy()
+        imgRes = ImageOps.contain(imgCopy, (350,350))        
+        imgTk = ImageTk.PhotoImage(imgRes)
+         
+        imgLbl = MyLabel(self)
+        imgLbl.configure(image=imgTk)
+        imgLbl.pack()
+        imgLbl.image = imgTk
+
+        sep = Separator(self, orient='horizontal')
+        sep.pack(padx=40, pady=20, fill='x')
+        
+        txt2 = (       
+            'Нажмите "Полное сканирование", чтобы обновить'
+            '\nфотографии всех коллекций за все время c 2018 года.'
+            )
+        descrLabel2 = MyLabel(self)
+        descrLabel2.config(
+            anchor='w', padx=5, text=txt2, justify='left')
+        descrLabel2.pack()
+        
         scanBtn = MyButton(
             self, lambda event: self.RunScan(), 'Полное сканирование')
         scanBtn.pack(anchor='center', pady=10)
+
+        sep = Separator(self, orient='horizontal')
+        sep.pack(padx=40, pady=20, fill='x')
         
-        belowBtn = MyFrame(self)
-        belowBtn.configure(height=10)
-        belowBtn.pack()
+        name = (
+            f'MiuzGallery {cfg.APP_VER}'
+            '\n\n'
+            )
+        made = (
+            'Created by Evgeny Loshkarev'
+            '\nCopyright © 2022 MIUZ Diamonds.'
+            '\nAll rights reserved.'
+            '\n'
+            )
+
+        createdBy = MyLabel(self)
+        createdBy.configure(text=name+made, justify='left', padx=5)
+        createdBy.pack(pady=20, anchor='w')
         
 
     def RunScan(self):
@@ -153,7 +189,6 @@ class Expert(tkmacosx.SFrame, TkObjects):
         
         with open(os.path.join(cfg.DB_DIR, 'cfg.json'), 'r') as file:
             data = json.load(file)
-
         
         labelsInserts = list()
         insterts = list()
@@ -161,7 +196,7 @@ class Expert(tkmacosx.SFrame, TkObjects):
         for key, value in data.items():
             
             desrc = MyLabel(self)
-            desrc.pack(anchor='w', pady=(30, 0))
+            desrc.pack(anchor='w', pady=(30, 0), padx=(0, 15))
             labelsInserts.append(desrc)
             
             ins = tkinter.Entry(
@@ -170,12 +205,14 @@ class Expert(tkmacosx.SFrame, TkObjects):
                 fg=cfg.FONTCOLOR,
                 insertbackground=cfg.FONTCOLOR,
                 selectbackground=cfg.BGPRESSED,
-                highlightthickness=0,
+                highlightthickness=5,
+                highlightbackground=cfg.BGBUTTON,
+                highlightcolor=cfg.BGBUTTON,
                 bd=0,
-                justify='center'
+                justify='center',
                 )
             ins.insert(0, value)
-            ins.pack(fill='x', pady=(0, 5), padx=(0, 10), ipady=3)
+            ins.pack(fill='x', pady=(0, 10), padx=(5, 15))
             insterts.append(ins)
             
             frameBtns = MyFrame(self)
