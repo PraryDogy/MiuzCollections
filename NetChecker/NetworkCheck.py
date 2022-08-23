@@ -1,7 +1,5 @@
 import urllib.request
-
-from .Gui import Create as Gui
-from DataBase.Database import dBase, AdminUtils
+from DataBase.Database import AdminUtils
 
 def Check():
     """Check internet connection. 
@@ -10,9 +8,6 @@ def Check():
     try:
         urllib.request.urlopen('http://google.com')
     except:
-        
         adm = AdminUtils()
         adm.Create()
         adm.FillConfig()
-
-        # Gui()

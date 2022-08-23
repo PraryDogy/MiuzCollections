@@ -1,5 +1,6 @@
 import traceback
 
+import cfg
 import cv2
 import numpy
 import sqlalchemy

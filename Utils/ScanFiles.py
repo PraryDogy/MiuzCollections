@@ -43,7 +43,8 @@ class ScanYears:
         agedDirs = list()
         
         fileAge = (
-            datetime.datetime.now() - datetime.timedelta(days=cfg.FILE_AGE))
+            datetime.datetime.now() - datetime.timedelta(
+                days=int(cfg.FILE_AGE)))
         youngerThan = fileAge.timestamp()
 
         for yearDir in yearsDirs:

@@ -35,10 +35,6 @@ class Create:
         MenuBar()
 
         Geometry()
-        # cfg.ROOT.geometry(
-        #     (f'{int(cfg.ROOT.winfo_screenwidth()/2)}x'
-        #     f'{int(cfg.ROOT.winfo_screenheight()/1.5)}')
-        #     )
         cfg.ROOT.update_idletasks()
         cfg.ROOT.eval(f'tk::PlaceWindow {cfg.ROOT} center')
         cfg.ROOT.geometry(f'+{cfg.ROOT.winfo_x()}+0')
