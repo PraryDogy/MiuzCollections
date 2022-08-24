@@ -12,8 +12,7 @@ from .Prev import Prev
 
 class Create(Prev):
     def  __init__(self):
-        '''
-        We have database.db with table named Thumbs.
+        """We have database.db with table named Thumbs.
         In Thumbs: img150, img200, img250, img300, src, collection, modified.
         
         We create tkinter table with pack method.
@@ -34,8 +33,9 @@ class Create(Prev):
         Generally:
         We get images filtered by selected collection
         and create images grid with number columns from clmns
-        and images size from "size" from database.db > Config > size
-        '''
+        and images size from "size" from database.db > Config > size"""
+        
+        cfg.GRID_GUI = Create
         selectRow = sqlalchemy.select(Config.value).where(
             Config.name=='currColl')
         self.curColl = dBase.conn.execute(selectRow).first()[0]
@@ -99,3 +99,4 @@ class Create(Prev):
         gridW = tkinter.Frame(
             cfg.IMG_GRID, bg=cfg.BGCOLOR, width=w*1.06, height=5)
         gridW.pack()
+        

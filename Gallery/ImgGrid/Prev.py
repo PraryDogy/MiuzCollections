@@ -4,7 +4,7 @@ import tkinter
 
 import cfg
 from PIL import Image, ImageTk
-# from Utils.Utils import *
+from Utils.Utils import MyCopy
 
 
 class Prev:
@@ -15,6 +15,7 @@ class Prev:
         self.src = src
         self.newWin = tkinter.Toplevel()
         self.newWin.protocol("WM_DELETE_WINDOW", lambda: self.newWin.destroy())
+        self.newWin.bind('<Command-w>', lambda event: self.newWin.destroy())
 
         self.newWin.configure(bg=cfg.BGCOLOR, padx=15, pady=15)
 
@@ -87,28 +88,36 @@ class Prev:
     def copyToClipboard(self):
         self.copyName.configure(bg=cfg.BGPRESSED)
         name = self.src.split('/')[-1].split('.')[0]
-        # MyCopy(name)
+        MyCopy(name)
         cfg.ROOT.after(
-            300, lambda: self.copyName.configure(bg=cfg.BGBUTTON))
+            100, lambda: self.copyName.configure(bg=cfg.BGBUTTON))
 
 
+    def OpenFolder(self):
+        self.OpenBtn.configure(bg=cfg.BGPRESSED)
+        subprocess.check_output(
+                    [
+                        "/usr/bin/open", 
+                        '/'.join(self.src.split('/')[:-1])
+                        ]
+                    )
+        cfg.ROOT.after(
+            100, lambda: self.OpenBtn.configure(bg=cfg.BGBUTTON))
+        
     def OpenClose(self):
         frame = tkinter.Frame(self.newWin, bg=cfg.BGCOLOR)
 
         if os.path.exists(self.src):
-            OpenBtn = tkinter.Label(
+            self.OpenBtn = tkinter.Label(
                 frame, bg=cfg.BGBUTTON, fg=cfg.FONTCOLOR,
                 height=2, width=17, text='Открыть папку')
-            OpenBtn.bind(
+            self.OpenBtn.bind(
                 '<Button-1>', 
-                lambda event: subprocess.check_output(
-                    ["/usr/bin/open", '/'.join(self.src.split('/')[:-1])])
-                    )
-            OpenBtn.pack(side='left')
+                lambda event: self.OpenFolder()
+                )
+            
+            self.OpenBtn.pack(side='left', padx=(0, 20))
 
-        betwBtns = tkinter.Frame(
-            frame, bg=cfg.BGCOLOR, width=20)
-        betwBtns.pack(side='left')
 
         closeBtn = tkinter.Label(
             frame, bg=cfg.BGBUTTON, fg=cfg.FONTCOLOR, 
