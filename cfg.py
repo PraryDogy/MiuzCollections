@@ -4,7 +4,7 @@ import tkinter
 
 # const
 
-APP_VER = '2.7.0кь'
+APP_VER = '2.7.3'
 DB_VER = '2.6.1'
 DB_DIR = os.path.join(
     os.path.expanduser('~'), 
@@ -18,8 +18,11 @@ BGBUTTON = "#434343"
 BGPRESSED = '#395432'
 
 ROOT = tkinter.Tk()
+IMG_GRID = tkinter.Entry
+UPFRAME = tkinter.Entry
+LIVE_LBL = tkinter.Label
+
 FLAG = True
-LIVE_LBL = None
 
 YADISK_TOKEN = "AQAAAAARTU_6AAgMRGzO_kyAykpGqUubuGuraCg"
 YADISK_DIR = '/miuzgall'
@@ -28,7 +31,6 @@ YADISK_DIR = '/miuzgall'
 """There is default values on 22.08.2022"""
 
 defaults = {    
-    'SMB_DIR': '/Volumes/Shares',
     'SMB_CONN': 'smb://192.168.10.105/Shares',
     
     'PHOTO_DIR': '/Volumes/Shares/Marketing/Photo',
@@ -48,8 +50,6 @@ else:
         json.dump(defaults, file, indent=4,)
         data = defaults
 
-# SMB_DIR = '/'
-SMB_DIR = data['SMB_DIR']
 SMB_CONN = data['SMB_CONN']
 
 # PHOTO_DIR = '/Users/evlosh/Downloads/MiuzGallery/MiuzGallery/SamplePhotos'
