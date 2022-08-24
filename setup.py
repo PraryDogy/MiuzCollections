@@ -4,9 +4,12 @@
     python setup.py py2app
 """
 
-from setuptools import setup
-from cfg import APP_VER
 import os
+import shutil
+
+from setuptools import setup
+
+from cfg import APP_VER
 
 APP = ['start.py']
 DATA_FILES = [os.path.join(
@@ -40,5 +43,5 @@ setup(
 
 
 parent = os.path.dirname(__file__)
-os.rmdir(os.path.join(parent, 'build'))
-os.rmdir(os.path.join(parent, '.eggs'))
+shutil.rmtree(os.path.join(parent, 'build'))
+shutil.rmtree(os.path.join(parent, '.eggs'))
