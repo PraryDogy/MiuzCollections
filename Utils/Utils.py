@@ -3,7 +3,6 @@ import tkinter
 
 import cfg
 import cv2
-from Gallery.ImgGrid.Gui import Create as ImgGridGui
 
 
 def CreateThumb(imgPath):
@@ -37,11 +36,13 @@ def MyCopy(output):
     process = subprocess.Popen(
         'pbcopy', env={'LANG': 'en_US.UTF-8'}, stdin=subprocess.PIPE)
     process.communicate(output.encode('utf-8'))
+    print('copied')
 
 
 def MyPaste():
     """Custom paste from clipboard with subprocess"""
     
+    print('pasted')
     return subprocess.check_output(
         'pbpaste', env={'LANG': 'en_US.UTF-8'}).decode('utf-8')
 
@@ -55,4 +56,4 @@ def ReloadGallery():
     imgFrame.pack(side='left', fill='both', expand=True)
     cfg.IMG_GRID = imgFrame
     
-    ImgGridGui()
+    cfg.GRID_GUI()
