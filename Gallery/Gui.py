@@ -16,6 +16,7 @@ class Create:
         
         cfg.ROOT.title('MiuzGallery')
         cfg.ROOT.configure(bg=cfg.BGCOLOR, padx=15, pady=0)
+        cfg.ROOT.bind('<Command-w>', lambda event: cfg.ROOT.iconify())
 
         upFrame = tkinter.Frame(cfg.ROOT, bg=cfg.BGCOLOR)
         upFrame.pack(fill='both', expand=True)
