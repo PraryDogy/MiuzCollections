@@ -5,7 +5,7 @@ import sys
 import cfg
 import sqlalchemy
 from admin import printAlive
-from DataBase.Database import Config, Thumbs, dBase
+from DataBase.Database import Thumbs, dBase
 
 from .Utils import CreateThumb
 

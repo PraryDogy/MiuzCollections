@@ -1,8 +1,10 @@
 import subprocess
 import tkinter
+
 import cfg
-from Gallery.ImgGrid.Gui import Create as ImgGridGui
 import cv2
+from Gallery.ImgGrid.Gui import Create as ImgGridGui
+
 
 def CreateThumb(imgPath):
     """Returns list with 4 square thumbnails: 150, 200, 250, 300"""
@@ -46,7 +48,7 @@ def MyPaste():
 
 def ReloadGallery():
     """Destroy cfg.IMG_GRID frame with thumbmails,
-    create new tkinter frame and put in it new thumbnails"""
+    create new tkinter frame cfg.IMG_GRID and put in it new thumbnails"""
     
     cfg.IMG_GRID.destroy()
     imgFrame = tkinter.Frame(cfg.UPFRAME, bg=cfg.BGCOLOR)
