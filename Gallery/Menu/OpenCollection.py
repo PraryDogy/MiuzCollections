@@ -6,7 +6,7 @@ from DataBase.Database import Config, dBase
 from Utils.Utils import *
 
 
-def OpenCollection(allBtns, currBtn):
+def OpenCollection(allBtns, currBtn,  coll):
     '''
     Change color for all buttons to default.
     Change color for pressed button in thread to prevent gui freezes.
@@ -26,7 +26,7 @@ def OpenCollection(allBtns, currBtn):
     t1.start()
     
     updateRow = sqlalchemy.update(Config).where(
-            Config.name=='currColl').values(value=currBtn.cget('text'))
+            Config.name=='currColl').values(value=coll)
     dBase.conn.execute(updateRow)
     
     ReloadGallery()

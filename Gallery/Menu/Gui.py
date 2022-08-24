@@ -91,52 +91,45 @@ class Create:
             collBtn = tkinter.Label(
                 self.firstClmn, bg=cfg.BGBUTTON, fg=cfg.FONTCOLOR, 
                 height=1, width=12,
-                text=collection,
+                text=collection[:13],
                 )
             
-            collBtn.pack()
+            collBtn.pack(pady=(0, 10))
             allBtns.append(collBtn)
                    
             collBtn.bind(
                 '<Button-1>', 
                 lambda event, 
                 allBtns=allBtns, 
-                currBtn=collBtn: 
-                    OpenCollection(allBtns, currBtn))
-            
-            belowButton = tkinter.Frame(
-                self.firstClmn, bg=cfg.BGCOLOR, height=10)
-            belowButton.pack()
- 
+                currBtn=collBtn,
+                coll=collection: 
+                    OpenCollection(allBtns, currBtn, coll)) 
  
         for collection in self.collsNames[len(self.collsNames)//2:]:
             collBtn = tkinter.Label(
                 self.secClmn, bg=cfg.BGBUTTON, fg=cfg.FONTCOLOR, 
                 height=1, width=12,
-                text=collection,
+                text=collection[:13],
                 )
                 
-            collBtn.pack()
+            collBtn.pack(pady=(0, 10))
             allBtns.append(collBtn)
             
             collBtn.bind(
                 '<Button-1>', 
                 lambda event, 
                 allBtns=allBtns, 
-                currBtn=collBtn: 
-                    OpenCollection(allBtns, currBtn))
+                currBtn=collBtn,
+                coll=collection: 
+                    OpenCollection(allBtns, currBtn, coll))
             
-            underButton = tkinter.Frame(
-                self.secClmn, bg=cfg.BGCOLOR, height=10)
-            underButton.pack()
-
-        getSelectedColl = sqlalchemy.select(Config.value).where(
+        getCurrColl = sqlalchemy.select(Config.value).where(
             Config.name=='currColl')
-        selColl = dBase.conn.execute(getSelectedColl).first()[0]
+        currColl = dBase.conn.execute(getCurrColl).first()[0]
         
-        for i in allBtns:
-            if selColl==i['text']:
-                i.configure(bg=cfg.BGPRESSED)
+        for btn in allBtns:
+            if currColl==btn['text']:
+                btn.configure(bg=cfg.BGPRESSED)
                 
                 
     def CollapseButtonCreate(self):
