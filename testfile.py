@@ -4,9 +4,5 @@ import cfg
 import os
 
 
-thumbs = [1, 2]
-colls = 5
-
-if len(thumbs) < colls:
-    for i in range(0, colls-len(thumbs)):
-        print(i)
+parent = os.path.dirname(__file__)
+os.rmdir(os.path.join(parent, '.eggs'))

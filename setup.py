@@ -38,3 +38,7 @@ setup(
         ]
     )
 
+
+parent = os.path.dirname(__file__)
+os.rmdir(os.path.join(parent, 'build'))
+os.rmdir(os.path.join(parent, '.eggs'))
