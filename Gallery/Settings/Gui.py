@@ -9,7 +9,7 @@ import sqlalchemy
 import tkmacosx
 from DataBase.Database import Config, dBase
 from PIL import Image, ImageOps, ImageTk
-from Utils.Utils import *
+from Utils.Utils import MyCopy, MyPaste
 from Utils.Styled import *
 
 from .Descriptions import descriptions
@@ -65,27 +65,38 @@ class Create(tkinter.Toplevel):
 class LeftMenu(MyFrame, TkObjects):
     def __init__(self, master):
         super().__init__(master)
-        genBtn = MyButton(
-            self, 
-            lambda event: self.Change(
-                TkObjects.expFrame, TkObjects.genFrame,
-                TkObjects.genBtn, TkObjects.expBtn), 
-            'Основные')
+        genBtn = MyButton(self, text='Основные')
         genBtn.configure(bg=cfg.BGPRESSED)
+        
+        genBtn.Cmd(
+            lambda event: self.Change(
+                TkObjects.expFrame, 
+                TkObjects.genFrame,
+                TkObjects.genBtn,
+                TkObjects.expBtn
+                )
+                )
         genBtn.pack()
 
         expertBtn = MyButton(
-            self, 
+            self, text = 'Эксперт')
+
+        expertBtn.Cmd(
             lambda event: self.Change(
-                TkObjects.genFrame, TkObjects.expFrame,
-                TkObjects.expBtn, TkObjects.genBtn),
-            'Эксперт')
+                TkObjects.genFrame, 
+                TkObjects.expFrame,
+                TkObjects.expBtn, 
+                TkObjects.genBtn
+                )
+                )
         expertBtn.pack()
 
         TkObjects.genBtn = genBtn
         TkObjects.expBtn = expertBtn
         
-    def Change(self, frameForget, framePack, btnPress, btnUnpress):
+    def Change(self, frameForget=tkinter.Frame, framePack=tkinter.Frame, 
+                    btnPress=tkinter.Button, btnUnpress=tkinter.Button):
+
         frameForget.pack_forget()
         framePack.pack(fill='both', expand=True)
 
@@ -98,13 +109,13 @@ class BelowMenu(MyFrame, TkObjects):
         super().__init__(master)
         TkObjects.belowMenu = self
         
-        buttonOk = MyButton(
-            self, lambda event: self.saveIns(), 'Сохранить')
-        buttonOk.pack(side='left', padx=10)
+        btnSave = MyButton(self, text='Сохранить')
+        btnSave.Cmd(lambda event: self.saveIns())
+        btnSave.pack(side='left', padx=10)
 
-        buttonCancel = MyButton(
-            self, lambda event: self.winfo_toplevel().destroy(), 'Отмена')
-        buttonCancel.pack(side='left')
+        btnCancel = MyButton(self, text='Отмена')
+        btnCancel.Cmd(lambda event: self.winfo_toplevel().destroy())
+        btnCancel.pack(side='left')
     
     def saveIns(self):
         with open(os.path.join(cfg.DB_DIR, 'cfg.json'), 'r') as file:
@@ -162,8 +173,8 @@ class General(MyFrame, TkObjects):
             anchor='w', padx=5, text=txt2, justify='left')
         descrLabel2.pack()
         
-        scanBtn = MyButton(
-            self, lambda event: self.RunScan(), 'Полное сканирование')
+        scanBtn = MyButton(self, text='Полное сканирование')
+        scanBtn.Cmd(lambda event: self.RunScan())
         scanBtn.pack(anchor='center', pady=10)
 
         sep = Separator(self, orient='horizontal')
@@ -231,18 +242,14 @@ class Expert(tkmacosx.SFrame, TkObjects):
             frameBtns = MyFrame(self)
             frameBtns.pack()
             
-            btnCopy = MyButton(frameBtns, '', 'Копировать')
-            btnCopy.configure(height=1, width=9)
-            btnCopy.bind(
-                '<Button-1>', 
+            btnCopy = MyButton(frameBtns, text='Копировать', height=1, width=9)
+            btnCopy.Cmd(
                 lambda event, ins=ins, btn=btnCopy: self.CopyIns(ins, btn)
                 )
             btnCopy.pack(side='left', padx=(0, 10))
             
-            btnPaste = MyButton(frameBtns, '', 'Вставить')
-            btnPaste.configure(height=1, width=9)
-            btnPaste.bind(
-                '<Button-1>', 
+            btnPaste = MyButton(frameBtns, text='Вставить', height=1, width=9)
+            btnPaste.Cmd(
                 lambda event, ins=ins, btn=btnPaste: self.PasteIns(ins, btn)
                 )
             btnPaste.pack(side='right', padx=(0, 10))
@@ -250,10 +257,8 @@ class Expert(tkmacosx.SFrame, TkObjects):
         for ins, descr in zip(labelsInserts, descriptions):
             ins.configure(text=descr, justify='left', wraplength=340)
 
-        restoreBtn = MyButton(self, '', 'По умолчанию')
-        restoreBtn.configure(height=1, width=15)
-        restoreBtn.bind(
-            '<Button-1>', 
+        restoreBtn = MyButton(self, text='По умолчанию', height=1, width=15)
+        restoreBtn.Cmd(
             lambda event, btn=restoreBtn: self.Restore(btn)
             )
         restoreBtn.pack(pady=(20, 15))
