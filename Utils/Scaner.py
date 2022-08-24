@@ -310,17 +310,7 @@ class DbUpdate(DbUtils):
                 self.InsertRow(src, size, created, mod)
                 
 
-class Updater(DbUpdate):
-    """Methods: DbExistsModified"""
-    
-    def DbExistsModified(self):
-        """Сhecks files for existence, modified"""
-        
-        self.DbExists()
-        self.DbModified()
-
-
-class CollsUpd(Updater, ScanFiles, DbUpdate):
+class CollsUpd(ScanFiles, DbUpdate):
     """Methods: CollsUpd"""
     
     def __Update(self, files):
@@ -329,13 +319,16 @@ class CollsUpd(Updater, ScanFiles, DbUpdate):
         add new from scanned files if not in database, 
         change collection if file moved from Retouches to Collections."""
         
+        cfg.LIVE_LBL.configure(text='10%')
+        self.DbExists()
+
         cfg.LIVE_LBL.configure(text='20%')
-        self.DbExistsModified()
+        self.DbModified()
         
         cfg.LIVE_LBL.configure(text='40%')
         self.DbMovedToColls(files)
 
-        cfg.LIVE_LBL.configure(text='60%')
+        cfg.LIVE_LBL.configure(text='50%')
         self.DbAddNewFile(files)  
  
     def CollsUpd(self):
@@ -347,17 +340,20 @@ class CollsUpd(Updater, ScanFiles, DbUpdate):
         self.__Update(files=self.FilesColls())
         
 
-class RtUpd(Updater, ScanFiles, DbUpdate):
+class RtUpd(ScanFiles, DbUpdate):
     """Methods: RtAgedUpd, RtUpd"""
 
     def __Update(self, files):
         """Input: scanned files from FilesScan. 
         Check files from database for existence, modified, 
         add new from scanned files if not in database."""
-        
-        cfg.LIVE_LBL.configure(text='80%')
-        self.DbExistsModified()
 
+        cfg.LIVE_LBL.configure(text='60%')
+        self.DbExists()
+
+        cfg.LIVE_LBL.configure(text='80%')
+        self.DbModified()
+        
         cfg.LIVE_LBL.configure(text='90%')
         self.DbAddNewFile(files)
 
