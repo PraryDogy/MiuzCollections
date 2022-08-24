@@ -9,7 +9,7 @@ class MyButton(tkinter.Label):
 
         tkinter.Label.__init__(self, master)
 
-        self.config(bg=cfg.BGBUTTON, fg=cfg.FONTCOLOR, 
+        self.configure(bg=cfg.BGBUTTON, fg=cfg.FONTCOLOR, 
             width=17, height=2, text=txt)
         self.bind('<Button-1>', cmd)
 
@@ -19,7 +19,7 @@ class MyFrame(tkinter.Frame):
     def __init__(self, master):
         tkinter.Frame.__init__(self, master)
 
-        self.config(bg=cfg.BGCOLOR)
+        self.configure(bg=cfg.BGCOLOR)
 
 
 class MyLabel(tkinter.Label):
@@ -27,4 +27,4 @@ class MyLabel(tkinter.Label):
     def __init__(self, master):
         tkinter.Label.__init__(self, master)
 
-        self.config(bg=cfg.BGCOLOR, fg=cfg.FONTCOLOR)
+        self.configure(bg=cfg.BGCOLOR, fg=cfg.FONTCOLOR)

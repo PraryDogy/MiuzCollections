@@ -1,6 +1,6 @@
 import sqlalchemy
 from DataBase.Database import Config, dBase
-from Utils.Manage import Geometry, ReloadGallery
+from Utils.Utils import *
 
 
 def Cmd(moreless):
@@ -22,4 +22,3 @@ def Cmd(moreless):
             dBase.conn.execute(query)
 
     ReloadGallery()
-    Geometry()

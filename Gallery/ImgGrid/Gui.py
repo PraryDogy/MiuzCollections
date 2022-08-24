@@ -4,13 +4,14 @@ import cfg
 import sqlalchemy
 import tkmacosx
 from DataBase.Database import Config, dBase
+from PIL import Image, ImageTk
 
 from .LoadThumbs import LoadThumbs
 from .Prev import Prev
 
 
 class Create(Prev):
-    def  __init__(self, imgGrid):
+    def  __init__(self):
         '''
         We have database.db with table named Thumbs.
         In Thumbs: img150, img200, img250, img300, src, collection, modified.
@@ -35,9 +36,6 @@ class Create(Prev):
         and create images grid with number columns from clmns
         and images size from "size" from database.db > Config > size
         '''
-        self.imgGrid = tkinter.Frame(imgGrid, bg=cfg.BGCOLOR)
-        self.imgGrid.pack(fill='both', expand=True)
-
         selectRow = sqlalchemy.select(Config.value).where(
             Config.name=='currColl')
         self.curColl = dBase.conn.execute(selectRow).first()[0]
@@ -48,23 +46,34 @@ class Create(Prev):
 
     def TitlePack(self):
         title = tkinter.Label(
-            self.imgGrid, bg=cfg.BGCOLOR, fg=cfg.FONTCOLOR,
+            cfg.IMG_GRID, bg=cfg.BGCOLOR, fg=cfg.FONTCOLOR,
             text=self.curColl, font=('Arial', 45, 'bold'), pady=15)
         title.pack()
         
 
     def ThumbnailsPack(self):
+        
         thumbs = LoadThumbs(self.curColl)
 
         scrollable = tkmacosx.SFrame(
-            self.imgGrid, bg=cfg.BGCOLOR, scrollbarwidth=10)
-        scrollable.config(avoidmousewheel=(scrollable))
+            cfg.IMG_GRID, bg=cfg.BGCOLOR, scrollbarwidth=10)
+        scrollable.configure(avoidmousewheel=(scrollable))
         scrollable.pack(expand=True, fill='both')
-
+        
         selectRow = sqlalchemy.select(Config.value).where(
             Config.name=='clmns')
         сolls = int(dBase.conn.execute(selectRow).first()[0])
 
+        if len(thumbs) < сolls:
+            
+            query = sqlalchemy.select(Config.value).where(Config.name=='size')
+            size = int(dBase.conn.execute(query).first()[0])
+            
+            for i in range(0, сolls-len(thumbs)):
+                new = Image.new('RGB', (size, size), cfg.BGCOLOR)
+                photo = ImageTk.PhotoImage(new)
+                thumbs.append((photo, None))
+        
         imgRows = [thumbs[x:x+сolls] for x in range(0, len(thumbs), сolls)]
 
         for row in imgRows:
@@ -87,6 +96,6 @@ class Create(Prev):
         scrollable.update_idletasks()
         w = scrollable.winfo_reqwidth()
 
-        endFrame = tkinter.Frame(
-            self.imgGrid, bg=cfg.BGCOLOR, width=w*1.06, height=5)
-        endFrame.pack()
+        gridW = tkinter.Frame(
+            cfg.IMG_GRID, bg=cfg.BGCOLOR, width=w*1.06, height=5)
+        gridW.pack()

@@ -1,7 +1,7 @@
 import cfg
 import sqlalchemy
 from DataBase.Database import Config, dBase
-from Utils import Main as Utils
+from Utils import Scaner
 
 
 def Scan():
@@ -13,7 +13,7 @@ def Scan():
         Config.name=='typeScan')
     typeScan = dBase.conn.execute(selectType).first()[0]
     
-    Utils.CollsUpd().CollsUpd()
+    Scaner.CollsUpd().CollsUpd()
 
     if typeScan == 'full':
 
@@ -21,10 +21,10 @@ def Scan():
             Config.name=='typeScan').values(value='')
         dBase.conn.execute(updateType)
 
-        Utils.RtUpd().RtUpd()
+        Scaner.RtUpd().RtUpd()
         return
 
-    Utils.RtUpd().RtAgedUpd()
+    Scaner.RtUpd().RtAgedUpd()
 
 
 def Skip(topLevel):
@@ -34,4 +34,3 @@ def Skip(topLevel):
     topLevel.withdraw()
     topLevel.destroy()
     cfg.FLAG = False
-    print('skip done')

@@ -1,6 +1,7 @@
 import sqlalchemy
 from DataBase.Database import Config, dBase
-from Utils.Manage import Geometry
+from Utils.Utils import *
+
 
 def CollapseMenu(currBtn, firstClmn, between, secClmn):
     getMenuClmn = sqlalchemy.select(Config.value).where(
@@ -13,19 +14,18 @@ def CollapseMenu(currBtn, firstClmn, between, secClmn):
     dBase.conn.execute(updateRow)
     
     if newClmn==1:
-        currBtn.config(text='▶')
+        currBtn.configure(text='▶')
         
         firstClmn.pack(side='top')
-        between.config(width=0)
+        between.configure(width=0)
         between.pack(side='top')
         secClmn.pack(side='top')
         
     else:
-        currBtn.config(text='◀')
+        currBtn.configure(text='◀')
         
         firstClmn.pack(side='left')
-        between.config(width=10)
+        between.configure(width=10)
         between.pack(side='left')
         secClmn.pack(side='left')
-
-    Geometry()
+        

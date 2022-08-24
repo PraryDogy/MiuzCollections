@@ -1,6 +1,5 @@
 import threading
 import tkinter
-import traceback
 
 import cfg
 
@@ -14,7 +13,7 @@ class Create:
         cfg.ROOT.eval(f'tk::PlaceWindow {self.newWin} center')
 
         self.newWin.title('Welcome')
-        self.newWin.config(bg=cfg.BGCOLOR, pady=10)
+        self.newWin.configure(bg=cfg.BGCOLOR, pady=10)
         self.newWin.resizable(0, 0)
 
         cfg.ROOT.createcommand(

@@ -10,7 +10,7 @@ def Create():
     
     newWin = tkinter.Toplevel()
     newWin.title('Подождите')
-    newWin.config(bg=cfg.BGCOLOR, padx=5, pady=10)
+    newWin.configure(bg=cfg.BGCOLOR, padx=5, pady=10)
     newWin.resizable(0,0)
 
     descr = tkinter.Label(

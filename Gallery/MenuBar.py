@@ -22,7 +22,7 @@ class Create:
             'tkAboutDialog', 
             lambda: cfg.ROOT.tk.call('tk::mac::standardAboutPanel'))
 
-        cfg.ROOT.config(menu=menubar)
+        cfg.ROOT.configure(menu=menubar)
 
     def AboutApp(self):
         newWin = tkinter.Toplevel(

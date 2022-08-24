@@ -9,7 +9,7 @@ import sqlalchemy
 import tkmacosx
 from DataBase.Database import Config, dBase
 from PIL import Image, ImageOps, ImageTk
-from Utils.ClipBoard import *
+from Utils.Utils import *
 from Utils.Styled import *
 
 from .Descriptions import descriptions
@@ -131,11 +131,11 @@ class General(MyFrame, TkObjects):
             f'\nвсех коллекций за последние {cfg.FILE_AGE} дней.'
             
             '\n\nНажмите "Обновить", чтобы обновить фотографии'
-            '\nтекущей коллекции за все время с 2018 года.'
+            '\nтекущей коллекции.'
             )
         
         descrLabel = MyLabel(self)
-        descrLabel.config(
+        descrLabel.configure(
             anchor='w', padx=5, text=txt1, justify='left')
         descrLabel.pack(pady=(30, 0))
 
@@ -158,7 +158,7 @@ class General(MyFrame, TkObjects):
             '\nфотографии всех коллекций за все время c 2018 года.'
             )
         descrLabel2 = MyLabel(self)
-        descrLabel2.config(
+        descrLabel2.configure(
             anchor='w', padx=5, text=txt2, justify='left')
         descrLabel2.pack()
         
@@ -276,12 +276,12 @@ class Expert(tkmacosx.SFrame, TkObjects):
     def CopyIns(self, ins, btn):
         btn.configure(bg=cfg.BGPRESSED)
         text = ins.get()
-        copy(text)
+        MyCopy(text)
         cfg.ROOT.after(100, lambda: btn.configure(bg=cfg.BGBUTTON))
     
     def PasteIns(self, ins, btn):
         btn.configure(bg=cfg.BGPRESSED)
-        text = paste()
+        text = MyPaste()
         ins.delete(0, 'end')
         ins.insert(0, text)
         cfg.ROOT.after(100, lambda: btn.configure(bg=cfg.BGBUTTON))

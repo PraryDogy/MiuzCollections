@@ -6,5 +6,4 @@ Download sample photos with necessary structure:
 https://disk.yandex.ru/d/Vffr_r9q6CybyQ
 
 Change cfg.py:
-SMB_DIR = /
 PHOTO_DIR = /path/to/sample/photos

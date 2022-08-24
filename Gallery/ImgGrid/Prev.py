@@ -3,17 +3,20 @@ import subprocess
 import tkinter
 
 import cfg
-from PIL import Image, ImageOps, ImageTk
-from Utils import ClipBoard
+from PIL import Image, ImageTk
+# from Utils.Utils import *
 
 
 class Prev:
     def __init__(self, src):
+        if src is None:
+            return
+        
         self.src = src
         self.newWin = tkinter.Toplevel()
         self.newWin.protocol("WM_DELETE_WINDOW", lambda: self.newWin.destroy())
 
-        self.newWin.config(bg=cfg.BGCOLOR, padx=15, pady=15)
+        self.newWin.configure(bg=cfg.BGCOLOR, padx=15, pady=15)
 
         copyName = self.CopyName()
         openClose = self.OpenClose()
@@ -82,11 +85,11 @@ class Prev:
 
 
     def copyToClipboard(self):
-        self.copyName.config(bg=cfg.BGPRESSED)
+        self.copyName.configure(bg=cfg.BGPRESSED)
         name = self.src.split('/')[-1].split('.')[0]
-        ClipBoard.copy(name)
+        # MyCopy(name)
         cfg.ROOT.after(
-            300, lambda: self.copyName.config(bg=cfg.BGBUTTON))
+            300, lambda: self.copyName.configure(bg=cfg.BGBUTTON))
 
 
     def OpenClose(self):

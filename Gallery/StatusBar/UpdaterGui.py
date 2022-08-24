@@ -2,7 +2,7 @@ import threading
 import tkinter
 
 import cfg
-from Utils.Manage import ReloadGallery
+from Utils.Utils import *
 
 from .UpdaterCmd import UpdateColl, Skip
 from SmbChecker.SmbCheck import Check as SmbCheck

@@ -20,7 +20,7 @@ class Scrollable:
 
         self.scrollable.bind(
             "<Configure>", 
-            lambda e: canvas.config(scrollregion=canvas.bbox("all"))
+            lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
             )
 
         canvas.bind_all(
@@ -30,7 +30,7 @@ class Scrollable:
             )
 
         canvas.create_window((0,0), window=self.scrollable, anchor='nw')
-        canvas.config(yscrollcommand=scrollbar.set)
+        canvas.configure(yscrollcommand=scrollbar.set)
 
         container.pack(fill='both', expand=True)
         canvas.pack(side='left', fill='both', expand=True)

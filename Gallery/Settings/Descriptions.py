@@ -1,8 +1,4 @@
-SMB_DIR = ('Путь к сетевому диску Miuz. По нему MiuzGallery проверяет '
-            'доступность диска.')
-
-SMB_CONN = ('Путь к сетевому диску для кнопки "Подключиться", когда '
-            'сетевой диск недоступен')
+SMB_CONN = ('Путь к сетевому диску')
 
 PHOTO_DIR = ('Путь ко всем фотографиям Miuz.'
             '\nНапример: /Путь/к/сетевому/диску/Miuz/AllPhotos'
@@ -25,5 +21,5 @@ FILE_AGE = ('По умолчанию MiuzGallery ищет папки Retouch (с
             'Здесь можно указать другое количество дней.')
 
 
-descriptions = [SMB_DIR, SMB_CONN, PHOTO_DIR, 
+descriptions = [SMB_CONN, PHOTO_DIR, 
                 COLL_FOLDER, RT_FOLDER, FILE_AGE]

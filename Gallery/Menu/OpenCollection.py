@@ -3,7 +3,7 @@ import threading
 import cfg
 import sqlalchemy
 from DataBase.Database import Config, dBase
-from Utils.Manage import ReloadGallery
+from Utils.Utils import *
 
 
 def OpenCollection(allBtns, currBtn):
@@ -20,9 +20,9 @@ def OpenCollection(allBtns, currBtn):
     '''
     
     for i in allBtns:
-        i.config(bg=cfg.BGBUTTON)
+        i.configure(bg=cfg.BGBUTTON)
 
-    t1 = threading.Thread(target=lambda: currBtn.config(bg=cfg.BGPRESSED))
+    t1 = threading.Thread(target=lambda: currBtn.configure(bg=cfg.BGPRESSED))
     t1.start()
     
     updateRow = sqlalchemy.update(Config).where(

@@ -8,6 +8,6 @@ def Check():
     \ncheck smb path
     \nreturn bool
     '''
-    if not os.path.exists(cfg.SMB_DIR):
+    if not os.path.exists(cfg.PHOTO_DIR):
         return False
     return True

@@ -1,7 +1,7 @@
 import tkinter
 
 import cfg
-from Utils.Manage import Geometry
+from Utils.Utils import *
 
 from .ImgGrid.Gui import Create as ImgGrigGui
 from .Menu.Gui import Create as MenuGui
@@ -15,27 +15,34 @@ class Create:
             'tk::mac::ReopenApplication', cfg.ROOT.deiconify)
         
         cfg.ROOT.title('MiuzGallery')
-        cfg.ROOT.config(bg=cfg.BGCOLOR, padx=15, pady=0)
+        cfg.ROOT.configure(bg=cfg.BGCOLOR, padx=15, pady=0)
 
         upFrame = tkinter.Frame(cfg.ROOT, bg=cfg.BGCOLOR)
         upFrame.pack(fill='both', expand=True)
-
+        cfg.UPFRAME = upFrame
+        
         bottomFrame = tkinter.Frame(cfg.ROOT, bg=cfg.BGCOLOR)
         bottomFrame.pack(fill='x')
 
-        menuFrame = tkinter.Frame(upFrame, bg=cfg.BGCOLOR)
-        menuFrame.pack(side='left')
-        MenuGui(menuFrame)
+        menuLeft = tkinter.Frame(upFrame, bg=cfg.BGCOLOR)
+        menuLeft.pack(side='left')
+        MenuGui(menuLeft)
         
-        imgFrame = tkinter.Frame(upFrame, bg=cfg.BGCOLOR)
-        imgFrame.pack(side='left', fill='both', expand=True)
-        ImgGrigGui(imgFrame)
+        imgGridRight = tkinter.Frame(upFrame, bg=cfg.BGCOLOR)
+        imgGridRight.pack(side='left', fill='both', expand=True)
+        cfg.IMG_GRID = imgGridRight
+        ImgGrigGui()
         
         StatusBar(bottomFrame)
         MenuBar()
 
-        Geometry()
         cfg.ROOT.update_idletasks()
         cfg.ROOT.eval(f'tk::PlaceWindow {cfg.ROOT} center')
-        cfg.ROOT.geometry(f'+{cfg.ROOT.winfo_x()}+0')
-
+        
+        x = cfg.ROOT.winfo_x()
+        y = 0
+        w = cfg.ROOT.winfo_width()
+        h = int(cfg.ROOT.winfo_screenheight()*0.8)
+        
+        cfg.ROOT.geometry(f'{w}x{h}+{x}+{y}')
+        

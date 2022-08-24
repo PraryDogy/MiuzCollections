@@ -1,13 +1,12 @@
 import cfg
 import sqlalchemy
 from DataBase.Database import Config, dBase
-from Utils import Main as Utils
-
+from Utils import Scaner
 
 def UpdateColl():
     cfg.FLAG = True
-    Utils.CollsUpd().CollsUpd()
-    Utils.RtUpd().RtAgedUpd()
+    Scaner.CollsUpd().CollsUpd()
+    Scaner.RtUpd().RtAgedUpd()
 
 
 def Skip(topLevel):
