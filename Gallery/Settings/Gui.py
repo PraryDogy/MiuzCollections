@@ -1,6 +1,7 @@
 import json
 import os
 import sys
+import textwrap
 import tkinter
 from tkinter.ttk import Separator
 
@@ -141,19 +142,18 @@ class General(MyFrame, TkObjects):
             'При запуске программа сканирует и обновляет фото'
             f'\nвсех коллекций за последние {cfg.FILE_AGE} дней.'
             
-            '\n\nНажмите "Обновить", чтобы обновить фотографии'
-            '\nтекущей коллекции.'
+            '\n\nНажмите "Обновить", чтобы повторно запустить сканирование.'
             )
         
         descrLabel = MyLabel(self)
         descrLabel.configure(
-            anchor='w', padx=5, text=txt1, justify='left')
-        descrLabel.pack(pady=(30, 0))
+            text=txt1, justify='left', wraplength=350)
+        descrLabel.pack(padx=(15, 0), pady=(30, 0), anchor='w')
 
         pathh = os.path.join(os.path.dirname(__file__), 'upd.jpg')
         imgSrc = Image.open(pathh)
         imgCopy= imgSrc.copy()
-        imgRes = ImageOps.contain(imgCopy, (350,350))        
+        imgRes = ImageOps.contain(imgCopy, (335,335))        
         imgTk = ImageTk.PhotoImage(imgRes)
          
         imgLbl = MyLabel(self)
@@ -170,8 +170,8 @@ class General(MyFrame, TkObjects):
             )
         descrLabel2 = MyLabel(self)
         descrLabel2.configure(
-            anchor='w', padx=5, text=txt2, justify='left')
-        descrLabel2.pack()
+            text=txt2, justify='left', wraplength=350)
+        descrLabel2.pack(padx=(15, 0), anchor='w')
         
         scanBtn = MyButton(self, text='Полное сканирование')
         scanBtn.Cmd(lambda event: self.RunScan())
@@ -181,19 +181,19 @@ class General(MyFrame, TkObjects):
         sep.pack(padx=40, pady=20, fill='x')
         
         name = (
-            f'MiuzGallery {cfg.APP_VER}'
+            f'{cfg.APP_NAME} {cfg.APP_VER}'
             '\n\n'
             )
         made = (
-            'Created by Evgeny Loshkarev'
+            '\nCreated by Evgeny Loshkarev'
             '\nCopyright © 2022 MIUZ Diamonds.'
             '\nAll rights reserved.'
-            '\n'
             )
 
         createdBy = MyLabel(self)
-        createdBy.configure(text=name+made, justify='left', padx=5)
-        createdBy.pack(pady=20, anchor='w')
+        createdBy.configure(
+            text=name+made, justify='left')
+        createdBy.pack(padx=(15, 0), anchor='w')
         
 
     def RunScan(self):
@@ -242,13 +242,15 @@ class Expert(tkmacosx.SFrame, TkObjects):
             frameBtns = MyFrame(self)
             frameBtns.pack()
             
-            btnCopy = MyButton(frameBtns, text='Копировать', height=1, width=9)
+            btnCopy = MyButton(frameBtns, text='Копировать')
+            btnCopy.configure(height=1, width=9)
             btnCopy.Cmd(
                 lambda event, ins=ins, btn=btnCopy: self.CopyIns(ins, btn)
                 )
             btnCopy.pack(side='left', padx=(0, 10))
             
-            btnPaste = MyButton(frameBtns, text='Вставить', height=1, width=9)
+            btnPaste = MyButton(frameBtns, text='Вставить')
+            btnPaste.configure(height=1, width=9)
             btnPaste.Cmd(
                 lambda event, ins=ins, btn=btnPaste: self.PasteIns(ins, btn)
                 )
@@ -257,7 +259,8 @@ class Expert(tkmacosx.SFrame, TkObjects):
         for ins, descr in zip(labelsInserts, descriptions):
             ins.configure(text=descr, justify='left', wraplength=340)
 
-        restoreBtn = MyButton(self, text='По умолчанию', height=1, width=15)
+        restoreBtn = MyButton(self, text='По умолчанию')
+        restoreBtn.configure(height=1, width=12)
         restoreBtn.Cmd(
             lambda event, btn=restoreBtn: self.Restore(btn)
             )
