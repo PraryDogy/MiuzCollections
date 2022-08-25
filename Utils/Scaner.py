@@ -10,7 +10,7 @@ from DataBase.Database import Thumbs, dBase
 from .Utils import CreateThumb
 
 
-class ScanYears:
+class BaseScan:
     """Methods: Years, YearsAged""" 
     
     def ScanYears(self):
@@ -52,9 +52,9 @@ class ScanYears:
         return agedDirs
 
 
-class ScanColls(ScanYears):
-    """Inheritance: ScanYears. 
-    Methods: Colls
+class ScanColls(BaseScan):
+    """Inheritance: BaseScan. 
+    Methods: ScanColls
     Returns list of dirs."""
     
     def ScanColls(self):
@@ -76,9 +76,9 @@ class ScanColls(ScanYears):
         return allColls
 
 
-class ScanRetouched(ScanYears):
-    """Inheritance: ScanYears.
-    Methods: Retouched, RetouchedAged.
+class ScanRetouched(BaseScan):
+    """Inheritance: BaseScan.
+    Methods: ScanRetouched, ScanRetouchedAged.
     Returns list of dirs."""
     
     def __Scan(self, dirsList):
@@ -102,8 +102,7 @@ class ScanRetouched(ScanYears):
     
     
     def ScanRetouchedAged(self):
-        """Scan aged month dirs from years for folders
-        with name from cfg.RT_FOLDER."""
+        """Scan aged years dirs for folders with name from cfg.RT_FOLDER."""
         return self.__Scan(self.ScanYearsAged())
     
 
