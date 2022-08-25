@@ -4,7 +4,7 @@ import tkinter
 
 # app info
 APP_NAME = 'MiuzGallery'
-APP_VER = '2.7.3'
+APP_VER = '2.7.4'
 
 # database info
 DB_VER = '2.6.1'

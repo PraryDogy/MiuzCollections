@@ -61,8 +61,9 @@ pasteHere = os.path.join(
 
 shutil.copytree(lib, pasteHere)
 
-inName = os.path.join(os.path.dirname(__file__), 'dist')
-outName = os.path.join(os.path.dirname(__file__), '__Dist')
-os.rename(inName, outName)
 
+file = os.path.join(parent, 'dist', f'{cfg.APP_NAME}.app')
+desktop = os.path.join(os.path.join(os.path.expanduser('~')), 'Desktop', f'{cfg.APP_NAME}.app')
+shutil.move(file, desktop)
 
+shutil.rmtree(os.path.join(parent, 'dist'))
