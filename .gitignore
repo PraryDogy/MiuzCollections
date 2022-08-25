@@ -6,3 +6,4 @@ SamplePhotos/
 dist/
 build/
 testfile.py
+__Dist/
