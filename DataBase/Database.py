@@ -40,7 +40,7 @@ class Config(dBase.base):
     value = sqlalchemy.Column(sqlalchemy.Text)
 
 
-class AdminUtils(dBase):
+class Utils(dBase):
     def Create(self):
         '''
         Removes all tables and create tables: Config, Thumbs.

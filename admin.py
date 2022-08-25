@@ -3,7 +3,7 @@ import os
 import yadisk
 
 import cfg
-from DataBase.Database import AdminUtils
+from DataBase import Database
 
 dbOutput = True
 
@@ -22,6 +22,6 @@ def printAlive(nameFunc='', whatPrint=''):
 
 
 def ClearDb():
-    AdminUtils().Create()
-    AdminUtils().FillConfig()
+    Database.Utils().Create()
+    Database.Utils().FillConfig()
     
