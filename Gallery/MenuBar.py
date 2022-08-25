@@ -27,6 +27,7 @@ class Create:
     def AboutApp(self):
         newWin = tkinter.Toplevel(
             cfg.ROOT, bg=cfg.BGCOLOR, pady=10, padx=10)
+        newWin.withdraw()
         newWin.title('О программе')
 
         name = (
@@ -52,11 +53,12 @@ class Create:
         closeButton.pack()
         
         cfg.ROOT.eval(f'tk::PlaceWindow {newWin} center')
-
+        newWin.deiconify()
     
     def Descr(self):
         newWin = tkinter.Toplevel(
             cfg.ROOT, bg=cfg.BGCOLOR, pady=10, padx=10)
+        newWin.withdraw()
         newWin.title('Поддержка')
 
         descr = (
@@ -76,3 +78,4 @@ class Create:
         closeButton.pack()
         
         cfg.ROOT.eval(f'tk::PlaceWindow {newWin} center')
+        newWin.deiconify()

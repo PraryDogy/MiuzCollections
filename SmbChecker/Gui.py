@@ -8,6 +8,7 @@ import cfg
 
 def Create():
     newWin = tkinter.Toplevel(cfg.ROOT)
+    newWin.withdraw()
     newWin.attributes('-topmost', 'true')
     newWin.resizable(0,0)
 
@@ -67,3 +68,5 @@ def Create():
     clsBtn.pack(side='left')
 
     cfg.ROOT.eval(f'tk::PlaceWindow {newWin} center')
+
+    newWin.deiconify()

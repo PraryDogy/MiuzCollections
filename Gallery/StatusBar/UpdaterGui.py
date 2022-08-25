@@ -12,6 +12,7 @@ def Create():
         return
         
     newWin = tkinter.Toplevel(cfg.ROOT, bg=cfg.BGCOLOR, pady=10)
+    newWin.withdraw()
     newWin.attributes('-topmost', 'true')
     newWin.resizable(0,0)
     newWin.title('Обновляю')
@@ -34,7 +35,8 @@ def Create():
     skipButton.bind('<Button-1>', lambda event: Skip(newWin))
     
     cfg.ROOT.eval(f'tk::PlaceWindow {newWin} center')
-
+    newWin.deiconify()
+    
     t1 = threading.Thread(target=lambda: UpdateColl())
     t1.start()
     

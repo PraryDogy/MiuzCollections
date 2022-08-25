@@ -1,3 +1,4 @@
+import tkinter
 import cfg
 import sqlalchemy
 from DataBase.Database import Config, dBase
@@ -27,7 +28,7 @@ def Scan():
     Scaner.RtUpd().RtAgedUpd()
 
 
-def Skip(topLevel):
+def Skip(topLevel=tkinter.Toplevel):
     '''
     Destroys tkinter topLevel window and set cfg.FLAF to False.
     '''

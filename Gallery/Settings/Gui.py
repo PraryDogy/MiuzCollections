@@ -36,6 +36,7 @@ class Create(tkinter.Toplevel):
             self, cfg.ROOT, bg=cfg.BGCOLOR)
         cfg.ROOT.eval(f'tk::PlaceWindow {self} center')
         
+        self.withdraw()
         self.resizable(0,0)
         self.attributes('-topmost', 'true')
         self.title('Настройки')
@@ -61,7 +62,7 @@ class Create(tkinter.Toplevel):
         yy = y + int(cfg.ROOT.winfo_height()/2)-int(self.winfo_height()/2)
 
         self.geometry(f'+{xx}+{yy}')
-
+        self.deiconify()
 
 class LeftMenu(MyFrame, TkObjects):
     def __init__(self, master):

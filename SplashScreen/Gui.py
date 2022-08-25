@@ -9,9 +9,8 @@ from .SplashCmd import Scan, Skip
 class Create:
     def __init__(self):
         self.newWin = tkinter.Toplevel()        
+        self.newWin.withdraw()
         
-        cfg.ROOT.eval(f'tk::PlaceWindow {self.newWin} center')
-
         self.newWin.title('Welcome')
         self.newWin.configure(bg=cfg.BGCOLOR, pady=10)
         self.newWin.resizable(0, 0)
@@ -19,6 +18,9 @@ class Create:
         cfg.ROOT.createcommand(
             'tk::mac::ReopenApplication', self.newWin.deiconify)
 
+        cfg.ROOT.eval(f'tk::PlaceWindow {self.newWin} center')
+        self.newWin.deiconify()
+        
         self.Start()
 
 

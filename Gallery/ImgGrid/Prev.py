@@ -14,6 +14,8 @@ class Prev:
         
         self.src = src
         self.newWin = tkinter.Toplevel()
+        self.newWin.withdraw()
+        
         self.newWin.protocol("WM_DELETE_WINDOW", lambda: self.newWin.destroy())
         self.newWin.bind('<Command-w>', lambda event: self.newWin.destroy())
 
@@ -34,7 +36,8 @@ class Prev:
 
         cfg.ROOT.eval(f'tk::PlaceWindow {self.newWin} center')
         self.newWin.geometry(f'+{self.newWin.winfo_x()}+0')
-    
+        self.newWin.deiconify()
+        
     def OpenImg(self, h):
         frame = tkinter.Frame(self.newWin, bg='black')
 
