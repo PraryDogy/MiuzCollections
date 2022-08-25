@@ -1,8 +1,15 @@
+import os
 import subprocess
+import threading
 import tkinter
+import traceback
 
 import cfg
 import cv2
+import yadisk
+from DataBase import Database
+
+from Utils.Styled import *
 
 
 def CreateThumb(imgPath):
@@ -57,3 +64,121 @@ def ReloadGallery():
     cfg.IMG_GRID = imgFrame
     
     cfg.GRID_GUI()
+    
+
+class SmbChecker(tkinter.Toplevel):
+    """Methods: Check"""
+    
+    def __init__(self):
+        tkinter.Toplevel.__init__(
+            self, cfg.ROOT, bg=cfg.BGCOLOR, padx=10, pady=10)
+        self.withdraw()
+
+    def Check(self):
+        if not os.path.exists(cfg.PHOTO_DIR):
+            if not self.Connect():
+                self.Gui()
+                return False
+        self.destroy()
+        return True
+
+    def Connect(self):
+        os.system(f"osascript -e 'mount volume \"{cfg.SMB_CONN}\"'")
+        if not os.path.exists(cfg.PHOTO_DIR):
+            return False
+        return True
+
+    def Gui(self):
+        self.focus_force()
+        self.title('Нет подключения')
+        self.resizable(0,0)
+        self.attributes('-topmost', 'true')
+        
+        txt = 'Нет подключения к сетевому диску Miuz. '
+        titleLbl = MyLabel(
+            self, text=txt, wraplength=350, font=('Arial', 10, 'bold'))
+        titleLbl.pack(pady=(0, 20))
+
+        txt2 =(
+            'Программа работает в офлайн режиме. '
+            '\n- Проверьте подключение к интернету. '
+            '\n- Откройте любую папку на сетевом диске,'
+            '\nвведите логин и пароль, если требуется'
+            '\n- Откройте настройки > эксперт, введите правильный адрес '
+            '\nи перезапустите приложение.'  
+            '\nПоддержка: loshkarev@miuz.ru'
+            '\nTelegram: evlosh'
+            )
+        descrLbl = MyLabel(self, text=txt2, justify='left')
+        descrLbl.pack(padx=15, pady=(0, 15))
+
+        clsBtn = MyButton(self, text='Закрыть')
+        clsBtn.Cmd(lambda event: self.destroy())
+        clsBtn.pack()
+
+        cfg.ROOT.eval(f'tk::PlaceWindow {self} center')
+        self.deiconify()
+        
+        
+class DbCkecker(tkinter.Toplevel):
+    def __init__(self):        
+        """Methods: Check."""
+
+        tkinter.Toplevel.__init__(
+            self, bg=cfg.BGCOLOR, padx=15, pady=10)
+        self.withdraw()
+   
+    def Check(self):
+        """Check db & folder db is exists. 
+        If not exists, run gui and wait for download db with threading, 
+        than destroy gui.
+        If can't download, create empty Database with tables and values."""
+        
+        if not os.path.exists(cfg.DB_DIR):
+            os.makedirs(cfg.DB_DIR)
+
+        db = os.path.join(cfg.DB_DIR, cfg.DB_NAME)
+        
+        if (not os.path.exists(db) or 
+            os.path.getsize(db) < 0.9):
+            
+            self.Gui()
+            checkDbTask = threading.Thread(target=lambda: self.DownloadDb())
+            checkDbTask.start()
+            
+            while checkDbTask.is_alive():
+                cfg.ROOT.update()
+        self.destroy()
+
+    def DownloadDb(self):
+        """Download database file  with thumbnails from Yandex Disk or
+        create new one with tables and values if download fails."""
+        
+        y = yadisk.YaDisk(token=cfg.YADISK_TOKEN)
+        localDirDb = os.path.join(cfg.DB_DIR, cfg.DB_NAME)
+        yadiskDirDb = os.path.join(cfg.YADISK_DIR, cfg.DB_NAME)
+
+        try:
+            y.download(yadiskDirDb, localDirDb)
+
+        except Exception:
+            adm = Database.Utils()
+            adm.Create()
+            adm.FillConfig()
+            print(traceback.format_exc())
+
+    def Gui(self):
+        """Create gui with text: Wait, downloading"""
+        self.focus_force()
+        self.title('Подождите')
+        self.resizable(0,0)
+
+        txt = 'Пожалуйста, подождите.'
+        titleLbl = MyLabel(
+            self, text=txt, wraplength=350, font=('Arial', 18, 'bold'))
+        titleLbl.pack(pady=(0, 10))
+
+        descr = MyLabel(self, text='Скачиваю дополнения.')
+        descr.pack()
+        cfg.ROOT.eval(f'tk::PlaceWindow {self} center')
+        self.deiconify()
