@@ -149,7 +149,7 @@ class General(MyFrame, TkObjects):
         descrLabel = MyLabel(self)
         descrLabel.configure(
             text=txt1, justify='left', wraplength=350)
-        descrLabel.pack(padx=(15, 0), pady=(30, 0), anchor='w')
+        descrLabel.pack(padx=(15, 0), pady=(30, 10), anchor='w')
 
         pathh = os.path.join(os.path.dirname(__file__), 'upd.jpg')
         imgSrc = Image.open(pathh)
@@ -172,14 +172,14 @@ class General(MyFrame, TkObjects):
         descrLabel2 = MyLabel(self)
         descrLabel2.configure(
             text=txt2, justify='left', wraplength=350)
-        descrLabel2.pack(padx=(15, 0), anchor='w')
+        descrLabel2.pack(padx=(15, 0), pady=(0, 10), anchor='w')
         
         scanBtn = MyButton(self, text='Полное сканирование')
         scanBtn.Cmd(lambda event: self.RunScan())
-        scanBtn.pack(anchor='center', pady=10)
+        scanBtn.pack(anchor='center')
 
         sep = Separator(self, orient='horizontal')
-        sep.pack(padx=40, pady=20, fill='x')
+        sep.pack(padx=40, pady=(25, 20), fill='x')
         
         name = (
             f'{cfg.APP_NAME} {cfg.APP_VER}'
