@@ -52,7 +52,7 @@ def ReloadGallery():
     create new tkinter frame cfg.IMG_GRID and put in it new thumbnails"""
     
     cfg.IMG_GRID.destroy()
-    imgFrame = tkinter.Frame(cfg.UPFRAME, bg=cfg.BGCOLOR)
+    imgFrame = tkinter.Frame(cfg.UP_FRAME, bg=cfg.BGCOLOR)
     imgFrame.pack(side='left', fill='both', expand=True)
     cfg.IMG_GRID = imgFrame
     
