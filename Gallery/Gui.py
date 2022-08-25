@@ -20,7 +20,7 @@ class Create:
 
         upFrame = tkinter.Frame(cfg.ROOT, bg=cfg.BGCOLOR)
         upFrame.pack(fill='both', expand=True)
-        cfg.UPFRAME = upFrame
+        cfg.UP_FRAME = upFrame
         
         bottomFrame = tkinter.Frame(cfg.ROOT, bg=cfg.BGCOLOR)
         bottomFrame.pack(fill='x')
