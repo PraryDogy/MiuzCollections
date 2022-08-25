@@ -5,10 +5,10 @@ import cfg
 from Utils.Utils import *
 
 from .UpdaterCmd import UpdateColl, Skip
-from SmbChecker.SmbCheck import Check as SmbCheck
+from Utils.Utils import SmbChecker
 
 def Create():
-    if not SmbCheck():
+    if not SmbChecker().Check():
         return
         
     newWin = tkinter.Toplevel(cfg.ROOT, bg=cfg.BGCOLOR, pady=10)
