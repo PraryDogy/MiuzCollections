@@ -13,29 +13,11 @@ from Utils.Styled import *
 
 class Create(MyFrame):
     def __init__(self):
-        """
-        We have list of collections created from database > Thumbs, 
-        each collection is button.
-        
-        We have option: one or two columns for buttons, 
-        collapse button always right of collection buttons.
-        
-        On click to collapce button we change columns with collection 
-        buttons to 1 or 2.
-        
-        Structure:
-        
-        - self > Frame (both columns collection buttons), Frame (collapse)
-        
-        - buttonsFrame > left & space between & right columns with buttons or
-          both columns is above & below
-        
-        - collapseFrame > collapse button
-        ***
-        coll = collection
-        btn = button
-        clps = collapse
-        clmn = column
+        """Inherit: MyFrame. 
+        Create tkinter Frame inside cfg.UP_FRAME. 
+        This is menu with buttons, based on list of collections. 
+        List of collections created from Database > Thumbs.collection. 
+        Button load collection, binded to this button. 
         """
         
         super().__init__(cfg.UP_FRAME)
