@@ -8,10 +8,11 @@ from DataBase.Database import Config, Thumbs, dBase
 
 from .CollapseBtn import CollapseMenu
 from .OpenCollection import OpenCollection
+from Utils.Styled import *
 
 
-class Create:
-    def __init__(self, menuFrame):
+class Create(MyFrame):
+    def __init__(self):
         """
         We have list of collections created from database > Thumbs, 
         each collection is button.
@@ -24,7 +25,7 @@ class Create:
         
         Structure:
         
-        - menuFrame > Frame (both columns collection buttons), Frame (collapse)
+        - self > Frame (both columns collection buttons), Frame (collapse)
         
         - buttonsFrame > left & space between & right columns with buttons or
           both columns is above & below
@@ -36,6 +37,9 @@ class Create:
         clps = collapse
         clmn = column
         """
+        
+        super().__init__(cfg.UP_FRAME)
+        self.pack(side='left')
         
         getCollsList = sqlalchemy.select(Thumbs.collection)
         res = dBase.conn.execute(getCollsList).fetchall()
@@ -49,9 +53,9 @@ class Create:
             
         self.collsNames.sort()
         
-        collBtnsFrame = tkinter.Frame(menuFrame, bg=cfg.BGCOLOR)
+        collBtnsFrame = tkinter.Frame(self, bg=cfg.BGCOLOR)
         collBtnsFrame.pack(side='left')
-        self.clpsBtnFrame = tkinter.Frame(menuFrame, bg=cfg.BGCOLOR)
+        self.clpsBtnFrame = tkinter.Frame(self, bg=cfg.BGCOLOR)
         self.clpsBtnFrame.pack(side='right')
                
         self.firstClmn = tkinter.Frame(collBtnsFrame, bg=cfg.BGCOLOR)
@@ -127,7 +131,7 @@ class Create:
         currColl = dBase.conn.execute(getCurrColl).first()[0]
         
         for btn in allBtns:
-            if currColl==btn['text']:
+            if btn['text'] in currColl:
                 btn.configure(bg=cfg.BGPRESSED)
                 
                 

@@ -1,3 +1,4 @@
+from re import T
 import tkinter
 
 import cfg
@@ -5,12 +6,13 @@ import sqlalchemy
 import tkmacosx
 from DataBase.Database import Config, dBase
 from PIL import Image, ImageTk
+from Utils.Styled import *
 
 from .LoadThumbs import LoadThumbs
 from .Prev import Prev
 
 
-class Create(Prev):
+class Create(MyFrame):
     def  __init__(self):
         """We have database.db with table named Thumbs.
         In Thumbs: img150, img200, img250, img300, src, collection, modified.
@@ -35,28 +37,24 @@ class Create(Prev):
         and create images grid with number columns from clmns
         and images size from "size" from database.db > Config > size"""
         
+        super().__init__(cfg.UP_FRAME)
+        self.pack(side='left', fill='both', expand=True)
         cfg.GRID_GUI = Create
+        cfg.IMG_GRID = self
+        self.Gui()
+        
+    def Gui(self):
         selectRow = sqlalchemy.select(Config.value).where(
             Config.name=='currColl')
-        self.curColl = dBase.conn.execute(selectRow).first()[0]
+        curColl = dBase.conn.execute(selectRow).first()[0]
 
-        self.TitlePack()
-        self.ThumbnailsPack()
-
-
-    def TitlePack(self):
-        title = tkinter.Label(
-            cfg.IMG_GRID, bg=cfg.BGCOLOR, fg=cfg.FONTCOLOR,
-            text=self.curColl, font=('Arial', 45, 'bold'), pady=15)
+        title = MyLabel(
+            self, text=curColl, font=('Arial', 45, 'bold'), pady=15)
         title.pack()
-        
 
-    def ThumbnailsPack(self):
-        
-        thumbs = LoadThumbs(self.curColl)
 
         scrollable = tkmacosx.SFrame(
-            cfg.IMG_GRID, bg=cfg.BGCOLOR, scrollbarwidth=10)
+            self, bg=cfg.BGCOLOR, scrollbarwidth=10)
         scrollable.configure(avoidmousewheel=(scrollable))
         scrollable.pack(expand=True, fill='both')
         
@@ -64,6 +62,7 @@ class Create(Prev):
             Config.name=='clmns')
         сolls = int(dBase.conn.execute(selectRow).first()[0])
 
+        thumbs = LoadThumbs(curColl)
         if len(thumbs) < сolls:
             
             query = sqlalchemy.select(Config.value).where(Config.name=='size')
@@ -75,28 +74,23 @@ class Create(Prev):
                 thumbs.append((photo, None))
         
         imgRows = [thumbs[x:x+сolls] for x in range(0, len(thumbs), сolls)]
-
         for row in imgRows:
             
-            frameRow = tkinter.Frame(scrollable, bg=cfg.BGCOLOR)
-            frameRow.pack(anchor='w', fill='y', expand=True)
+            frameRow = MyFrame(scrollable)
+            frameRow.pack(fill='y', expand=True, anchor='w')
 
             for image, src in row:
-                
-                l2 = tkinter.Label(
-                    frameRow, bg=cfg.BGCOLOR, image=image, 
-                    highlightthickness=1)
+
+                l2 = MyButton(frameRow, image=image, highlightthickness=1)
+                l2.configure(width=0, height=0, bg=cfg.BGCOLOR)
                 l2.image = image
-                l2.bind(
-                    '<Button-1>', 
-                    lambda event, src=src: Prev(src)
-                    )
+                l2.Cmd(lambda event, src=src: Prev(src))
                 l2.pack(side='left')
-            
+                            
         scrollable.update_idletasks()
         w = scrollable.winfo_reqwidth()
 
         gridW = tkinter.Frame(
-            cfg.IMG_GRID, bg=cfg.BGCOLOR, width=w*1.06, height=5)
+            self, bg=cfg.BGCOLOR, width=w*1.06, height=5)
         gridW.pack()
         

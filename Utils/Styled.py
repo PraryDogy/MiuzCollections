@@ -16,6 +16,10 @@ class MyButton(tkinter.Label):
         """Bind tkinter label to left click"""
         self.bind('<Button-1>', cmd)
 
+    def Press(self):
+        self.configure(bg=cfg.BGPRESSED)
+        cfg.ROOT.after(100, lambda: self.configure(bg=cfg.BGBUTTON))
+        
 
 class MyFrame(tkinter.Frame):
     """Tkinter Frame with cfg styles"""

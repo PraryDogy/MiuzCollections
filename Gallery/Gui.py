@@ -6,7 +6,7 @@ from Utils.Utils import *
 from .ImgGrid.Gui import Create as ImgGrigGui
 from .Menu.Gui import Create as MenuGui
 from .MenuBar import Create as MenuBar
-from .StatusBar.Gui import Create as StatusBar
+from .StatusBar import StatusBar
 
 
 class Create:
@@ -18,23 +18,12 @@ class Create:
         cfg.ROOT.configure(bg=cfg.BGCOLOR, padx=15, pady=0)
         cfg.ROOT.bind('<Command-w>', lambda event: cfg.ROOT.iconify())
 
-        upFrame = tkinter.Frame(cfg.ROOT, bg=cfg.BGCOLOR)
-        upFrame.pack(fill='both', expand=True)
-        cfg.UP_FRAME = upFrame
+        cfg.UP_FRAME = tkinter.Frame(cfg.ROOT, bg=cfg.BGCOLOR)
+        cfg.UP_FRAME.pack(fill='both', expand=True)
         
-        bottomFrame = tkinter.Frame(cfg.ROOT, bg=cfg.BGCOLOR)
-        bottomFrame.pack(fill='x')
-
-        menuLeft = tkinter.Frame(upFrame, bg=cfg.BGCOLOR)
-        menuLeft.pack(side='left')
-        MenuGui(menuLeft)
-        
-        imgGridRight = tkinter.Frame(upFrame, bg=cfg.BGCOLOR)
-        imgGridRight.pack(side='left', fill='both', expand=True)
-        cfg.IMG_GRID = imgGridRight
+        MenuGui()
         ImgGrigGui()
-        
-        StatusBar(bottomFrame)
+        StatusBar()
         MenuBar()
 
         cfg.ROOT.update_idletasks()
