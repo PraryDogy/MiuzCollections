@@ -1,14 +1,16 @@
+import re
 import tkinter
 from tkinter.ttk import Separator
 
 import cfg
 from Gallery.Settings import Gui as Settings
+from Utils.Splashscreen import SplashScreen
+from Utils.Utils import ReloadGallery
 
 from .ClmnBtnCmd import Cmd as ClmnCmd
 from .GridBtnCmd import Cmd as GridCmd
-from .UpdaterGui import Create as UpdaterGui
 
-
+    
 class Create:
     def __init__(self, bottomFrame):        
 
@@ -19,8 +21,6 @@ class Create:
             bottomFrame, bg=cfg.BGCOLOR, height=10, pady=5)
         self.stBar.pack(anchor='e')
 
-
-
         settingLabel = tkinter.Label(
             self.stBar, bg=cfg.BGCOLOR, fg=cfg.FONTCOLOR, text='Настройки')
         settingLabel.pack(side='left')
@@ -28,13 +28,12 @@ class Create:
         settingsBtn = tkinter.Label(
             self.stBar, bg=cfg.BGBUTTON, fg=cfg.FONTCOLOR, 
             width=7, font=('', 10, ''), text='⚙', padx=5)
-        settingsBtn.bind('<Button-1>', lambda event: Settings.Create())
+        settingsBtn.bind(
+            '<Button-1>', lambda event: self.OpenSettings(settingsBtn))
         settingsBtn.pack(side='left')
-
+        
         rightSettings = tkinter.Frame(self.stBar, bg=cfg.BGCOLOR, width=15)
         rightSettings.pack(side='left')
-        
-        
         
         updaterLabel = tkinter.Label(
             self.stBar, bg=cfg.BGCOLOR, fg=cfg.FONTCOLOR, text='Обновить')
@@ -44,7 +43,8 @@ class Create:
             self.stBar, bg=cfg.BGBUTTON, fg=cfg.FONTCOLOR, 
             width=7, font=('', 10, ''), text='⟲', padx=5)
         updaterBtn.pack(side='left')
-        updaterBtn.bind('<Button-1>', lambda event: UpdaterGui())
+        updaterBtn.bind(
+            '<Button-1>', lambda event: self.Update(updaterBtn))
 
         rightUpdater = tkinter.Frame(self.stBar, bg=cfg.BGCOLOR, width=15)
         rightUpdater.pack(side='left')     
@@ -91,4 +91,23 @@ class Create:
             text='+', width=7, font=('', 10, ''))
         clmnMore.bind('<Button-1>', lambda event: ClmnCmd(moreless='+'))
         clmnMore.pack(side='left')
+
+    def OpenSettings(self, btn):
+        if cfg.TOP_LVL:
+            return
         
+        cfg.TOP_LVL = True
+        btn.configure(bg=cfg.BGPRESSED)
+        cfg.ROOT.after(100, lambda: btn.configure(bg=cfg.BGBUTTON))
+        Settings.Create()
+        
+
+    def Update(self, btn):
+        if cfg.TOP_LVL:
+            return
+
+        cfg.TOP_LVL = True
+        btn.configure(bg=cfg.BGPRESSED)
+        cfg.ROOT.after(100, lambda: btn.configure(bg=cfg.BGBUTTON))
+        SplashScreen()
+        ReloadGallery()
