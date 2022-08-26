@@ -12,7 +12,7 @@ from .OpenCollection import OpenCollection
 
 class Create:
     def __init__(self, menuFrame):
-        '''
+        """
         We have list of collections created from database > Thumbs, 
         each collection is button.
         
@@ -35,18 +35,17 @@ class Create:
         btn = button
         clps = collapse
         clmn = column
-        '''
+        """
         
         getCollsList = sqlalchemy.select(Thumbs.collection)
         res = dBase.conn.execute(getCollsList).fetchall()
         res = set(i[0] for i in res)
-
         
         self.collsNames = list()
-        for i in res:
-            collEdit = re.search(r'(\d{0,30}\s){,1}', i).group()
-            name = i.replace(collEdit, '')
-            self.collsNames.append(name)
+        for nameColl in res:
+            collEdit = re.search(r'(\d{0,30}\s){,1}', nameColl).group()
+            nameBtn = nameColl.replace(collEdit, '')
+            self.collsNames.append((nameBtn[:13], nameColl))
             
         self.collsNames.sort()
         
@@ -87,11 +86,11 @@ class Create:
         
         allBtns = list()
         
-        for collection in self.collsNames[:len(self.collsNames)//2]:
+        for nameBtn, nameColl in self.collsNames[:len(self.collsNames)//2]:
             collBtn = tkinter.Label(
                 self.firstClmn, bg=cfg.BGBUTTON, fg=cfg.FONTCOLOR, 
                 height=1, width=12,
-                text=collection[:13],
+                text=nameBtn,
                 )
             
             collBtn.pack(pady=(0, 10))
@@ -102,14 +101,14 @@ class Create:
                 lambda event, 
                 allBtns=allBtns, 
                 currBtn=collBtn,
-                coll=collection: 
+                coll=nameColl: 
                     OpenCollection(allBtns, currBtn, coll)) 
  
-        for collection in self.collsNames[len(self.collsNames)//2:]:
+        for nameBtn, nameColl in self.collsNames[len(self.collsNames)//2:]:
             collBtn = tkinter.Label(
                 self.secClmn, bg=cfg.BGBUTTON, fg=cfg.FONTCOLOR, 
                 height=1, width=12,
-                text=collection[:13],
+                text=nameBtn,
                 )
                 
             collBtn.pack(pady=(0, 10))
@@ -120,7 +119,7 @@ class Create:
                 lambda event, 
                 allBtns=allBtns, 
                 currBtn=collBtn,
-                coll=collection: 
+                coll=nameColl: 
                     OpenCollection(allBtns, currBtn, coll))
             
         getCurrColl = sqlalchemy.select(Config.value).where(
