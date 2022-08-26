@@ -27,13 +27,12 @@ class TkObjects:
 
 
 class Create(tkinter.Toplevel):
-    def __init__(self):
+    def __init__(self):        
         """Create tk TopLevel with tkinter.Labels and buttons. 
         Methods: just run class. 
         Imports: ManageDb from DataBase package."""
-
-        tkinter.Toplevel.__init__(
-            self, cfg.ROOT, bg=cfg.BGCOLOR)
+        
+        super().__init__(cfg.ROOT, bg=cfg.BGCOLOR)
         cfg.ROOT.eval(f'tk::PlaceWindow {self} center')
         
         self.withdraw()
@@ -42,7 +41,8 @@ class Create(tkinter.Toplevel):
         self.title('Настройки')
         self.geometry(f'570x650')
         self.configure(padx=10, pady=10)
-        
+        self.protocol("WM_DELETE_WINDOW", self.on_closing)
+
         frameUp = MyFrame(self)
         frameUp.pack(fill='both', expand=True)
 
@@ -63,6 +63,10 @@ class Create(tkinter.Toplevel):
 
         self.geometry(f'+{xx}+{yy}')
         self.deiconify()
+        
+    def on_closing(self):
+        cfg.TOP_LVL = False
+        self.destroy()
 
 class LeftMenu(MyFrame, TkObjects):
     def __init__(self, master):
@@ -116,9 +120,13 @@ class BelowMenu(MyFrame, TkObjects):
         btnSave.pack(side='left', padx=10)
 
         btnCancel = MyButton(self, text='Отмена')
-        btnCancel.Cmd(lambda event: self.winfo_toplevel().destroy())
+        btnCancel.Cmd(lambda event: self.cancel())
         btnCancel.pack(side='left')
     
+    def cancel(self):
+        cfg.TOP_LVL = False
+        self.winfo_toplevel().destroy()
+        
     def saveIns(self):
         with open(os.path.join(cfg.DB_DIR, 'cfg.json'), 'r') as file:
             data = json.load(file)
@@ -130,26 +138,30 @@ class BelowMenu(MyFrame, TkObjects):
         with open(os.path.join(cfg.DB_DIR, 'cfg.json'), 'w') as file:
             json.dump(data, file, indent=4)
             
-        TkObjects.inserts = list()
+        TkObjects.inserts.clear()
+        
+        cfg.TOP_LVL = False
         self.winfo_toplevel().destroy()
 
         
 class General(MyFrame, TkObjects):
     def __init__(self, master):
-        super().__init__(master)
+        super().__init__(master, padx=15)
         TkObjects.genFrame = self
+
+        title = MyLabel(self, text='Основные', font=('Arial', 22, 'bold'))
+        title.pack(pady=10)
         
         txt1 = (
             'При запуске программа сканирует и обновляет фото'
             f'\nвсех коллекций за последние {cfg.FILE_AGE} дней.'
-            
-            '\n\nНажмите "Обновить", чтобы повторно запустить сканирование.'
+            '\nНажмите "Обновить", чтобы повторно запустить сканирование.'
             )
         
         descrLabel = MyLabel(self)
         descrLabel.configure(
             text=txt1, justify='left', wraplength=350)
-        descrLabel.pack(padx=(15, 0), pady=(30, 10), anchor='w')
+        descrLabel.pack(pady=(0, 10), anchor='w')
 
         pathh = os.path.join(os.path.dirname(__file__), 'upd.jpg')
         imgSrc = Image.open(pathh)
@@ -172,7 +184,7 @@ class General(MyFrame, TkObjects):
         descrLabel2 = MyLabel(self)
         descrLabel2.configure(
             text=txt2, justify='left', wraplength=350)
-        descrLabel2.pack(padx=(15, 0), pady=(0, 10), anchor='w')
+        descrLabel2.pack(pady=(0, 10), anchor='w')
         
         scanBtn = MyButton(self, text='Полное сканирование')
         scanBtn.Cmd(lambda event: self.RunScan())
@@ -181,11 +193,8 @@ class General(MyFrame, TkObjects):
         sep = Separator(self, orient='horizontal')
         sep.pack(padx=40, pady=(25, 20), fill='x')
         
-        name = (
-            f'{cfg.APP_NAME} {cfg.APP_VER}'
-            '\n\n'
-            )
         made = (
+            f'{cfg.APP_NAME} {cfg.APP_VER}'
             '\nCreated by Evgeny Loshkarev'
             '\nCopyright © 2022 MIUZ Diamonds.'
             '\nAll rights reserved.'
@@ -193,8 +202,8 @@ class General(MyFrame, TkObjects):
 
         createdBy = MyLabel(self)
         createdBy.configure(
-            text=name+made, justify='left')
-        createdBy.pack(padx=(15, 0), anchor='w')
+            text=made, justify='left')
+        createdBy.pack(anchor='w')
         
 
     def RunScan(self):
@@ -206,12 +215,13 @@ class General(MyFrame, TkObjects):
 
 class Expert(tkmacosx.SFrame, TkObjects):
     def __init__(self, master):
-        super().__init__(master)
-        
+        super().__init__(master, padx=15)
         self.configure(bg=cfg.BGCOLOR, scrollbarwidth=10)
         self.configure(avoidmousewheel=(self))
-        
         TkObjects.expFrame = self
+
+        title = MyLabel(self, text='Эксперт', font=('Arial', 22, 'bold'))
+        title.pack(pady=10)
         
         with open(os.path.join(cfg.DB_DIR, 'cfg.json'), 'r') as file:
             data = json.load(file)
@@ -220,8 +230,8 @@ class Expert(tkmacosx.SFrame, TkObjects):
         
         for key, value in data.items():
             
-            desrc = MyLabel(self)
-            desrc.pack(anchor='w', pady=(30, 0), padx=(0, 15))
+            desrc = MyLabel(self, wraplength=350)
+            desrc.pack(anchor='w', pady=(0, 10))
             labelsInserts.append(desrc)
             
             ins = tkinter.Entry(
@@ -235,9 +245,10 @@ class Expert(tkmacosx.SFrame, TkObjects):
                 highlightcolor=cfg.BGBUTTON,
                 bd=0,
                 justify='center',
+                width=35
                 )
             ins.insert(0, value)
-            ins.pack(fill='x', pady=(0, 10), padx=(5, 15))
+            ins.pack(pady=(0, 10))
             TkObjects.inserts.append(ins)
             
             frameBtns = MyFrame(self)
@@ -256,7 +267,10 @@ class Expert(tkmacosx.SFrame, TkObjects):
                 lambda event, ins=ins, btn=btnPaste: self.PasteIns(ins, btn)
                 )
             btnPaste.pack(side='right', padx=(0, 10))
-            
+
+            sep = Separator(self, orient='horizontal')
+            sep.pack(padx=40, pady=20, fill='x')
+        
         for ins, descr in zip(labelsInserts, descriptions):
             ins.configure(text=descr, justify='left', wraplength=340)
 
@@ -265,7 +279,7 @@ class Expert(tkmacosx.SFrame, TkObjects):
         restoreBtn.Cmd(
             lambda event, btn=restoreBtn: self.Restore(btn)
             )
-        restoreBtn.pack(pady=(20, 15))
+        restoreBtn.pack(pady=(0, 15))
         
     def Restore(self, btn):
         btn.configure(bg=cfg.BGPRESSED)
