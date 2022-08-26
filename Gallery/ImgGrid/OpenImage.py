@@ -5,7 +5,7 @@ from PIL import Image, ImageOps, ImageTk
 
 class OpenImage(tkinter.Frame):
     def __init__(self, master, src):
-        tkinter.Frame.__init__(self, master)
+        super().__init__(master)
 
         self.image = Image.open(src)
         self.img_copy= self.image.copy()

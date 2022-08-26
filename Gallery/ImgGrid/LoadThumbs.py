@@ -1,6 +1,5 @@
 import traceback
 
-import cfg
 import cv2
 import numpy
 import sqlalchemy
@@ -9,31 +8,15 @@ from PIL import Image, ImageTk
 
 
 def LoadThumbs(currColl):
-    '''
-    return list turples
-    (img, src)
-    '''
+    """return list turples: (img, src)"""
+    
     query = sqlalchemy.select(Config.value).where(Config.name=='size')
     size = int(dBase.conn.execute(query).first()[0])
 
-    if size==150:
-        img = Thumbs.img150
-    if size==200:
-        img = Thumbs.img200
-    if size==250:
-        img = Thumbs.img250
-    if size==300:
-        img = Thumbs.img300  
-
-    getColls = sqlalchemy.select(Thumbs.collection)
-    collsNames = dBase.conn.execute(getColls).fetchall()
-    collsNames = set(i[0] for i in collsNames)
-    try:
-        currColl = [i for i in collsNames if currColl in i][0]
-    except IndexError:
-        print(traceback.format_exc())
-        currColl = 'noCollection'
-
+    for i in [Thumbs.img150, Thumbs.img200, Thumbs.img250, Thumbs.img300]:
+        if str(size) in str(i):
+            img = i
+        
     query = sqlalchemy.select(img, Thumbs.src).where(
         Thumbs.collection==currColl).order_by(
             -Thumbs.modified)
