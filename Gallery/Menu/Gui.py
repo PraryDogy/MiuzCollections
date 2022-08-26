@@ -14,10 +14,10 @@ from Utils.Styled import *
 class Create(MyFrame):
     def __init__(self):
         """Inherit: MyFrame. 
-        Create tkinter Frame inside cfg.UP_FRAME. 
+        Creates tkinter Frame inside cfg.UP_FRAME. 
         This is menu with buttons, based on list of collections. 
-        List of collections created from Database > Thumbs.collection. 
-        Button load collection, binded to this button. 
+        Database > Thumbs.collection creates list of collections.
+        Button loads collection, binded to this button. 
         """
         
         super().__init__(cfg.UP_FRAME)
