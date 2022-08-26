@@ -42,12 +42,10 @@ class BtnCmd:
 
 class StatusBar(MyFrame, BtnCmd):
     def __init__(self):        
-
+        super().__init__(cfg.ROOT)
+        
         separ = Separator(cfg.ROOT,orient='horizontal')
         separ.pack(fill='x', pady=10)
-
-        super().__init__(cfg.ROOT)
-        self.pack(anchor='e', pady=(0, 10))
 
         settingLabel = MyLabel(self, text='Настройки')
         settingLabel.pack(side='left')

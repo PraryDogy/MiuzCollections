@@ -21,9 +21,9 @@ class Create:
         cfg.UP_FRAME = tkinter.Frame(cfg.ROOT, bg=cfg.BGCOLOR)
         cfg.UP_FRAME.pack(fill='both', expand=True)
         
-        MenuGui()
-        ImgGrigGui()
-        StatusBar()
+        MenuGui().pack(side='left')
+        ImgGrigGui().pack(side='left', fill='both', expand=True)
+        StatusBar().pack(pady=(0, 10))
         MenuBar()
 
         cfg.ROOT.update_idletasks()

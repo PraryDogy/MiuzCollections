@@ -39,7 +39,6 @@ class Create(MyFrame):
         """
         
         super().__init__(cfg.UP_FRAME)
-        self.pack(side='left')
         
         getCollsList = sqlalchemy.select(Thumbs.collection)
         res = dBase.conn.execute(getCollsList).fetchall()

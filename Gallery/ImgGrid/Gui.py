@@ -38,7 +38,6 @@ class Create(MyFrame):
         and images size from "size" from database.db > Config > size"""
         
         super().__init__(cfg.UP_FRAME)
-        self.pack(side='left', fill='both', expand=True)
         cfg.GRID_GUI = Create
         cfg.IMG_GRID = self
         self.Gui()
