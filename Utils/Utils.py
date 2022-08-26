@@ -66,15 +66,26 @@ def ReloadGallery():
     cfg.GRID_GUI()
     
 
-class SmbChecker(tkinter.Toplevel):
-    """Methods: Check"""
-    
+class SmbChecker(tkinter.Toplevel):    
     def __init__(self):
-        tkinter.Toplevel.__init__(
-            self, cfg.ROOT, bg=cfg.BGCOLOR, padx=10, pady=10)
+        """Methods: Check"""
+
+        super().__init__(cfg.ROOT, bg=cfg.BGCOLOR, padx=10, pady=10)
         self.withdraw()
 
     def Check(self):
+        """Checks smb availability with cfg.PHOTO_DIR os.exists method,
+        e.g: /Volumes/Path/To/Photo/Dir.
+        
+        If dir not exists, will tries connect to smb with Connect method.
+        Connect is AppleScript execution with os.system, where
+        smb dir for connection is cfg.SMB_CONN e.g:
+        smb://XXX.XXX.XX.XXX/FolderName
+        
+        PHOTO_DIR and SMB_CONN can be changed in settings gui or in
+        cfg.json. 
+        Read cfg.py file."""
+        
         if not os.path.exists(cfg.PHOTO_DIR):
             if not self.Connect():
                 self.Gui()
@@ -83,6 +94,11 @@ class SmbChecker(tkinter.Toplevel):
         return True
 
     def Connect(self):
+        """Returns True if connect, else False. 
+        AppleScript execution with os.system, where
+        smb dir for connection is cfg.SMB_CONN e.g:
+        smb://XXX.XXX.XX.XXX/FolderName"""
+        
         os.system(f"osascript -e 'mount volume \"{cfg.SMB_CONN}\"'")
         if not os.path.exists(cfg.PHOTO_DIR):
             return False
@@ -124,8 +140,7 @@ class DbCkecker(tkinter.Toplevel):
     def __init__(self):        
         """Methods: Check."""
 
-        tkinter.Toplevel.__init__(
-            self, bg=cfg.BGCOLOR, padx=15, pady=10)
+        super().__init__(bg=cfg.BGCOLOR, padx=15, pady=10)
         self.withdraw()
    
     def Check(self):

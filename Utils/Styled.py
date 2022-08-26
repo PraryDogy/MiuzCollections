@@ -7,7 +7,7 @@ class MyButton(tkinter.Label):
     Methods: Cmd"""
 
     def __init__(self, master, **kwargs):
-        tkinter.Label.__init__(self, master, **kwargs)
+        super().__init__(master, **kwargs)
         self.configure(
             bg=cfg.BGBUTTON, fg=cfg.FONTCOLOR, 
             width=17, height=2)
@@ -20,12 +20,12 @@ class MyButton(tkinter.Label):
 class MyFrame(tkinter.Frame):
     """Tkinter Frame with cfg styles"""
     def __init__(self, master, **kwargs):
-        tkinter.Frame.__init__(self, master, **kwargs)
+        super().__init__(master, **kwargs)
         self.configure(bg=cfg.BGCOLOR)
 
 
 class MyLabel(tkinter.Label):
     """Tkinter Label with cfg styles"""
     def __init__(self, master, **kwargs):
-        tkinter.Label.__init__(self, master, **kwargs)
+        super().__init__(master, **kwargs)
         self.configure(bg=cfg.BGCOLOR, fg=cfg.FONTCOLOR)
