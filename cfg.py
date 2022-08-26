@@ -27,6 +27,7 @@ LIVE_LBL = tkinter.Label
 
 GRID_GUI = object
 FLAG = True
+TOP_LVL = False
 
 # for downloading database from Yandex Disk
 YADISK_TOKEN = "AQAAAAARTU_6AAgMRGzO_kyAykpGqUubuGuraCg"
