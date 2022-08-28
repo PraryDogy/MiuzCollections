@@ -7,3 +7,4 @@ dist/
 build/
 testfile.py
 __Dist/
+test.py
