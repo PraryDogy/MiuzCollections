@@ -52,57 +52,33 @@ def MyPaste():
     print('pasted')
     return subprocess.check_output(
         'pbpaste', env={'LANG': 'en_US.UTF-8'}).decode('utf-8')
-
-
-def ReloadGallery():
-    """Destroy cfg.IMG_GRID frame with thumbmails,
-    create new tkinter frame cfg.IMG_GRID and put in it new thumbnails"""
-    
-    cfg.IMG_GRID.destroy()
-    imgFrame = tkinter.Frame(cfg.UP_FRAME, bg=cfg.BGCOLOR)
-    imgFrame.pack(side='left', fill='both', expand=True)
-    cfg.IMG_GRID = imgFrame
-    
-    cfg.GRID_GUI()
     
 
 class SmbChecker(tkinter.Toplevel):    
     def __init__(self):
         """Methods: Check"""
 
-        super().__init__(cfg.ROOT, bg=cfg.BGCOLOR, padx=10, pady=10)
+        tkinter.Toplevel.__init__(
+            self, cfg.ROOT, bg=cfg.BGCOLOR, padx=10, pady=10)
         self.withdraw()
 
     def Check(self):
         """Checks smb availability with cfg.PHOTO_DIR os.exists method,
         e.g: /Volumes/Path/To/Photo/Dir.
         
-        If dir not exists, will tries connect to smb with Connect method.
-        Connect is AppleScript execution with os.system, where
-        smb dir for connection is cfg.SMB_CONN e.g:
-        smb://XXX.XXX.XX.XXX/FolderName
+        If dir not exists, show gui with description and return False.
         
         PHOTO_DIR and SMB_CONN can be changed in settings gui or in
         cfg.json. 
         Read cfg.py file."""
         
-        if not os.path.exists(cfg.PHOTO_DIR):
-            if not self.Connect():
-                self.Gui()
-                return False
+        photoDir = os.path.join(os.sep, *cfg.PHOTO_DIR.split('/')) 
+        if not os.path.exists(photoDir):
+            self.Gui()
+            return False
         self.destroy()
         return True
 
-    def Connect(self):
-        """Returns True if connect, else False. 
-        AppleScript execution with os.system, where
-        smb dir for connection is cfg.SMB_CONN e.g:
-        smb://XXX.XXX.XX.XXX/FolderName"""
-        
-        os.system(f"osascript -e 'mount volume \"{cfg.SMB_CONN}\"'")
-        if not os.path.exists(cfg.PHOTO_DIR):
-            return False
-        return True
 
     def Gui(self):
         self.focus_force()
@@ -111,8 +87,7 @@ class SmbChecker(tkinter.Toplevel):
         self.attributes('-topmost', 'true')
         
         txt = 'Нет подключения к сетевому диску Miuz. '
-        titleLbl = MyLabel(
-            self, text=txt, wraplength=350, font=('Arial', 10, 'bold'))
+        titleLbl = MyLabel(self, text=txt, wraplength=350)
         titleLbl.pack(pady=(0, 20))
 
         txt2 =(
@@ -129,7 +104,7 @@ class SmbChecker(tkinter.Toplevel):
         descrLbl.pack(padx=15, pady=(0, 15))
 
         clsBtn = MyButton(self, text='Закрыть')
-        clsBtn.Cmd(lambda event: self.destroy())
+        clsBtn.Cmd(lambda e: self.destroy())
         clsBtn.pack()
 
         cfg.ROOT.eval(f'tk::PlaceWindow {self} center')
@@ -140,7 +115,7 @@ class DbCkecker(tkinter.Toplevel):
     def __init__(self):        
         """Methods: Check."""
 
-        super().__init__(bg=cfg.BGCOLOR, padx=15, pady=10)
+        tkinter.Toplevel.__init__(self, bg=cfg.BGCOLOR, padx=15, pady=10)
         self.withdraw()
    
     def Check(self):

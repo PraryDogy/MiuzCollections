@@ -2,7 +2,7 @@ import tkinter
 
 import cfg
 
-from .Settings.Gui import Create as Settings
+from .Sttngs import Settings
 
 
 class Create:
@@ -49,7 +49,7 @@ class Create:
         closeButton = tkinter.Label(
             newWin, bg=cfg.BGBUTTON, fg=cfg.FONTCOLOR, 
             height=2, width=17, text='Закрыть')
-        closeButton.bind('<Button-1>', lambda event: newWin.destroy())
+        closeButton.bind('<Button-1>', lambda e: newWin.destroy())
         closeButton.pack()
         
         cfg.ROOT.eval(f'tk::PlaceWindow {newWin} center')
@@ -74,7 +74,7 @@ class Create:
         closeButton = tkinter.Label(
             newWin, bg=cfg.BGBUTTON, fg=cfg.FONTCOLOR, 
             height=2, width=17, text='Закрыть')
-        closeButton.bind('<Button-1>', lambda event: newWin.destroy())
+        closeButton.bind('<Button-1>', lambda e: newWin.destroy())
         closeButton.pack()
         
         cfg.ROOT.eval(f'tk::PlaceWindow {newWin} center')

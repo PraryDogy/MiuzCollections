@@ -21,11 +21,8 @@ BGPRESSED = '#395432'
 
 # tkinter global variables for avaibility from any place
 ROOT = tkinter.Tk()
-UP_FRAME = tkinter.Entry
-IMG_GRID = tkinter.Entry
 LIVE_LBL = tkinter.Label
 
-GRID_GUI = object
 FLAG = True
 TOP_LVL = False
 
@@ -35,7 +32,6 @@ YADISK_DIR = '/miuzgall'
 
 # There is default values on 22.08.2022
 defaults = {    
-    'SMB_CONN': 'smb://192.168.10.105/Shares',
     'PHOTO_DIR': '/Volumes/Shares/Marketing/Photo',
     'COLL_FOLDER': '_Collections',
     'RT_FOLDER': 'Retouch',
@@ -50,7 +46,6 @@ else:
         json.dump(defaults, file, indent=4,)
         data = defaults
 
-SMB_CONN = data['SMB_CONN']
 PHOTO_DIR = data['PHOTO_DIR']
 COLL_FOLDER = data['COLL_FOLDER']
 RT_FOLDER = data['RT_FOLDER']

@@ -11,30 +11,29 @@ from .Utils import DbCkecker, SmbChecker
 
 
 class SplashScreen:
-    def __init__(self) -> None:
+    def __init__(self):
+        """Creates toplevel window and run Scaner from utils.
+        Destroys automaticaly when Scaner done"""
+        
+        DbCkecker().Check()
+        if not SmbChecker().Check():
+            return
+
         gui = Gui()
         task = Scan()
-
-        while task.is_alive():
-            cfg.ROOT.update()
+        while task.is_alive(): cfg.ROOT.update()
         gui.destroy()
-        
         cfg.TOP_LVL = False
     
+
 class Gui(tkinter.Toplevel):
     def __init__(self):
         """Loads database checker, smb checker, files scaner and
         database updater.
-        Methods: just run init."""
-        
-        DbCkecker().Check()
-        
-        if not SmbChecker().Check():
-            return
-        
-        super().__init__(bg=cfg.BGCOLOR)
-        self.attributes('-topmost', 'true')
+        Methods: just run init."""        
+        tkinter.Toplevel.__init__(self, bg=cfg.BGCOLOR)
         self.withdraw()
+        self.attributes('-topmost', 'true')
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
 
         self.Gui()         
@@ -66,7 +65,7 @@ class Gui(tkinter.Toplevel):
         cfg.LIVE_LBL = dynamic
 
         skipBtn = MyButton(self, text='Пропустить')
-        skipBtn.Cmd(lambda event: self.Skip())
+        skipBtn.Cmd(lambda e: self.Skip())
         skipBtn.pack(pady=(0, 10))
              
         cfg.ROOT.eval(f'tk::PlaceWindow {self} center')
@@ -78,7 +77,7 @@ class Scan(threading.Thread):
         """Scan files & update db with threading.
         Just run init."""
         
-        super().__init__(target=self.__Scan)
+        threading.Thread.__init__(self, target=self.__Scan)
         self.start()
         
     def __Scan(self):

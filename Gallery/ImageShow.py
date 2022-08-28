@@ -17,7 +17,7 @@ class Prev:
         self.newWin.withdraw()
         
         self.newWin.protocol("WM_DELETE_WINDOW", lambda: self.newWin.destroy())
-        self.newWin.bind('<Command-w>', lambda event: self.newWin.destroy())
+        self.newWin.bind('<Command-w>', lambda e: self.newWin.destroy())
 
         self.newWin.configure(bg=cfg.BGCOLOR, padx=15, pady=15)
 
@@ -84,7 +84,7 @@ class Prev:
             frame, bg=cfg.BGBUTTON, fg=cfg.FONTCOLOR, 
             text='Копировать имя файла', padx=10)
         self.copyName.pack(side='left')           
-        self.copyName.bind('<Button-1>', lambda event: self.copyToClipboard())
+        self.copyName.bind('<Button-1>', lambda e: self.copyToClipboard())
         return frame
 
 
@@ -116,7 +116,7 @@ class Prev:
                 height=2, width=17, text='Открыть папку')
             self.OpenBtn.bind(
                 '<Button-1>', 
-                lambda event: self.OpenFolder()
+                lambda e: self.OpenFolder()
                 )
             
             self.OpenBtn.pack(side='left', padx=(0, 20))
@@ -126,6 +126,6 @@ class Prev:
             frame, bg=cfg.BGBUTTON, fg=cfg.FONTCOLOR, 
             height=2, width=17, text='Закрыть')
 
-        closeBtn.bind('<Button-1>', lambda event: self.newWin.destroy())
+        closeBtn.bind('<Button-1>', lambda e: self.newWin.destroy())
         closeBtn.pack(side='left')
         return frame

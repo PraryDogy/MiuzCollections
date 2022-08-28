@@ -45,19 +45,11 @@ setup(
 
 
 parent = os.path.dirname(__file__)
-shutil.rmtree(os.path.join(parent, 'build'))
-shutil.rmtree(os.path.join(parent, '.eggs'))
-
 
 lib = '/Users/Loshkarev/Documents/Разное/Projects/files/lib'
 
-pasteHere = os.path.join(
-    os.path.dirname(__file__), 
-    'dist', 
-    f'{cfg.APP_NAME}.app', 
-    'Contents', 
-    'lib'
-    )
+pasteHere = os.path.join(os.path.dirname(__file__), 'dist', 
+                        f'{cfg.APP_NAME}.app', 'Contents', 'lib')
 
 shutil.copytree(lib, pasteHere)
 
@@ -66,4 +58,6 @@ file = os.path.join(parent, 'dist', f'{cfg.APP_NAME}.app')
 desktop = os.path.join(os.path.join(os.path.expanduser('~')), 'Desktop', f'{cfg.APP_NAME}.app')
 shutil.move(file, desktop)
 
+shutil.rmtree(os.path.join(parent, 'build'))
+shutil.rmtree(os.path.join(parent, '.eggs'))
 shutil.rmtree(os.path.join(parent, 'dist'))

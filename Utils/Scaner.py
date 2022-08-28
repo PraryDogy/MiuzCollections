@@ -21,8 +21,10 @@ class BaseScan:
         "years" folder."""         
            
         yearsDirs = list()
+        photoDir = os.path.join(os.sep, *cfg.PHOTO_DIR.split('/')) 
+
         for i in range(2018, datetime.datetime.now().year + 1):
-            yearDir = os.path.join(cfg.PHOTO_DIR, str(i))
+            yearDir = os.path.join(photoDir, str(i))
             yearsDirs.append(yearDir) if os.path.exists(yearDir) else None
 
         listDirs = list()

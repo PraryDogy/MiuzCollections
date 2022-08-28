@@ -1,7 +1,6 @@
 import json
 import os
 import sys
-import textwrap
 import tkinter
 from tkinter.ttk import Separator
 
@@ -10,13 +9,13 @@ import sqlalchemy
 import tkmacosx
 from DataBase.Database import Config, dBase
 from PIL import Image, ImageOps, ImageTk
-from Utils.Utils import MyCopy, MyPaste
 from Utils.Styled import *
+from Utils.Utils import MyCopy, MyPaste
 
 from .Descriptions import descriptions
 
 
-class TkObjects:
+class Globals:
     
     genFrame = tkinter.Frame
     expFrame = tkinter.Frame
@@ -26,13 +25,12 @@ class TkObjects:
     inserts = list()
 
 
-class Create(tkinter.Toplevel):
+class Settings(tkinter.Toplevel):
     def __init__(self):        
-        """Create tk TopLevel with tkinter.Labels and buttons. 
-        Methods: just run class. 
-        Imports: ManageDb from DataBase package."""
+        """Tkinter toplevel with settings gui.
+        Methods: just run init."""
         
-        super().__init__(cfg.ROOT, bg=cfg.BGCOLOR)
+        tkinter.Toplevel.__init__(self, cfg.ROOT, bg=cfg.BGCOLOR)
         cfg.ROOT.eval(f'tk::PlaceWindow {self} center')
         
         self.withdraw()
@@ -68,18 +66,18 @@ class Create(tkinter.Toplevel):
         cfg.TOP_LVL = False
         self.destroy()
 
-class LeftMenu(MyFrame, TkObjects):
+class LeftMenu(MyFrame):
     def __init__(self, master):
-        super().__init__(master)
+        MyFrame.__init__(self, master)
         genBtn = MyButton(self, text='Основные')
         genBtn.configure(bg=cfg.BGPRESSED)
         
         genBtn.Cmd(
-            lambda event: self.Change(
-                TkObjects.expFrame, 
-                TkObjects.genFrame,
-                TkObjects.genBtn,
-                TkObjects.expBtn
+            lambda e: self.Change(
+                Globals.expFrame, 
+                Globals.genFrame,
+                Globals.genBtn,
+                Globals.expBtn
                 )
                 )
         genBtn.pack()
@@ -88,17 +86,17 @@ class LeftMenu(MyFrame, TkObjects):
             self, text = 'Эксперт')
 
         expertBtn.Cmd(
-            lambda event: self.Change(
-                TkObjects.genFrame, 
-                TkObjects.expFrame,
-                TkObjects.expBtn, 
-                TkObjects.genBtn
+            lambda e: self.Change(
+                Globals.genFrame, 
+                Globals.expFrame,
+                Globals.expBtn, 
+                Globals.genBtn
                 )
                 )
         expertBtn.pack()
 
-        TkObjects.genBtn = genBtn
-        TkObjects.expBtn = expertBtn
+        Globals.genBtn = genBtn
+        Globals.expBtn = expertBtn
         
     def Change(self, frameForget=tkinter.Frame, framePack=tkinter.Frame, 
                     btnPress=tkinter.Button, btnUnpress=tkinter.Button):
@@ -110,17 +108,17 @@ class LeftMenu(MyFrame, TkObjects):
         btnUnpress.configure(bg=cfg.BGBUTTON)
 
         
-class BelowMenu(MyFrame, TkObjects):
+class BelowMenu(MyFrame):
     def __init__(self, master):
-        super().__init__(master)
-        TkObjects.belowMenu = self
+        MyFrame.__init__(self, master)
+        Globals.belowMenu = self
         
         btnSave = MyButton(self, text='Сохранить')
-        btnSave.Cmd(lambda event: self.saveIns())
+        btnSave.Cmd(lambda e: self.saveIns())
         btnSave.pack(side='left', padx=10)
 
         btnCancel = MyButton(self, text='Отмена')
-        btnCancel.Cmd(lambda event: self.cancel())
+        btnCancel.Cmd(lambda e: self.cancel())
         btnCancel.pack(side='left')
     
     def cancel(self):
@@ -131,23 +129,23 @@ class BelowMenu(MyFrame, TkObjects):
         with open(os.path.join(cfg.DB_DIR, 'cfg.json'), 'r') as file:
             data = json.load(file)
 
-        newValues = [i.get() for i in TkObjects.inserts]
+        newValues = [i.get() for i in Globals.inserts]
         for key, ins in zip(data, newValues):
             data[key] = ins
             
         with open(os.path.join(cfg.DB_DIR, 'cfg.json'), 'w') as file:
             json.dump(data, file, indent=4)
             
-        TkObjects.inserts.clear()
+        Globals.inserts.clear()
         
         cfg.TOP_LVL = False
         self.winfo_toplevel().destroy()
 
         
-class General(MyFrame, TkObjects):
+class General(MyFrame):
     def __init__(self, master):
-        super().__init__(master, padx=15)
-        TkObjects.genFrame = self
+        MyFrame.__init__(self, master, padx=15)
+        Globals.genFrame = self
 
         title = MyLabel(self, text='Основные', font=('Arial', 22, 'bold'))
         title.pack(pady=10)
@@ -187,7 +185,7 @@ class General(MyFrame, TkObjects):
         descrLabel2.pack(pady=(0, 10), anchor='w')
         
         scanBtn = MyButton(self, text='Полное сканирование')
-        scanBtn.Cmd(lambda event: self.RunScan())
+        scanBtn.Cmd(lambda e: self.RunScan())
         scanBtn.pack(anchor='center')
 
         sep = Separator(self, orient='horizontal')
@@ -213,12 +211,12 @@ class General(MyFrame, TkObjects):
         os.execv(sys.executable, ['python'] + sys.argv)
 
 
-class Expert(tkmacosx.SFrame, TkObjects):
+class Expert(tkmacosx.SFrame):
     def __init__(self, master):
-        super().__init__(master, padx=15)
-        self.configure(bg=cfg.BGCOLOR, scrollbarwidth=10)
+        tkmacosx.SFrame.__init__(self, master, padx=15)
+        self.configure(bg=cfg.BGCOLOR, scrollbarwidth=0)
         self.configure(avoidmousewheel=(self))
-        TkObjects.expFrame = self
+        Globals.expFrame = self
 
         title = MyLabel(self, text='Эксперт', font=('Arial', 22, 'bold'))
         title.pack(pady=10)
@@ -249,7 +247,7 @@ class Expert(tkmacosx.SFrame, TkObjects):
                 )
             ins.insert(0, value)
             ins.pack(pady=(0, 10))
-            TkObjects.inserts.append(ins)
+            Globals.inserts.append(ins)
             
             frameBtns = MyFrame(self)
             frameBtns.pack()
@@ -257,14 +255,14 @@ class Expert(tkmacosx.SFrame, TkObjects):
             btnCopy = MyButton(frameBtns, text='Копировать')
             btnCopy.configure(height=1, width=9)
             btnCopy.Cmd(
-                lambda event, ins=ins, btn=btnCopy: self.CopyIns(ins, btn)
+                lambda e, ins=ins, btn=btnCopy: self.CopyIns(ins, btn)
                 )
             btnCopy.pack(side='left', padx=(0, 10))
             
             btnPaste = MyButton(frameBtns, text='Вставить')
             btnPaste.configure(height=1, width=9)
             btnPaste.Cmd(
-                lambda event, ins=ins, btn=btnPaste: self.PasteIns(ins, btn)
+                lambda e, ins=ins, btn=btnPaste: self.PasteIns(ins, btn)
                 )
             btnPaste.pack(side='right', padx=(0, 10))
 
@@ -277,7 +275,7 @@ class Expert(tkmacosx.SFrame, TkObjects):
         restoreBtn = MyButton(self, text='По умолчанию')
         restoreBtn.configure(height=1, width=12)
         restoreBtn.Cmd(
-            lambda event, btn=restoreBtn: self.Restore(btn)
+            lambda e, btn=restoreBtn: self.Restore(btn)
             )
         restoreBtn.pack(pady=(0, 15))
         
@@ -292,7 +290,7 @@ class Expert(tkmacosx.SFrame, TkObjects):
         with open(os.path.join(cfg.DB_DIR, 'cfg.json'), 'r') as file:
             data = json.load(file)
         
-        for item, ins in zip(data.values(), TkObjects.inserts):
+        for item, ins in zip(data.values(), Globals.inserts):
             ins.delete(0, 'end')
             ins.insert(0, item)
                 

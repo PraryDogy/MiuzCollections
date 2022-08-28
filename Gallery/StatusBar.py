@@ -4,10 +4,12 @@ from tkinter.ttk import Separator
 import cfg
 import sqlalchemy
 from DataBase.Database import Config, dBase
-from Gallery.Settings import Gui as Settings
 from Utils.Splashscreen import SplashScreen
 from Utils.Styled import *
-from Utils.Utils import ReloadGallery
+
+from .Sttngs import Settings
+
+from .Gallery import GalleryReset
 
 
 class BtnCmd:
@@ -16,7 +18,7 @@ class BtnCmd:
             return
         btn.Press()
         cfg.TOP_LVL = True
-        Settings.Create()
+        Settings()
 
     def Update(self, btn=MyButton):
         if cfg.TOP_LVL:
@@ -24,7 +26,7 @@ class BtnCmd:
         btn.Press()
         cfg.TOP_LVL = True
         SplashScreen()
-        ReloadGallery()
+        GalleryReset()
         
     def MoreLess(self, delta, min, max, dbName):
         query = sqlalchemy.select(Config.value).where(Config.name==dbName)
@@ -37,22 +39,22 @@ class BtnCmd:
         query = sqlalchemy.update(Config).where(
             Config.name==dbName).values(value=str(size))
         dBase.conn.execute(query)
-        ReloadGallery()
+        GalleryReset()
 
 
 class StatusBar(MyFrame, BtnCmd):
-    def __init__(self):        
-        super().__init__(cfg.ROOT)
-        
-        separ = Separator(cfg.ROOT,orient='horizontal')
+    def __init__(self, master):                
+        separ = Separator(master,orient='horizontal')
         separ.pack(fill='x', pady=10)
+
+        MyFrame.__init__(self, master)
 
         settingLabel = MyLabel(self, text='Настройки')
         settingLabel.pack(side='left')
             
         settBtn = MyButton(self, text='⚙', padx=5)
         settBtn.configure(width=5, height=1)
-        settBtn.Cmd(lambda event: self.OpenSettings(settBtn))
+        settBtn.Cmd(lambda e: self.OpenSettings(settBtn))
         settBtn.pack(side='left', padx=(0, 15))
         
         
@@ -61,7 +63,7 @@ class StatusBar(MyFrame, BtnCmd):
         
         updBtn = MyButton(self, text='⟲', padx=5)
         updBtn.configure(width=5, height=1, )
-        updBtn.Cmd(lambda event: self.Update(updBtn))
+        updBtn.Cmd(lambda e: self.Update(updBtn))
         updBtn.pack(side='left', padx=(0, 15))
 
         
@@ -71,13 +73,13 @@ class StatusBar(MyFrame, BtnCmd):
         lessGrid = MyButton(self, text='-', padx=5)
         lessGrid.configure(width=5, height=1, )
         lessGrid.Cmd(
-            lambda event: self.MoreLess(-50, 150, 300, 'size'))
+            lambda e: self.MoreLess(-50, 150, 300, 'size'))
         lessGrid.pack(side='left', padx=(0, 15))
 
         moreGrid = MyButton(self, text='+', padx=5)
         moreGrid.configure(width=5, height=1, )
         moreGrid.Cmd(
-            lambda event: self.MoreLess(+50, 150, 300, 'size'))
+            lambda e: self.MoreLess(+50, 150, 300, 'size'))
         moreGrid.pack(side='left', padx=(0, 15))
 
 
@@ -87,13 +89,13 @@ class StatusBar(MyFrame, BtnCmd):
         lessGrid = MyButton(self, text='-', padx=5)
         lessGrid.configure(width=5, height=1, )
         lessGrid.Cmd(
-            lambda event: self.MoreLess(-1, 1, 10, 'clmns'))
+            lambda e: self.MoreLess(-1, 1, 10, 'clmns'))
         lessGrid.pack(side='left', padx=(0, 15))
 
         moreGrid = MyButton(self, text='+', padx=5)
         moreGrid.configure(width=5, height=1, )
         moreGrid.Cmd(
-            lambda event: self.MoreLess(+1, 1, 10, 'clmns'))
+            lambda e: self.MoreLess(+1, 1, 10, 'clmns'))
         moreGrid.pack(side='left', padx=(0, 15))
 
 

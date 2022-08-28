@@ -3,8 +3,7 @@ import tkinter
 import cfg
 from Utils.Utils import *
 
-from .ImgGrid.Gui import Create as ImgGrigGui
-from .Menu.Gui import Create as MenuGui
+from .Gallery import Gallery
 from .MenuBar import Create as MenuBar
 from .StatusBar import StatusBar
 
@@ -16,14 +15,10 @@ class Create:
         
         cfg.ROOT.title('MiuzGallery')
         cfg.ROOT.configure(bg=cfg.BGCOLOR, padx=15, pady=0)
-        cfg.ROOT.bind('<Command-w>', lambda event: cfg.ROOT.iconify())
-
-        cfg.UP_FRAME = tkinter.Frame(cfg.ROOT, bg=cfg.BGCOLOR)
-        cfg.UP_FRAME.pack(fill='both', expand=True)
+        cfg.ROOT.bind('<Command-w>', lambda e: cfg.ROOT.iconify())
         
-        MenuGui().pack(side='left')
-        ImgGrigGui().pack(side='left', fill='both', expand=True)
-        StatusBar().pack(pady=(0, 10))
+        Gallery(cfg.ROOT).pack(fill='both', expand=True)
+        StatusBar(cfg.ROOT).pack(pady=(0, 10))
         MenuBar()
 
         cfg.ROOT.update_idletasks()
