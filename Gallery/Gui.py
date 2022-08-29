@@ -1,12 +1,12 @@
 import tkinter
+from tkinter.ttk import Separator
 
 import cfg
-from Utils.Utils import *
 
 from .Gallery import Gallery
 from .MenuBar import Create as MenuBar
 from .StatusBar import StatusBar
-from tkinter.ttk import Separator
+
 
 class Create:
     def __init__(self):
