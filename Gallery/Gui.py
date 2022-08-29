@@ -6,7 +6,7 @@ from Utils.Utils import *
 from .Gallery import Gallery
 from .MenuBar import Create as MenuBar
 from .StatusBar import StatusBar
-
+from tkinter.ttk import Separator
 
 class Create:
     def __init__(self):
@@ -17,8 +17,10 @@ class Create:
         cfg.ROOT.configure(bg=cfg.BGCOLOR, padx=15, pady=0)
         cfg.ROOT.bind('<Command-w>', lambda e: cfg.ROOT.iconify())
         
-        Gallery(cfg.ROOT).pack(fill='both', expand=True)
+        Gallery(cfg.ROOT).pack(fill=tkinter.BOTH, expand=True)
+        Separator(cfg.ROOT, orient='horizontal').pack(fill=tkinter.X, pady=10)
         StatusBar(cfg.ROOT).pack(pady=(0, 10))
+        
         MenuBar()
 
         cfg.ROOT.update_idletasks()
