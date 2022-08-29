@@ -12,7 +12,7 @@ from PIL import Image, ImageTk
 from Utils.Styled import *
 from Utils.Utils import *
 
-from .ImageShow import Prev
+from .ImageWin import ImageShow
 
 
 class Globals:
@@ -74,11 +74,11 @@ class Scrollables(MyFrame):
         MyFrame.__init__(self, master)
         self.pack(expand=True, fill=tkinter.BOTH, side=tkinter.BOTTOM)
 
-        Menu(self)
-        Images(self)
+        MenuFrame(self)
+        ImagesFrame(self)
 
 
-class Menu(tkmacosx.SFrame):
+class MenuFrame(tkmacosx.SFrame):
     def __init__(self, master):
         """Creates tkinter scrollable Frame for menu.
         : don't need's pack"""
@@ -86,16 +86,16 @@ class Menu(tkmacosx.SFrame):
         tkmacosx.SFrame.__init__(self, 
             master, bg=cfg.BGCOLOR, scrollbarwidth=1, width=150)
         self.pack(
-            expand=True, fill=tkinter.Y, padx=(0, 15), side=tkinter.LEFT)
+            fill=tkinter.Y, padx=(0, 15), side=tkinter.LEFT,
+            )
         MenuButtons(self)
 
 
-class MenuButtons:
+class MenuButtons(MyButton):
     def __init__(self, master):
         """This is menu with buttons, based on list of collections. 
         Database > Thumbs.collection creates list of collections. 
-        Button command: open collection, 
-        where collection name is button name."""
+        """
 
         __getCollsList = sqlalchemy.select(Thumbs.collection)
         __res = dBase.conn.execute(__getCollsList).fetchall()
@@ -110,6 +110,20 @@ class MenuButtons:
 
         btns = list()
 
+        # for nameBtn, nameColl in collNames:
+
+        #     MyButton.__init__(self, master, text=nameBtn)
+        #     self.configure(height=1, width=12)
+        #     self.pack(pady=(0, 10))
+        #     btns.append(self)
+
+        #     if nameColl == Globals.currColl:
+        #         self.configure(bg=cfg.BGPRESSED)
+
+        #     self.Cmd(
+        #         lambda e, coll=nameColl, m=master: 
+        #             self.OpenCollection(coll, master)) 
+            
         for nameBtn, nameColl in collNames:
 
             btn = MyButton(master, text=nameBtn)
@@ -124,6 +138,7 @@ class MenuButtons:
                 lambda e, coll=nameColl, btn=btn, btns=btns: 
                     self.OpenCollection(coll, btn, btns)) 
 
+
     def OpenCollection(self, coll, btn, btns):
         updateRow = sqlalchemy.update(Config).where(
                 Config.name=='currColl').values(value=coll)
@@ -136,19 +151,23 @@ class MenuButtons:
         GalleryReset()
 
 
-class Images(tkmacosx.SFrame):
+class ImagesFrame(tkmacosx.SFrame):
     def __init__(self, master):
         """Creates tkinter scrollable Frame for images.
         : don't need's pack"""
         self.master = master
         tkmacosx.SFrame.__init__(
             self, master, bg=cfg.BGCOLOR, scrollbarwidth=1)
+        
         ImagesThumbs(self)
+        
         self.update_idletasks()
         w = self.winfo_reqwidth()
         self.configure(width=w*1.03)
+        
         self.pack(
             expand=True, fill=tkinter.BOTH, side=tkinter.RIGHT)
+        
         Globals.imagesReset = self.Reset
         
     def Reset(self):
@@ -156,7 +175,7 @@ class Images(tkmacosx.SFrame):
         self.__init__(self.master)
 
 
-class ImagesThumbs():
+class ImagesThumbs(MyFrame):
     def __init__(self, master) -> None:
         _query = sqlalchemy.select(Config.value).where(
             Config.name=='clmns')
@@ -177,17 +196,17 @@ class ImagesThumbs():
             thumbs[x:x+сlmnCount] for x in range(0, len(thumbs), сlmnCount)]
         
         for row in imgRows:
-            frameRow = MyFrame(master)
-            frameRow.pack(fill='y', expand=True, anchor='w')
+            MyFrame.__init__(self, master)
+            self.pack(fill=tkinter.Y, expand=True, anchor=tkinter.W)
 
-            for image, src in row:
+            for image, src in row:                
+                thumb = MyButton(self, image=image, highlightthickness=1)
+                thumb.configure(width=0, height=0, bg=cfg.BGCOLOR)
+                thumb.image_names = image
+                thumb.Cmd(lambda e, src=src: ImageShow(src))
+                thumb.pack(side=tkinter.LEFT)
 
-                l2 = MyButton(frameRow, image=image, highlightthickness=1)
-                l2.configure(width=0, height=0, bg=cfg.BGCOLOR)
-                l2.image = image
-                l2.Cmd(lambda e, src=src: Prev(src))
-                l2.pack(side='left')
-
+                
     def LoadThumbs(self):
         """return list turples: (img, src)"""
         
