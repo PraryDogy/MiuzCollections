@@ -170,7 +170,7 @@ class General(MyFrame):
         imgLbl = MyLabel(self)
         imgLbl.configure(image=imgTk)
         imgLbl.pack()
-        imgLbl.image = imgTk
+        imgLbl.image_names = imgTk
 
         sep = Separator(self, orient='horizontal')
         sep.pack(padx=40, pady=20, fill=tkinter.X)
