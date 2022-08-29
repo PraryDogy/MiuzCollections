@@ -15,7 +15,7 @@ import cfg
 APP = ['start.py']
 DATA_FILES = [os.path.join(
     os.path.dirname(__file__), 
-    'Gallery/Settings/upd.jpg')
+    'Gallery/upd.jpg')
               ]
 
 OPTIONS = {
