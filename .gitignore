@@ -5,6 +5,4 @@ SamplePhotos/
 .eggs/
 dist/
 build/
-testfile.py
 __Dist/
-test.py
