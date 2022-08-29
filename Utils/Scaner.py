@@ -10,48 +10,37 @@ from DataBase.Database import Thumbs, dBase
 from .Utils import CreateThumb
 
 
-class BaseScan:
+class BaseScan(list):
     """Methods: Years, YearsAged""" 
     
-    def ScanYears(self):
+    def ScanYears(self, aged=True):
         """Returns list of dirs. 
         
         Scan cfg.PHOTO_DIR for folders with "year" names, 
         e.g. path/to/photo_dir/2020 and return list of dirs inside each
         "years" folder."""         
            
-        yearsDirs = list()
+        __baseDirs = list()
         photoDir = os.path.join(os.sep, *cfg.PHOTO_DIR.split('/')) 
 
         for i in range(2018, datetime.datetime.now().year + 1):
             yearDir = os.path.join(photoDir, str(i))
-            yearsDirs.append(yearDir) if os.path.exists(yearDir) else None
+            __baseDirs.append(yearDir) if os.path.exists(yearDir) else None
 
-        listDirs = list()
-        for year in yearsDirs:
-            subDirs = [
-                os.path.join(year, subYear) for subYear in os.listdir(year)]
-            [listDirs.append(i) for i in subDirs]
-        return listDirs
+        for year in __baseDirs:
+            for dirs in os.listdir(year):
+                subDir = os.path.join(year, dirs)
+                self.append(subDir)
 
-    def ScanYearsAged(self):
-        """Returns list of dirs. 
-    
-        Scan years dirs from Years method for folders 
-        younger than date from cfg.FILE_AGE, """
-        
-        yearsDirs = self.ScanYears()
-        agedDirs = list()
-        
-        fileAge = (
-            datetime.datetime.now() - datetime.timedelta(
-                days=int(cfg.FILE_AGE)))
-        youngerThan = fileAge.timestamp()
+        if aged:
+            days = int(cfg.FILE_AGE)
+            fileAge = (
+                datetime.datetime.now() - datetime.timedelta(days=days))
+            youngerThan = fileAge.timestamp()
 
-        for yearDir in yearsDirs:
-            if os.stat(yearDir).st_birthtime > youngerThan:
-                agedDirs.append(yearDir)
-        return agedDirs
+            for dir in self:
+                if os.stat(dir).st_birthtime > youngerThan:
+                    self.remove(dir)
 
 
 class ScanColls(BaseScan):
@@ -63,10 +52,10 @@ class ScanColls(BaseScan):
         """Scan years dirs from ScanYears for folders 
         with "Collection" name from cfg.COLL_FOLDER"""
         
-        yearsDirs = self.ScanYears()
+        BaseScan.__init__(self)
         collsDirs = list()
         
-        for yearDir in yearsDirs:
+        for yearDir in self:
             if f'/{cfg.COLL_FOLDER}' in yearDir:
                 collsDirs.append(yearDir)
                 
