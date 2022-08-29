@@ -100,7 +100,7 @@ class SmbChecker(tkinter.Toplevel):
             '\nПоддержка: loshkarev@miuz.ru'
             '\nTelegram: evlosh'
             )
-        descrLbl = MyLabel(self, text=txt2, justify='left')
+        descrLbl = MyLabel(self, text=txt2, justify=tkinter.LEFT)
         descrLbl.pack(padx=15, pady=(0, 15))
 
         clsBtn = MyButton(self, text='Закрыть')

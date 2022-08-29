@@ -66,8 +66,8 @@ class Scrollable:
         canvas.create_window((0,0), window=self.scrollable, anchor='nw')
         canvas.configure(yscrollcommand=scrollbar.set)
 
-        container.pack(fill='both', expand=True)
-        canvas.pack(side='left', fill='both', expand=True)
-        scrollbar.pack(side='right', fill='y')
+        container.pack(fill=tkinter.BOTH, expand=True)
+        canvas.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=True)
+        scrollbar.pack(side=tkinter.RIGHT, fill=tkinter.Y)
 
         return self.scrollable
