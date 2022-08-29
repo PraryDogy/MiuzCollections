@@ -1,19 +1,58 @@
-import tkinter
+import datetime
+import os
+import sys
 
-from Utils.Styled import MyButton
+import cfg
+import sqlalchemy
+from admin import printAlive
+from DataBase.Database import Thumbs, dBase
 
-root = tkinter.Tk()
 
 
-class Buttons(MyButton):
-    def __init__(self, master):
-        
-        for i in range(0, 15):
-            MyButton.__init__(self, master, text=i)
-            kk = self['text']
-            self.Cmd(lambda e, n=kk: print(n))
+class BaseScan(list):
+    """Methods: Years, YearsAged""" 
+    
+    def __init__(self, aged=True):
 
-            self.pack(pady=(0, 10))
+        __baseDirs = list()
+        photoDir = os.path.join(os.sep, *cfg.PHOTO_DIR.split('/')) 
 
-Buttons(root)
-root.mainloop()
+        for i in range(2018, datetime.datetime.now().year + 1):
+            yearDir = os.path.join(photoDir, str(i))
+            __baseDirs.append(yearDir) if os.path.exists(yearDir) else None
+
+        for year in __baseDirs:
+            for dirs in os.listdir(year):
+                subDir = os.path.join(year, dirs)
+                self.append(subDir)
+
+        if aged:
+            days = int(cfg.FILE_AGE)
+            fileAge = (
+                datetime.datetime.now() - datetime.timedelta(days=days))
+            youngerThan = fileAge.timestamp()
+
+            for dir in self:
+                print(dir)
+                if os.stat(dir).st_birthtime > youngerThan:
+                    self.remove(dir)
+
+
+class ScanColls(list):
+    """Inheritance: BaseScan. 
+    Methods: ScanColls
+    Returns list of dirs."""
+    
+    def __init__(self):
+
+        collsDirs = list()
+        for yearDir in BaseScan():
+
+            if f'/{cfg.COLL_FOLDER}' in yearDir:
+                collsDirs.append(yearDir)
+                
+        for subColl in collsDirs:
+            for i in os.listdir(subColl):
+                self.append(os.path.join(subColl, i))
+
+print(BaseScan())
