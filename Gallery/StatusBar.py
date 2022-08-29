@@ -1,13 +1,10 @@
-from tkinter.messagebox import NO
-from tkinter.ttk import Separator
-
 import cfg
 import sqlalchemy
 from DataBase.Database import Config, dBase
 from Utils.Splashscreen import SplashScreen
 from Utils.Styled import *
 
-from .Sttngs import Settings
+from .SettingsWin import Settings
 
 from .Gallery import GalleryReset
 
@@ -44,58 +41,69 @@ class BtnCmd:
 
 class StatusBar(MyFrame, BtnCmd):
     def __init__(self, master):                
-        separ = Separator(master,orient='horizontal')
-        separ.pack(fill='x', pady=10)
-
         MyFrame.__init__(self, master)
+        
+        SettingsSection(self)
+        UpdateSection(self)
+        GridSection(self)
+        ClmnSection(self)
+        
+        
+class SettingsSection(MyLabel, MyButton, BtnCmd):
+    def __init__(self, master):
+        MyLabel.__init__(self, master, text='Настройки')
+        self.pack(side=tkinter.LEFT)
+                 
+        MyButton.__init__(self, master, text='⚙', padx=5)
+        self.configure(width=5, height=1)
+        self.Cmd(lambda e: self.OpenSettings(self))
+        self.pack(side=tkinter.LEFT, padx=(0, 15))
+                
 
-        settingLabel = MyLabel(self, text='Настройки')
-        settingLabel.pack(side='left')
-            
-        settBtn = MyButton(self, text='⚙', padx=5)
-        settBtn.configure(width=5, height=1)
-        settBtn.Cmd(lambda e: self.OpenSettings(settBtn))
-        settBtn.pack(side='left', padx=(0, 15))
+class UpdateSection(MyLabel, MyButton, BtnCmd):
+    def __init__(self, master):
+        MyLabel.__init__(self, master, text='Обновить')
+        self.pack(side=tkinter.LEFT)
         
-        
-        updLabel = MyLabel(self, text='Обновить')
-        updLabel.pack(side='left')
-        
-        updBtn = MyButton(self, text='⟲', padx=5)
-        updBtn.configure(width=5, height=1, )
-        updBtn.Cmd(lambda e: self.Update(updBtn))
-        updBtn.pack(side='left', padx=(0, 15))
+        MyButton.__init__(self, master, text='⟲', padx=5)
+        self.configure(width=5, height=1, )
+        self.Cmd(lambda e: self.Update(self))
+        self.pack(side=tkinter.LEFT, padx=(0, 15))
 
-        
-        gridLbl = MyLabel(self, text='Размер фото')
-        gridLbl.pack(side='left')
 
-        lessGrid = MyButton(self, text='-', padx=5)
-        lessGrid.configure(width=5, height=1, )
-        lessGrid.Cmd(
+class GridSection(MyLabel, MyButton, BtnCmd):
+    def __init__(self, master):
+        
+        MyLabel.__init__(self, master, text='Размер фото')
+        self.pack(side=tkinter.LEFT)
+
+        MyButton.__init__(self, master, text='-', padx=5)
+        self.configure(width=5, height=1)
+        self.Cmd(
             lambda e: self.MoreLess(-50, 150, 300, 'size'))
-        lessGrid.pack(side='left', padx=(0, 15))
+        self.pack(side=tkinter.LEFT, padx=(0, 15))
 
-        moreGrid = MyButton(self, text='+', padx=5)
-        moreGrid.configure(width=5, height=1, )
-        moreGrid.Cmd(
+        MyButton.__init__(self, master, text='+', padx=5)
+        self.configure(width=5, height=1, )
+        self.Cmd(
             lambda e: self.MoreLess(+50, 150, 300, 'size'))
-        moreGrid.pack(side='left', padx=(0, 15))
+        self.pack(side=tkinter.LEFT, padx=(0, 15))
 
 
-        clmnLbl = MyLabel(self, text='Столбцы')
-        clmnLbl.pack(side='left')
+class ClmnSection(MyLabel, MyButton, BtnCmd):
+    def __init__(self, master):
+        MyLabel.__init__(self, master, text='Столбцы')
+        self.pack(side=tkinter.LEFT)
     
-        lessGrid = MyButton(self, text='-', padx=5)
-        lessGrid.configure(width=5, height=1, )
-        lessGrid.Cmd(
+        MyButton.__init__(self, master, text='-', padx=5)
+        self.configure(width=5, height=1, )
+        self.Cmd(
             lambda e: self.MoreLess(-1, 1, 10, 'clmns'))
-        lessGrid.pack(side='left', padx=(0, 15))
+        self.pack(side=tkinter.LEFT, padx=(0, 15))
 
-        moreGrid = MyButton(self, text='+', padx=5)
-        moreGrid.configure(width=5, height=1, )
-        moreGrid.Cmd(
+        MyButton.__init__(self, master, text='+', padx=5)
+        self.configure(width=5, height=1, )
+        self.Cmd(
             lambda e: self.MoreLess(+1, 1, 10, 'clmns'))
-        moreGrid.pack(side='left', padx=(0, 15))
-
+        self.pack(side=tkinter.LEFT, padx=(0, 15))
 
