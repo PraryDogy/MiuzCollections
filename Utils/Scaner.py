@@ -2,109 +2,85 @@ import datetime
 import os
 import sys
 
-import cfg
 import sqlalchemy
+
+import cfg
 from admin import printAlive
 from DataBase.Database import Thumbs, dBase
+from Utils.Utils import CreateThumb
 
-from .Utils import CreateThumb
 
-
-class BaseScan(list):
-    """Methods: Years, YearsAged""" 
+class BaseScan(list):    
+    def __init__(self, aged=True):
+        """List of dirs in folders with 
+        year name (year name is 2018, 2020 etc). 
+        :param bool aged: if true removes dirs with time created
+        earlier than number of days ago (cfg.FILE_AGE)""" 
     
-    def ScanYears(self, aged=True):
-        """Returns list of dirs. 
-        
-        Scan cfg.PHOTO_DIR for folders with "year" names, 
-        e.g. path/to/photo_dir/2020 and return list of dirs inside each
-        "years" folder."""         
-           
-        __baseDirs = list()
         photoDir = os.path.join(os.sep, *cfg.PHOTO_DIR.split('/')) 
+        __baseDirs = list()
 
-        for i in range(2018, datetime.datetime.now().year + 1):
-            yearDir = os.path.join(photoDir, str(i))
+        for r in range(2018, datetime.datetime.now().year + 1):
+            yearDir = os.path.join(photoDir, str(r))
             __baseDirs.append(yearDir) if os.path.exists(yearDir) else None
 
-        for year in __baseDirs:
-            for dirs in os.listdir(year):
-                subDir = os.path.join(year, dirs)
-                self.append(subDir)
-
-        if aged:
-            days = int(cfg.FILE_AGE)
-            fileAge = (
-                datetime.datetime.now() - datetime.timedelta(days=days))
-            youngerThan = fileAge.timestamp()
-
-            for dir in self:
-                if os.stat(dir).st_birthtime > youngerThan:
-                    self.remove(dir)
-
-
-class ScanColls(BaseScan):
-    """Inheritance: BaseScan. 
-    Methods: ScanColls
-    Returns list of dirs."""
+        for __b in __baseDirs:
+            for dirs in os.listdir(__b):
+                self.append(os.path.join(__b, dirs))
     
-    def ScanColls(self):
-        """Scan years dirs from ScanYears for folders 
-        with "Collection" name from cfg.COLL_FOLDER"""
+        self.__aged() if aged else None
+    
+    def __aged(self):
+        now = datetime.datetime.now().replace(microsecond=0)
+        delta = datetime.timedelta(days=int(cfg.FILE_AGE))
+        fileAge = now - delta
         
-        BaseScan.__init__(self)
+        oldDirs = list()
+        for s in self:
+            
+            birthFloat = os.stat(s).st_birthtime
+            birth = datetime.datetime.fromtimestamp(birthFloat)
+
+            if  birth < fileAge:
+                oldDirs.append(s)                
+        
+        [self.remove(o) for o in oldDirs]
+                  
+                    
+class SearchColls(list):    
+    def __init__(self):
+        """List of dirs with cfg.COLL_FOLDER name."""
+
         collsDirs = list()
-        
-        for yearDir in self:
+        for yearDir in BaseScan(aged=False):
             if f'/{cfg.COLL_FOLDER}' in yearDir:
                 collsDirs.append(yearDir)
                 
-        allColls = list()
         for subColl in collsDirs:
             for i in os.listdir(subColl):
-                allColls.append(os.path.join(subColl, i))
-            
-        return allColls
+                self.append(os.path.join(subColl, i))
 
 
-class ScanRetouched(BaseScan):
-    """Inheritance: BaseScan.
-    Methods: ScanRetouched, ScanRetouchedAged.
-    Returns list of dirs."""
-    
-    def __Scan(self, dirsList):
-        """Search all folders with cfg.RT_FOLDER name."""
+class SearchRetouched(list):
+    def __init__(self, aged=True):
+        """List of dirs with "retouch" name (from cfg.RT_FOLDER). 
+        :param bool aged: if true scan dirs with time created
+        earlier than number of days ago (cfg.FILE_AGE) only.""" 
         
-        rtDirs = list()
-        
-        for dirItem in dirsList:
+        for dirItem in BaseScan(aged):
             for root, _, _ in os.walk(dirItem):
                 printAlive(sys._getframe().f_code.co_name, root)
                 
                 if not cfg.FLAG:
                     return
                 if os.path.join(os.sep, cfg.RT_FOLDER) in root:
-                    rtDirs.append(root)
-        return rtDirs
-    
-    def ScanRetouched(self):
-        """Scan years dirs for folders with name from cfg.RT_FOLDER."""
-        return self.__Scan(self.ScanYears())
-    
-    
-    def ScanRetouchedAged(self):
-        """Scan aged years dirs for folders with name from cfg.RT_FOLDER."""
-        return self.__Scan(self.ScanYearsAged())
-    
+                    self.append(root)
+                    
 
-class ScanFiles(ScanRetouched, ScanColls):
-    """Inheritance: ScanRetouch, ScanColls.
-    Methods: FilesRtAged, FilesRtAll, FilesCollsAll. 
-    Returns list of turples: src, int size, int created, int modified."""
-    
-    def __ScanFiles(self, listDirs):
-        """Returns list of jpeg files. 
-        Input: list of dirs."""
+class SearchImages(list):
+    def __init__(self, listDirs):
+        """List of tuples (src, size, created, modified) of jpeg files. 
+        :param list lisrDirs: list of dirs for jpeg search."""
         
         allFiles = list()
         
@@ -118,7 +94,7 @@ class ScanFiles(ScanRetouched, ScanColls):
                     if not cfg.FLAG:
                         return
         
-        scannedFiles = set()
+        jpegs = set()
         for src in allFiles:
             
             if not cfg.FLAG:
@@ -128,41 +104,20 @@ class ScanFiles(ScanRetouched, ScanColls):
                 size = int(os.path.getsize(src))
                 created = int(props.st_birthtime)
                 modified = int(props.st_mtime)
-                scannedFiles.add((src, size, created, modified))
-        return list(scannedFiles)
+                jpegs.add((src, size, created, modified))
+                
+        self.extend(jpegs)
 
-    def FilesRtAged(self):
-        """Scan aged folders with cfg.RT_FOLDER name for jpg files."""
-        return self.__ScanFiles(self.ScanRetouchedAged())
-    
-    def FilesRt(self):
-        """Scan folders with cfg.RT_FOLDER name for jpg files."""
-        return self.__ScanFiles(self.ScanRetouched())
-    
-    def FilesColls(self):
-        """Scan folders with cfg.COLL_FOLDER name for jpg files."""
-        return self.__ScanFiles(self.ScanColls())
-    
 
-class DbUtils:
-    """Methods: DbLoadColls, InsertRow."""
-    
-    def DbLoadColls(self):
-        """Load Files.src, Files.size, Files.created, Files.modified, 
-        Files.collection from Database > Files
-        
-        Return list of tuples (src, size, created, mod, coll)"""
-        
+
+class DbUpdate(list):
+    def __init__(self):
         q = sqlalchemy.select(
-            Thumbs.src, 
-            Thumbs.size, 
-            Thumbs.created, 
-            Thumbs.modified, 
+            Thumbs.src, Thumbs.size, Thumbs.created, Thumbs.modified, 
             Thumbs.collection
             )
-        files = dBase.conn.execute(q).fetchall()    
-        return list(tuple(i) for i in files)    
-
+        files = dBase.conn.execute(q).fetchall()  
+        self.extend(files)
 
     def InsertRow(self, src, size, created, mod):
         """Input: tuple > (src, size, created, mod, coll). 
@@ -186,19 +141,9 @@ class DbUtils:
             modified=mod,
             collection=collName)
         dBase.conn.execute(q)
-            
-
-class DbUpdate(DbUtils):
-    """Methods: DbExists, DbModified
-    Inheritance: DbUtils"""
     
-    def DbExists(self):
-        """Get list of dirs from database > Thumbs, 
-        check exists with os exitst method. 
-        Remove from database if not exists."""
-        
-        for src, size, created, mod, coll in self.DbLoadColls():
-            
+    def Removed(self):
+        for src, size, created, mod, coll in self:
             printAlive(sys._getframe().f_code.co_name, src)
             
             if not cfg.FLAG:
@@ -206,49 +151,39 @@ class DbUpdate(DbUtils):
             
             if not os.path.exists(src):
                 print('removed file', src)
+                
+                self.remove((src, size, created, mod, coll))
                 q = sqlalchemy.delete(Thumbs).where(Thumbs.src==src)
                 dBase.conn.execute(q)
-
-    def DbModified(self):
-        """Get list items with dirs, modified time of file
-        from database > Thumbs. 
-        Get modified time of file from dir with os.stat method.
-        Compare modified times and replace database row if file from dir
-        newer, than in database."""
-
-        for src, size, created, mod, coll in self.DbLoadColls():
-            
+    
+    def Modified(self):
+        for src, size, created, mod, coll in self:
             printAlive(sys._getframe().f_code.co_name, src)
             
             if not cfg.FLAG:
                 return
             
             fileStat = os.stat(src)
+            
             if int(fileStat.st_mtime) > mod:
                 print('modified', src)
 
+                nSize = int(os.path.getsize(src)), 
+                nCreated = int(fileStat.st_birthtime), 
+                nMod = int(fileStat.st_mtime)
+                    
+                self.remove((src, size, created, mod, coll))
                 q = sqlalchemy.delete(Thumbs).where(Thumbs.src==src)
                 dBase.conn.execute(q)
-                
-                self.InsertRow(
-                    src=src, 
-                    size=int(os.path.getsize(src)), 
-                    created=int(fileStat.st_birthtime), 
-                    mod=int(fileStat.st_mtime),
-                    )
 
-    def DbAddNewFile(self, scannedFiles):
-        """Load items with filesize, file created & file modified from 
-        database > Thumbs and compare with scanned files. 
-        Add new row if item from scanned files not in dataabase loaded items"""
-        
-        loadedColls = self.DbLoadColls()
+                self.append((src, nSize, nCreated, nMod, coll))                
+                self.InsertRow(src, nSize, nCreated, nMod)
+
+    def Added(self, listDirs):
         dbColls = list(
-            (size, creat, mod) for src, size, creat, mod, coll in loadedColls
-            )
+            (size, creat, mod) for src, size, creat, mod, coll in self)
 
-        for src, size, created, mod in scannedFiles:
-            
+        for src, size, created, mod in listDirs:
             printAlive(sys._getframe().f_code.co_name, src)
             
             if not cfg.FLAG:
@@ -256,32 +191,19 @@ class DbUpdate(DbUtils):
 
             if (size, created, mod) not in dbColls:
                 print('add new file', src)
+                
+                self.append((src, size, created, mod))
                 self.InsertRow(src, size, created, mod)    
-
-    def DbMovedToColls(self, scannedColls):
-        """!!! Input dirs: scanned collections only. !!!
         
-        Load items with filesize, file created, file modified, collection 
-        from database > Thumbs. 
-        Create list with noCollection only from loaded list tuples.
-        Compare collections dirs with created list.
-        If dir from collections in noCollection list - update database row
-        from noCollection to collection name.
-        
-        Explanation: if file dir from database with noCollection was found 
-        in list of scanned collections, it means that file from noCollection
-        was copied to collections folder."""
-        
-        loadedColls = self.DbLoadColls()
-
+    def Moved(self, lisrDirs):
         noColls = list()
-        for src, size, created, mod, coll in loadedColls:
+
+        for src, size, created, mod, coll in self:
             if coll=='noCollection':
                 noColls.append((size, created, mod))
     
         
-        for src, size, created, mod in scannedColls:
-            
+        for src, size, created, mod in lisrDirs:
             printAlive(sys._getframe().f_code.co_name, src)
             
             if not cfg.FLAG:
@@ -299,71 +221,41 @@ class DbUpdate(DbUtils):
 
                 self.InsertRow(src, size, created, mod)
                 
-
-class CollsUpd(ScanFiles, DbUpdate):
-    """Methods: CollsUpd"""
     
-    def __Update(self, files):
-        """Input: scanned files from FilesScan. 
-        Check files from database for existence, modified, 
-        add new from scanned files if not in database, 
-        change collection if file moved from Retouches to Collections."""
-        
+class UpdateColl():
+    def __init__(self):
         cfg.LIVE_LBL.configure(text='10%')
-        self.DbExists()
-
+        listDirs = SearchColls()
+        images = SearchImages(listDirs)
+        
+        upd = DbUpdate()
+        
         cfg.LIVE_LBL.configure(text='20%')
-        self.DbModified()
+        upd.Removed()
+        
+        cfg.LIVE_LBL.configure(text='30%')
+        upd.Modified()
         
         cfg.LIVE_LBL.configure(text='40%')
-        self.DbMovedToColls(files)
-
-        cfg.LIVE_LBL.configure(text='50%')
-        self.DbAddNewFile(files)  
- 
-    def CollsUpd(self):
-        """Scan folders with 'Collection' name from cfg.COLL_FOLDER for
-        jpg files.
-        Compare with database.
-        Add new, move from noCollection to Collections, remove old, update
-        modified."""
-        self.__Update(files=self.FilesColls())
+        upd.Added(images)
         
+        cfg.LIVE_LBL.configure(text='50%')
+        upd.Moved(images)
 
-class RtUpd(ScanFiles, DbUpdate):
-    """Methods: RtAgedUpd, RtUpd"""
 
-    def __Update(self, files):
-        """Input: scanned files from FilesScan. 
-        Check files from database for existence, modified, 
-        add new from scanned files if not in database."""
-
+class UpdateRt():
+    def __init__(self, aged=True):
         cfg.LIVE_LBL.configure(text='60%')
-        self.DbExists()
-
+        listDirs = SearchRetouched(aged)
+        images = SearchImages(listDirs)
+        
+        upd = DbUpdate()
+        
+        cfg.LIVE_LBL.configure(text='70%')
+        upd.Removed()
+        
         cfg.LIVE_LBL.configure(text='80%')
-        self.DbModified()
+        upd.Modified()
         
         cfg.LIVE_LBL.configure(text='90%')
-        self.DbAddNewFile(files)
-
-    def RtAgedUpd(self):
-        """Scan aged folders with 'Retouch' name from cfg.RT_FOLDER for
-        jpg files.
-        Compare with database.
-        Add new, remove old, update modified."""
-        
-        self.__Update(files=self.FilesRtAged())
-        
-    def RtUpd(self):
-        """Scan all folders with 'Retouch' name from cfg.RT_FOLDER for
-        jpg files.
-        Compare with database.
-        Add new, remove old, update modified."""
-        
-        txt = (
-            'Пожалуйста, подождите. Сканирую фото за все время.'
-            )
-        
-        cfg.LIVE_LBL.configure(text=txt)
-        self.__Update(files=self.FilesRt())
+        upd.Added(images)

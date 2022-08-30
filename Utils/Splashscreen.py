@@ -88,14 +88,15 @@ class Scan(threading.Thread):
         selectType = sqlalchemy.select(Config.value).where(
             Config.name=='typeScan')
         typeScan = dBase.conn.execute(selectType).first()[0]
-        
-        CollsUpd().CollsUpd()
-        if typeScan == 'full':
 
+        UpdateColl()
+
+        if typeScan == 'full':
             updateType = sqlalchemy.update(Config).where(
                 Config.name=='typeScan').values(value='')
             dBase.conn.execute(updateType)
-            RtUpd().RtUpd()
+            
+            UpdateRt(aged=False)
             return
         
-        RtUpd().RtAgedUpd()
+        UpdateRt(aged=True)
