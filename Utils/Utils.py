@@ -12,10 +12,10 @@ from DataBase import Database
 from Utils.Styled import *
 
 
-def CreateThumb(imgPath):
+def CreateThumb(src):
     """Returns list with 4 square thumbnails: 150, 200, 250, 300"""
     
-    img = cv2.imread(imgPath)
+    img = cv2.imread(src)
     width, height = img.shape[1], img.shape[0]
     
     if height >= width:
