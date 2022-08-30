@@ -1,5 +1,6 @@
 import datetime
 import os
+from select import select
 import sys
 
 import sqlalchemy
@@ -9,17 +10,11 @@ from admin import printAlive
 from DataBase.Database import Thumbs, dBase
 from Utils.Utils import CreateThumb
 
-src = '/Volumes/Shares/Marketing/Photo/2022/_Collections/00 Коллекции по камням/2022-08-24 10-28-51 копия.jpg'
-fileProps = os.stat(src)
-            
+names = (
+    Thumbs.src, Thumbs.size, Thumbs.created, Thumbs.modified, Thumbs.collection)
+q = sqlalchemy.select(names)
 
-nSize = int(os.path.getsize(src))
-nCreated = int(fileProps.st_birthtime)
-nMod = int(fileProps.st_mtime)
-    
-# self.remove((src, size, created, mod, coll))
-# q = sqlalchemy.delete(Thumbs).where(Thumbs.src==src)
-# dBase.conn.execute(q)
+res = dBase.conn.execute(q).fetchall()
 
-print(src, nSize, nCreated, nMod)                
 
+print(res)
