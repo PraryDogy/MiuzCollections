@@ -109,43 +109,86 @@ class SearchImages(list):
         self.extend(jpegs)
 
 
-
-class DbUpdate(list):
-    def __init__(self):
-        q = sqlalchemy.select(
-            Thumbs.src, Thumbs.size, Thumbs.created, Thumbs.modified, 
-            Thumbs.collection
-            )
-        files = dBase.conn.execute(q).fetchall()  
-        self.extend(files)
-
-    def InsertRow(self, src, size, created, mod):
-        """Input: tuple > (src, size, created, mod, coll). 
-        Inserts new row in Database > Files. 
-        Requires CreateThumb object."""
+class DbUtils():
+    def CollName(self, src):
+        """Returns collection name from image path, 
+        if collection not detected, collection = noCollection.
         
+        Name of collection follows collection folder (cfg.COLL_FOLDER). 
+        Path example:
+        :path/to/image/cfg.COLL_FOLDER/collection_name
+
+        :param str src: Image path"""
+
         collName = 'noCollection'
         if f'/{cfg.COLL_FOLDER}' in src:
             collName = src.split(f'/{cfg.COLL_FOLDER}')[-1].split('/')[1]
+        return collName
+
+    def InsertRow(self, src, size, birth, mod, coll):
+        """Inserts new row in Database > Thumbs. 
+        Creates 150, 200, 250, 300 thumbnails from Image's path.
+        :param str src: Image's path
+        :param int size: Image's size
+        :param int birth: Image's date created
+        :param int mod: Date last modified of image
+        :param str coll: name of collection from CollName mehtod"""
 
         img150, img200, img250, img300 = CreateThumb(src)
         
-        q = sqlalchemy.insert(Thumbs).values(
-            img150=img150,
-            img200=img200,
-            img250=img250,
-            img300=img300,
-            src=src,
-            size=size,
-            created=created,
-            modified=mod,
-            collection=collName)
+        values = {
+            'img150':img150,
+            'img200':img200,
+            'img250':img250,
+            'img300':img300,
+            'src':src,
+            'size':size,
+            'created':birth,
+            'modified':mod,
+            'collection':coll
+            }
+
+        q = sqlalchemy.insert(Thumbs).values(values)
         dBase.conn.execute(q)
+
+
+class DbUpdate(list, DbUtils):
+    def __init__(self):
+        """Gets list of tuples (src, size, created, modified, collection) from
+        DataBase > Thumbs. 
+
+        Checks whether the list item has been deleted or modified.
+
+        Compares the list with list of tuples from new search.
+
+        Add's to database new item if it's in new search list and not in 
+        database list.
+
+        Methods:
+            Removed
+            Modified
+            Added
+            Moved
+
+        Args:
+            param1 (str): Description of "param1".
+            param2 (:obj:`int`, optional): Description of `param2`. Multiple
+                lines are supported.
+            param3 (:obj:`list` of :obj:`str`): Description of `param3`.
+
+        """
+        names =[
+            Thumbs.src, Thumbs.size, Thumbs.created, 
+            Thumbs.modified, Thumbs.collection
+            ]
+        q = sqlalchemy.select(names)
+        files = dBase.conn.execute(q).fetchall()  
+        self.extend(files)
     
     def Removed(self):
         for src, size, created, mod, coll in self:
             printAlive(sys._getframe().f_code.co_name, src)
-            
+
             if not cfg.FLAG:
                 return
             
@@ -155,29 +198,24 @@ class DbUpdate(list):
                 self.remove((src, size, created, mod, coll))
                 q = sqlalchemy.delete(Thumbs).where(Thumbs.src==src)
                 dBase.conn.execute(q)
-    
+
     def Modified(self):
         for src, size, created, mod, coll in self:
-            printAlive(sys._getframe().f_code.co_name, src)
-            
-            if not cfg.FLAG:
-                return
-            
-            fileStat = os.stat(src)
-            
-            if int(fileStat.st_mtime) > mod:
+            atr = os.stat(src)
+            if int(atr.st_mtime) > mod:
                 print('modified', src)
 
-                nSize = int(os.path.getsize(src)), 
-                nCreated = int(fileStat.st_birthtime), 
-                nMod = int(fileStat.st_mtime)
-                    
+                nSize = int(os.path.getsize(src))
+                nCreated = int(atr.st_birthtime)
+                nMod = int(atr.st_mtime)
+                
                 self.remove((src, size, created, mod, coll))
                 q = sqlalchemy.delete(Thumbs).where(Thumbs.src==src)
                 dBase.conn.execute(q)
 
+                coll = self.CollName(src)
                 self.append((src, nSize, nCreated, nMod, coll))                
-                self.InsertRow(src, nSize, nCreated, nMod)
+                self.InsertRow(src, nSize, nCreated, nMod, coll)
 
     def Added(self, listDirs):
         dbColls = list(
@@ -191,9 +229,10 @@ class DbUpdate(list):
 
             if (size, created, mod) not in dbColls:
                 print('add new file', src)
-                
-                self.append((src, size, created, mod))
-                self.InsertRow(src, size, created, mod)    
+
+                coll = self.CollName(src)
+                self.append((src, size, created, mod, coll))
+                self.InsertRow(src, size, created, mod, coll)    
         
     def Moved(self, lisrDirs):
         noColls = list()
@@ -216,10 +255,11 @@ class DbUpdate(list):
                     Thumbs.size==size,
                     Thumbs.created==created,
                     Thumbs.modified==mod
-                )
+                    )
                 dBase.conn.execute(remRow)
 
-                self.InsertRow(src, size, created, mod)
+                coll = self.CollName(src)
+                self.InsertRow(src, size, created, mod, coll)
                 
     
 class UpdateColl():
