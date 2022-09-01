@@ -231,7 +231,7 @@ class ImagesThumbs(MyFrame):
 
     def load_thumbs(self):
         """
-        Loads thumbnails from database > thumbnails bases on size from
+        Loads thumbnails from database > thumbnails based on size from
         database > config > size > value.
         * returns: list turples: (img, src)
         """
