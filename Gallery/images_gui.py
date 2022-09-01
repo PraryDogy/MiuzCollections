@@ -5,6 +5,7 @@ Gui menu and images grid.
 import re
 import tkinter
 import traceback
+from datetime import datetime
 
 import cfg
 import cv2
@@ -191,66 +192,49 @@ class ImagesFrame(tkmacosx.SFrame):
         ImagesFrame(self.master)
 
 
-class ImagesThumbs(MyFrame):
+class ImagesThumbs(object):
     """
     Creates images grid based on database thumbnails.
     Grid is labels with images created with pack method.
     Number of columns in each row based on Database > Config > clmns > value.
     * param master: tkmacosx scrollable frame.
     """
-    def __init__(self, master) -> None:
+    def __init__(self, master):
         clmns = Dbase.conn.execute(sqlalchemy.select(
             Config.value).where(Config.name=='clmns')).first()[0]
         clmns = int(clmns)
 
         thumbs = self.load_thumbs()
-        if len(thumbs) < clmns:
+        thumbs = self.fill_empty(thumbs, clmns)
 
-            query = sqlalchemy.select(Config.value).where(Config.name=='size')
-            size = int(Dbase.conn.execute(query).first()[0])
+        for y in self.split_years(thumbs):
 
-            for i in range(0, clmns-len(thumbs)):
-                new = Image.new('RGB', (size, size), cfg.BGCOLOR)
-                photo = ImageTk.PhotoImage(new)
-                thumbs.append((photo, None))
+            year_label = MyLabel(
+                master, text=y[-1][-1], font=('Arial', 35, 'bold'))
+            year_label.pack(pady=15)
 
-        img_rows = [thumbs[x:x+clmns] for x in range(0, len(thumbs), clmns)]
-        for row in img_rows:
-
-            MyFrame.__init__(self, master)
-            self.pack(fill=tkinter.Y, expand=True, anchor=tkinter.W)
-
-            for image, src in row:
-                thumb = MyButton(self, image=image, highlightthickness=1)
-                thumb.configure(width=0, height=0, bg=cfg.BGCOLOR)
-                thumb.image_names = image
-                thumb.Cmd(lambda e, src=src: ImagePreview(src))
-                thumb.pack(side=tkinter.LEFT)
-
+            self.pack_rows(y, clmns, master)
 
     def load_thumbs(self):
         """
         Loads thumbnails from database > thumbnails based on size from
         database > config > size > value.
-        * returns: list turples: (img, src)
+        * returns: list turples: (img, src, modified)
         """
 
         size = Dbase.conn.execute(
             sqlalchemy.select(Config.value).where(
                 Config.name=='size')).first()[0]
         size = int(size)
-
-        for i in [Thumbs.img150, Thumbs.img200, Thumbs.img250, Thumbs.img300]:
-            if str(size) in str(i):
-                img = i
+        img = Thumbs.__dict__[f'img{size}']
 
         res = Dbase.conn.execute(
-            sqlalchemy.select(img, Thumbs.src).where(
-                    Thumbs.collection==Globals.currColl).order_by(
-                        -Thumbs.modified)).fetchall()
+            sqlalchemy.select(img, Thumbs.src, Thumbs.modified).where(
+            Thumbs.collection==Globals.currColl).order_by(
+            -Thumbs.modified)).fetchall()
 
         thumbs = []
-        for blob, src in res:
+        for blob, src, mod in res:
 
             try:
                 nparr = numpy.frombuffer(blob, numpy.byte)
@@ -262,10 +246,84 @@ class ImagesThumbs(MyFrame):
                 # load numpy array image
                 image = Image.fromarray(imageRGB)
                 photo = ImageTk.PhotoImage(image)
-
-                thumbs.append((photo, src))
+                year = datetime.fromtimestamp(mod).year
+                thumbs.append((photo, src, year))
 
             except Exception:
                 print(traceback.format_exc())
 
         return thumbs
+
+    def fill_empty(self, thumbs, clmns):
+        """
+        Creates new images for thumbs list if thumbs list smaller than
+        collumn count.
+        Each new image has fill with cfg.BGCOLOR color and size based on
+        database > config > size > value
+
+        This is necessary so that the row with images has a fixed number of
+        columns and tkinter root doesn't change it's size
+        if the number of columns is too small.
+
+        * returns: list of tuples (img, src, year)
+        * param thumbs: list of tuples (img, src, year)
+        * param clmns: int from database > config > clmns > value
+        """
+
+        if len(thumbs) < clmns:
+
+            size = int(Dbase.conn.execute(
+                    sqlalchemy.select(Config.value).where(
+                    Config.name=='size')).first()[0])
+
+            for _ in range(0, clmns-len(thumbs)):
+                new = Image.new('RGB', (size, size), cfg.BGCOLOR)
+                photo = ImageTk.PhotoImage(new)
+                thumbs.append((photo, None))
+        return thumbs
+
+    def split_years(self, thumbs):
+        """
+        Splits a list into lists by year.
+        * returns: list of lists
+        * param thumbs: list tuples (imageTk, image src, image year modified)
+        """
+
+        years = set(year for _, _, year in thumbs)
+        list_years = []
+
+        for y in years:
+            tmp = [(im, src, year) for im, src, year in thumbs if year == y]
+            list_years.append(tmp)
+        list_years.reverse()
+        return list_years
+
+    def pack_rows(self, thumbs, clmns, master):
+        """
+        Splits list of tuples by the number of lists.
+        Each list is row with number of columns based on 'clmns'.
+
+        In short we create images grid with a number columns from images list
+        with tkinter pack method.
+        Tkinter pack don't have 'new line' method and we need create
+        tkinter frame for each row with images. For this we split big list
+        into small lists, each of which is row with tkinter labels.
+
+        * param thumbs: list tuples(imageTk, image src, image year)
+        * param clmns: int from database > config > clmns > value
+        * param master: tkinter frame
+        """
+
+        img_rows = [thumbs[x:x+clmns] for x in range(0, len(thumbs), clmns)]
+
+        for row in img_rows:
+
+            row_frame = MyFrame(master)
+            row_frame.pack(fill=tkinter.Y, expand=True, anchor=tkinter.W)
+
+            for image, src, _ in row:
+                thumb = MyButton(row_frame, image=image, highlightthickness=1)
+                thumb.configure(width=0, height=0, bg=cfg.BGCOLOR)
+                thumb.image_names = image
+                thumb.Cmd(lambda e, src=src: ImagePreview(src))
+                thumb.pack(side=tkinter.LEFT)
