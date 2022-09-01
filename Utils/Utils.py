@@ -7,54 +7,55 @@ import traceback
 import cfg
 import cv2
 import yadisk
-from DataBase import Database
+import database
 
-from Utils.Styled import *
+from Utils.Styled import MyLabel, MyButton
 
 
-def CreateThumb(src):
+def create_thumb(src):
     """Returns list with 4 square thumbnails: 150, 200, 250, 300"""
-    
+
     img = cv2.imread(src)
     width, height = img.shape[1], img.shape[0]
-    
+
     if height >= width:
         diff = int((height-width)/2)
         new_img = img[diff:height-diff, 0:width]
 
     else:
         diff = int((width-height)/2)
-        new_img = img[0:height, diff:width-diff]       
+        new_img = img[0:height, diff:width-diff]
 
-    resized = list()
-    
+    resized = []
+
     for size in [(150, 150), (200, 200), (250, 250), (300, 300)]:
         newsize = cv2.resize(
             new_img, size, interpolation = cv2.INTER_AREA)
         encoded = cv2.imencode('.jpg', newsize)[1].tobytes()
-        resized.append(encoded)    
-        
+        resized.append(encoded)
+
     return resized
 
 
-def MyCopy(output):
+def my_copy(output):
     """Custom copy to clipboard with subprocess"""
-    
-    process = subprocess.Popen(
-        'pbcopy', env={'LANG': 'en_US.UTF-8'}, stdin=subprocess.PIPE)
+
+    process = subprocess.Popen('pbcopy', env={'LANG': 'en_US.UTF-8'},
+                                stdin=subprocess.PIPE)
     process.communicate(output.encode('utf-8'))
     print('copied')
 
 
-def MyPaste():
+def my_paste():
     """Custom paste from clipboard with subprocess"""
-    
-    print('pasted')
-    return subprocess.check_output(
-        'pbpaste', env={'LANG': 'en_US.UTF-8'}).decode('utf-8')
-    
 
-class SmbChecker(tkinter.Toplevel):    
+    print('pasted')
+    return subprocess.check_output('pbpaste',
+                                env={'LANG': 'en_US.UTF-8'}).decode('utf-8')
+
+
+class SmbChecker(tkinter.Toplevel):
+
     def __init__(self):
         """Methods: Check"""
 
@@ -62,33 +63,30 @@ class SmbChecker(tkinter.Toplevel):
             self, cfg.ROOT, bg=cfg.BGCOLOR, padx=10, pady=10)
         self.withdraw()
 
-    def Check(self):
+    def check(self):
         """Checks smb availability with cfg.PHOTO_DIR os.exists method,
-        e.g: /Volumes/Path/To/Photo/Dir.
-        
-        If dir not exists, show gui with description and return False.
-        
-        PHOTO_DIR and SMB_CONN can be changed in settings gui or in
-        cfg.json. 
+        e.g: /Volumes/Path/To/Photo/Dir
+        If dir not exists, show gui with description and return False
+
+        PHOTO_DIR and SMB_CONN can be changed in settings gui or in cfg.json
         Read cfg.py file."""
-        
-        photoDir = os.path.join(os.sep, *cfg.PHOTO_DIR.split('/')) 
-        if not os.path.exists(photoDir):
-            self.Gui()
+
+        if not os.path.exists(os.path.join(os.sep, *cfg.PHOTO_DIR.split('/'))):
+            self.gui()
             return False
         self.destroy()
         return True
 
-
-    def Gui(self):
+    def gui(self):
+        """doc"""
         self.focus_force()
         self.title('Нет подключения')
         self.resizable(0,0)
         self.attributes('-topmost', 'true')
-        
+
         txt = 'Нет подключения к сетевому диску Miuz. '
-        titleLbl = MyLabel(self, text=txt, wraplength=350)
-        titleLbl.pack(pady=(0, 20))
+        title_lbl = MyLabel(self, text=txt, wraplength=350)
+        title_lbl.pack(pady=(0, 20))
 
         txt2 =(
             'Программа работает в офлайн режиме. '
@@ -100,75 +98,12 @@ class SmbChecker(tkinter.Toplevel):
             '\nПоддержка: loshkarev@miuz.ru'
             '\nTelegram: evlosh'
             )
-        descrLbl = MyLabel(self, text=txt2, justify=tkinter.LEFT)
-        descrLbl.pack(padx=15, pady=(0, 15))
+        descr_lbl = MyLabel(self, text=txt2, justify=tkinter.LEFT)
+        descr_lbl.pack(padx=15, pady=(0, 15))
 
-        clsBtn = MyButton(self, text='Закрыть')
-        clsBtn.Cmd(lambda e: self.destroy())
-        clsBtn.pack()
+        cls_btn = MyButton(self, text='Закрыть')
+        cls_btn.Cmd(lambda e: self.destroy())
+        cls_btn.pack()
 
-        cfg.ROOT.eval(f'tk::PlaceWindow {self} center')
-        self.deiconify()
-        
-        
-class DbCkecker(tkinter.Toplevel):
-    def __init__(self):        
-        """Methods: Check."""
-
-        tkinter.Toplevel.__init__(self, bg=cfg.BGCOLOR, padx=15, pady=10)
-        self.withdraw()
-   
-    def Check(self):
-        """Check db & folder db is exists. 
-        If not exists, run gui and wait for download db with threading, 
-        than destroy gui.
-        If can't download, create empty Database with tables and values."""
-        
-        if not os.path.exists(cfg.DB_DIR):
-            os.makedirs(cfg.DB_DIR)
-
-        db = os.path.join(cfg.DB_DIR, cfg.DB_NAME)
-        
-        if (not os.path.exists(db) or 
-            os.path.getsize(db) < 0.9):
-            
-            self.Gui()
-            checkDbTask = threading.Thread(target=lambda: self.DownloadDb())
-            checkDbTask.start()
-            
-            while checkDbTask.is_alive():
-                cfg.ROOT.update()
-        self.destroy()
-
-    def DownloadDb(self):
-        """Download database file  with thumbnails from Yandex Disk or
-        create new one with tables and values if download fails."""
-        
-        y = yadisk.YaDisk(token=cfg.YADISK_TOKEN)
-        localDirDb = os.path.join(cfg.DB_DIR, cfg.DB_NAME)
-        yadiskDirDb = os.path.join(cfg.YADISK_DIR, cfg.DB_NAME)
-
-        try:
-            y.download(yadiskDirDb, localDirDb)
-
-        except Exception:
-            adm = Database.Utils()
-            adm.Create()
-            adm.FillConfig()
-            print(traceback.format_exc())
-
-    def Gui(self):
-        """Create gui with text: Wait, downloading"""
-        self.focus_force()
-        self.title('Подождите')
-        self.resizable(0,0)
-
-        txt = 'Пожалуйста, подождите.'
-        titleLbl = MyLabel(
-            self, text=txt, wraplength=350, font=('Arial', 18, 'bold'))
-        titleLbl.pack(pady=(0, 10))
-
-        descr = MyLabel(self, text='Скачиваю дополнения.')
-        descr.pack()
         cfg.ROOT.eval(f'tk::PlaceWindow {self} center')
         self.deiconify()

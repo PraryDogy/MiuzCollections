@@ -1,13 +1,13 @@
 import cfg
 import sqlalchemy
-from DataBase.Database import Config, dBase
+from database import Config, Dbase
 from Utils.Splashscreen import SplashScreen
-from Utils.Styled import *
+from Utils.Styled import MyButton, MyFrame, MyLabel
 
 from .SettingsWin import Settings
 
-from .Gallery import GalleryReset
-
+from .images_gui import GalleryReset
+import tkinter
 
 class BtnCmd:
     def OpenSettings(self, btn=MyButton):
@@ -27,7 +27,7 @@ class BtnCmd:
         
     def MoreLess(self, delta, min, max, dbName):
         query = sqlalchemy.select(Config.value).where(Config.name==dbName)
-        size = int(dBase.conn.execute(query).first()[0])
+        size = int(Dbase.conn.execute(query).first()[0])
         
         size = size + delta
         size = min if size < min else size
@@ -35,7 +35,7 @@ class BtnCmd:
         
         query = sqlalchemy.update(Config).where(
             Config.name==dbName).values(value=str(size))
-        dBase.conn.execute(query)
+        Dbase.conn.execute(query)
         GalleryReset()
 
 

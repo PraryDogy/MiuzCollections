@@ -3,25 +3,38 @@ import os
 import yadisk
 
 import cfg
-from DataBase import Database
-
-dbOutput = True
+import database
 
 
-def uploadDb():
-    y = yadisk.YaDisk(token=cfg.YADISK_TOKEN)
-    dbPath = os.path.join(cfg.DB_DIR, cfg.DB_NAME)
+def upload_db():
+    """Uploads database file to yandex disk.
+    """
 
-    with open(dbPath, "rb") as f:
-        y.upload(f, os.path.join(cfg.YADISK_DIR, cfg.DB_NAME))
+    yandex = yadisk.YaDisk(token=cfg.YADISK_TOKEN)
+    db_path = os.path.join(cfg.DB_DIR, cfg.DB_NAME)
+
+    with open(db_path, "rb") as f:
+        yandex.upload(f, os.path.join(cfg.YADISK_DIR, cfg.DB_NAME))
 
 
-def printAlive(nameFunc='', whatPrint=''):
+def print_alive(name_func='', what_print=''):
+    """Prints output:
+    function name, sometext.
+    Needs for debug
+
+    Args:
+        name_func (str): class.__name__,
+        what_print (str): text.
+    """
+
     # print(nameFunc, whatPrint)
     return
 
 
-def ClearDb():
-    Database.Utils().Create()
-    Database.Utils().FillConfig()
-    
+def clear_db():
+    """
+    Just clears database, create new one and fills created tables.
+    """
+
+    database.Utils().create()
+    database.Utils().fill_config()

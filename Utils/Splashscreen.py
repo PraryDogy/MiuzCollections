@@ -3,28 +3,30 @@ import tkinter
 
 import cfg
 import sqlalchemy
-from DataBase.Database import Config, dBase
+from database import Config, Dbase
 
-from .Scaner import *
-from .Styled import *
-from .Utils import DbCkecker, SmbChecker
+import Utils.Scaner
+import Utils.Styled
+import Utils.Utils
 
 
 class SplashScreen:
     def __init__(self):
+
+
         """Creates toplevel window and run Scaner from utils.
         Destroys automaticaly when Scaner done"""
-        
-        DbCkecker().Check()
-        if not SmbChecker().Check():
+
+        if not Utils.Utils.SmbChecker().check():
             return
 
         gui = Gui()
         task = Scan()
-        while task.is_alive(): cfg.ROOT.update()
+        while task.is_alive():
+            cfg.ROOT.update()
         gui.destroy()
         cfg.TOP_LVL = False
-    
+
 
 class Gui(tkinter.Toplevel):
     def __init__(self):
@@ -55,16 +57,16 @@ class Gui(tkinter.Toplevel):
         self.resizable(0, 0)
         cfg.ROOT.createcommand('tk::mac::ReopenApplication', self.deiconify)
         
-        subTitle = MyLabel(self, 
-            text=f'Сканирую фото за последние {cfg.FILE_AGE} дней',
-            wraplength=300)
+        subTitle = Utils.Styled.MyLabel(self,
+                    text=f'Сканирую фото за последние {cfg.FILE_AGE} дней',
+                    wraplength=300)
         subTitle.pack(pady=(20, 0))
         
-        dynamic = MyLabel(self, width=40, text='5%')
+        dynamic = Utils.Styled.MyLabel(self, width=40, text='5%')
         dynamic.pack(pady=(0, 20))
         cfg.LIVE_LBL = dynamic
 
-        skipBtn = MyButton(self, text='Пропустить')
+        skipBtn = Utils.Styled.MyButton(self, text='Пропустить')
         skipBtn.Cmd(lambda e: self.Skip())
         skipBtn.pack(pady=(0, 10))
              
@@ -87,16 +89,16 @@ class Scan(threading.Thread):
         
         selectType = sqlalchemy.select(Config.value).where(
             Config.name=='typeScan')
-        typeScan = dBase.conn.execute(selectType).first()[0]
+        typeScan = Dbase.conn.execute(selectType).first()[0]
 
-        UpdateColl()
+        Utils.Scaner.UpdateColl()
 
         if typeScan == 'full':
             updateType = sqlalchemy.update(Config).where(
                 Config.name=='typeScan').values(value='')
-            dBase.conn.execute(updateType)
+            Dbase.conn.execute(updateType)
             
-            UpdateRt(aged=False)
+            Utils.Scaner.UpdateRt(aged=False)
             return
         
-        UpdateRt(aged=True)
+        Utils.Scaner.UpdateRt(aged=True)

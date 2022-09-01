@@ -5,9 +5,9 @@ import sys
 import sqlalchemy
 
 import cfg
-from admin import printAlive
-from DataBase.Database import Thumbs, dBase
-from Utils.Utils import CreateThumb
+from admin import print_alive
+from database import Thumbs, Dbase
+from Utils.Utils import create_thumb
 
 
 class BaseScan(list):    
@@ -69,7 +69,7 @@ class SearchRetouched(list):
         
         for dirItem in BaseScan(aged):
             for root, _, _ in os.walk(dirItem):
-                printAlive(sys._getframe().f_code.co_name, root)
+                print_alive(sys._getframe().f_code.co_name, root)
                 
                 if not cfg.FLAG:
                     return
@@ -86,7 +86,7 @@ class SearchImages(list):
         
         for path in listDirs:
             for root, _, files in os.walk(path):
-                printAlive(sys._getframe().f_code.co_name, root)
+                print_alive(sys._getframe().f_code.co_name, root)
                 
                 for file in files:
                     allFiles.append(os.path.join(root, file))
@@ -134,7 +134,7 @@ class DbUtils():
         :param int mod: Date last modified of image
         :param str coll: name of collection from CollName mehtod"""
 
-        img150, img200, img250, img300 = CreateThumb(src)
+        img150, img200, img250, img300 = create_thumb(src)
         
         values = {
             'img150':img150,
@@ -149,7 +149,7 @@ class DbUtils():
             }
 
         q = sqlalchemy.insert(Thumbs).values(values)
-        dBase.conn.execute(q)
+        Dbase.conn.execute(q)
 
 
 class DbUpdate(list, DbUtils):
@@ -182,12 +182,12 @@ class DbUpdate(list, DbUtils):
             Thumbs.modified, Thumbs.collection
             ]
         q = sqlalchemy.select(names)
-        files = dBase.conn.execute(q).fetchall()  
+        files = Dbase.conn.execute(q).fetchall()  
         self.extend(files)
     
     def Removed(self):
         for src, size, created, mod, coll in self:
-            printAlive(sys._getframe().f_code.co_name, src)
+            print_alive(sys._getframe().f_code.co_name, src)
 
             if not cfg.FLAG:
                 return
@@ -197,7 +197,7 @@ class DbUpdate(list, DbUtils):
                 
                 self.remove((src, size, created, mod, coll))
                 q = sqlalchemy.delete(Thumbs).where(Thumbs.src==src)
-                dBase.conn.execute(q)
+                Dbase.conn.execute(q)
 
     def Modified(self):
         for src, size, created, mod, coll in self:
@@ -211,7 +211,7 @@ class DbUpdate(list, DbUtils):
                 
                 self.remove((src, size, created, mod, coll))
                 q = sqlalchemy.delete(Thumbs).where(Thumbs.src==src)
-                dBase.conn.execute(q)
+                Dbase.conn.execute(q)
 
                 coll = self.CollName(src)
                 self.append((src, nSize, nCreated, nMod, coll))                
@@ -222,7 +222,7 @@ class DbUpdate(list, DbUtils):
             (size, creat, mod) for src, size, creat, mod, coll in self)
 
         for src, size, created, mod in listDirs:
-            printAlive(sys._getframe().f_code.co_name, src)
+            print_alive(sys._getframe().f_code.co_name, src)
             
             if not cfg.FLAG:
                 return
@@ -243,7 +243,7 @@ class DbUpdate(list, DbUtils):
     
         
         for src, size, created, mod in lisrDirs:
-            printAlive(sys._getframe().f_code.co_name, src)
+            print_alive(sys._getframe().f_code.co_name, src)
             
             if not cfg.FLAG:
                 return
@@ -256,7 +256,7 @@ class DbUpdate(list, DbUtils):
                     Thumbs.created==created,
                     Thumbs.modified==mod
                     )
-                dBase.conn.execute(remRow)
+                Dbase.conn.execute(remRow)
 
                 coll = self.CollName(src)
                 self.InsertRow(src, size, created, mod, coll)

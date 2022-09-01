@@ -1,11 +1,11 @@
 import cfg
-from Gallery.Gui import Create as MainGui
+from Gallery.main_gui import MainGui
 from Utils.Splashscreen import SplashScreen
 
 
 def LoadAll():
     cfg.ROOT.withdraw()
-    
+
     SplashScreen()
     MainGui()
 

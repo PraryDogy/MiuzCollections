@@ -1,17 +1,25 @@
+"""
+Gui for view image.
+"""
+
 import os
 import subprocess
 import tkinter
-from Utils.Styled import *
 
 import cfg
 from PIL import Image, ImageTk
-from Utils.Utils import MyCopy
+from Utils.Styled import MyFrame, MyButton, MyLabel
+from Utils.Utils import my_copy
+
 
 class Globals:
+    """
+    Stores variables
+    """
     src = str()
     
     
-class ImageShow(tkinter.Toplevel):
+class ImagePreview(tkinter.Toplevel):
     def __init__(self, src):
         if src is None:
             return
@@ -92,7 +100,7 @@ class NamePathButton(MyButton):
 
     def copyToClipboard(self):
         self.Press()
-        MyCopy(Globals.src.split('/')[-1].split('.')[0])
+        my_copy(Globals.src.split('/')[-1].split('.')[0])
 
 
 class OpenCloseFrame(MyFrame):

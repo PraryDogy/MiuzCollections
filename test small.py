@@ -1,20 +1,29 @@
-import datetime
-import os
-from select import select
-import sys
+class Vehicles(object):
+    '''
+    The Vehicle object contains a lot of vehicles
 
-import sqlalchemy
+    Args:
+        arg (str): The arg is used for...
+        *args: The variable arguments are used for...
+        **kwargs: The keyword arguments are used for...
 
-import cfg
-from admin import printAlive
-from DataBase.Database import Thumbs, dBase
-from Utils.Utils import CreateThumb
+    Attributes:
+        arg (str): This is where we store arg,
+    '''
+    def __init__(self, arg, *args, **kwargs):
+        self.arg = arg
 
-names = (
-    Thumbs.src, Thumbs.size, Thumbs.created, Thumbs.modified, Thumbs.collection)
-q = sqlalchemy.select(names)
+    def cars(self, distance,destination):
+        '''We can't travel distance in vehicles without fuels, so here is the fuels
 
-res = dBase.conn.execute(q).fetchall()
+        Args:
+            distance (int): The amount of distance traveled
+            destination (bool): Should the fuels refilled to cover the distance?
 
+        Raises:
+            RuntimeError: Out of fuel
 
-print(res)
+        Returns:
+            cars: A car mileage
+        '''
+        pass

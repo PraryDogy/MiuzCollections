@@ -7,12 +7,12 @@ from tkinter.ttk import Separator
 import cfg
 import sqlalchemy
 import tkmacosx
-from DataBase.Database import Config, dBase
+from database import Config, Dbase
 from PIL import Image, ImageOps, ImageTk
-from Utils.Styled import *
-from Utils.Utils import MyCopy, MyPaste
+from Utils.Styled import MyButton, MyFrame, MyLabel
+from Utils.Utils import my_copy, my_paste
 
-from .Descriptions import descriptions
+from .descriptions import descriptions
 
 
 class Globals:
@@ -207,7 +207,7 @@ class General(MyFrame):
     def RunScan(self):
         query = sqlalchemy.update(Config).where(
             Config.name=='typeScan').values(value='full')
-        dBase.conn.execute(query)
+        Dbase.conn.execute(query)
         os.execv(sys.executable, ['python'] + sys.argv)
 
 
@@ -297,12 +297,12 @@ class Expert(tkmacosx.SFrame):
     def CopyIns(self, ins, btn):
         btn.configure(bg=cfg.BGPRESSED)
         text = ins.get()
-        MyCopy(text)
+        my_copy(text)
         cfg.ROOT.after(100, lambda: btn.configure(bg=cfg.BGBUTTON))
     
     def PasteIns(self, ins, btn):
         btn.configure(bg=cfg.BGPRESSED)
-        text = MyPaste()
+        text = my_paste()
         ins.delete(0, 'end')
         ins.insert(0, text)
         cfg.ROOT.after(100, lambda: btn.configure(bg=cfg.BGBUTTON))
