@@ -6,6 +6,8 @@ import re
 import tkinter
 import traceback
 from datetime import datetime
+from tkinter.ttk import Separator
+from turtle import width
 
 import cfg
 import cv2
@@ -28,9 +30,6 @@ class Globals:
         Config.name=='currColl')
     currColl = Dbase.conn.execute(__getCurrColl).first()[0]
 
-    # bind reset function for title frame: Title().Reset()
-    title_reset = object
-
     # bind reset function for thumbnails frame: Images().Reset()
     images_reset = object
 
@@ -40,7 +39,6 @@ class GalleryReset:
     Destroys title frame & images frame and create again.
     """
     def __init__(self):
-        Globals.title_reset()
         Globals.images_reset()
 
 
@@ -53,31 +51,7 @@ class Gallery(MyFrame):
     def  __init__(self, master):
 
         MyFrame.__init__(self, master)
-        Title(self)
         Scrollables(self)
-
-
-class Title(MyLabel):
-    """
-    Label, gets text from database > Config > currColl
-    * don't need's pack
-    * methods: reset
-    * param master: tkinter frame
-    """
-    def __init__(self, master):
-        self.master = master
-        MyLabel.__init__(
-            self, master, text=Globals.currColl, font=('Arial', 45, 'bold'))
-        self.pack(pady=15, side=tkinter.TOP)
-        Globals.title_reset = self.reset
-
-    def reset(self):
-        """
-        Destroys self.Run init again
-        """
-        self.destroy()
-        Title(self.master)
-
 
 class Scrollables(MyFrame):
     """
@@ -104,7 +78,11 @@ class MenuFrame(tkmacosx.SFrame):
     def __init__(self, master):
         tkmacosx.SFrame.__init__(
             self, master, bg=cfg.BGCOLOR, scrollbarwidth=1, width=150)
-        self.pack(fill=tkinter.Y, padx=(0, 15), side=tkinter.LEFT)
+
+        self.pack(
+            fill=tkinter.Y, padx=(0, 15), pady=(20,0), side=tkinter.LEFT)
+
+        MyLabel(self, bg='red', width=10).pack(fill=tkinter.BOTH, expand=True)
         MenuButtons(self)
 
 
@@ -172,7 +150,11 @@ class ImagesFrame(tkmacosx.SFrame):
         self.master = master
         tkmacosx.SFrame.__init__(
             self, master, bg=cfg.BGCOLOR, scrollbarwidth=1)
-
+        
+        Title(self)
+        Separator(
+            self, orient='horizontal').pack(
+                fill=tkinter.X, padx=150, pady=(0, 35))
         ImagesThumbs(self)
 
         self.update_idletasks()
@@ -190,6 +172,23 @@ class ImagesFrame(tkmacosx.SFrame):
         """
         self.destroy()
         ImagesFrame(self.master)
+
+
+class Title(MyLabel):
+    """
+    Label, gets text from database > Config > currColl
+    * don't need's pack
+    * methods: reset
+    * param master: tkinter frame
+    """
+    def __init__(self, master):
+        self.master = master
+        MyLabel.__init__(
+
+
+            self, master, text=Globals.currColl,
+            font=('Arial', 45, 'bold'))
+        self.pack(pady=(0, 15))
 
 
 class ImagesThumbs(object):
@@ -211,9 +210,14 @@ class ImagesThumbs(object):
 
             year_label = MyLabel(
                 master, text=y[-1][-1], font=('Arial', 35, 'bold'))
-            year_label.pack(pady=15)
+            year_label.pack(pady=(0, 15))
 
             self.pack_rows(y, clmns, master)
+    
+            Separator(
+                master, orient='horizontal').pack(
+                    fill=tkinter.X, padx=150, pady=(35, 10))
+
 
     def load_thumbs(self):
         """
