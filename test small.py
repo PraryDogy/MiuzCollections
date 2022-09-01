@@ -1,29 +1,16 @@
-class Vehicles(object):
-    '''
-    The Vehicle object contains a lot of vehicles
+thumbs = [2019, 2020, 2021]*5
+thumbs = [('image', i) for i in thumbs]
 
-    Args:
-        arg (str): The arg is used for...
-        *args: The variable arguments are used for...
-        **kwargs: The keyword arguments are used for...
 
-    Attributes:
-        arg (str): This is where we store arg,
-    '''
-    def __init__(self, arg, *args, **kwargs):
-        self.arg = arg
 
-    def cars(self, distance,destination):
-        '''We can't travel distance in vehicles without fuels, so here is the fuels
+def split_years(thumbs):
+    years = set(i[1] for i in thumbs)
+    list_years = []
 
-        Args:
-            distance (int): The amount of distance traveled
-            destination (bool): Should the fuels refilled to cover the distance?
+    for i in years:
+]
+        list_years.append([(img, year) for img, year in thumbs if year == i])
 
-        Raises:
-            RuntimeError: Out of fuel
+    return list_years
 
-        Returns:
-            cars: A car mileage
-        '''
-        pass
+# 

@@ -2,6 +2,7 @@
 Gui for view image.
 """
 
+from datetime import datetime
 import os
 import subprocess
 import tkinter
