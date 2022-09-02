@@ -41,7 +41,7 @@ class Gallery(MyFrame):
     def __init__(self, master):
         MyFrame.__init__(self, master)
         MenuFrame(self).pack(
-            pady=(00, 0), padx=(0, 15), side=tkinter.LEFT, fill=tkinter.Y)
+            pady=(0, 0), padx=(0, 15), side=tkinter.LEFT, fill=tkinter.Y)
         ImagesFrame(self).pack(
             expand=True, fill=tkinter.BOTH, side=tkinter.RIGHT)
 
@@ -56,9 +56,6 @@ class MenuFrame(tkmacosx.SFrame):
             self, master, bg=cfg.BGCOLOR, scrollbarwidth=7, width=150)
 
         MenuButtons(self)
-
-        screen_h = cfg.ROOT.winfo_screenheight()
-        self['height'] = int(screen_h*0.45)
 
 class MenuButtons(object):
     """
