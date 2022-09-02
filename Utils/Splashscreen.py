@@ -12,8 +12,6 @@ import Utils.Utils
 
 class SplashScreen:
     def __init__(self):
-
-
         """Creates toplevel window and run Scaner from utils.
         Destroys automaticaly when Scaner done"""
 
