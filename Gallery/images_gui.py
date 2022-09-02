@@ -2,12 +2,11 @@
 Gui menu and images grid.
 """
 
+import os
 import re
 import tkinter
 import traceback
 from datetime import datetime
-from tkinter.ttk import Separator
-from turtle import width
 
 import cfg
 import cv2
@@ -34,77 +33,65 @@ class Globals:
     images_reset = object
 
 
-class GalleryReset:
-    """
-    Destroys title frame & images frame and create again.
-    """
-    def __init__(self):
-        Globals.images_reset()
-
-
 class Gallery(MyFrame):
     """
-    General frame:
-    *up: title
-    *bottom: left menu, right images
-    """
-    def  __init__(self, master):
-
-        MyFrame.__init__(self, master)
-        Scrollables(self)
-
-class Scrollables(MyFrame):
-    """
-    Creates frame for menu and images.
-    * don't need's pack
-    * read Gallery notes
+    Creates tkinter frame with menu and grid of images.
     * param master: tkinter frame
     """
-
     def __init__(self, master):
         MyFrame.__init__(self, master)
-        self.pack(expand=True, fill=tkinter.BOTH, side=tkinter.BOTTOM)
-
-        MenuFrame(self)
-        ImagesFrame(self)
+        MenuFrame(self).pack(
+            pady=(30, 0), padx=(0, 15), side=tkinter.LEFT, fill=tkinter.Y)
+        ImagesFrame(self).pack(
+            expand=True, fill=tkinter.BOTH, side=tkinter.RIGHT)
 
 
 class MenuFrame(tkmacosx.SFrame):
     """
     Creates tkinter scrollable Frame for menu.
-    * don't need's pack
     * param master: tkinter frame
     """
     def __init__(self, master):
         tkmacosx.SFrame.__init__(
-            self, master, bg=cfg.BGCOLOR, scrollbarwidth=1, width=150)
+            self, master, bg=cfg.BGCOLOR, scrollbarwidth=7, width=150)
 
-        self.pack(
-            fill=tkinter.Y, padx=(0, 15), pady=(20,0), side=tkinter.LEFT)
-
-        MyLabel(self, bg='red', width=10).pack(fill=tkinter.BOTH, expand=True)
         MenuButtons(self)
 
+        screen_h = cfg.ROOT.winfo_screenheight()
+        self['height'] = int(screen_h*0.45)
 
-class MenuButtons(list):
+class MenuButtons(object):
     """
-    This is menu with buttons, based on list of collections.
-    Database > Thumbs.collection creates list of collections.
+    Creates tkinter buttons with vertical pack.
+    Buttons based on list of collections.
+    List of collections based on Database > Thumbs.collection.
+    * param master: tkinter frame
     """
     def __init__(self, master):
+        img_src = Image.open(
+            os.path.join(os.path.dirname(__file__), 'logo.png'))
+
+        img_tk= ImageTk.PhotoImage(img_src)
+
+        img_lbl = MyLabel(master)
+        img_lbl.configure(image=img_tk)
+        img_lbl.pack(pady=(0, 20))
+        img_lbl.image_names = img_tk
+
         __query = sqlalchemy.select(Thumbs.collection)
         __res = Dbase.conn.execute(__query).fetchall()
         __colls_list = set(i[0] for i in __res)
 
+        for_btns = []
         for coll_item in __colls_list:
             name_btn = coll_item.replace(
                 re.search(r'(\d{0,30}\s){,1}', coll_item).group(),
                 '')
-            self.append((name_btn[:13], coll_item))
-        self.sort()
+            for_btns.append((name_btn[:13], coll_item))
+        for_btns.sort()
 
         btns = []
-        for name_btn, name_coll in self:
+        for name_btn, name_coll in for_btns:
 
             btn = MyButton(master, text=name_btn)
             btn.configure(height=1, width=12)
@@ -115,9 +102,9 @@ class MenuButtons(list):
                 btn.configure(bg=cfg.BGPRESSED)
 
             btn.Cmd(lambda e, coll=name_coll, btn=btn, btns=btns:
-                    self.open_coll(coll, btn, btns))
+                    self.__open_coll(coll, btn, btns))
 
-    def open_coll(self, coll, btn, btns):
+    def __open_coll(self, coll, btn, btns):
         """
         Changes all buttons color to default and change color for
         pressed button.
@@ -137,58 +124,34 @@ class MenuButtons(list):
         for btn_item in btns:
             btn_item['bg'] = cfg.BGBUTTON
         btn['bg'] = cfg.BGPRESSED
-        GalleryReset()
+        Globals.images_reset()
 
 
 class ImagesFrame(tkmacosx.SFrame):
     """
-    Creates tkinter scrollable Frame for images.
-    * don't need's pack
+    Creates tkinter scrollable frame for images.
     * param master: tkinter frame
     """
     def __init__(self, master):
         self.master = master
+        Globals.images_reset = self.reset
+
         tkmacosx.SFrame.__init__(
-            self, master, bg=cfg.BGCOLOR, scrollbarwidth=1)
-        
-        Title(self)
-        Separator(
-            self, orient='horizontal').pack(
-                fill=tkinter.X, padx=150, pady=(0, 35))
+            self, master, bg=cfg.BGCOLOR, scrollbarwidth=7)
+
         ImagesThumbs(self)
 
         self.update_idletasks()
         w = self.winfo_reqwidth()
         self.configure(width=w*1.03)
 
-        self.pack(
-            expand=True, fill=tkinter.BOTH, side=tkinter.RIGHT)
-
-        Globals.images_reset = self.reset
-
     def reset(self):
         """
         Destroys self.Run init again
         """
         self.destroy()
-        ImagesFrame(self.master)
-
-
-class Title(MyLabel):
-    """
-    Label, gets text from database > Config > currColl
-    * don't need's pack
-    * methods: reset
-    * param master: tkinter frame
-    """
-    def __init__(self, master):
-        self.master = master
-        MyLabel.__init__(
-
-
-            self, master, text=Globals.currColl,
-            font=('Arial', 45, 'bold'))
-        self.pack(pady=(0, 15))
+        ImagesFrame(self.master).pack(
+            expand=True, fill=tkinter.BOTH, side=tkinter.RIGHT)
 
 
 class ImagesThumbs(object):
@@ -199,25 +162,27 @@ class ImagesThumbs(object):
     * param master: tkmacosx scrollable frame.
     """
     def __init__(self, master):
+
+        title = MyLabel(
+            master, text=Globals.currColl, font=('Arial', 45, 'bold'))
+        title.pack(pady=(15, 15))
+
         clmns = Dbase.conn.execute(sqlalchemy.select(
-            Config.value).where(Config.name=='clmns')).first()[0]
+                Config.value).where(Config.name=='clmns')).first()[0]
         clmns = int(clmns)
 
         thumbs = self.load_thumbs()
-        thumbs = self.fill_empty(thumbs, clmns)
+
+        if len(thumbs) == 0:
+            return
 
         for y in self.split_years(thumbs):
 
             year_label = MyLabel(
                 master, text=y[-1][-1], font=('Arial', 35, 'bold'))
-            year_label.pack(pady=(0, 15))
+            year_label.pack(pady=(15, 15))
 
-            self.pack_rows(y, clmns, master)
-    
-            Separator(
-                master, orient='horizontal').pack(
-                    fill=tkinter.X, padx=150, pady=(35, 10))
-
+            self.pack_rows(self.fill_empty(y, clmns), clmns, master)
 
     def load_thumbs(self):
         """
@@ -245,10 +210,10 @@ class ImagesThumbs(object):
                 image1 = cv2.imdecode(nparr, cv2.IMREAD_ANYCOLOR)
 
                 # convert cv2 color to rgb
-                imageRGB = cv2.cvtColor(image1, cv2.COLOR_BGR2RGB)
+                image_RGB = cv2.cvtColor(image1, cv2.COLOR_BGR2RGB)
 
                 # load numpy array image
-                image = Image.fromarray(imageRGB)
+                image = Image.fromarray(image_RGB)
                 photo = ImageTk.PhotoImage(image)
                 year = datetime.fromtimestamp(mod).year
                 thumbs.append((photo, src, year))
@@ -274,8 +239,8 @@ class ImagesThumbs(object):
         * param clmns: int from database > config > clmns > value
         """
 
-        if len(thumbs) < clmns:
-
+        if len(thumbs) < clmns and len(thumbs) != 0:
+            year = thumbs[-1][-1]
             size = int(Dbase.conn.execute(
                     sqlalchemy.select(Config.value).where(
                     Config.name=='size')).first()[0])
@@ -283,7 +248,8 @@ class ImagesThumbs(object):
             for _ in range(0, clmns-len(thumbs)):
                 new = Image.new('RGB', (size, size), cfg.BGCOLOR)
                 photo = ImageTk.PhotoImage(new)
-                thumbs.append((photo, None))
+                thumbs.append((photo, None, year))
+
         return thumbs
 
     def split_years(self, thumbs):
@@ -292,7 +258,6 @@ class ImagesThumbs(object):
         * returns: list of lists
         * param thumbs: list tuples (imageTk, image src, image year modified)
         """
-
         years = set(year for _, _, year in thumbs)
         list_years = []
 

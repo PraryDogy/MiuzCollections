@@ -6,7 +6,7 @@ from Utils.Styled import MyButton, MyFrame, MyLabel
 
 from .SettingsWin import Settings
 
-from .images_gui import GalleryReset
+from .images_gui import Globals
 import tkinter
 
 class BtnCmd:
@@ -23,7 +23,7 @@ class BtnCmd:
         btn.Press()
         cfg.TOP_LVL = True
         SplashScreen()
-        GalleryReset()
+        Globals.images_reset()
         
     def MoreLess(self, delta, min, max, dbName):
         query = sqlalchemy.select(Config.value).where(Config.name==dbName)
@@ -36,7 +36,7 @@ class BtnCmd:
         query = sqlalchemy.update(Config).where(
             Config.name==dbName).values(value=str(size))
         Dbase.conn.execute(query)
-        GalleryReset()
+        Globals.images_reset()
 
 
 class StatusBar(MyFrame, BtnCmd):

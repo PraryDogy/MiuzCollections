@@ -214,7 +214,7 @@ class General(MyFrame):
 class Expert(tkmacosx.SFrame):
     def __init__(self, master):
         tkmacosx.SFrame.__init__(self, master, padx=15)
-        self.configure(bg=cfg.BGCOLOR, scrollbarwidth=0)
+        self.configure(bg=cfg.BGCOLOR, scrollbarwidth=7)
         self.configure(avoidmousewheel=(self))
         Globals.expFrame = self
 
