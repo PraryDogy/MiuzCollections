@@ -41,7 +41,7 @@ class Gallery(MyFrame):
     def __init__(self, master):
         MyFrame.__init__(self, master)
         MenuFrame(self).pack(
-            pady=(30, 0), padx=(0, 15), side=tkinter.LEFT, fill=tkinter.Y)
+            pady=(00, 0), padx=(0, 15), side=tkinter.LEFT, fill=tkinter.Y)
         ImagesFrame(self).pack(
             expand=True, fill=tkinter.BOTH, side=tkinter.RIGHT)
 

@@ -25,6 +25,7 @@ class DbChecker(tkinter.Toplevel):
     def __init__(self):
         tkinter.Toplevel.__init__(self, bg=cfg.BGCOLOR, padx=15, pady=10)
         self.withdraw()
+        cfg.ROOT.withdraw()
         self.__check()
 
     def __check(self):
