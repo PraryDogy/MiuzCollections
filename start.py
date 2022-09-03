@@ -4,7 +4,6 @@ from Utils.Splashscreen import SplashScreen
 
 
 def LoadAll():
-    cfg.ROOT.withdraw()
 
     SplashScreen()
     MainGui()

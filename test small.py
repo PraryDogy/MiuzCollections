@@ -1,16 +1,20 @@
-thumbs = [2019, 2020, 2021]*5
-thumbs = [('image', i) for i in thumbs]
+class One(list):
+    def __init__(self):
+        [self.append(i) for i in range(0, 15)]
 
 
+class Two(str):
+    def __init__(self):
+        self.text = 'aaa'
 
-def split_years(thumbs):
-    years = set(i[1] for i in thumbs)
-    list_years = []
 
-    for i in years:
-]
-        list_years.append([(img, year) for img, year in thumbs if year == i])
+class Test(One, Two):
+    def __init__(self):
+        One.__init__(self)
+        print(self)
 
-    return list_years
+        Two.__init__(self)
+        print(self)
 
-# 
+
+Test()
