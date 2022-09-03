@@ -162,7 +162,7 @@ class ImagesThumbs(object):
 
         title = MyLabel(
             master, text=Globals.currColl, font=('Arial', 45, 'bold'))
-        title.pack(pady=(15, 15))
+        title.pack(pady=(0, 15))
 
         clmns = Dbase.conn.execute(sqlalchemy.select(
                 Config.value).where(Config.name=='clmns')).first()[0]

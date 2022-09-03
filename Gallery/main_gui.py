@@ -8,7 +8,7 @@ from tkinter.ttk import Separator
 import cfg
 
 from .images_gui import Gallery
-from .MenuBar import Create as MenuBar
+from .bar_menu import BarMenu
 from .StatusBar import StatusBar
 
 
@@ -31,7 +31,7 @@ class MainGui:
         Separator(cfg.ROOT, orient='horizontal').pack(fill=tkinter.X, pady=10)
         StatusBar(cfg.ROOT).pack(pady=(0, 10))
 
-        MenuBar()
+        BarMenu()
 
         cfg.ROOT.update_idletasks()
         cfg.ROOT.eval(f'tk::PlaceWindow {cfg.ROOT} center')
