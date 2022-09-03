@@ -21,10 +21,11 @@ BGPRESSED = '#395432'
 
 # tkinter global variables for avaibility from any place
 ROOT = tkinter.Tk()
+ROOT.withdraw()
+
 LIVE_LBL = tkinter.Label
 
 FLAG = True
-TOP_LVL = False
 
 # for downloading database from Yandex Disk
 YADISK_TOKEN = "AQAAAAARTU_6AAgMRGzO_kyAykpGqUubuGuraCg"
