@@ -153,54 +153,40 @@ class DbUtils():
 
 
 class DbUpdate(list, DbUtils):
-    def __init__(self):
-        """Gets list of tuples (src, size, created, modified, collection) from
-        DataBase > Thumbs. 
+    """
+    Gets list of tuples (src, size, created, modified, collection) from
+    DataBase > Thumbs.
+    Checks whether the list item has been deleted or modified.
+    Compares the list with list of tuples from new search.
+    Add's to database new item if it's in new search list and not in 
+    database list.
+    """
 
-        Checks whether the list item has been deleted or modified.
-
-        Compares the list with list of tuples from new search.
-
-        Add's to database new item if it's in new search list and not in 
-        database list.
-
-        Methods:
-            Removed
-            Modified
-            Added
-            Moved
-
-        Args:
-            param1 (str): Description of "param1".
-            param2 (:obj:`int`, optional): Description of `param2`. Multiple
-                lines are supported.
-            param3 (:obj:`list` of :obj:`str`): Description of `param3`.
-
-        """
+    def load_db(self):
+        self.clear()
         names =[
-            Thumbs.src, Thumbs.size, Thumbs.created, 
-            Thumbs.modified, Thumbs.collection
-            ]
-        q = sqlalchemy.select(names)
-        files = Dbase.conn.execute(q).fetchall()  
+            Thumbs.src, Thumbs.size, Thumbs.created,
+            Thumbs.modified, Thumbs.collection]
+        files = Dbase.conn.execute(sqlalchemy.select(names)).fetchall()
         self.extend(files)
-    
+
     def Removed(self):
-        for src, size, created, mod, coll in self:
+        self.load_db()
+        for src, _, _, _, _ in self:
             print_alive(sys._getframe().f_code.co_name, src)
 
             if not cfg.FLAG:
                 return
-            
+
             if not os.path.exists(src):
                 print('removed file', src)
-                
-                self.remove((src, size, created, mod, coll))
-                q = sqlalchemy.delete(Thumbs).where(Thumbs.src==src)
-                Dbase.conn.execute(q)
+
+                Dbase.conn.execute(
+                    sqlalchemy.delete(Thumbs).where(Thumbs.src==src))
 
     def Modified(self):
-        for src, size, created, mod, coll in self:
+        self.load_db()
+        for src, _, _, mod, coll in self:
             atr = os.stat(src)
             if int(atr.st_mtime) > mod:
                 print('modified', src)
@@ -208,22 +194,21 @@ class DbUpdate(list, DbUtils):
                 nSize = int(os.path.getsize(src))
                 nCreated = int(atr.st_birthtime)
                 nMod = int(atr.st_mtime)
-                
-                self.remove((src, size, created, mod, coll))
-                q = sqlalchemy.delete(Thumbs).where(Thumbs.src==src)
-                Dbase.conn.execute(q)
+
+                Dbase.conn.execute(
+                    sqlalchemy.delete(Thumbs).where(Thumbs.src==src))
 
                 coll = self.CollName(src)
-                self.append((src, nSize, nCreated, nMod, coll))                
                 self.InsertRow(src, nSize, nCreated, nMod, coll)
 
     def Added(self, listDirs):
+        self.load_db()
         dbColls = list(
-            (size, creat, mod) for src, size, creat, mod, coll in self)
+            (size, creat, mod) for _, size, creat, mod, _ in self)
 
         for src, size, created, mod in listDirs:
             print_alive(sys._getframe().f_code.co_name, src)
-            
+
             if not cfg.FLAG:
                 return
 
@@ -231,26 +216,25 @@ class DbUpdate(list, DbUtils):
                 print('add new file', src)
 
                 coll = self.CollName(src)
-                self.append((src, size, created, mod, coll))
-                self.InsertRow(src, size, created, mod, coll)    
+                self.InsertRow(src, size, created, mod, coll)
         
     def Moved(self, lisrDirs):
-        noColls = list()
+        self.load_db()
 
+        noColls = []
         for src, size, created, mod, coll in self:
             if coll=='noCollection':
                 noColls.append((size, created, mod))
-    
-        
+
         for src, size, created, mod in lisrDirs:
             print_alive(sys._getframe().f_code.co_name, src)
-            
+
             if not cfg.FLAG:
                 return
-                
+
             if (size, created, mod) in noColls:
                 print('moved to colls', src)
-                        
+
                 remRow = sqlalchemy.delete(Thumbs).where(
                     Thumbs.size==size,
                     Thumbs.created==created,
