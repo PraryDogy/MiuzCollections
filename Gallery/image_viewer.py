@@ -8,15 +8,15 @@ import tkinter
 
 import cfg
 from PIL import Image, ImageTk
-from Utils.Styled import MyFrame, MyButton, MyLabel
-from Utils.Utils import my_copy
+from Utils.Styled import MyButton, MyFrame, MyLabel
+from Utils.Utils import SmbChecker, my_copy
 
 
 class Globals:
     """
     Stores variables
     """
-    src = str()
+    src = str
 
 
 class ImagePreview(tkinter.Toplevel):
@@ -25,29 +25,29 @@ class ImagePreview(tkinter.Toplevel):
     * param src: source path of image.
     """
     def __init__(self, src):
-        if src is None:
-            return
-
         Globals.src = src
 
         tkinter.Toplevel.__init__(self)
         self.withdraw()
+
+        if not SmbChecker().check():
+            return
+
+        if src is None:
+            return
+
         self.protocol("WM_DELETE_WINDOW", self.destroy)
         self.bind('<Command-w>', lambda e: self.destroy())
         self.configure(bg=cfg.BGCOLOR, padx=15, pady=15)
+        self.resizable(0,0)
 
-        if os.path.exists(Globals.src):
-            cfg.ROOT.update_idletasks()
-            ImageFrame(self).pack(expand=True, fill=tkinter.BOTH)
-        else:
-            ImageError(self)
+        ImageFrame(self).pack(fill=tkinter.BOTH)
+        NamePath(self).pack(pady=(15, 15), padx=15)
+        OpenCloseFrame(self).pack()
 
-        NamePathFrame(self)
-        OpenCloseFrame(self)
-
-        cfg.ROOT.eval(f'tk::PlaceWindow {self} center')
+        cfg.ROOT.update_idletasks()
         self.geometry(f'+{self.winfo_x()}+0')
-        self.deiconify()
+        cfg.ROOT.eval(f'tk::PlaceWindow {self} center')
 
 
 class ImageFrame(MyLabel):
@@ -56,75 +56,53 @@ class ImageFrame(MyLabel):
     * param master: tkinter toplevel.
     """
     def __init__(self, master):
+        self.master = master
         img_src = Image.open(Globals.src)
         img_copy= img_src.copy()
 
-        screen_h = int(cfg.ROOT.winfo_screenheight()*0.8)
-        screen_w = int(cfg.ROOT.winfo_screenwidth()*0.8)
-        img_copy.thumbnail((screen_w, screen_h))
+        MyLabel.__init__(
+            self, master, height=int(cfg.ROOT.winfo_screenheight()*0.7),
+            borderwidth=0)
+        self.configure(bg='black')
+        self.bind("<Configure>", lambda e: self.resize(e, img_copy))
 
-        img_tk = ImageTk.PhotoImage(img_copy)
+    def resize(self, e, img):
+        """
+        Fits image to label size.
+        * param img: current image.
+        """
+        size = (e.width, e.height)
+        img.thumbnail(size)
+        img_tk = ImageTk.PhotoImage(img)
 
-        MyLabel.__init__(self, master, image=img_tk)
+        self.configure(image=img_tk)
         self.image_names = img_tk
 
-
-class ImageError(MyLabel):
-    """
-    Creates tkinter label with error message.
-    * param master: tkinter toplevel
-    """
-    def __init__(self, master):
-        txt = (
-            'Не могу открыть изображение. Возможные причины:'
-            '\n\nНет подключения к сетевому диску MIUZ,'
-            '\nпопробуйте открыть любую папку на сетевом диске.'
-            '\n\nПопробуйте запустить полное сканирование из настроек.'
-            )
-        MyLabel.__init__(self, master, text=txt)
-        self.pack()
-
-
-class NamePathFrame(MyFrame):
+class NamePath(MyFrame):
     """
     Creates tkinter frame.
     * param master: tkinter top level.
     """
     def __init__(self, master):
         MyFrame.__init__(self, master)
-        self.pack(pady=(15, 15))
-        NamePathTitle(self)
-        NamePathButton(self)
 
+        path_lbl = MyLabel(
+            self, text=Globals.src.replace(cfg.PHOTO_DIR, ''),
+            wraplength=500, justify=tkinter.LEFT)
+        path_lbl.pack(side=tkinter.LEFT)
 
-class NamePathTitle(MyLabel):
-    """
-    Creates tkinter label with src path to img.
-    * param master: tkinter frame.
-    """
-    def __init__(self, master):
-        MyLabel.__init__(
-            self, master, text=Globals.src.replace(cfg.PHOTO_DIR, ''))
-        self.pack(side=tkinter.LEFT)
+        copy_btn = MyButton(self, text='Копировать имя')
+        copy_btn.configure(height=1)
+        copy_btn.Cmd(lambda e: self.copy_name(copy_btn))
+        copy_btn.pack(side=tkinter.LEFT, padx=(15, 0))
 
-
-class NamePathButton(MyButton):
-    """
-    Creates tkinter button with copy img path fuction.
-    * param master: tkinter frame.
-    """
-    def __init__(self, master):
-        MyButton.__init__(self, master, text='Копировать имя')
-        self.configure(height=1)
-        self.Cmd(lambda e: self.copy_name())
-        self.pack(side=tkinter.LEFT, padx=(15, 0))
-
-    def copy_name(self):
+    def copy_name(self, btn=MyButton):
         """
         Copies path to folder with image.
         Simulates button press with color.
+        * param btn: current tkinter button.
         """
-        self.Press()
+        btn.Press()
         my_copy(Globals.src.split('/')[-1].split('.')[0])
 
 
@@ -135,40 +113,24 @@ class OpenCloseFrame(MyFrame):
     """
     def __init__(self, master):
         MyFrame.__init__(self, master)
-        self.pack()
+
+        close = MyButton(self, text='Закрыть')
+        close.configure(height=2)
+        close.Cmd(lambda e: self.winfo_toplevel().destroy())
+        close.pack(side=tkinter.RIGHT)
+
         if os.path.exists(Globals.src):
-            OpenButton(self)
-        CloseButton(self)
+            open_btn = MyButton(self, text='Открыть папку')
+            open_btn.configure(height=2)
+            open_btn.Cmd(lambda e: self.open_folder(open_btn))
+            open_btn.pack(side=tkinter.LEFT, padx=(0, 15))
 
-
-class OpenButton(MyButton):
-    """
-    Creates tkinter button with open image folder function.
-    * param master: tkinter frame.
-    """
-    def __init__(self, master):
-        MyButton.__init__(self, master, text='Открыть папку')
-        self.configure(height=2)
-        self.Cmd(lambda e: self.open_folder())
-        self.pack(side=tkinter.LEFT, padx=(0, 15))
-
-    def open_folder(self):
+    def open_folder(self, btn=MyButton):
         """
         Opens folder with image.
         Simulates button press with color.
+        * param btn: current tkinter button.
         """
-        self.Press()
+        btn.Press()
         path = '/'.join(Globals.src.split('/')[:-1])
         subprocess.check_output(["/usr/bin/open", path])
-
-
-class CloseButton(MyButton):
-    """
-    Creates tkinter button with close current toplevel function.
-    * param master: tkinter frame.
-    """
-    def __init__(self, master):
-        MyButton.__init__(self, master, text='Закрыть')
-        self.configure(height=2)
-        self.Cmd(lambda e: self.winfo_toplevel().destroy())
-        self.pack(side=tkinter.RIGHT)
