@@ -1,27 +1,26 @@
+import tkinter
+
 import cfg
 import sqlalchemy
 from database import Config, Dbase
 from Utils.Splashscreen import SplashScreen
 from Utils.Styled import MyButton, MyFrame, MyLabel
-
-from .SettingsWin import Settings
+from Utils.Utils import SmbChecker
 
 from .images_gui import Globals
-import tkinter
+from .settings import Settings
+
 
 class BtnCmd:
     def OpenSettings(self, btn=MyButton):
-        if cfg.TOP_LVL:
-            return
         btn.Press()
-        cfg.TOP_LVL = True
         Settings()
 
     def Update(self, btn=MyButton):
-        if cfg.TOP_LVL:
+        if not SmbChecker():
             return
+
         btn.Press()
-        cfg.TOP_LVL = True
         SplashScreen()
         Globals.images_reset()
         

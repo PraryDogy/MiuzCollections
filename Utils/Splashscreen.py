@@ -23,7 +23,6 @@ class SplashScreen:
         while task.is_alive():
             cfg.ROOT.update()
         gui.destroy()
-        cfg.TOP_LVL = False
 
 
 class Gui(tkinter.Toplevel):
@@ -33,13 +32,11 @@ class Gui(tkinter.Toplevel):
         Methods: just run init."""        
         tkinter.Toplevel.__init__(self, bg=cfg.BGCOLOR)
         self.withdraw()
-        self.attributes('-topmost', 'true')
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
 
-        self.Gui()         
+        self.Gui()
 
     def on_closing(self):
-        cfg.TOP_LVL = False
         cfg.FLAG = False
         self.destroy()
         
@@ -70,7 +67,7 @@ class Gui(tkinter.Toplevel):
              
         cfg.ROOT.eval(f'tk::PlaceWindow {self} center')
         self.deiconify()
-
+        self.grab_set()
 
 class Scan(threading.Thread):
     def __init__(self):

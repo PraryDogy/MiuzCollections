@@ -82,10 +82,9 @@ class SmbChecker(tkinter.Toplevel):
         self.focus_force()
         self.title('Нет подключения')
         self.resizable(0,0)
-        self.attributes('-topmost', 'true')
 
         txt = 'Нет подключения к сетевому диску Miuz. '
-        title_lbl = MyLabel(self, text=txt, wraplength=350)
+        title_lbl = MyLabel(self, text=txt)
         title_lbl.pack(pady=(0, 20))
 
         txt2 =(
@@ -93,8 +92,8 @@ class SmbChecker(tkinter.Toplevel):
             '\n- Проверьте подключение к интернету. '
             '\n- Откройте любую папку на сетевом диске,'
             '\nвведите логин и пароль, если требуется'
-            '\n- Откройте настройки > эксперт, введите правильный адрес '
-            '\nи перезапустите приложение.'  
+            '\n- Откройте настройки > эксперт, введите'
+            '\nправильный адрес и перезапустите приложение.'
             '\nПоддержка: loshkarev@miuz.ru'
             '\nTelegram: evlosh'
             )
@@ -107,3 +106,4 @@ class SmbChecker(tkinter.Toplevel):
 
         cfg.ROOT.eval(f'tk::PlaceWindow {self} center')
         self.deiconify()
+        self.grab_set()
