@@ -2,6 +2,7 @@
 Gui menu and images grid.
 """
 
+from cgitb import text
 import os
 import re
 import tkinter
@@ -25,9 +26,9 @@ class Globals:
     Variables for current module
     """
 
-    __getCurrColl = sqlalchemy.select(Config.value).where(
-        Config.name=='currColl')
-    currColl = Dbase.conn.execute(__getCurrColl).first()[0]
+    currColl = Dbase.conn.execute(
+        sqlalchemy.select(Config.value).where(
+            Config.name=='currColl')).first()[0]
 
     # bind reset function for thumbnails frame: Images().Reset()
     images_reset = object
@@ -36,7 +37,7 @@ class Globals:
 class Gallery(MyFrame):
     """
     Creates tkinter frame with menu and grid of images.
-    * param master: tkinter frame
+    * param `master`: tkinter frame
     """
     def __init__(self, master):
         MyFrame.__init__(self, master)
@@ -49,7 +50,7 @@ class Gallery(MyFrame):
 class MenuFrame(tkmacosx.SFrame):
     """
     Creates tkinter scrollable Frame for menu.
-    * param master: tkinter frame
+    * param `master`: tkinter frame
     """
     def __init__(self, master):
         tkmacosx.SFrame.__init__(
@@ -62,7 +63,7 @@ class MenuButtons(object):
     Creates tkinter buttons with vertical pack.
     Buttons based on list of collections.
     List of collections based on Database > Thumbs.collection.
-    * param master: tkinter frame
+    * param `master`: tkinter frame
     """
     def __init__(self, master):
         img_src = Image.open(
@@ -72,11 +73,15 @@ class MenuButtons(object):
 
         img_lbl = MyLabel(master)
         img_lbl.configure(image=img_tk)
-        img_lbl.pack(pady=(0, 20))
+        img_lbl.pack(pady=(0, 0))
         img_lbl.image_names = img_tk
 
-        __query = sqlalchemy.select(Thumbs.collection)
-        __res = Dbase.conn.execute(__query).fetchall()
+        company_name = MyLabel(
+            master, text='Коллекции', font=('Arial', 18, 'bold'))
+        company_name.pack(pady=(15, 20))
+
+        __res = Dbase.conn.execute(
+            sqlalchemy.select(Thumbs.collection)).fetchall()
         __colls_list = set(i[0] for i in __res)
 
         for_btns = []
@@ -108,9 +113,9 @@ class MenuButtons(object):
         Updates database > config > currColl > value to collection from
         button.
         Runs GalleryReset.
-        * param coll: str, stores real collection name
-        * param btn: tkinter curren button object
-        * param btns: list of created tkinter buttons
+        * param `coll`: str, stores real collection name
+        * param `btn`: tkinter curren button object
+        * param `btns`: list of created tkinter buttons
         """
 
         Dbase.conn.execute(
@@ -127,7 +132,7 @@ class MenuButtons(object):
 class ImagesFrame(tkmacosx.SFrame):
     """
     Creates tkinter scrollable frame for images.
-    * param master: tkinter frame
+    * param `master`: tkinter frame
     """
     def __init__(self, master):
         self.master = master
@@ -156,7 +161,7 @@ class ImagesThumbs(object):
     Creates images grid based on database thumbnails.
     Grid is labels with images created with pack method.
     Number of columns in each row based on Database > Config > clmns > value.
-    * param master: tkmacosx scrollable frame.
+    * param `master`: tkmacosx scrollable frame.
     """
     def __init__(self, master):
 
@@ -232,16 +237,16 @@ class ImagesThumbs(object):
         if the number of columns is too small.
 
         * returns: list of tuples (img, src, year)
-        * param thumbs: list of tuples (img, src, year)
-        * param clmns: int from database > config > clmns > value
+        * param `thumbs`: list of tuples (img, src, year)
+        * param `clmns`: int from database > config > clmns > value
         """
 
         if len(thumbs) < clmns and len(thumbs) != 0:
             year = thumbs[-1][-1]
-            size = int(Dbase.conn.execute(
-                    sqlalchemy.select(Config.value).where(
-                    Config.name=='size')).first()[0])
-
+            size = Dbase.conn.execute(sqlalchemy.select(Config.value).where(
+                    Config.name=='size')).first()[0]
+            size = int(size)
+            
             for _ in range(0, clmns-len(thumbs)):
                 new = Image.new('RGB', (size, size), cfg.BGCOLOR)
                 photo = ImageTk.PhotoImage(new)
@@ -253,7 +258,7 @@ class ImagesThumbs(object):
         """
         Splits a list into lists by year.
         * returns: list of lists
-        * param thumbs: list tuples (imageTk, image src, image year modified)
+        * param `thumbs`: list tuples (imageTk, image src, image year modified)
         """
         years = set(year for _, _, year in thumbs)
         list_years = []
@@ -275,9 +280,9 @@ class ImagesThumbs(object):
         tkinter frame for each row with images. For this we split big list
         into small lists, each of which is row with tkinter labels.
 
-        * param thumbs: list tuples(imageTk, image src, image year)
-        * param clmns: int from database > config > clmns > value
-        * param master: tkinter frame
+        * param `thumbs`: list tuples(imageTk, image src, image year)
+        * param `clmns`: int from database > config > clmns > value
+        * param `master`: tkinter frame
         """
 
         img_rows = [thumbs[x:x+clmns] for x in range(0, len(thumbs), clmns)]

@@ -28,7 +28,7 @@ class BarMenu(tkinter.Menu):
         self.add_command(label="Выход", command=cfg.ROOT.destroy)
 
         cfg.ROOT.createcommand(
-            'tkAboutDialog', 
+            'tkAboutDialog',
             lambda: cfg.ROOT.tk.call('tk::mac::standardAboutPanel'))
 
         cfg.ROOT.configure(menu=menubar)

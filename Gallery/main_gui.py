@@ -9,7 +9,7 @@ import cfg
 
 from .images_gui import Gallery
 from .bar_menu import BarMenu
-from .StatusBar import StatusBar
+from .status_bar import StatusBar
 
 
 class MainGui:

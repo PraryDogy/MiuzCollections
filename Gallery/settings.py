@@ -12,7 +12,7 @@ import cfg
 import sqlalchemy
 import tkmacosx
 from database import Config, Dbase
-from PIL import Image, ImageOps, ImageTk
+from PIL import Image, ImageTk
 from Utils.Styled import MyButton, MyFrame, MyLabel
 from Utils.Utils import my_copy, my_paste
 
@@ -81,7 +81,7 @@ class Settings(tkinter.Toplevel):
 class LeftMenu(MyFrame):
     """
     Menu with buttons "General settins" and "Advanced settings".
-    param master: tkinter frame.
+    param `master`: tkinter frame.
     """
     def __init__(self, master):
         MyFrame.__init__(self, master)
@@ -105,11 +105,11 @@ class LeftMenu(MyFrame):
         Destroys frame, creates new one.
         Press button with created frame and clear button with destroyed frame.
 
-        * params: kill, pack, press, clear
-        * param kill: tkinter frame for destroy
-        * param pack: tkinter frame for pack: fill both, expand is True
-        * param press: changes tkinter button bg to cfg.BGPRESSED
-        * param clear: changes tkinter button bg to cfg.BGBUTTON
+        * params: `kill`, `pack`, `press`, `clear`
+        * param `kill`: tkinter frame for destroy
+        * param `pack`: tkinter frame for pack: fill both, expand is True
+        * param `press`: changes tkinter button bg to cfg.BGPRESSED
+        * param `clear`: changes tkinter button bg to cfg.BGBUTTON
         """
         kw['kill'].pack_forget()
         kw['pack'].pack(fill=tkinter.BOTH, expand=True)
@@ -121,7 +121,7 @@ class LeftMenu(MyFrame):
 class BelowMenu(MyFrame):
     """
     Creates tkinter frame with save settings button and close button.
-    param master: tkinter frame
+    * param `master`: tkinter frame
     """
     def __init__(self, master):
         MyFrame.__init__(self, master)
@@ -158,7 +158,7 @@ class BelowMenu(MyFrame):
 class General(MyFrame):
     """
     Tkinter frame with general app settings.
-    * param master: tkinter frame
+    * param `master`: tkinter frame
     """
     def __init__(self, master):
         MyFrame.__init__(self, master, padx=15)
@@ -177,11 +177,10 @@ class General(MyFrame):
             text=txt1, justify=tkinter.LEFT, wraplength=350)
         descr_updater.pack(pady=(0, 10), anchor=tkinter.W)
 
-        img_path = os.path.join(os.path.dirname(__file__), 'upd.jpg')
+        img_path = os.path.join(os.path.dirname(__file__), 'upd.png')
         img_src = Image.open(img_path)
         img_copy= img_src.copy()
-        img_res = ImageOps.contain(img_copy, (335,335))
-        img_tk = ImageTk.PhotoImage(img_res)
+        img_tk = ImageTk.PhotoImage(img_copy)
 
         img_lbl = MyLabel(self)
         img_lbl.configure(image=img_tk)
@@ -288,7 +287,7 @@ class Expert(tkmacosx.SFrame):
         """
         Gets advanced settings values from cfg and write to cfg.json
         Sets default text in all text input fields in advanced settings.
-        * param btn: current tkinter button
+        * param `btn`: current tkinter button
         """
         btn.Press()
         data = cfg.defaults
@@ -302,8 +301,8 @@ class Expert(tkmacosx.SFrame):
     def copy_input(self, ins, btn):
         """
         Gets text from current text input field and copy to clipboard.
-        * param ins: tkinter entry current text input
-        * param btn: current button
+        * param `ins`: tkinter entry current text input
+        * param `btn`: current button
         """
         btn.Press()
         my_copy(ins.get())
@@ -311,8 +310,8 @@ class Expert(tkmacosx.SFrame):
     def paste_input(self, ins, btn):
         """
         Gets text from clipboard and paste in text input field.
-        * param ins: tkinter entry current text input
-        * param btn: current button
+        * param `ins`: tkinter entry current text input
+        * param `btn`: current button
         """
         btn.Press()
         ins.delete(0, 'end')

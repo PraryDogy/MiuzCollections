@@ -22,7 +22,7 @@ class Globals:
 class ImagePreview(tkinter.Toplevel):
     """
     Creates new window (tkinter Top Level) with image & buttons.
-    * param src: source path of image.
+    * param `src`: source path of image.
     """
     def __init__(self, src):
         Globals.src = src
@@ -53,7 +53,7 @@ class ImagePreview(tkinter.Toplevel):
 class ImageFrame(MyLabel):
     """
     Creates tkinter label with image 0.8 wight, height of screen.
-    * param master: tkinter toplevel.
+    * param `master`: tkinter toplevel.
     """
     def __init__(self, master):
         self.master = master
@@ -69,7 +69,7 @@ class ImageFrame(MyLabel):
     def resize(self, e, img):
         """
         Fits image to label size.
-        * param img: current image.
+        * param `img`: current image.
         """
         size = (e.width, e.height)
         img.thumbnail(size)
@@ -81,7 +81,7 @@ class ImageFrame(MyLabel):
 class NamePath(MyFrame):
     """
     Creates tkinter frame.
-    * param master: tkinter top level.
+    * param `master`: tkinter top level.
     """
     def __init__(self, master):
         MyFrame.__init__(self, master)
@@ -100,7 +100,7 @@ class NamePath(MyFrame):
         """
         Copies path to folder with image.
         Simulates button press with color.
-        * param btn: current tkinter button.
+        * param `btn`: current tkinter button.
         """
         btn.Press()
         my_copy(Globals.src.split('/')[-1].split('.')[0])
@@ -109,7 +109,7 @@ class NamePath(MyFrame):
 class OpenCloseFrame(MyFrame):
     """
     Creates tkinter frame for open and close buttons.
-    * param master: tkinter frame.
+    * param `master`: tkinter frame.
     """
     def __init__(self, master):
         MyFrame.__init__(self, master)
@@ -129,7 +129,7 @@ class OpenCloseFrame(MyFrame):
         """
         Opens folder with image.
         Simulates button press with color.
-        * param btn: current tkinter button.
+        * param `btn`: current tkinter button.
         """
         btn.Press()
         path = '/'.join(Globals.src.split('/')[:-1])
