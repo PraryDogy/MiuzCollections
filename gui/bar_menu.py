@@ -5,7 +5,7 @@ Mac osx bar menus.
 import tkinter
 
 import cfg
-from Utils.Styled import MyButton, MyLabel
+from utils.Styled import MyButton, MyLabel
 
 from .settings import Settings
 

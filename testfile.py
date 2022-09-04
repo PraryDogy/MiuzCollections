@@ -12,7 +12,6 @@ import sqlalchemy
 import tkmacosx
 from database import Config, Dbase, Thumbs
 from PIL import Image, ImageTk
-from Utils.Styled import MyButton, MyFrame, MyLabel
 
 class Globals:
     """

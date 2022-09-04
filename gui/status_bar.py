@@ -6,9 +6,9 @@ import tkinter
 
 import sqlalchemy
 from database import Config, Dbase
-from Utils.Splashscreen import SplashScreen
-from Utils.Styled import MyButton, MyFrame, MyLabel
-from Utils.Utils import SmbChecker
+from utils.splashscreen import SplashScreen
+from utils.Styled import MyButton, MyFrame, MyLabel
+from utils.Utils import SmbChecker
 
 from .images_gui import Globals
 from .settings import Settings
@@ -28,10 +28,10 @@ class BtnCmd:
 
     def updater(self, btn=MyButton):
         """
-        Run Updater from Utils with Splashscreen gui from Utils.
+        Run Updater from utils with Splashscreen gui from utils.
         * param `btn`: tkinter button
         """
-        if not SmbChecker():
+        if not SmbChecker().check():
             return
 
         btn.Press()

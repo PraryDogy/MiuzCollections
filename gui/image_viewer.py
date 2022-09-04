@@ -8,8 +8,8 @@ import tkinter
 
 import cfg
 from PIL import Image, ImageTk
-from Utils.Styled import MyButton, MyFrame, MyLabel
-from Utils.Utils import SmbChecker, my_copy
+from utils.Styled import MyButton, MyFrame, MyLabel
+from utils.Utils import SmbChecker, my_copy
 
 
 class Globals:

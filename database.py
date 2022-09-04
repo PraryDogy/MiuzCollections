@@ -11,7 +11,7 @@ import cfg
 import sqlalchemy
 import sqlalchemy.ext.declarative
 import yadisk
-from Utils.Styled import MyLabel
+from utils.Styled import MyLabel
 
 
 class DbChecker(tkinter.Toplevel):

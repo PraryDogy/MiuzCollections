@@ -13,8 +13,8 @@ import sqlalchemy
 import tkmacosx
 from database import Config, Dbase
 from PIL import Image, ImageTk
-from Utils.Styled import MyButton, MyFrame, MyLabel
-from Utils.Utils import my_copy, my_paste
+from utils.Styled import MyButton, MyFrame, MyLabel
+from utils.Utils import my_copy, my_paste
 
 from .descriptions import descriptions
 
@@ -27,7 +27,6 @@ class Globals:
     adv_frame = tkinter.Frame
     gen_btn = tkinter.Button
     adv_btn = tkinter.Button
-    save_close = tkinter.Frame
     inserts = []
 
 
@@ -125,7 +124,6 @@ class BelowMenu(MyFrame):
     """
     def __init__(self, master):
         MyFrame.__init__(self, master)
-        Globals.save_close = self
 
         save_btn = MyButton(self, text='Сохранить')
         save_btn.Cmd(lambda e: self.save_settings())
@@ -235,7 +233,7 @@ class Expert(tkmacosx.SFrame):
         self.configure(avoidmousewheel=(self))
         Globals.adv_frame = self
 
-        title = MyLabel(self, text='Эксперт', font=('Arial', 22, 'bold'))
+        title = MyLabel(self, text='Дополнительно', font=('Arial', 22, 'bold'))
         title.pack(pady=10)
 
         with open(os.path.join(cfg.DB_DIR, 'cfg.json'), 'r') as file:
