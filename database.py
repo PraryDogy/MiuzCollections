@@ -7,11 +7,12 @@ import threading
 import tkinter
 import traceback
 
-import cfg
 import sqlalchemy
 import sqlalchemy.ext.declarative
 import yadisk
-from utils.Styled import MyLabel
+
+import cfg
+from utils.utils import MyLabel
 
 
 class DbChecker(tkinter.Toplevel):

@@ -9,7 +9,8 @@ import cfg
 import sqlalchemy
 from database import Config, Dbase
 
-from utils import Utils, Styled
+from .scaner import UpdateCollections, UpdateRetouched
+from .utils import MyButton, MyLabel, SmbChecker
 
 
 class SplashScreen:
@@ -18,7 +19,7 @@ class SplashScreen:
     Destroys gui automaticaly when Scaner is done.
     """
     def __init__(self):
-        if not Utils.SmbChecker().check():
+        if not SmbChecker().check():
             return
 
         gui = Gui()
@@ -41,17 +42,17 @@ class Gui(tkinter.Toplevel):
         self.resizable(0, 0)
         cfg.ROOT.createcommand('tk::mac::ReopenApplication', self.deiconify)
 
-        sub_title = Styled.MyLabel(self,
+        sub_title = MyLabel(self,
                     text=f'Сканирую фото за последние {cfg.FILE_AGE} дней',
                     wraplength=300)
         sub_title.pack(pady=(20, 0))
 
-        dynamic = Utils.Styled.MyLabel(self, width=40, text='5%')
+        dynamic = MyLabel(self, width=40, text='5%')
         dynamic.pack(pady=(0, 20))
         cfg.LIVE_LBL = dynamic
 
-        skip_btn = Utils.Styled.MyButton(self, text='Пропустить')
-        skip_btn.Cmd(lambda e: self.stop())
+        skip_btn = MyButton(self, text='Пропустить')
+        skip_btn.cmd(lambda e: self.stop())
         skip_btn.pack(pady=(0, 10))
 
         cfg.ROOT.eval(f'tk::PlaceWindow {self} center')
@@ -82,13 +83,13 @@ class Scan(threading.Thread):
         type_scan = Dbase.conn.execute(sqlalchemy.select(Config.value).where(
             Config.name=='typeScan')).first()[0]
 
-        Utils.Scaner.UpdateColl()
+        UpdateCollections()
 
         if type_scan == 'full':
             Dbase.conn.execute(sqlalchemy.update(Config).where(
                 Config.name=='typeScan').values(value=''))
 
-            Utils.Scaner.UpdateRt(aged=False)
+            UpdateRetouched(aged=False)
             return
 
-        Utils.Scaner.UpdateRt(aged=True)
+        UpdateRetouched(aged=True)

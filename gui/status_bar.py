@@ -7,8 +7,7 @@ import tkinter
 import sqlalchemy
 from database import Config, Dbase
 from utils.splashscreen import SplashScreen
-from utils.Styled import MyButton, MyFrame, MyLabel
-from utils.Utils import SmbChecker
+from utils.utils import MyButton, MyFrame, MyLabel, SmbChecker
 
 from .images_gui import Globals
 from .settings import Settings
@@ -98,7 +97,7 @@ class SettingsSection(MyLabel, MyButton, BtnCmd):
 
         MyButton.__init__(self, master, text='⚙', padx=5)
         self.configure(width=5, height=1)
-        self.Cmd(lambda e: self.open_settings(self))
+        self.cmd(lambda e: self.open_settings(self))
         self.pack(side=tkinter.LEFT, padx=(0, 15))
 
 
@@ -112,7 +111,7 @@ class UpdateSection(MyLabel, MyButton, BtnCmd):
 
         MyButton.__init__(self, master, text='⟲', padx=5)
         self.configure(width=5, height=1, )
-        self.Cmd(lambda e: self.updater(self))
+        self.cmd(lambda e: self.updater(self))
         self.pack(side=tkinter.LEFT, padx=(0, 15))
 
 
@@ -127,13 +126,13 @@ class GridSection(MyLabel, MyButton, BtnCmd):
 
         MyButton.__init__(self, master, text='-', padx=5)
         self.configure(width=5, height=1)
-        self.Cmd(lambda e: self.more_less(
+        self.cmd(lambda e: self.more_less(
             delta=-50, min=150, max=300, db_name='size'))
         self.pack(side=tkinter.LEFT, padx=(0, 15))
 
         MyButton.__init__(self, master, text='+', padx=5)
         self.configure(width=5, height=1, )
-        self.Cmd(lambda e: self.more_less(
+        self.cmd(lambda e: self.more_less(
             delta=+50, min=150, max=300, db_name='size'))
         self.pack(side=tkinter.LEFT, padx=(0, 15))
 
@@ -150,12 +149,12 @@ class ClmnSection(MyLabel, MyButton, BtnCmd):
 
         MyButton.__init__(self, master, text='-', padx=5)
         self.configure(width=5, height=1, )
-        self.Cmd(lambda e: self.more_less(
+        self.cmd(lambda e: self.more_less(
             delta=-1, min=1, max=10, db_name='clmns'))
         self.pack(side=tkinter.LEFT, padx=(0, 15))
 
         MyButton.__init__(self, master, text='+', padx=5)
         self.configure(width=5, height=1, )
-        self.Cmd(lambda e: self.more_less(
+        self.cmd(lambda e: self.more_less(
             delta=+1, min=1, max=10, db_name='clmns'))
         self.pack(side=tkinter.LEFT, padx=(0, 15))

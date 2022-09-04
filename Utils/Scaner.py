@@ -6,94 +6,91 @@ import datetime
 import os
 import sys
 
-import sqlalchemy
-
 import cfg
+import sqlalchemy
 from admin import print_alive
-from database import Thumbs, Dbase
-from utils.utils import create_thumb
+from database import Dbase, Thumbs
+
+from .utils import create_thumb
 
 
-class BaseScan(list):
+class SearchDirs(list):
     """
-    Looking for folders with year names like "2018", "2020" etc.
-    in `cfg.PHOTO_DIR`
-    Looking for all folders in year named folders.
-    Returns list dirs.
-
-    * param `aged`: bool
-
-    `True` dirs from dirs list with time created earlier than
-    `cfg.FILE_AGE` days ago.
-    `False` returns dirs list with any time created.
-
-    `cfg.PHOTO_DIR` and `cfg.FILE_AGE` can be changed in
-    `cfg.json` (read `cfg.py`) or from app's settings.
+    Methods: years, aged_years, colls, retouched
     """
 
-    def __init__(self, aged):
+    def years(self):
+        """
+        Returns list dirs.
+        Looking for folders with year names like "2018", "2020" etc.
+        in `cfg.PHOTO_DIR`
+        Looking for all folders in year named folders.
+        """
         photo_dir = os.path.join(os.sep, *cfg.PHOTO_DIR.split('/'))
-        base_dirs = []
 
+        base_dirs = []
         for r in range(2018, datetime.datetime.now().year + 1):
+
             year_dir = os.path.join(photo_dir, str(r))
             base_dirs.append(year_dir) if os.path.exists(year_dir) else False
 
+        years_dirs = []
         for b_dir in base_dirs:
             for dirs in os.listdir(b_dir):
-                self.append(os.path.join(b_dir, dirs))
+                years_dirs.append(os.path.join(b_dir, dirs))
+        return years_dirs
 
-        self.aged() if aged else False
-
-    def aged(self):
+    def aged_years(self, list_dirs):
         """
-        Removes from dirs list all dirs created earlier than
-        `cfg.FILE_AGE` days ago.
+        Returns list of dirs.
+        Looking for all dirs created later than `cfg.FILE_AGE` days ago
+
+        * param `list_dirs`: list of path like objects
         """
         now = datetime.datetime.now().replace(microsecond=0)
         delta = datetime.timedelta(days=int(cfg.FILE_AGE))
         file_age = now - delta
 
-        old_dirs = []
-        for dir_item in self:
+        aged_years = []
+        for dir_item in list_dirs:
 
             birth_float = os.stat(dir_item).st_birthtime
             birth = datetime.datetime.fromtimestamp(birth_float)
 
-            if  birth < file_age:
-                old_dirs.append(dir_item)
+            if  birth > file_age:
+                aged_years.append(dir_item)
+        return aged_years
 
-        [self.remove(o) for o in old_dirs]
+    def colls(self, list_dirs):
+        """
+        Returns list of dirs.
+        Looking for folders with `cfg.COLL_FOLDER` name in list of dirs
+        Looking for all folders in `cfg.COLL_FOLDER`
 
+        * param `list_dirs`: list of path like objects
+        """
 
-class SearchColls(list):
-    """
-    Looking for folders with `cfg.COLL_FOLDER` name in list of dirs from
-    `BaseScan` with `aged=False` param.
-    Looking for all folders in `cfg.COLL_FOLDER`
-    """
-    def __init__(self):
-
-        colls_dirs = list()
-        for year_dir in BaseScan(aged=False):
+        colls_dirs = []
+        for year_dir in list_dirs:
             if os.path.join(os.sep, cfg.COLL_FOLDER) in year_dir:
                 colls_dirs.append(year_dir)
 
+        colls = []
         for sub_coll in colls_dirs:
             for i in os.listdir(sub_coll):
                 self.append(os.path.join(sub_coll, i))
+        return colls
 
+    def retouched(self, list_dirs):
+        """
+        Returns list of dirs.
+        Looking for folders with `cfg.RT_FOLDER` name in list of dirs
 
-class SearchRetouched(list):
-    """
-    Looking for folders with `cfg.RT_FOLDER` name in list of dirs from
-    `BaseScan`.
+        * param `list_dirs`: list of path like objects
+        """
 
-    * param `aged`: bool. Read BaseScan about `aged`.
-    """
-    def __init__(self, aged):
-
-        for dir_item in BaseScan(aged):
+        retouched = []
+        for dir_item in list_dirs:
             for root, _, _ in os.walk(dir_item):
                 print_alive(sys._getframe().f_code.co_name, root)
 
@@ -102,6 +99,7 @@ class SearchRetouched(list):
 
                 if os.path.join(os.sep, cfg.RT_FOLDER) in root:
                     self.append(root)
+        return retouched
 
 
 class SearchImages(list):
@@ -117,11 +115,11 @@ class SearchImages(list):
             for root, _, files in os.walk(path):
                 print_alive(sys._getframe().f_code.co_name, root)
 
+                if not cfg.FLAG:
+                    return
+                    
                 for file in files:
                     all_files.append(os.path.join(root, file))
-
-                    if not cfg.FLAG:
-                        return
 
         jpegs = set()
         for src in all_files:
@@ -132,67 +130,90 @@ class SearchImages(list):
             if src.endswith(('.jpg', '.jpeg', '.JPG', '.JPEG')):
                 attr = os.stat(src)
                 size = int(os.path.getsize(src))
-                created = int(props.st_birthtime)
-                modified = int(props.st_mtime)
+                created = int(attr.st_birthtime)
+                modified = int(attr.st_mtime)
                 jpegs.add((src, size, created, modified))
 
         self.extend(jpegs)
 
 
 class DbUtils():
-    def CollName(self, src):
-        """Returns collection name from image path, 
-        if collection not detected, collection = noCollection.
-        
-        Name of collection follows collection folder (cfg.COLL_FOLDER). 
-        Path example:
-        :path/to/image/cfg.COLL_FOLDER/collection_name
+    """
+    Methods:
+    * get_coll_name
+    * insert_row
+    """
+    def get_coll_name(self, src):
+        """
+        Returns collection name.
+        Returns `noCollection` if name not found.
 
-        :param str src: Image path"""
+        Looking for collection name in path like object.
+        Name of collection must be follow next to `cfg.COLL_FOLDER`
 
-        collName = 'noCollection'
-        if f'/{cfg.COLL_FOLDER}' in src:
-            collName = src.split(f'/{cfg.COLL_FOLDER}')[-1].split('/')[1]
-        return collName
+        # Example
+        ```
+        cfg.COLL_FOLDER = "collection"
+        collection_path = /path/to/collection/any_collection_name
+        print(get_coll_name(collection_path))
+        > any_collection_name
 
-    def InsertRow(self, src, size, birth, mod, coll):
-        """Inserts new row in Database > Thumbs. 
-        Creates 150, 200, 250, 300 thumbnails from Image's path.
-        :param str src: Image's path
-        :param int size: Image's size
-        :param int birth: Image's date created
-        :param int mod: Date last modified of image
-        :param str coll: name of collection from CollName mehtod"""
+        cfg.COLL_FOLDER = "collection"
+        collection_path = /some/path/without/coll_folder
+        print(get_coll_name(collection_path))
+        > noCollection
+        ```
+        """
+        coll_name = 'noCollection'
+        if os.path.join(os.sep, cfg.COLL_FOLDER) in src:
+            coll_name = src.split(
+                os.path.join(os.sep, cfg.COLL_FOLDER))[-1].split(os.sep)[1]
+        return coll_name
 
-        img150, img200, img250, img300 = create_thumb(src)
-        
+    def insert_row(self, **kw):
+        """
+        Adds new line to Database > Thumbs with new thumbnails.
+        Creates thumbnails with `create_thumb` method from `utils`
+        * param `src`: Image's path
+        * param `size`: Image's size `int`
+        * param `birth`: Image's date created `int`
+        * param `mod`: Date last modified of image `int`
+        * param `coll`: name of collection created with `get_coll_name`
+        """
+
+        img150, img200, img250, img300 = create_thumb(kw['src'])
+
         values = {
-            'img150':img150,
-            'img200':img200,
-            'img250':img250,
-            'img300':img300,
-            'src':src,
-            'size':size,
-            'created':birth,
-            'modified':mod,
-            'collection':coll
-            }
+            'img150':img150, 'img200':img200,
+            'img250':img250, 'img300':img300,
+            'src':kw['src'], 'size':kw['size'],
+            'created':kw['birth'], 'modified':kw['mod'],
+            'collection':kw['coll']}
 
-        q = sqlalchemy.insert(Thumbs).values(values)
-        Dbase.conn.execute(q)
+        Dbase.conn.execute(sqlalchemy.insert(Thumbs).values(values))
 
 
 class DbUpdate(list, DbUtils):
     """
-    Gets list of tuples (src, size, created, modified, collection) from
-    DataBase > Thumbs.
-    Checks whether the list item has been deleted or modified.
-    Compares the list with list of tuples from new search.
-    Add's to database new item if it's in new search list and not in 
-    database list.
+    Methods:
+    * `load_db`: loads from Database > Thumbs: `src`, `size`, `created`,
+    `modified`, `collection` to tuples list
+    * `removed`: checks whether each item in the `load_db` list has been
+    deleted with os.exists method
+    * `modified`: checks whether each item in the `load_db` list has been
+    modified by comparing file modification dates
+    * `added`: adds new line with thumnails to database if list item
+    not in `load_db` list and exists in `SearchImages` list
+    * `moved`: updates database line if list item is in
+    both lists (`db_load`, `SearchImages`).
+    It's means, that image was copied or moved to `collections` folder.
     """
 
     def load_db(self):
+        """
+        Loads from Database > Thumbs: `src`, `size`, `created`,
+        `modified`, `collection` to tuples list
+        """
         self.clear()
         names =[
             Thumbs.src, Thumbs.size, Thumbs.created,
@@ -200,7 +221,11 @@ class DbUpdate(list, DbUtils):
         files = Dbase.conn.execute(sqlalchemy.select(names)).fetchall()
         self.extend(files)
 
-    def Removed(self):
+    def removed(self):
+        """
+        Checks whether each item in the `load_db` list has been
+        deleted with os.exists method
+        """
         self.load_db()
         for src, _, _, _, _ in self:
             print_alive(sys._getframe().f_code.co_name, src)
@@ -214,41 +239,66 @@ class DbUpdate(list, DbUtils):
                 Dbase.conn.execute(
                     sqlalchemy.delete(Thumbs).where(Thumbs.src==src))
 
-    def Modified(self):
+    def modified(self):
+        """
+        Checks whether each item in the `load_db` list has been 
+        modified by comparing file modification dates
+        """
         self.load_db()
         for src, _, _, mod, coll in self:
             atr = os.stat(src)
             if int(atr.st_mtime) > mod:
                 print('modified', src)
 
-                nSize = int(os.path.getsize(src))
-                nCreated = int(atr.st_birthtime)
-                nMod = int(atr.st_mtime)
+                n_size = int(os.path.getsize(src))
+                n_birth = int(atr.st_birthtime)
+                n_mod = int(atr.st_mtime)
 
                 Dbase.conn.execute(
                     sqlalchemy.delete(Thumbs).where(Thumbs.src==src))
 
-                coll = self.CollName(src)
-                self.InsertRow(src, nSize, nCreated, nMod, coll)
+                coll = self.get_coll_name(src)
+                self.insert_row(src=src, size=n_size, birth=n_birth,
+                                mod=n_mod, coll=coll)
 
-    def Added(self, listDirs):
+    def added(self, list_dirs):
+        """
+        Adds new line with thumnails to database if list item
+        not in `load_db` list and exists in `SearchImages` list
+
+        * param `list_dirs`: list of tuples from `SearchImages`
+        """
         self.load_db()
-        dbColls = list(
-            (size, creat, mod) for _, size, creat, mod, _ in self)
+        db_colls = list(
+            (size, created, mod) for _, size, created, mod, _ in self)
 
-        for src, size, created, mod in listDirs:
+        for src, size, created, mod in list_dirs:
             print_alive(sys._getframe().f_code.co_name, src)
 
             if not cfg.FLAG:
                 return
 
-            if (size, created, mod) not in dbColls:
+            if (size, created, mod) not in db_colls:
                 print('add new file', src)
 
-                coll = self.CollName(src)
-                self.InsertRow(src, size, created, mod, coll)
-        
-    def Moved(self, lisrDirs):
+                coll = self.get_coll_name(src)
+                self.insert_row(src=src, size=size, birth=created,
+                                mod=mod, coll=coll)
+
+    def moved(self, list_dirs):
+        """
+        Updates database line if list item is in both lists (`db_load`,
+        `SearchImages`).
+        It's means, that image was copied or moved to `collections` folder.
+
+        We have only two places where we search images: folders with
+        `cfg.RT_FOLDER` name and collection folders with `cfg.COLL_FOLDER`.
+        Folder with collection name is a priority.
+        If image in both folder, in database will only one line about this
+        image - from collection folder.
+
+        * param `list_dirs`: list of tuples from `SearchImages`
+        """
         self.load_db()
 
         noColls = []
@@ -256,7 +306,7 @@ class DbUpdate(list, DbUtils):
             if coll=='noCollection':
                 noColls.append((size, created, mod))
 
-        for src, size, created, mod in lisrDirs:
+        for src, size, created, mod in list_dirs:
             print_alive(sys._getframe().f_code.co_name, src)
 
             if not cfg.FLAG:
@@ -265,51 +315,66 @@ class DbUpdate(list, DbUtils):
             if (size, created, mod) in noColls:
                 print('moved to colls', src)
 
-                remRow = sqlalchemy.delete(Thumbs).where(
-                    Thumbs.size==size,
-                    Thumbs.created==created,
-                    Thumbs.modified==mod
-                    )
-                Dbase.conn.execute(remRow)
+                Dbase.conn.execute(sqlalchemy.delete(Thumbs).where(
+                    Thumbs.size==size, Thumbs.created==created,
+                    Thumbs.modified==mod))
 
-                coll = self.CollName(src)
-                self.InsertRow(src, size, created, mod, coll)
-                
-    
-class UpdateColl():
+                coll = self.get_coll_name(src)
+                self.insert_row(src=src, size=size, birth=created,
+                                mod=mod, coll=coll)
+
+
+class UpdateCollections():
+    """
+    Public method.
+    Collection dirs analysis.
+    Searchs images.
+    Updates the database.
+    """
     def __init__(self):
-        cfg.LIVE_LBL.configure(text='10%')
-        listDirs = SearchColls()
-        images = SearchImages(listDirs)
-        
-        upd = DbUpdate()
-        
-        cfg.LIVE_LBL.configure(text='20%')
-        upd.Removed()
-        
-        cfg.LIVE_LBL.configure(text='30%')
-        upd.Modified()
-        
-        cfg.LIVE_LBL.configure(text='40%')
-        upd.Added(images)
-        
-        cfg.LIVE_LBL.configure(text='50%')
-        upd.Moved(images)
+        cfg.LIVE_LBL['text'] = '10%'
+        coll_dirs = SearchDirs().colls(SearchDirs().years())
+        images = SearchImages(coll_dirs)
+
+        cfg.LIVE_LBL['text'] = '20%'
+        DbUpdate().removed()
+
+        cfg.LIVE_LBL['text'] = '30%'
+        DbUpdate().modified()
+
+        cfg.LIVE_LBL['text'] = '40%'
+        DbUpdate().added(images)
+
+        cfg.LIVE_LBL['text'] = '50%'
+        DbUpdate().moved(images)
 
 
-class UpdateRt():
-    def __init__(self, aged=True):
-        cfg.LIVE_LBL.configure(text='60%')
-        listDirs = SearchRetouched(aged)
-        images = SearchImages(listDirs)
-        
-        upd = DbUpdate()
-        
-        cfg.LIVE_LBL.configure(text='70%')
-        upd.Removed()
-        
-        cfg.LIVE_LBL.configure(text='80%')
-        upd.Modified()
-        
-        cfg.LIVE_LBL.configure(text='90%')
-        upd.Added(images)
+class UpdateRetouched():
+    """
+    Public method.
+    Collection dirs analysis.
+    Searchs images.
+    Updates the database.
+
+    * param `aged`: true = updates dirs created later than `cfg.FILE_AGE`
+    value
+    """
+    def __init__(self, aged):
+        cfg.LIVE_LBL['text'] = '60%'
+
+        if aged:
+            aged_dirs = SearchDirs().retouched(
+                SearchDirs().aged_years(SearchDirs().years()))
+        else:
+            aged_dirs = SearchDirs().retouched(SearchDirs().years())
+
+        images = SearchImages(aged_dirs)
+
+        cfg.LIVE_LBL['text'] = '70%'
+        DbUpdate().removed()
+
+        cfg.LIVE_LBL['text'] = '80%'
+        DbUpdate().modified()
+
+        cfg.LIVE_LBL['text'] = '90%'
+        DbUpdate().added(images)

@@ -13,8 +13,7 @@ import sqlalchemy
 import tkmacosx
 from database import Config, Dbase
 from PIL import Image, ImageTk
-from utils.Styled import MyButton, MyFrame, MyLabel
-from utils.Utils import my_copy, my_paste
+from utils.utils import MyButton, MyFrame, MyLabel, my_copy, my_paste
 
 from .descriptions import descriptions
 
@@ -87,14 +86,14 @@ class LeftMenu(MyFrame):
         Globals.gen_btn = MyButton(self, text='Основные')
         Globals.gen_btn.configure(bg=cfg.BGPRESSED)
 
-        Globals.gen_btn.Cmd(lambda e: self.change(
+        Globals.gen_btn.cmd(lambda e: self.change(
             kill=Globals.adv_frame, pack=Globals.gen_frame,
             press=Globals.gen_btn, clear=Globals.adv_btn))
         Globals.gen_btn.pack()
 
         Globals.adv_btn = MyButton(self, text = 'Дополнительно')
 
-        Globals.adv_btn.Cmd(lambda e: self.change(
+        Globals.adv_btn.cmd(lambda e: self.change(
             kill=Globals.gen_frame, pack=Globals.adv_frame,
             press=Globals.adv_btn, clear=Globals.gen_btn))
         Globals.adv_btn.pack()
@@ -126,11 +125,11 @@ class BelowMenu(MyFrame):
         MyFrame.__init__(self, master)
 
         save_btn = MyButton(self, text='Сохранить')
-        save_btn.Cmd(lambda e: self.save_settings())
+        save_btn.cmd(lambda e: self.save_settings())
         save_btn.pack(side=tkinter.LEFT, padx=10)
 
         cancel_btn = MyButton(self, text='Отмена')
-        cancel_btn.Cmd(lambda e: self.winfo_toplevel().destroy())
+        cancel_btn.cmd(lambda e: self.winfo_toplevel().destroy())
         cancel_btn.pack(side=tkinter.LEFT)
 
 
@@ -197,7 +196,7 @@ class General(MyFrame):
         descr_scan.pack(pady=(0, 10), anchor=tkinter.W)
 
         scan_btn = MyButton(self, text='Полное сканирование')
-        scan_btn.Cmd(lambda e: self.full_scan())
+        scan_btn.cmd(lambda e: self.full_scan())
         scan_btn.pack(anchor='center')
 
         sep = Separator(self, orient='horizontal')
@@ -260,13 +259,13 @@ class Expert(tkmacosx.SFrame):
 
             btn_copy = MyButton(frame_btns, text='Копировать')
             btn_copy.configure(height=1, width=9)
-            btn_copy.Cmd(
+            btn_copy.cmd(
                 lambda e, x=text_input, y=btn_copy: self.copy_input(x, y))
             btn_copy.pack(side=tkinter.LEFT, padx=(0, 10))
 
             btn_paste = MyButton(frame_btns, text='Вставить')
             btn_paste.configure(height=1, width=9)
-            btn_paste.Cmd(
+            btn_paste.cmd(
                 lambda e, x=text_input, y=btn_paste: self.paste_input(x, y))
             btn_paste.pack(side=tkinter.RIGHT, padx=(0, 10))
 
@@ -278,7 +277,7 @@ class Expert(tkmacosx.SFrame):
 
         restore_btn = MyButton(self, text='По умолчанию')
         restore_btn.configure(height=1, width=12)
-        restore_btn.Cmd(lambda e, x=restore_btn: self.restore(x))
+        restore_btn.cmd(lambda e, x=restore_btn: self.restore(x))
         restore_btn.pack(pady=(0, 15))
 
     def restore(self, btn):

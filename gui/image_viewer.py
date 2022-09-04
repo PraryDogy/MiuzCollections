@@ -8,8 +8,7 @@ import tkinter
 
 import cfg
 from PIL import Image, ImageTk
-from utils.Styled import MyButton, MyFrame, MyLabel
-from utils.Utils import SmbChecker, my_copy
+from utils.utils import MyButton, MyFrame, MyLabel, SmbChecker, my_copy
 
 
 class Globals:
@@ -93,7 +92,7 @@ class NamePath(MyFrame):
 
         copy_btn = MyButton(self, text='Копировать имя')
         copy_btn.configure(height=1)
-        copy_btn.Cmd(lambda e: self.copy_name(copy_btn))
+        copy_btn.cmd(lambda e: self.copy_name(copy_btn))
         copy_btn.pack(side=tkinter.LEFT, padx=(15, 0))
 
     def copy_name(self, btn=MyButton):
@@ -116,13 +115,13 @@ class OpenCloseFrame(MyFrame):
 
         close = MyButton(self, text='Закрыть')
         close.configure(height=2)
-        close.Cmd(lambda e: self.winfo_toplevel().destroy())
+        close.cmd(lambda e: self.winfo_toplevel().destroy())
         close.pack(side=tkinter.RIGHT)
 
         if os.path.exists(Globals.src):
             open_btn = MyButton(self, text='Открыть папку')
             open_btn.configure(height=2)
-            open_btn.Cmd(lambda e: self.open_folder(open_btn))
+            open_btn.cmd(lambda e: self.open_folder(open_btn))
             open_btn.pack(side=tkinter.LEFT, padx=(0, 15))
 
     def open_folder(self, btn=MyButton):
@@ -131,6 +130,6 @@ class OpenCloseFrame(MyFrame):
         Simulates button press with color.
         * param `btn`: current tkinter button.
         """
-        btn.Press()
+        btn.press()
         path = '/'.join(Globals.src.split('/')[:-1])
         subprocess.check_output(["/usr/bin/open", path])

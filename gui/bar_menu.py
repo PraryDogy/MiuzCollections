@@ -5,7 +5,7 @@ Mac osx bar menus.
 import tkinter
 
 import cfg
-from utils.Styled import MyButton, MyLabel
+from utils.utils import MyButton, MyLabel
 
 from .settings import Settings
 
@@ -59,7 +59,7 @@ class BarMenu(tkinter.Menu):
 
         close_btn = MyButton(new_win)
         close_btn.configure(height=2, width=17, text='Закрыть')
-        close_btn.Cmd(lambda e: new_win.destroy())
+        close_btn.cmd(lambda e: new_win.destroy())
         close_btn.pack()
 
         cfg.ROOT.eval(f'tk::PlaceWindow {new_win} center')
@@ -86,7 +86,7 @@ class BarMenu(tkinter.Menu):
 
         close_btn = MyButton(new_win)
         close_btn.configure(height=2, width=17, text='Закрыть')
-        close_btn.Cmd(lambda e: new_win.destroy())
+        close_btn.cmd(lambda e: new_win.destroy())
         close_btn.pack()
 
         cfg.ROOT.eval(f'tk::PlaceWindow {new_win} center')

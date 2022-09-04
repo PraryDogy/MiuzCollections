@@ -2,7 +2,6 @@
 Gui menu and images grid.
 """
 
-from cgitb import text
 import os
 import re
 import tkinter
@@ -16,7 +15,7 @@ import sqlalchemy
 import tkmacosx
 from database import Config, Dbase, Thumbs
 from PIL import Image, ImageTk
-from utils.Styled import MyButton, MyFrame, MyLabel
+from utils.utils import MyButton, MyFrame, MyLabel
 
 from .image_viewer import ImagePreview
 
@@ -103,7 +102,7 @@ class MenuButtons(object):
             if name_coll == Globals.currColl:
                 btn.configure(bg=cfg.BGPRESSED)
 
-            btn.Cmd(lambda e, coll=name_coll, btn=btn, btns=btns:
+            btn.cmd(lambda e, coll=name_coll, btn=btn, btns=btns:
                     self.__open_coll(coll, btn, btns))
 
     def __open_coll(self, coll, btn, btns):
@@ -296,5 +295,5 @@ class ImagesThumbs(object):
                 thumb = MyButton(row_frame, image=image, highlightthickness=1)
                 thumb.configure(width=0, height=0, bg=cfg.BGCOLOR)
                 thumb.image_names = image
-                thumb.Cmd(lambda e, src=src: ImagePreview(src))
+                thumb.cmd(lambda e, src=src: ImagePreview(src))
                 thumb.pack(side=tkinter.LEFT)
