@@ -123,7 +123,7 @@ class BelowMenu(MyFrame):
         save_btn.pack(side=tkinter.LEFT, padx=10)
 
         cancel_btn = MyButton(self, text='Отмена')
-        cancel_btn.cmd(lambda e: master.destroy())
+        cancel_btn.cmd(lambda e: self.winfo_toplevel().destroy())
         cancel_btn.pack(side=tkinter.LEFT)
 
 
