@@ -24,11 +24,11 @@ def create_thumb(src):
     width, height = img.shape[1], img.shape[0]
 
     if height >= width:
-        delta = int((height-width)/2)
+        delta = (height-width)//2
         new_img = img[delta:height-delta, 0:width]
 
     else:
-        delta = int((width-height)/2)
+        delta = (width-height)//2
         new_img = img[0:height, delta:width-delta]
 
     resized = []

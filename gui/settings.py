@@ -62,8 +62,8 @@ class Settings(tkinter.Toplevel):
 
         cfg.ROOT.update_idletasks()
         x, y = cfg.ROOT.winfo_x(), cfg.ROOT.winfo_y()
-        xx = x + int(cfg.ROOT.winfo_width()/2)-int(self.winfo_width()/2)
-        yy = y + int(cfg.ROOT.winfo_height()/2)-int(self.winfo_height()/2)
+        xx = x + cfg.ROOT.winfo_width()//2-self.winfo_width()//2
+        yy = y + cfg.ROOT.winfo_height()//2-self.winfo_height()//2
 
         self.geometry(f'+{xx}+{yy}')
         self.deiconify()
