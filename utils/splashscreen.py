@@ -37,10 +37,12 @@ class Gui(tkinter.Toplevel):
     def __init__(self):
         tkinter.Toplevel.__init__(self, bg=cfg.BGCOLOR)
         self.withdraw()
+
         self.protocol("WM_DELETE_WINDOW", self.stop)
+        self.bind('<Command-w>', lambda e: self.stop())
+
         self.title('MiuzGallery')
         self.resizable(0, 0)
-        cfg.ROOT.createcommand('tk::mac::ReopenApplication', self.deiconify)
 
         sub_title = MyLabel(self,
                     text=f'Сканирую фото за последние {cfg.FILE_AGE} дней',

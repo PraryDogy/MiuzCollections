@@ -43,7 +43,9 @@ class Settings(tkinter.Toplevel):
         self.title('Настройки')
         self.geometry('570x650')
         self.configure(padx=10, pady=10)
-        self.protocol("WM_DELETE_WINDOW", self.on_closing)
+
+        self.protocol("WM_DELETE_WINDOW", self.destroy)
+        self.bind('<Command-w>', lambda e: self.destroy())
 
         frame_up = MyFrame(self)
         frame_up.pack(fill=tkinter.BOTH, expand=True)
@@ -66,14 +68,6 @@ class Settings(tkinter.Toplevel):
         self.geometry(f'+{xx}+{yy}')
         self.deiconify()
         self.grab_set()
-
-    def on_closing(self):
-        """
-        Close tkinter toplevel window.
-        Change global variable cfg.TOP_LVL to False.
-        cfg.TOP_LVL prevents creating new window with settings while True.
-        """
-        self.destroy()
 
 
 class LeftMenu(MyFrame):
@@ -129,7 +123,7 @@ class BelowMenu(MyFrame):
         save_btn.pack(side=tkinter.LEFT, padx=10)
 
         cancel_btn = MyButton(self, text='Отмена')
-        cancel_btn.cmd(lambda e: self.winfo_toplevel().destroy())
+        cancel_btn.cmd(lambda e: master.destroy())
         cancel_btn.pack(side=tkinter.LEFT)
 
 
@@ -286,7 +280,7 @@ class Expert(tkmacosx.SFrame):
         Sets default text in all text input fields in advanced settings.
         * param `btn`: current tkinter button
         """
-        btn.Press()
+        btn.press()
         data = cfg.defaults
         with open(os.path.join(cfg.DB_DIR, 'cfg.json'), 'w') as file:
             json.dump(data, file, indent=4)
@@ -301,7 +295,7 @@ class Expert(tkmacosx.SFrame):
         * param `ins`: tkinter entry current text input
         * param `btn`: current button
         """
-        btn.Press()
+        btn.press()
         my_copy(ins.get())
 
     def paste_input(self, ins, btn):
@@ -310,6 +304,6 @@ class Expert(tkmacosx.SFrame):
         * param `ins`: tkinter entry current text input
         * param `btn`: current button
         """
-        btn.Press()
+        btn.press()
         ins.delete(0, 'end')
         ins.insert(0, my_paste())

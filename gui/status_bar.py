@@ -22,7 +22,7 @@ class BtnCmd:
         Opens settings gui.
         * param `btn`: tkinter button
         """
-        btn.Press()
+        btn.press()
         Settings()
 
     def updater(self, btn=MyButton):
@@ -33,7 +33,7 @@ class BtnCmd:
         if not SmbChecker().check():
             return
 
-        btn.Press()
+        btn.press()
         SplashScreen()
         Globals.images_reset()
 

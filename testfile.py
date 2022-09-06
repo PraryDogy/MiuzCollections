@@ -1,6 +1,1 @@
-class Test(list):
-
-    def ttt(self):
-        print('hhh')
-
-Test().ttt()
+print(100//3)

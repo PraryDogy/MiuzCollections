@@ -78,7 +78,8 @@ class SearchDirs(list):
         colls = []
         for sub_coll in colls_dirs:
             for i in os.listdir(sub_coll):
-                self.append(os.path.join(sub_coll, i))
+                colls.append(os.path.join(sub_coll, i))
+
         return colls
 
     def retouched(self, list_dirs):
@@ -98,7 +99,8 @@ class SearchDirs(list):
                     return
 
                 if os.path.join(os.sep, cfg.RT_FOLDER) in root:
-                    self.append(root)
+                    retouched.append(root)
+
         return retouched
 
 
@@ -117,7 +119,7 @@ class SearchImages(list):
 
                 if not cfg.FLAG:
                     return
-                    
+
                 for file in files:
                     all_files.append(os.path.join(root, file))
 

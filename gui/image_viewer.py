@@ -37,16 +37,20 @@ class ImagePreview(tkinter.Toplevel):
 
         self.protocol("WM_DELETE_WINDOW", self.destroy)
         self.bind('<Command-w>', lambda e: self.destroy())
+
         self.configure(bg=cfg.BGCOLOR, padx=15, pady=15)
         self.resizable(0,0)
+        side = int(cfg.ROOT.winfo_screenheight()*0.8)
+        self.geometry(f'{side}x{side}')
 
-        ImageFrame(self).pack(fill=tkinter.BOTH)
+        ImageFrame(self).pack(fill=tkinter.BOTH, expand=True)
         NamePath(self).pack(pady=(15, 15), padx=15)
         OpenCloseFrame(self).pack()
 
         cfg.ROOT.update_idletasks()
-        self.geometry(f'+{self.winfo_x()}+0')
-        cfg.ROOT.eval(f'tk::PlaceWindow {self} center')
+
+        self.geometry(f'+{cfg.ROOT.winfo_x() + 100}+{cfg.ROOT.winfo_y()}')
+        self.deiconify()
 
 
 class ImageFrame(MyLabel):
@@ -59,10 +63,12 @@ class ImageFrame(MyLabel):
         img_src = Image.open(Globals.src)
         img_copy= img_src.copy()
 
-        MyLabel.__init__(
-            self, master, height=int(cfg.ROOT.winfo_screenheight()*0.7),
-            borderwidth=0)
-        self.configure(bg='black')
+        MyLabel.__init__(self, master, borderwidth=0)
+
+        # self['height'] = int(cfg.ROOT.winfo_screenheight()*0.7)
+        # self['width'] =  self['height']
+        self['bg']='black'
+
         self.bind("<Configure>", lambda e: self.resize(e, img_copy))
 
     def resize(self, e, img):
@@ -101,7 +107,7 @@ class NamePath(MyFrame):
         Simulates button press with color.
         * param `btn`: current tkinter button.
         """
-        btn.Press()
+        btn.press()
         my_copy(Globals.src.split('/')[-1].split('.')[0])
 
 
