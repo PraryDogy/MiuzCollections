@@ -31,6 +31,7 @@ class Globals:
 
     # bind reset function for thumbnails frame: Images().Reset()
     images_reset = object
+    all_images = []
 
 
 class Gallery(MyFrame):
@@ -105,6 +106,30 @@ class MenuButtons(object):
             btn.cmd(lambda e, coll=name_coll, btn=btn, btns=btns:
                     self.__open_coll(coll, btn, btns))
 
+        last_imgs = MyButton(master, text='Последние')
+        last_imgs.configure(height=1, width=12)
+        last_imgs.cmd(lambda e: self.last_imgs(btns, last_imgs))
+        last_imgs.pack(pady=(0, 10))
+        btns.append(last_imgs)
+
+    def last_imgs(self, btns, btn):
+        size = Dbase.conn.execute(
+            sqlalchemy.select(Config.value).where(
+                Config.name=='size')).first()[0]
+        img = Thumbs.__dict__[f'img{int(size)}']
+
+        res = Dbase.conn.execute(
+            sqlalchemy.select(img, Thumbs.src, Thumbs.modified).order_by(
+                -Thumbs.modified).limit(20)).fetchall()
+
+        for btn_item in btns:
+            btn_item['bg'] = cfg.BGBUTTON
+        btn['bg'] = cfg.BGPRESSED
+
+        Globals.all_images = res
+        Globals.currColl = 'Последние добавленные'
+        Globals.images_reset()
+
     def __open_coll(self, coll, btn, btns):
         """
         Changes all buttons color to default and change color for
@@ -116,11 +141,23 @@ class MenuButtons(object):
         * param `btn`: tkinter curren button object
         * param `btns`: list of created tkinter buttons
         """
-
         Dbase.conn.execute(
             sqlalchemy.update(Config).where(
                 Config.name=='currColl').values(value=coll))
         Globals.currColl = coll
+
+        size = Dbase.conn.execute(
+            sqlalchemy.select(Config.value).where(
+                Config.name=='size')).first()[0]
+        size = int(size)
+        img = Thumbs.__dict__[f'img{size}']
+
+        res = Dbase.conn.execute(
+            sqlalchemy.select(img, Thumbs.src, Thumbs.modified).where(
+            Thumbs.collection==Globals.currColl).order_by(
+            -Thumbs.modified)).fetchall()
+
+        Globals.all_images = res
 
         for btn_item in btns:
             btn_item['bg'] = cfg.BGBUTTON
@@ -172,6 +209,18 @@ class ImagesThumbs(object):
                 Config.value).where(Config.name=='clmns')).first()[0]
         clmns = int(clmns)
 
+        if len(Globals.all_images) < 1:
+            size = Dbase.conn.execute(
+                sqlalchemy.select(Config.value).where(
+                    Config.name=='size')).first()[0]
+            size = int(size)
+            img = Thumbs.__dict__[f'img{size}']
+
+            Globals.all_images = Dbase.conn.execute(
+                sqlalchemy.select(img, Thumbs.src, Thumbs.modified).where(
+                Thumbs.collection==Globals.currColl).order_by(
+                -Thumbs.modified)).fetchall()
+
         thumbs = self.load_thumbs()
 
         if len(thumbs) == 0:
@@ -192,20 +241,8 @@ class ImagesThumbs(object):
         * returns: list turples: (img, src, modified)
         """
 
-        size = Dbase.conn.execute(
-            sqlalchemy.select(Config.value).where(
-                Config.name=='size')).first()[0]
-        size = int(size)
-        img = Thumbs.__dict__[f'img{size}']
-
-        res = Dbase.conn.execute(
-            sqlalchemy.select(img, Thumbs.src, Thumbs.modified).where(
-            Thumbs.collection==Globals.currColl).order_by(
-            -Thumbs.modified)).fetchall()
-
         thumbs = []
-        for blob, src, mod in res:
-
+        for blob, src, mod in Globals.all_images:
             try:
                 nparr = numpy.frombuffer(blob, numpy.byte)
                 image1 = cv2.imdecode(nparr, cv2.IMREAD_ANYCOLOR)

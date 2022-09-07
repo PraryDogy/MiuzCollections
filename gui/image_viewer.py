@@ -8,7 +8,9 @@ import tkinter
 
 import cfg
 from PIL import Image, ImageTk
-from utils.utils import MyButton, MyFrame, MyLabel, SmbChecker, my_copy
+from utils.utils import (Compare, MyButton, MyFrame, MyLabel, SmbChecker,
+                         my_copy)
+from utils.scaner import DbUtils
 
 
 class Globals:
@@ -16,6 +18,17 @@ class Globals:
     Stores variables
     """
     src = str
+    path_lbl = tkinter.Label
+
+def on_closing(obj):
+    print(cfg.IMAGES_COMPARE)
+
+    if len(cfg.IMAGES_COMPARE)==2:
+        cfg.IMAGES_COMPARE.remove(Globals.src)
+    else:
+        cfg.IMAGES_COMPARE.clear()
+    obj.destroy()
+
 
 
 class ImagePreview(tkinter.Toplevel):
@@ -35,8 +48,8 @@ class ImagePreview(tkinter.Toplevel):
         if src is None:
             return
 
-        self.protocol("WM_DELETE_WINDOW", self.destroy)
-        self.bind('<Command-w>', lambda e: self.destroy())
+        self.protocol("WM_DELETE_WINDOW", lambda: on_closing(self))
+        self.bind('<Command-w>', lambda e: on_closing(self))
 
         self.configure(bg=cfg.BGCOLOR, padx=15, pady=15)
         self.resizable(0,0)
@@ -45,6 +58,7 @@ class ImagePreview(tkinter.Toplevel):
 
         ImageFrame(self).pack(fill=tkinter.BOTH, expand=True)
         NamePath(self).pack(pady=(15, 15), padx=15)
+        CopyCompare(self).pack(pady=(0, 35))
         OpenCloseFrame(self).pack()
 
         cfg.ROOT.update_idletasks()
@@ -64,11 +78,7 @@ class ImageFrame(MyLabel):
         img_copy= img_src.copy()
 
         MyLabel.__init__(self, master, borderwidth=0)
-
-        # self['height'] = int(cfg.ROOT.winfo_screenheight()*0.7)
-        # self['width'] =  self['height']
         self['bg']='black'
-
         self.bind("<Configure>", lambda e: self.resize(e, img_copy))
 
     def resize(self, e, img):
@@ -78,10 +88,14 @@ class ImageFrame(MyLabel):
         """
         size = (e.width, e.height)
         img.thumbnail(size)
-        img_tk = ImageTk.PhotoImage(img)
+        Globals.img = ImageTk.PhotoImage(img)
 
-        self.configure(image=img_tk)
-        self.image_names = img_tk
+        self.configure(image=Globals.img)
+        self.image_names = Globals.img
+
+        if len(cfg.IMAGES_COMPARE) < 2:
+            cfg.IMAGES_COMPARE.add(Globals.src)
+
 
 class NamePath(MyFrame):
     """
@@ -91,17 +105,51 @@ class NamePath(MyFrame):
     def __init__(self, master):
         MyFrame.__init__(self, master)
 
-        path_lbl = MyLabel(
-            self, text=Globals.src.replace(cfg.PHOTO_DIR, ''),
+        txt = (f'Коллекция: {DbUtils().get_coll_name(Globals.src)}'
+                f'\nИмя: {Globals.src.split(os.sep)[-1]}')
+
+        Globals.path_lbl = MyLabel(
+            self, text=txt,
             wraplength=500, justify=tkinter.LEFT)
-        path_lbl.pack(side=tkinter.LEFT)
+        Globals.path_lbl.pack(side=tkinter.LEFT)
+
+
+class CopyCompare(MyFrame):
+    """
+    Tkinter frame with button that calls images compare method.
+    """
+    def __init__(self, master):
+        MyFrame.__init__(self, master)
+        b_wight = 15
 
         copy_btn = MyButton(self, text='Копировать имя')
-        copy_btn.configure(height=1)
+        copy_btn.configure(height=1, width=b_wight)
         copy_btn.cmd(lambda e: self.copy_name(copy_btn))
-        copy_btn.pack(side=tkinter.LEFT, padx=(15, 0))
+        copy_btn.pack(side=tkinter.LEFT, padx=(0, 15))
 
-    def copy_name(self, btn=MyButton):
+        comp_btn = MyButton(self, text='Сравнить')
+        comp_btn.configure(height=1, width=b_wight)
+        comp_btn.cmd(lambda e: self.compare(comp_btn))
+        comp_btn.pack(side=tkinter.RIGHT)
+
+        if os.path.exists(Globals.src):
+            open_btn = MyButton(self, text='Открыть коллекцию')
+            open_btn.configure(height=1, width=b_wight)
+            open_btn.cmd(lambda e: self.open_folder(open_btn))
+            open_btn.pack(side=tkinter.LEFT, padx=(0, 15))
+
+    def compare(self, btn):
+        btn.press()
+        if len(cfg.IMAGES_COMPARE) < 2:
+            old_txt = Globals.path_lbl['text']
+            txt = '\nОткройте второе изображение'
+            Globals.path_lbl['text'] = txt
+            cfg.ROOT.after(
+                1500, lambda: Globals.path_lbl.configure(text=old_txt))
+            return
+        Compare()
+
+    def copy_name(self, btn):
         """
         Copies path to folder with image.
         Simulates button press with color.
@@ -109,6 +157,16 @@ class NamePath(MyFrame):
         """
         btn.press()
         my_copy(Globals.src.split('/')[-1].split('.')[0])
+
+    def open_folder(self, btn):
+            """
+            Opens folder with image.
+            Simulates button press with color.
+            * param `btn`: current tkinter button.
+            """
+            btn.press()
+            path = '/'.join(Globals.src.split('/')[:-1])
+            subprocess.check_output(["/usr/bin/open", path])
 
 
 class OpenCloseFrame(MyFrame):
@@ -121,21 +179,5 @@ class OpenCloseFrame(MyFrame):
 
         close = MyButton(self, text='Закрыть')
         close.configure(height=2)
-        close.cmd(lambda e: self.winfo_toplevel().destroy())
+        close.cmd(lambda e: on_closing(self.winfo_toplevel()))
         close.pack(side=tkinter.RIGHT)
-
-        if os.path.exists(Globals.src):
-            open_btn = MyButton(self, text='Открыть папку')
-            open_btn.configure(height=2)
-            open_btn.cmd(lambda e: self.open_folder(open_btn))
-            open_btn.pack(side=tkinter.LEFT, padx=(0, 15))
-
-    def open_folder(self, btn=MyButton):
-        """
-        Opens folder with image.
-        Simulates button press with color.
-        * param `btn`: current tkinter button.
-        """
-        btn.press()
-        path = '/'.join(Globals.src.split('/')[:-1])
-        subprocess.check_output(["/usr/bin/open", path])
