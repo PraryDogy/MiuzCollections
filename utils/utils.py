@@ -201,6 +201,7 @@ class Scrollable(tkinter.Frame):
 class Compare(list):
     def __init__(self):
         images = list(cfg.IMAGES_COMPARE)
+
         before = cv2.imread(images[0])
         after = cv2.imread(images[1])
 
@@ -216,6 +217,7 @@ class Compare(list):
 
         except ValueError:
             cfg.IMAGES_COMPARED.append(None)
+            return
 
         # The diff image contains the actual image differences between the two images
         # and is represented as a floating point data type in the range [0,1] 

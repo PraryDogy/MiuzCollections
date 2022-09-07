@@ -20,6 +20,7 @@ class Globals:
     src = str
     path_lbl = tkinter.Label
 
+
 def on_closing(obj):
     print(cfg.IMAGES_COMPARE)
 
@@ -28,7 +29,6 @@ def on_closing(obj):
     else:
         cfg.IMAGES_COMPARE.clear()
     obj.destroy()
-
 
 
 class ImagePreview(tkinter.Toplevel):
