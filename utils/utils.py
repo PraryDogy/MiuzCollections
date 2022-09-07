@@ -209,8 +209,13 @@ class Compare(list):
         after_gray = cv2.cvtColor(after, cv2.COLOR_BGR2GRAY)
 
         # Compute SSIM between the two images
-        (score, diff) = structural_similarity(before_gray, after_gray, full=True)
-        print("Image Similarity: {:.4f}%".format(score * 100))
+        try:
+            (score, diff) = structural_similarity(before_gray, after_gray, full=True)
+            print("Image Similarity: {:.4f}%".format(score * 100))
+            cfg.IMAGES_SIMILAR = score * 100
+
+        except ValueError:
+            cfg.IMAGES_COMPARED.append(None)
 
         # The diff image contains the actual image differences between the two images
         # and is represented as a floating point data type in the range [0,1] 
@@ -238,11 +243,9 @@ class Compare(list):
                 cv2.drawContours(mask, [c], 0, (255,255,255), -1)
                 cv2.drawContours(filled_after, [c], 0, (0,255,0), -1)
 
-        self.append(before)
-        self.append(after)
-        # cv2.imshow('before', before)
-        # cv2.imshow('after', after)
-        cv2.waitKey()
+        for i in [before, after]:
+            cfg.IMAGES_COMPARED.append(i)
+
 
 def get_coll_name(src):
     """

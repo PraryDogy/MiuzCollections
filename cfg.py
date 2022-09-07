@@ -26,7 +26,10 @@ ROOT = tkinter.Tk()
 ROOT.withdraw()
 LIVE_LBL = tkinter.Label
 FLAG = True
+
 IMAGES_COMPARE = set()
+IMAGES_COMPARED = list()
+IMAGES_SIMILAR = int
 
 # for downloading database from Yandex Disk
 YADISK_TOKEN = "AQAAAAARTU_6AAgMRGzO_kyAykpGqUubuGuraCg"
