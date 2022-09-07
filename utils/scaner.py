@@ -302,8 +302,8 @@ class UpdateRetouched():
     Searchs images.
     Updates the database.
 
-    * param `aged`: true = updates dirs created later than `cfg.FILE_AGE`
-    value
+    * param `aged`: true = updates dirs created later
+    than `cfg.FILE_AGE` value
     """
     def __init__(self, aged):
         cfg.LIVE_LBL['text'] = '60%'
