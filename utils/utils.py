@@ -201,7 +201,6 @@ class Scrollable(tkinter.Frame):
 class Compare(list):
     def __init__(self):
         images = list(cfg.IMAGES_COMPARE)
-        print(images)
         before = cv2.imread(images[0])
         after = cv2.imread(images[1])
 
@@ -239,8 +238,10 @@ class Compare(list):
                 cv2.drawContours(mask, [c], 0, (255,255,255), -1)
                 cv2.drawContours(filled_after, [c], 0, (0,255,0), -1)
 
-        cv2.imshow('before', before)
-        cv2.imshow('after', after)
+        self.append(before)
+        self.append(after)
+        # cv2.imshow('before', before)
+        # cv2.imshow('after', after)
         cv2.waitKey()
 
 def get_coll_name(src):

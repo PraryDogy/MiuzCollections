@@ -8,8 +8,9 @@ import tkinter
 
 import cfg
 from PIL import Image, ImageTk
-from utils.utils import (Compare, MyButton, MyFrame, MyLabel, SmbChecker,
+from utils.utils import (MyButton, MyFrame, MyLabel, SmbChecker,
                          get_coll_name, my_copy)
+from .images_compare import ImagesCompare
 
 
 class Globals:
@@ -146,7 +147,7 @@ class CopyCompare(MyFrame):
             cfg.ROOT.after(
                 1500, lambda: Globals.path_lbl.configure(text=old_txt))
             return
-        Compare()
+        ImagesCompare()
 
     def copy_name(self, btn):
         """
