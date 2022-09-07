@@ -25,14 +25,19 @@ class Globals:
     Variables for current module
     """
 
-    currColl = Dbase.conn.execute(
-        sqlalchemy.select(Config.value).where(
-            Config.name=='currColl')).first()[0]
+    currColl = ''
 
     # bind reset function for thumbnails frame: Images().Reset()
     images_reset = object
     all_images = []
 
+    def get_curr_coll(self):
+        return Dbase.conn.execute(sqlalchemy.select(Config.value).where(
+            Config.name=='currColl')).first()[0]
+
+    def get_size(self):
+        return int(Dbase.conn.execute(sqlalchemy.select(Config.value).where(
+            Config.name=='size')).first()[0])
 
 class Gallery(MyFrame):
     """
@@ -100,7 +105,7 @@ class MenuButtons(object):
             btn.pack(pady=(0, 10))
             btns.append(btn)
 
-            if name_coll == Globals.currColl:
+            if name_coll == Globals().get_curr_coll():
                 btn.configure(bg=cfg.BGPRESSED)
 
             btn.cmd(lambda e, coll=name_coll, btn=btn, btns=btns:
@@ -113,10 +118,8 @@ class MenuButtons(object):
         btns.append(last_imgs)
 
     def last_imgs(self, btns, btn):
-        size = Dbase.conn.execute(
-            sqlalchemy.select(Config.value).where(
-                Config.name=='size')).first()[0]
-        img = Thumbs.__dict__[f'img{int(size)}']
+
+        img = Thumbs.__dict__[f'img{Globals().get_size()}']
 
         res = Dbase.conn.execute(
             sqlalchemy.select(img, Thumbs.src, Thumbs.modified).order_by(
@@ -127,7 +130,7 @@ class MenuButtons(object):
         btn['bg'] = cfg.BGPRESSED
 
         Globals.all_images = res
-        Globals.currColl = 'Последние добавленные'
+        # Globals.currColl = 'Последние добавленные'
         Globals.images_reset()
 
     def __open_coll(self, coll, btn, btns):
@@ -144,17 +147,12 @@ class MenuButtons(object):
         Dbase.conn.execute(
             sqlalchemy.update(Config).where(
                 Config.name=='currColl').values(value=coll))
-        Globals.currColl = coll
 
-        size = Dbase.conn.execute(
-            sqlalchemy.select(Config.value).where(
-                Config.name=='size')).first()[0]
-        size = int(size)
-        img = Thumbs.__dict__[f'img{size}']
+        img = Thumbs.__dict__[f'img{Globals().get_size()}']
 
         res = Dbase.conn.execute(
             sqlalchemy.select(img, Thumbs.src, Thumbs.modified).where(
-            Thumbs.collection==Globals.currColl).order_by(
+            Thumbs.collection==Globals().get_curr_coll()).order_by(
             -Thumbs.modified)).fetchall()
 
         Globals.all_images = res
@@ -210,15 +208,11 @@ class ImagesThumbs(object):
         clmns = int(clmns)
 
         if len(Globals.all_images) < 1:
-            size = Dbase.conn.execute(
-                sqlalchemy.select(Config.value).where(
-                    Config.name=='size')).first()[0]
-            size = int(size)
-            img = Thumbs.__dict__[f'img{size}']
+            img = Thumbs.__dict__[f'img{Globals().get_size()}']
 
             Globals.all_images = Dbase.conn.execute(
                 sqlalchemy.select(img, Thumbs.src, Thumbs.modified).where(
-                Thumbs.collection==Globals.currColl).order_by(
+                Thumbs.collection==Globals().get_curr_coll()).order_by(
                 -Thumbs.modified)).fetchall()
 
         thumbs = self.load_thumbs()
@@ -279,9 +273,7 @@ class ImagesThumbs(object):
 
         if len(thumbs) < clmns and len(thumbs) != 0:
             year = thumbs[-1][-1]
-            size = Dbase.conn.execute(sqlalchemy.select(Config.value).where(
-                    Config.name=='size')).first()[0]
-            size = int(size)
+            size = Globals().get_size()
             
             for _ in range(0, clmns-len(thumbs)):
                 new = Image.new('RGB', (size, size), cfg.BGCOLOR)
