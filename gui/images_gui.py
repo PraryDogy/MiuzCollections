@@ -24,20 +24,53 @@ class Globals:
     """
     Variables for current module
     """
-
-    currColl = ''
-
     # bind reset function for thumbnails frame: Images().Reset()
     images_reset = object
-    all_images = []
 
     def get_curr_coll(self):
+        """
+        Returns name of selected collection.
+        Loads from Database > Config > currColl > value.
+        """
         return Dbase.conn.execute(sqlalchemy.select(Config.value).where(
             Config.name=='currColl')).first()[0]
 
     def get_size(self):
+        """
+        Returns int selected thumbnails size.
+        Loads from Database > Config > size > value
+        """
         return int(Dbase.conn.execute(sqlalchemy.select(Config.value).where(
             Config.name=='size')).first()[0])
+
+    def upd_curr_coll(self, coll):
+        """
+        Updates Database > Config > currColl > value
+        * param `coll`: str selected collection name
+        """
+        Dbase.conn.execute(sqlalchemy.update(Config).where(
+            Config.name=='currColl').values(value=coll))
+
+    def load_last(self, img_size):
+        """
+        Returns tuples list (image, image source, image modified time).
+        * param `img_size`: Thumbs.__dict__['img'+ `Globals().get_size()`]
+        """
+        return Dbase.conn.execute(sqlalchemy.select(
+            img_size, Thumbs.src, Thumbs.modified).order_by(
+                        -Thumbs.modified).limit(20)).fetchall()
+
+    def load_curr_coll(self, img_size, curr_coll):
+        """
+        Returns tuples list (image, image source, image modified time).
+        * param `img_size`: Thumbs.__dict__['img'+ `Globals().get_size()`]
+        * param `curr_coll`: from `Globals().get_curr_coll()`
+        """
+        return Dbase.conn.execute(sqlalchemy.select(
+            img_size, Thumbs.src, Thumbs.modified).where(
+                Thumbs.collection==curr_coll).order_by(
+                    -Thumbs.modified)).fetchall()
+
 
 class Gallery(MyFrame):
     """
@@ -97,6 +130,7 @@ class MenuButtons(object):
             for_btns.append((name_btn[:13], coll_item))
         for_btns.sort()
 
+        curr_coll = Globals().get_curr_coll()
         btns = []
         for name_btn, name_coll in for_btns:
 
@@ -105,7 +139,7 @@ class MenuButtons(object):
             btn.pack(pady=(0, 10))
             btns.append(btn)
 
-            if name_coll == Globals().get_curr_coll():
+            if name_coll == curr_coll:
                 btn.configure(bg=cfg.BGPRESSED)
 
             btn.cmd(lambda e, coll=name_coll, btn=btn, btns=btns:
@@ -113,25 +147,12 @@ class MenuButtons(object):
 
         last_imgs = MyButton(master, text='Последние')
         last_imgs.configure(height=1, width=12)
-        last_imgs.cmd(lambda e: self.last_imgs(btns, last_imgs))
+        last_imgs.cmd(lambda e: self.__open_coll('last', last_imgs, btns))
         last_imgs.pack(pady=(0, 10))
         btns.append(last_imgs)
 
-    def last_imgs(self, btns, btn):
-
-        img = Thumbs.__dict__[f'img{Globals().get_size()}']
-
-        res = Dbase.conn.execute(
-            sqlalchemy.select(img, Thumbs.src, Thumbs.modified).order_by(
-                -Thumbs.modified).limit(20)).fetchall()
-
-        for btn_item in btns:
-            btn_item['bg'] = cfg.BGBUTTON
-        btn['bg'] = cfg.BGPRESSED
-
-        Globals.all_images = res
-        # Globals.currColl = 'Последние добавленные'
-        Globals.images_reset()
+        if curr_coll == 'last':
+            last_imgs.configure(bg=cfg.BGPRESSED)
 
     def __open_coll(self, coll, btn, btns):
         """
@@ -140,26 +161,16 @@ class MenuButtons(object):
         Updates database > config > currColl > value to collection from
         button.
         Runs GalleryReset.
-        * param `coll`: str, stores real collection name
+        * param `coll`: str, real collection name from path to img
         * param `btn`: tkinter curren button object
         * param `btns`: list of created tkinter buttons
         """
-        Dbase.conn.execute(
-            sqlalchemy.update(Config).where(
-                Config.name=='currColl').values(value=coll))
-
-        img = Thumbs.__dict__[f'img{Globals().get_size()}']
-
-        res = Dbase.conn.execute(
-            sqlalchemy.select(img, Thumbs.src, Thumbs.modified).where(
-            Thumbs.collection==Globals().get_curr_coll()).order_by(
-            -Thumbs.modified)).fetchall()
-
-        Globals.all_images = res
 
         for btn_item in btns:
             btn_item['bg'] = cfg.BGBUTTON
         btn['bg'] = cfg.BGPRESSED
+        
+        Globals().upd_curr_coll(coll)
         Globals.images_reset()
 
 
@@ -198,24 +209,27 @@ class ImagesThumbs(object):
     * param `master`: tkmacosx scrollable frame.
     """
     def __init__(self, master):
-
-        title = MyLabel(
-            master, text=Globals.currColl, font=('Arial', 45, 'bold'))
-        title.pack(pady=(0, 15))
-
         clmns = Dbase.conn.execute(sqlalchemy.select(
                 Config.value).where(Config.name=='clmns')).first()[0]
         clmns = int(clmns)
 
-        if len(Globals.all_images) < 1:
-            img = Thumbs.__dict__[f'img{Globals().get_size()}']
+        img_size = Thumbs.__dict__[f'img{Globals().get_size()}']
+        curr_coll = Globals().get_curr_coll()
 
-            Globals.all_images = Dbase.conn.execute(
-                sqlalchemy.select(img, Thumbs.src, Thumbs.modified).where(
-                Thumbs.collection==Globals().get_curr_coll()).order_by(
-                -Thumbs.modified)).fetchall()
+        if curr_coll == 'last':
+            res = Globals().load_last(img_size)
 
-        thumbs = self.load_thumbs()
+        else:
+            res = Globals().load_curr_coll(img_size, curr_coll)
+
+        title = MyLabel(
+            master, text=curr_coll, font=('Arial', 45, 'bold'))
+        title.pack(pady=(0, 15))
+
+        if curr_coll == 'last':
+            title.configure(text='Последние добавленные')
+
+        thumbs = self.load_thumbs(res)
 
         if len(thumbs) == 0:
             return
@@ -228,7 +242,7 @@ class ImagesThumbs(object):
 
             self.pack_rows(self.fill_empty(y, clmns), clmns, master)
 
-    def load_thumbs(self):
+    def load_thumbs(self, all_images):
         """
         Loads thumbnails from database > thumbnails based on size from
         database > config > size > value.
@@ -236,7 +250,7 @@ class ImagesThumbs(object):
         """
 
         thumbs = []
-        for blob, src, mod in Globals.all_images:
+        for blob, src, mod in all_images:
             try:
                 nparr = numpy.frombuffer(blob, numpy.byte)
                 image1 = cv2.imdecode(nparr, cv2.IMREAD_ANYCOLOR)

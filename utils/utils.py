@@ -14,8 +14,10 @@ import tkinter
 
 import cfg
 import cv2
-from skimage.metrics import structural_similarity
 import numpy as np
+import sqlalchemy
+import database
+from skimage.metrics import structural_similarity
 
 
 def create_thumb(src):
@@ -74,7 +76,6 @@ class SmbChecker(tkinter.Toplevel):
         tkinter.Toplevel.__init__(
             self, cfg.ROOT, bg=cfg.BGCOLOR, padx=10, pady=10)
         self.withdraw()
-        self.check()
 
     def check(self):
         """
@@ -237,7 +238,57 @@ class Compare(list):
                 cv2.rectangle(diff_box, (x, y), (x + w, y + h), (36,255,12), 2)
                 cv2.drawContours(mask, [c], 0, (255,255,255), -1)
                 cv2.drawContours(filled_after, [c], 0, (0,255,0), -1)
-        
+
         cv2.imshow('before', before)
         cv2.imshow('after', after)
         cv2.waitKey()
+
+def get_coll_name(src):
+    """
+    Returns collection name.
+    Returns `noCollection` if name not found.
+
+    Looking for collection name in path like object.
+    Name of collection must be follow next to `cfg.COLL_FOLDER`
+
+    # Example
+    ```
+    cfg.COLL_FOLDER = "collection"
+    collection_path = /path/to/collection/any_collection_name
+    print(get_coll_name(collection_path))
+    > any_collection_name
+
+    cfg.COLL_FOLDER = "collection"
+    collection_path = /some/path/without/coll_folder
+    print(get_coll_name(collection_path))
+    > noCollection
+    ```
+    """
+    coll_name = 'noCollection'
+    if os.path.join(os.sep, cfg.COLL_FOLDER) in src:
+        coll_name = src.split(
+            os.path.join(os.sep, cfg.COLL_FOLDER))[-1].split(os.sep)[1]
+    return coll_name
+
+def insert_row(**kw):
+    """
+    Adds new line to Database > Thumbs with new thumbnails.
+    Creates thumbnails with `create_thumb` method from `utils`
+    * param `src`: Image's path
+    * param `size`: Image's size `int`
+    * param `birth`: Image's date created `int`
+    * param `mod`: Date last modified of image `int`
+    * param `coll`: name of collection created with `get_coll_name`
+    """
+
+    img150, img200, img250, img300 = create_thumb(kw['src'])
+
+    values = {
+        'img150':img150, 'img200':img200,
+        'img250':img250, 'img300':img300,
+        'src':kw['src'], 'size':kw['size'],
+        'created':kw['birth'], 'modified':kw['mod'],
+        'collection':kw['coll']}
+
+    database.Dbase.conn.execute(sqlalchemy.insert(
+        database.Thumbs).values(values))

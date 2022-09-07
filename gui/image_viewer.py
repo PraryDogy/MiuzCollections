@@ -9,8 +9,7 @@ import tkinter
 import cfg
 from PIL import Image, ImageTk
 from utils.utils import (Compare, MyButton, MyFrame, MyLabel, SmbChecker,
-                         my_copy)
-from utils.scaner import DbUtils
+                         get_coll_name, my_copy)
 
 
 class Globals:
@@ -105,7 +104,7 @@ class NamePath(MyFrame):
     def __init__(self, master):
         MyFrame.__init__(self, master)
 
-        txt = (f'Коллекция: {DbUtils().get_coll_name(Globals.src)}'
+        txt = (f'Коллекция: {get_coll_name(Globals.src)}'
                 f'\nИмя: {Globals.src.split(os.sep)[-1]}')
 
         Globals.path_lbl = MyLabel(

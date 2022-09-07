@@ -11,7 +11,7 @@ import sqlalchemy
 from admin import print_alive
 from database import Dbase, Thumbs
 
-from .utils import create_thumb
+from .utils import get_coll_name, insert_row
 
 
 class SearchDirs(list):
@@ -139,63 +139,7 @@ class SearchImages(list):
         self.extend(jpegs)
 
 
-class DbUtils():
-    """
-    Methods:
-    * get_coll_name
-    * insert_row
-    """
-    def get_coll_name(self, src):
-        """
-        Returns collection name.
-        Returns `noCollection` if name not found.
-
-        Looking for collection name in path like object.
-        Name of collection must be follow next to `cfg.COLL_FOLDER`
-
-        # Example
-        ```
-        cfg.COLL_FOLDER = "collection"
-        collection_path = /path/to/collection/any_collection_name
-        print(get_coll_name(collection_path))
-        > any_collection_name
-
-        cfg.COLL_FOLDER = "collection"
-        collection_path = /some/path/without/coll_folder
-        print(get_coll_name(collection_path))
-        > noCollection
-        ```
-        """
-        coll_name = 'noCollection'
-        if os.path.join(os.sep, cfg.COLL_FOLDER) in src:
-            coll_name = src.split(
-                os.path.join(os.sep, cfg.COLL_FOLDER))[-1].split(os.sep)[1]
-        return coll_name
-
-    def insert_row(self, **kw):
-        """
-        Adds new line to Database > Thumbs with new thumbnails.
-        Creates thumbnails with `create_thumb` method from `utils`
-        * param `src`: Image's path
-        * param `size`: Image's size `int`
-        * param `birth`: Image's date created `int`
-        * param `mod`: Date last modified of image `int`
-        * param `coll`: name of collection created with `get_coll_name`
-        """
-
-        img150, img200, img250, img300 = create_thumb(kw['src'])
-
-        values = {
-            'img150':img150, 'img200':img200,
-            'img250':img250, 'img300':img300,
-            'src':kw['src'], 'size':kw['size'],
-            'created':kw['birth'], 'modified':kw['mod'],
-            'collection':kw['coll']}
-
-        Dbase.conn.execute(sqlalchemy.insert(Thumbs).values(values))
-
-
-class DbUpdate(list, DbUtils):
+class DbUpdate(list):
     """
     Methods:
     * `load_db`: loads from Database > Thumbs: `src`, `size`, `created`,
@@ -259,8 +203,8 @@ class DbUpdate(list, DbUtils):
                 Dbase.conn.execute(
                     sqlalchemy.delete(Thumbs).where(Thumbs.src==src))
 
-                coll = self.get_coll_name(src)
-                self.insert_row(src=src, size=n_size, birth=n_birth,
+                coll = get_coll_name(src)
+                insert_row(src=src, size=n_size, birth=n_birth,
                                 mod=n_mod, coll=coll)
 
     def added(self, list_dirs):
@@ -283,8 +227,8 @@ class DbUpdate(list, DbUtils):
             if (size, created, mod) not in db_colls:
                 print('add new file', src)
 
-                coll = self.get_coll_name(src)
-                self.insert_row(src=src, size=size, birth=created,
+                coll = get_coll_name(src)
+                insert_row(src=src, size=size, birth=created,
                                 mod=mod, coll=coll)
 
     def moved(self, list_dirs):
@@ -321,8 +265,8 @@ class DbUpdate(list, DbUtils):
                     Thumbs.size==size, Thumbs.created==created,
                     Thumbs.modified==mod))
 
-                coll = self.get_coll_name(src)
-                self.insert_row(src=src, size=size, birth=created,
+                coll = get_coll_name(src)
+                insert_row(src=src, size=size, birth=created,
                                 mod=mod, coll=coll)
 
 
