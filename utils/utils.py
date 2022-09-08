@@ -206,8 +206,10 @@ class Compare(list):
     def __init__(self):
         images = list(cfg.IMAGES_COMPARE)
 
-        before = cv2.imread(images[0])
-        after = cv2.imread(images[1])
+        resized = [self.image_resize(i, 2500, 2500) for i in images]
+
+        before = resized[0]
+        after = resized[1]
 
         # Convert images to grayscale
         before_gray = cv2.cvtColor(before, cv2.COLOR_BGR2GRAY)
@@ -255,6 +257,37 @@ class Compare(list):
         for i in [before, after]:
             cfg.IMAGES_COMPARED.append(i)
 
+    def image_resize(self, image, width = None, height = None, inter = cv2.INTER_AREA):
+        # initialize the dimensions of the image to be resized and
+        # grab the image size
+        image = cv2.imread(image)
+        dim = None
+        (h, w) = image.shape[:2]
+
+        # if both the width and height are None, then return the
+        # original image
+        if width is None and height is None:
+            return image
+
+        # check to see if the width is None
+        if width is None:
+            # calculate the ratio of the height and construct the
+            # dimensions
+            r = height / float(h)
+            dim = (int(w * r), height)
+
+        # otherwise, the height is None
+        else:
+            # calculate the ratio of the width and construct the
+            # dimensions
+            r = width / float(w)
+            dim = (width, int(h * r))
+
+        # resize the image
+        resized = cv2.resize(image, dim, interpolation = inter)
+
+        # return the resized image
+        return resized
 
 def get_coll_name(src):
     """
