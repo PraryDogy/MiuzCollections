@@ -139,7 +139,7 @@ class GridSection(MyLabel, MyButton, BtnCmd):
 
 class ClmnSection(MyLabel, MyButton, BtnCmd):
     """
-    Tkinter frame with button function thumbnails columns number 
+    Tkinter frame with button function thumbnails columns number
     and description.
     """
     def __init__(self, master):

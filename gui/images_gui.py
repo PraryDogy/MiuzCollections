@@ -169,7 +169,7 @@ class MenuButtons(object):
         for btn_item in btns:
             btn_item['bg'] = cfg.BGBUTTON
         btn['bg'] = cfg.BGPRESSED
-        
+
         Globals().upd_curr_coll(coll)
         Globals.images_reset()
 
@@ -256,10 +256,10 @@ class ImagesThumbs(object):
                 image1 = cv2.imdecode(nparr, cv2.IMREAD_ANYCOLOR)
 
                 # convert cv2 color to rgb
-                image_RGB = cv2.cvtColor(image1, cv2.COLOR_BGR2RGB)
+                image_rgb = cv2.cvtColor(image1, cv2.COLOR_BGR2RGB)
 
                 # load numpy array image
-                image = Image.fromarray(image_RGB)
+                image = Image.fromarray(image_rgb)
                 photo = ImageTk.PhotoImage(image)
                 year = datetime.fromtimestamp(mod).year
                 thumbs.append((photo, src, year))
@@ -288,7 +288,7 @@ class ImagesThumbs(object):
         if len(thumbs) < clmns and len(thumbs) != 0:
             year = thumbs[-1][-1]
             size = Globals().get_size()
-            
+
             for _ in range(0, clmns-len(thumbs)):
                 new = Image.new('RGB', (size, size), cfg.BGCOLOR)
                 photo = ImageTk.PhotoImage(new)

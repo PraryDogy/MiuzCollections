@@ -199,6 +199,10 @@ class Scrollable(tkinter.Frame):
 
 
 class Compare(list):
+    """
+    Compares two images with tkinter method.
+    Gets images from `cfg.IMAGES_COMPARE`.
+    """
     def __init__(self):
         images = list(cfg.IMAGES_COMPARE)
 
@@ -211,7 +215,8 @@ class Compare(list):
 
         # Compute SSIM between the two images
         try:
-            (score, diff) = structural_similarity(before_gray, after_gray, full=True)
+            (score, diff) = structural_similarity(
+                before_gray, after_gray, full=True)
             print("Image Similarity: {:.4f}%".format(score * 100))
             cfg.IMAGES_SIMILAR = score * 100
 
@@ -228,8 +233,10 @@ class Compare(list):
 
         # Threshold the difference image, followed by finding contours to
         # obtain the regions of the two input images that differ
-        thresh = cv2.threshold(diff, 0, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
-        contours = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        thresh = cv2.threshold(
+            diff, 0, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
+        contours = cv2.findContours(
+            thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         contours = contours[0] if len(contours) == 2 else contours[1]
 
         mask = np.zeros(before.shape, dtype='uint8')
@@ -275,6 +282,7 @@ def get_coll_name(src):
         coll_name = src.split(
             os.path.join(os.sep, cfg.COLL_FOLDER))[-1].split(os.sep)[1]
     return coll_name
+
 
 def insert_row(**kw):
     """

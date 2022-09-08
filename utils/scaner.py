@@ -247,10 +247,10 @@ class DbUpdate(list):
         """
         self.load_db()
 
-        noColls = []
+        no_colls = []
         for src, size, created, mod, coll in self:
             if coll=='noCollection':
-                noColls.append((size, created, mod))
+                no_colls.append((size, created, mod))
 
         for src, size, created, mod in list_dirs:
             print_alive(sys._getframe().f_code.co_name, src)
@@ -258,7 +258,7 @@ class DbUpdate(list):
             if not cfg.FLAG:
                 return
 
-            if (size, created, mod) in noColls:
+            if (size, created, mod) in no_colls:
                 print('moved to colls', src)
 
                 Dbase.conn.execute(sqlalchemy.delete(Thumbs).where(
