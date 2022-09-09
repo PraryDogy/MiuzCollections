@@ -46,6 +46,7 @@ class Settings(tkinter.Toplevel):
 
         self.protocol("WM_DELETE_WINDOW", self.destroy)
         self.bind('<Command-w>', lambda e: self.destroy())
+        self.bind('<Command-q>', lambda e: quit())
 
         frame_up = MyFrame(self)
         frame_up.pack(fill=tkinter.BOTH, expand=True)

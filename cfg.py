@@ -8,7 +8,7 @@ import tkinter
 
 # app info
 APP_NAME = 'MiuzGallery'
-APP_VER = '2.8.5'
+APP_VER = '2.9.0'
 
 # database info
 DB_VER = '2.6.1'
@@ -28,8 +28,8 @@ LIVE_LBL = tkinter.Label
 FLAG = True
 
 IMAGES_COMPARE = set()
-IMAGES_COMPARED = list()
-IMAGES_SIMILAR = int
+IMAGES_INFO = []
+IMAGES_SRC = []
 
 # for downloading database from Yandex Disk
 YADISK_TOKEN = "AQAAAAARTU_6AAgMRGzO_kyAykpGqUubuGuraCg"

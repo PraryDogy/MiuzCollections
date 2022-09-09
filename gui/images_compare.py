@@ -1,152 +1,60 @@
-"""
-Tkinter toplevel window with compared images with open cv method.
-"""
-
-from datetime import datetime
-import os
-import threading
+import subprocess
 import tkinter
 
 import cfg
-import cv2
-from PIL import Image, ImageTk
-from utils.utils import Compare, MyButton, MyFrame, MyLabel
+from utils.utils import MyButton, MyFrame, MyLabel, my_copy
 
 
-def on_closing():
+def images_list():
+    return [i.__dict__['image_names'] for i in list(cfg.IMAGES_COMPARE)]
+
+def on_closing(obj):
     """
-    Destroys all tkinter toplevels with "compare" name.
-    Clears `cfg.IMAGES_COMPARE`, `cfg.IMAGES_COMPARED` lists.
+    Destroys current tkinter toplevel.
+    Clears `cfg.IMAGES_COMPARE` list.
+    * param `obj`: tkinter toplevel
     """
+    
+    prevs = [v for k, v in cfg.ROOT.children.items() if "preview" in k]
+    [i.destroy() for i in prevs]
     cfg.IMAGES_COMPARE.clear()
-    cfg.IMAGES_COMPARED.clear()
+    cfg.IMAGES_INFO.clear()
+    cfg.IMAGES_SRC.clear()
+    obj.destroy()
 
-    comp_win = [v for k, v in cfg.ROOT.children.items() if 'compare' in k]
-    [i.destroy() for i in comp_win]
+
+class Globals:
+    curr_img = tkinter.Image
+    img_frame = tkinter.Label
+    info_frame = tkinter.Label
+    ind = int
 
 
 class ImagesCompare(tkinter.Toplevel):
-    """
-    Tkinter toplevel window with compared images with open cv method.
-    """
     def __init__(self):
+        prevs = [v for k, v in cfg.ROOT.children.items() if "preview" in k]
+        [i.withdraw() for i in prevs]
+
         tkinter.Toplevel.__init__(self)
+        self.withdraw()
 
-        prevs = [v for k, v in cfg.ROOT.children.items() if 'prev' in k]
-        [i.destroy() for i in prevs]
+        self.protocol("WM_DELETE_WINDOW", lambda: on_closing(self))
+        self.bind('<Command-w>', lambda e: on_closing(self))
+        self.bind('<Command-q>', lambda e: quit())
 
-        analyse_lbl = AnalyseLbl(self)
-        analyse_lbl.pack()
-        close_btn = CloseBtn(self)
-        close_btn.pack(pady=(0, 10))
-
-        self.protocol("WM_DELETE_WINDOW", on_closing)
-        self.bind('<Command-w>', lambda e: on_closing())
-        self.configure(bg=cfg.BGCOLOR, padx=10, pady=5)
+        self.configure(bg=cfg.BGCOLOR, padx=15, pady=15)
         self.resizable(0,0)
-        self.grab_set()
-
-        xx = cfg.ROOT.winfo_x()+cfg.ROOT.winfo_width()//2 - self.winfo_width()//2
-        yy = cfg.ROOT.winfo_y()+cfg.ROOT.winfo_height()//2 - self.winfo_height()//2
-        self.geometry(f'+{xx}+{yy}')
-
-        tsk = threading.Thread(target=Compare)
-        tsk.start()
-
-        while tsk.is_alive():
-            cfg.ROOT.update()
-
-        if cfg.IMAGES_COMPARED[0] is None:
-            analyse_lbl.destroy()
-            ErrorLbl(self).pack(side=tkinter.TOP)
-            close_btn.pack(side=tkinter.BOTTOM, pady=(0, 10))
-            return
-
         side = int(cfg.ROOT.winfo_screenheight()*0.8)
-        self.geometry(f'{int(side*1.8)}x{side}')
+        self.geometry(f'{side}x{side}')
+
+        ImageFrame(self).pack(fill=tkinter.BOTH, expand=True, pady=(0, 15))
+        CopyCompare(self).pack(pady=(0, 15))
+        NamePath(self).pack(pady=(0, 15))
+        OpenCloseFrame(self).pack()
+
         cfg.ROOT.update_idletasks()
-        center = cfg.ROOT.winfo_screenwidth()//2-self.winfo_width()//2
-        self.geometry(f'+{center}+{0}')
-        self.grab_release()
-
-        analyse_lbl.destroy()
-        ImagesSplit(self).pack(
-            side=tkinter.TOP, fill=tkinter.BOTH, expand=True, pady=(0, 15))
-        ImagesInfo(self).pack(side=tkinter.BOTTOM, pady=(0, 15))
-        close_btn.pack(side=tkinter.BOTTOM, pady=(0, 10))
-
-
-class AnalyseLbl(MyLabel):
-    """
-    Tkinter label with text and styles from cfg.
-    """
-    def __init__(self, master):
-        MyLabel.__init__(self, master, text='Анализирую', width=25, height=4)
-
-
-class ErrorLbl(MyLabel):
-    """
-    Tkinter label with text and styles from cfg.
-    """
-    def __init__(self, master):
-        txt = (
-            'Ошибка'
-            '\n- Изображения разного размера'
-            '\n- Это разные изображения'
-            )
-        MyLabel.__init__(self, master, text=txt, width=25, height=4)
-
-
-class CloseBtn(MyButton):
-    """
-    Tkinter close window button.
-    """
-    def __init__(self, master):
-        MyButton.__init__(self, master, text='Закрыть')
-        self.cmd(lambda e: on_closing())
-
-
-class ImagesInfo(MyFrame):
-    """
-    Tkinter label with text and styles from cfg.
-    Text: images names, images sizes, image modification dates
-    """
-    def __init__(self, master):
-        MyFrame.__init__(self, master)
-        images_src = list(cfg.IMAGES_COMPARE)
-        file1, file2 = images_src[0], images_src[1]
-
-        file1_size = f'{(os.path.getsize(file1)/(1024*1024)).__round__(2)}мб'
-        file2_size = f'{(os.path.getsize(file2)/(1024*1024)).__round__(2)}мб'
-
-        file1_mod = datetime.fromtimestamp(
-            os.path.getmtime(file1)).strftime("%d-%m-%Y %H:%M:%S")
-        file2_mod = datetime.fromtimestamp(
-            os.path.getmtime(file2)).strftime("%d-%m-%Y %H:%M:%S")
-
-        txt = (
-            f'Совпадение: {int(cfg.IMAGES_SIMILAR)}%'
-            f'\nИмена: {file1.split("/")[-1]} / {file2.split("/")[-1]}'
-            f'\nРазмеры: {file1_size} / {file2_size}'
-            f'\nДата изменения: {file1_mod} / {file2_mod}'
-            )
-
-        info = MyLabel(master, text=txt)
-        info.pack()
-
-
-class ImagesSplit(MyFrame):
-    """
-    Tkinter frame for images
-    """
-    def __init__(self, master):
-        MyFrame.__init__(self, master)
-
-        ImageFrame(self, cfg.IMAGES_COMPARED[0]).pack(
-            fill=tkinter.BOTH, expand=True, side=tkinter.LEFT, padx=(0, 5))
-
-        ImageFrame(self, cfg.IMAGES_COMPARED[1]).pack(
-            fill=tkinter.BOTH, expand=True, side=tkinter.RIGHT)
+        self.geometry(f'+{cfg.ROOT.winfo_x() + 100}+{cfg.ROOT.winfo_y()}')
+        self.deiconify()
 
 
 class ImageFrame(MyLabel):
@@ -154,24 +62,84 @@ class ImageFrame(MyLabel):
     Creates tkinter label with image 0.8 wight, height of screen.
     * param `master`: tkinter toplevel.
     """
-    def __init__(self, master, image):
-        self.master = master
-
-        conv = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        image_rgb = Image.fromarray(conv)
-
+    def __init__(self, master):
         MyLabel.__init__(self, master, borderwidth=0)
         self['bg']='black'
-        self.bind("<Configure>", lambda e: self.resize(e, image_rgb))
 
-    def resize(self, e, img):
-        """
-        Fits image to label size.
-        * param `img`: current image.
-        """
-        size = (e.width, e.height)
-        img.thumbnail(size)
-        img = ImageTk.PhotoImage(img)
+        Globals.curr_img = images_list()[0]
+        self.configure(image=Globals.curr_img)
+        Globals.img_frame = self
+        Globals.ind = 0
 
-        self.configure(image=img)
-        self.image_names = img
+class CopyCompare(MyFrame):
+    """
+    Tkinter frame with button that calls images compare method.
+    """
+    def __init__(self, master):
+        MyFrame.__init__(self, master)
+        b_wight = 13
+
+        copy_btn = MyButton(self, text='Копировать имя')
+        copy_btn.configure(height=1, width=b_wight)
+        copy_btn.cmd(lambda e: self.copy_name(copy_btn))
+        copy_btn.pack(side=tkinter.LEFT, padx=(0, 15))
+
+        open_btn = MyButton(self, text='Папка с фото')
+        open_btn.configure(height=1, width=b_wight)
+        open_btn.cmd(lambda e: self.open_folder(open_btn))
+        open_btn.pack(side=tkinter.LEFT, padx=(0, 15))
+
+        toogle = MyButton(self, text='Переключить')
+        toogle.configure(height=1, width=b_wight)
+        toogle.cmd(lambda e: self.param(toogle))
+        toogle.pack(side=tkinter.LEFT, padx=(0, 0))
+
+    def copy_name(self, btn):
+        """
+        Copies path to folder with image.
+        Simulates button press with color.
+        * param `btn`: current tkinter button.
+        """
+        btn.press()
+        my_copy(cfg.IMAGES_SRC[Globals.ind].split('/')[-1].split('.')[0])
+
+    def open_folder(self, btn):
+        """
+        Opens folder with image.
+        Simulates button press with color.
+        * param `btn`: current tkinter button.
+        """
+        btn.press()
+        path = '/'.join(cfg.IMAGES_SRC[Globals.ind].split('/')[:-1])
+        subprocess.check_output(["/usr/bin/open", path])
+
+    def param(self, btn):
+            btn.press()
+            images = images_list()
+
+            Globals.ind = 0 if images.index(Globals.curr_img) == 1 else 1
+
+            Globals.img_frame.configure(image=images[Globals.ind])
+            Globals.info_frame.configure(text=cfg.IMAGES_INFO[Globals.ind])
+            Globals.curr_img = images[Globals.ind]
+
+
+class NamePath(MyLabel):
+    """
+    Creates tkinter frame.
+    * param `master`: tkinter top level.
+    """
+    def __init__(self, master):
+        MyLabel.__init__(
+            self, master, text=cfg.IMAGES_INFO[0], justify=tkinter.CENTER)
+        Globals.info_frame = self
+
+class OpenCloseFrame(MyButton):
+    """
+    Creates tkinter frame for open and close buttons.
+    * param `master`: tkinter frame.
+    """
+    def __init__(self, master):
+        MyButton.__init__(self, master, text='Закрыть')
+        self.configure(height=2)
+        self.cmd(lambda e: on_closing(self.winfo_toplevel()))

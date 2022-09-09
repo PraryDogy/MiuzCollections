@@ -40,6 +40,7 @@ class Gui(tkinter.Toplevel):
 
         self.protocol("WM_DELETE_WINDOW", self.stop)
         self.bind('<Command-w>', lambda e: self.stop())
+        self.bind('<Command-q>', lambda e: quit())
 
         self.title('MiuzGallery')
         self.resizable(0, 0)

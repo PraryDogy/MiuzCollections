@@ -2,6 +2,8 @@
 Gui for view image.
 """
 
+import cgi
+from datetime import datetime
 import os
 import subprocess
 import tkinter
@@ -11,7 +13,6 @@ from PIL import Image, ImageTk
 from utils.utils import (MyButton, MyFrame, MyLabel, SmbChecker,
                          get_coll_name, my_copy)
 from .images_compare import ImagesCompare
-from .images_compare_n import CompareNew
 
 class Globals:
     """
@@ -51,6 +52,7 @@ class ImagePreview(tkinter.Toplevel):
 
         self.protocol("WM_DELETE_WINDOW", lambda: on_closing(self))
         self.bind('<Command-w>', lambda e: on_closing(self))
+        self.bind('<Command-q>', lambda e: quit())
 
         self.configure(bg=cfg.BGCOLOR, padx=15, pady=15)
         self.resizable(0,0)
@@ -108,13 +110,25 @@ class NamePath(MyFrame):
     def __init__(self, master):
         MyFrame.__init__(self, master)
 
+        filesize = round(os.path.getsize(Globals.src)/(1024*1024), 2)
+        
+        filemod = datetime.fromtimestamp(os.path.getmtime(Globals.src))
+        filemod = filemod.strftime("%H:%M:%S %d-%m-%Y")
+
         txt = (f'Коллекция: {get_coll_name(Globals.src)}'
-                f'\nИмя: {Globals.src.split(os.sep)[-1]}')
+                f'\nИмя: {Globals.src.split(os.sep)[-1]}'
+                f'\nРазмер: {filesize} мб'
+                f'\nДата изменения: {filemod}')
 
         Globals.path_lbl = MyLabel(
-            self, text=txt, justify=tkinter.CENTER)
+            self, text=txt, justify=tkinter.LEFT)
         Globals.path_lbl.pack(side=tkinter.LEFT)
 
+        if len(cfg.IMAGES_INFO) < 2:
+            cfg.IMAGES_INFO.append(txt)
+
+        if len(cfg.IMAGES_SRC) < 2:
+            cfg.IMAGES_SRC.append(Globals.src)
 
 class CopyCompare(MyFrame):
     """
@@ -145,16 +159,15 @@ class CopyCompare(MyFrame):
         Compares two images and open gui with result.
         * param `btn`: current tkinter button.
         """
-        # btn.press()
-        # if len(cfg.IMAGES_COMPARE) < 2:
-        #     old_txt = Globals.path_lbl['text']
-        #     txt = '\nОткройте второе изображение'
-        #     Globals.path_lbl['text'] = txt
-        #     cfg.ROOT.after(
-        #         1500, lambda: Globals.path_lbl.configure(text=old_txt))
-        #     return
-        # ImagesCompare()
-        CompareNew()
+        btn.press()
+        if len(cfg.IMAGES_COMPARE) < 2:
+            old_txt = Globals.path_lbl['text']
+            txt = '\nОткройте второе изображение\n\n'
+            Globals.path_lbl['text'] = txt
+            cfg.ROOT.after(
+                1500, lambda: Globals.path_lbl.configure(text=old_txt))
+            return
+        ImagesCompare()
 
     def copy_name(self, btn):
         """
