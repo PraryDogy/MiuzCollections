@@ -11,7 +11,7 @@ from PIL import Image, ImageTk
 from utils.utils import (MyButton, MyFrame, MyLabel, SmbChecker,
                          get_coll_name, my_copy)
 from .images_compare import ImagesCompare
-
+from .images_compare_n import CompareNew
 
 class Globals:
     """
@@ -27,10 +27,8 @@ def on_closing(obj):
     Clears `cfg.IMAGES_COMPARE` list.
     * param `obj`: tkinter toplevel
     """
-    if len(cfg.IMAGES_COMPARE)==2:
-        cfg.IMAGES_COMPARE.remove(Globals.src)
-    else:
-        cfg.IMAGES_COMPARE.clear()
+    image_frame = [v for k, v in obj.children.items() if 'imageframe' in k]
+    cfg.IMAGES_COMPARE.remove(image_frame[0])
     obj.destroy()
 
 
@@ -89,15 +87,17 @@ class ImageFrame(MyLabel):
         Fits image to label size.
         * param `img`: current image.
         """
+        self.unbind("<Configure>")
+
         size = (e.width, e.height)
         img.thumbnail(size)
-        Globals.img = ImageTk.PhotoImage(img)
+        img_tk = ImageTk.PhotoImage(img)
 
-        self.configure(image=Globals.img)
-        self.image_names = Globals.img
+        self.configure(image=img_tk)
+        self.image_names = img_tk
 
         if len(cfg.IMAGES_COMPARE) < 2:
-            cfg.IMAGES_COMPARE.add(Globals.src)
+            cfg.IMAGES_COMPARE.add(self)
 
 
 class NamePath(MyFrame):
@@ -145,15 +145,16 @@ class CopyCompare(MyFrame):
         Compares two images and open gui with result.
         * param `btn`: current tkinter button.
         """
-        btn.press()
-        if len(cfg.IMAGES_COMPARE) < 2:
-            old_txt = Globals.path_lbl['text']
-            txt = '\nОткройте второе изображение'
-            Globals.path_lbl['text'] = txt
-            cfg.ROOT.after(
-                1500, lambda: Globals.path_lbl.configure(text=old_txt))
-            return
-        ImagesCompare()
+        # btn.press()
+        # if len(cfg.IMAGES_COMPARE) < 2:
+        #     old_txt = Globals.path_lbl['text']
+        #     txt = '\nОткройте второе изображение'
+        #     Globals.path_lbl['text'] = txt
+        #     cfg.ROOT.after(
+        #         1500, lambda: Globals.path_lbl.configure(text=old_txt))
+        #     return
+        # ImagesCompare()
+        CompareNew()
 
     def copy_name(self, btn):
         """
