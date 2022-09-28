@@ -27,7 +27,7 @@ def print_alive(name_func='', what_print=''):
         what_print (str): text.
     """
 
-    # print(nameFunc, whatPrint)
+    # print(name_func, what_print)
     return
 
 
