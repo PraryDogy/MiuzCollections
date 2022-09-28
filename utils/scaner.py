@@ -61,22 +61,13 @@ class SearchDirs(list):
                 aged_years.append(dir_item)
         return aged_years
 
-    def colls(self, list_dirs):
+    def colls(self):
         """
         Returns list of dirs.
-        Looking for folders with `cfg.COLL_FOLDER` name in list of dirs
-        Looking for all folders in `cfg.COLL_FOLDER`
-
-        * param `list_dirs`: list of path like objects
+        Looking for all folders in `cfg.COLL_FOLDERS`
         """
-
-        colls_dirs = []
-        for year_dir in list_dirs:
-            if os.path.join(os.sep, cfg.COLL_FOLDER) in year_dir:
-                colls_dirs.append(year_dir)
-
         colls = []
-        for sub_coll in colls_dirs:
+        for sub_coll in cfg.COLL_FOLDERS:
             for i in os.listdir(sub_coll):
                 colls.append(os.path.join(sub_coll, i))
 
@@ -279,7 +270,7 @@ class UpdateCollections():
     """
     def __init__(self):
         cfg.LIVE_LBL['text'] = '10%'
-        coll_dirs = SearchDirs().colls(SearchDirs().years())
+        coll_dirs = SearchDirs().colls()
         images = SearchImages(coll_dirs)
 
         cfg.LIVE_LBL['text'] = '20%'

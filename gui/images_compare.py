@@ -67,7 +67,13 @@ class ImageFrame(MyLabel):
         self['bg']='black'
 
         Globals.curr_img = images_list()[0]
-        self.configure(image=Globals.curr_img)
+    
+        self.configure(
+            image=Globals.curr_img,
+            width=Globals.curr_img.height(),
+            height=Globals.curr_img.height()
+            )
+
         Globals.img_frame = self
         Globals.ind = 0
 
@@ -93,6 +99,8 @@ class CopyCompare(MyFrame):
         toogle.configure(height=1, width=b_wight)
         toogle.cmd(lambda e: self.param(toogle))
         toogle.pack(side=tkinter.LEFT, padx=(0, 0))
+
+        self.flick(toogle)
 
     def copy_name(self, btn):
         """
@@ -123,6 +131,10 @@ class CopyCompare(MyFrame):
             Globals.info_frame.configure(text=cfg.IMAGES_INFO[Globals.ind])
             Globals.curr_img = images[Globals.ind]
 
+    def flick(self, btn):
+        for i in range(100, 1000, 200):
+            cfg.ROOT.after(i, lambda: btn.press())
+
 
 class NamePath(MyLabel):
     """
@@ -131,8 +143,9 @@ class NamePath(MyLabel):
     """
     def __init__(self, master):
         MyLabel.__init__(
-            self, master, text=cfg.IMAGES_INFO[0], justify=tkinter.CENTER)
+            self, master, text=cfg.IMAGES_INFO[0], justify=tkinter.LEFT)
         Globals.info_frame = self
+
 
 class OpenCloseFrame(MyButton):
     """

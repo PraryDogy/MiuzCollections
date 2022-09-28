@@ -252,9 +252,9 @@ def get_coll_name(src):
     ```
     """
     coll_name = 'noCollection'
-    if os.path.join(os.sep, cfg.COLL_FOLDER) in src:
-        coll_name = src.split(
-            os.path.join(os.sep, cfg.COLL_FOLDER))[-1].split(os.sep)[1]
+    for i in cfg.COLL_FOLDERS:
+        if i in src:
+            coll_name = src.split(i)[-1].split(os.sep)[1]
     return coll_name
 
 

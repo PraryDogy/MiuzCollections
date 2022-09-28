@@ -2,7 +2,6 @@
 Gui for view image.
 """
 
-import cgi
 from datetime import datetime
 import os
 import subprocess
@@ -19,6 +18,7 @@ class Globals:
     Stores variables
     """
     src = str
+    curr_img = Image
     path_lbl = tkinter.Label
 
 
@@ -29,7 +29,10 @@ def on_closing(obj):
     * param `obj`: tkinter toplevel
     """
     image_frame = [v for k, v in obj.children.items() if 'imageframe' in k]
-    cfg.IMAGES_COMPARE.remove(image_frame[0])
+    try:
+        cfg.IMAGES_COMPARE.remove(image_frame[0])
+    except KeyError:
+        pass
     obj.destroy()
 
 
@@ -69,6 +72,10 @@ class ImagePreview(tkinter.Toplevel):
         self.geometry(f'+{cfg.ROOT.winfo_x() + 100}+{cfg.ROOT.winfo_y()}')
         self.deiconify()
 
+        for k, v in cfg.ROOT.children.items():
+            if 'preview' in k:
+                v.lift()
+
 
 class ImageFrame(MyLabel):
     """
@@ -76,9 +83,8 @@ class ImageFrame(MyLabel):
     * param `master`: tkinter toplevel.
     """
     def __init__(self, master):
-        self.master = master
-        img_src = Image.open(Globals.src)
-        img_copy= img_src.copy()
+        Globals.curr_img = Image.open(Globals.src)
+        img_copy = Globals.curr_img.copy()
 
         MyLabel.__init__(self, master, borderwidth=0)
         self['bg']='black'
@@ -114,9 +120,11 @@ class NamePath(MyFrame):
         
         filemod = datetime.fromtimestamp(os.path.getmtime(Globals.src))
         filemod = filemod.strftime("%H:%M:%S %d-%m-%Y")
+        img_w, img_h = Globals.curr_img.width, Globals.curr_img.height
 
         txt = (f'Коллекция: {get_coll_name(Globals.src)}'
                 f'\nИмя: {Globals.src.split(os.sep)[-1]}'
+                f'\nРазрешение: {img_w}x{img_h}'
                 f'\nРазмер: {filesize} мб'
                 f'\nДата изменения: {filemod}')
 
@@ -162,7 +170,7 @@ class CopyCompare(MyFrame):
         btn.press()
         if len(cfg.IMAGES_COMPARE) < 2:
             old_txt = Globals.path_lbl['text']
-            txt = '\nОткройте второе изображение\n\n'
+            txt = '\n\nОткройте второе изображение\n\n'
             Globals.path_lbl['text'] = txt
             cfg.ROOT.after(
                 1500, lambda: Globals.path_lbl.configure(text=old_txt))

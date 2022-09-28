@@ -58,7 +58,7 @@ class Globals:
         """
         return Dbase.conn.execute(sqlalchemy.select(
             img_size, Thumbs.src, Thumbs.modified).order_by(
-                        -Thumbs.modified).limit(20)).fetchall()
+                        -Thumbs.modified).limit(60)).fetchall()
 
     def load_curr_coll(self, img_size, curr_coll):
         """
