@@ -8,7 +8,7 @@ import tkinter
 
 # app info
 APP_NAME = 'MiuzGallery'
-APP_VER = '2.9.0'
+APP_VER = '2.9.2'
 
 # database info
 DB_VER = '2.6.1'
@@ -39,7 +39,7 @@ YADISK_DIR = os.path.join(os.sep, 'miuzgall')
 defaults = {
     'PHOTO_DIR': os.path.join(
         os.sep, 'Volumes', 'Shares', 'Marketing', 'Photo'),
-    'COLL_FOLDER': '_Collections',
+    'COLL_FOLDERS': ['/Volumes/Shares/Marketing/Photo/_Collections'],
     'RT_FOLDER': 'Retouch',
     'FILE_AGE':60
     }
@@ -53,6 +53,6 @@ else:
         data = defaults
 
 PHOTO_DIR = data['PHOTO_DIR']
-COLL_FOLDER = data['COLL_FOLDER']
+COLL_FOLDERS = data['COLL_FOLDERS']
 RT_FOLDER = data['RT_FOLDER']
 FILE_AGE = data['FILE_AGE']
