@@ -67,6 +67,7 @@ class SearchDirs(list):
         Looking for all folders in `cfg.COLL_FOLDERS`
         """
         colls = []
+
         for sub_coll in cfg.COLL_FOLDERS:
             for i in os.listdir(sub_coll):
                 colls.append(os.path.join(sub_coll, i))

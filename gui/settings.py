@@ -124,9 +124,12 @@ class BelowMenu(MyFrame):
         save_btn.pack(side=tkinter.LEFT, padx=10)
 
         cancel_btn = MyButton(self, text='Отмена')
-        cancel_btn.cmd(lambda e: self.winfo_toplevel().destroy())
+        cancel_btn.cmd(lambda e: self.cancel())
         cancel_btn.pack(side=tkinter.LEFT)
 
+    def cancel(self):
+        self.winfo_toplevel().destroy()
+        Globals.inserts = []
 
     def save_settings(self):
         """
@@ -137,6 +140,11 @@ class BelowMenu(MyFrame):
             data = json.load(file)
 
         new_values = [i.get() for i in Globals.inserts]
+        new_values[1] = new_values[1].split(',')
+
+        if not self.values_check(new_values):
+            return
+
         for key, ins in zip(data, new_values):
             data[key] = ins
 
@@ -145,6 +153,45 @@ class BelowMenu(MyFrame):
 
         Globals.inserts = []
         self.winfo_toplevel().destroy()
+
+    def values_check(self, values):
+        if not os.path.exists(values[0]):
+            self.error_gui(values[0])
+            return False
+
+        for i in values[1]:
+            if not os.path.exists(i):
+                self.error_gui(i)
+                return False
+
+        return True
+
+    def error_gui(self, path_check):
+        win = tkinter.Toplevel(bg=cfg.BGCOLOR, padx=15, pady=15)
+        win.withdraw()
+        win.resizable(0,0)
+
+        msg = MyLabel(
+            win, text = f'Такого пути не существует:\n{path_check}',
+            wraplength=350)
+        msg.pack()
+
+        def cmd():
+            win.grab_release()
+            win.destroy()
+
+        close = MyButton(win, text='Закрыть')
+        close.cmd(lambda e: cmd())
+        close.pack(pady=(10, 0))
+
+        cfg.ROOT.update_idletasks()
+        x, y = cfg.ROOT.winfo_x(), cfg.ROOT.winfo_y()
+        xx = x + cfg.ROOT.winfo_width()//2-self.winfo_width()//2
+        yy = y + cfg.ROOT.winfo_height()//2-self.winfo_height()//2
+        win.geometry(f'+{xx}+{yy}')
+        win.deiconify()
+        win.protocol("WM_DELETE_WINDOW", cmd)
+        win.grab_set()
 
 
 class General(MyFrame):

@@ -14,10 +14,8 @@ import tkinter
 
 import cfg
 import cv2
-import numpy as np
 import sqlalchemy
 import database
-from skimage.metrics import structural_similarity
 
 
 def create_thumb(src):
