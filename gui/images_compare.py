@@ -6,7 +6,12 @@ from utils.utils import MyButton, MyFrame, MyLabel, my_copy
 
 
 def images_list():
+    """
+    Returns list of tkinter image objects.
+    `cfg.IMAGES_COMPARE` is set with tkinter image labels.
+    """
     return [i.__dict__['image_names'] for i in list(cfg.IMAGES_COMPARE)]
+
 
 def on_closing(obj):
     """
@@ -14,7 +19,7 @@ def on_closing(obj):
     Clears `cfg.IMAGES_COMPARE` list.
     * param `obj`: tkinter toplevel
     """
-    
+
     prevs = [v for k, v in cfg.ROOT.children.items() if "preview" in k]
     [i.destroy() for i in prevs]
     cfg.IMAGES_COMPARE.clear()
@@ -24,13 +29,27 @@ def on_closing(obj):
 
 
 class Globals:
+    """
+    Global variables.
+    * `curr_img`: tkinter image object from `images_list()` function.
+    * `curr_src`: image source path.
+    * `img_frame`: tkinter frame with `curr_img`
+    * `info_label`: tkinter label with image info from `image_viewer`
+    """
     curr_img = tkinter.Image
+    curr_src = str
+
     img_frame = tkinter.Label
-    info_frame = tkinter.Label
-    ind = int
+    info_label = tkinter.Label
 
 
 class ImagesCompare(tkinter.Toplevel):
+    """
+    A new tkinter window containing two images and
+    a button with an image switch.
+    You can click the toggle button to see the difference between similar
+    images
+    """
     def __init__(self):
         prevs = [v for k, v in cfg.ROOT.children.items() if "preview" in k]
         [i.withdraw() for i in prevs]
@@ -48,9 +67,9 @@ class ImagesCompare(tkinter.Toplevel):
         self.geometry(f'{side}x{side}')
 
         ImageFrame(self).pack(fill=tkinter.BOTH, expand=True, pady=(0, 15))
-        CopyCompare(self).pack(pady=(0, 15))
-        NamePath(self).pack(pady=(0, 15))
-        OpenCloseFrame(self).pack()
+        ImgButtons(self).pack(pady=(0, 15))
+        NamePath(self).pack(pady=(0, 15), anchor=tkinter.CENTER)
+        CloseBtn(self).pack()
 
         cfg.ROOT.update_idletasks()
         self.geometry(f'+{cfg.ROOT.winfo_x() + 100}+{cfg.ROOT.winfo_y()}')
@@ -59,7 +78,7 @@ class ImagesCompare(tkinter.Toplevel):
 
 class ImageFrame(MyLabel):
     """
-    Creates tkinter label with image 0.8 wight, height of screen.
+    Creates tkinter label with image.
     * param `master`: tkinter toplevel.
     """
     def __init__(self, master):
@@ -67,19 +86,22 @@ class ImageFrame(MyLabel):
         self['bg']='black'
 
         Globals.curr_img = images_list()[0]
-    
+        Globals.img_frame = self
+        Globals.curr_src = cfg.IMAGES_SRC[0]
+
         self.configure(
             image=Globals.curr_img,
             width=Globals.curr_img.height(),
             height=Globals.curr_img.height()
             )
 
-        Globals.img_frame = self
-        Globals.ind = 0
 
-class CopyCompare(MyFrame):
+class ImgButtons(MyFrame):
     """
-    Tkinter frame with button that calls images compare method.
+    Tkinter frame with buttons:
+    * copy image name
+    * open image folder
+    * switch to second image
     """
     def __init__(self, master):
         MyFrame.__init__(self, master)
@@ -97,10 +119,8 @@ class CopyCompare(MyFrame):
 
         toogle = MyButton(self, text='Переключить')
         toogle.configure(height=1, width=b_wight)
-        toogle.cmd(lambda e: self.param(toogle))
+        toogle.cmd(lambda e: self.switch_image(toogle))
         toogle.pack(side=tkinter.LEFT, padx=(0, 0))
-
-        self.flick(toogle)
 
     def copy_name(self, btn):
         """
@@ -109,7 +129,8 @@ class CopyCompare(MyFrame):
         * param `btn`: current tkinter button.
         """
         btn.press()
-        my_copy(cfg.IMAGES_SRC[Globals.ind].split('/')[-1].split('.')[0])
+        get_name = Globals.curr_src.split('/')[-1].split('.')[0]
+        my_copy(get_name)
 
     def open_folder(self, btn):
         """
@@ -118,36 +139,41 @@ class CopyCompare(MyFrame):
         * param `btn`: current tkinter button.
         """
         btn.press()
-        path = '/'.join(cfg.IMAGES_SRC[Globals.ind].split('/')[:-1])
+        path = '/'.join(Globals.curr_src.split('/')[:-1])
         subprocess.check_output(["/usr/bin/open", path])
 
-    def param(self, btn):
-            btn.press()
-            images = images_list()
+    def switch_image(self, btn):
+        """
+        Switches between two images from cfg.IMAGES_COMPARE set.
+        """
+        btn.press()
 
-            Globals.ind = 0 if images.index(Globals.curr_img) == 1 else 1
+        Globals.curr_img = [
+            i for i in images_list() if i != Globals.curr_img][0]
 
-            Globals.img_frame.configure(image=images[Globals.ind])
-            Globals.info_frame.configure(text=cfg.IMAGES_INFO[Globals.ind])
-            Globals.curr_img = images[Globals.ind]
+        Globals.curr_src = [
+            i for i in cfg.IMAGES_SRC if i != Globals.curr_src][0]
 
-    def flick(self, btn):
-        for i in range(100, 1000, 200):
-            cfg.ROOT.after(i, lambda: btn.press())
+        image_info = [
+            i for i in cfg.IMAGES_INFO if i != Globals.info_label['text']][0]
+
+        Globals.img_frame.configure(image=Globals.curr_img)
+        Globals.info_label.configure(text=image_info)
 
 
 class NamePath(MyLabel):
     """
-    Creates tkinter frame.
+    Creates tkinter frame with image info.
     * param `master`: tkinter top level.
     """
     def __init__(self, master):
         MyLabel.__init__(
-            self, master, text=cfg.IMAGES_INFO[0], justify=tkinter.LEFT)
-        Globals.info_frame = self
+            self, master, anchor=tkinter.W, justify=tkinter.LEFT,
+            text=cfg.IMAGES_INFO[0], width=40)
+        Globals.info_label = self
 
 
-class OpenCloseFrame(MyButton):
+class CloseBtn(MyButton):
     """
     Creates tkinter frame for open and close buttons.
     * param `master`: tkinter frame.

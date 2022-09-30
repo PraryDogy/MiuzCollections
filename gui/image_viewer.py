@@ -20,7 +20,7 @@ class Globals:
     src = str
     curr_img = Image
     path_lbl = tkinter.Label
-
+    copy_compare_w = tkinter
 
 def on_closing(obj):
     """
@@ -63,9 +63,9 @@ class ImagePreview(tkinter.Toplevel):
         self.geometry(f'{side}x{side}')
 
         ImageFrame(self).pack(fill=tkinter.BOTH, expand=True)
-        CopyCompare(self).pack(pady=(15, 15))
-        NamePath(self).pack(pady=(0, 15), padx=15)
-        OpenCloseFrame(self).pack()
+        ImgButtons(self).pack(pady=(15, 15))
+        ImgInfo(self).pack(pady=(0, 15), padx=15)
+        CloseButton(self).pack()
 
         cfg.ROOT.update_idletasks()
 
@@ -108,7 +108,7 @@ class ImageFrame(MyLabel):
             cfg.IMAGES_COMPARE.add(self)
 
 
-class NamePath(MyFrame):
+class ImgInfo(MyFrame):
     """
     Creates tkinter frame.
     * param `master`: tkinter top level.
@@ -117,13 +117,14 @@ class NamePath(MyFrame):
         MyFrame.__init__(self, master)
 
         filesize = round(os.path.getsize(Globals.src)/(1024*1024), 2)
-        
+
         filemod = datetime.fromtimestamp(os.path.getmtime(Globals.src))
         filemod = filemod.strftime("%H:%M:%S %d-%m-%Y")
         img_w, img_h = Globals.curr_img.width, Globals.curr_img.height
+        name = Globals.src.split(os.sep)[-1]
 
         txt = (f'Коллекция: {get_coll_name(Globals.src)}'
-                f'\nИмя: {Globals.src.split(os.sep)[-1]}'
+                f'\nИмя: {name}'
                 f'\nРазрешение: {img_w}x{img_h}'
                 f'\nРазмер: {filesize} мб'
                 f'\nДата изменения: {filemod}')
@@ -138,7 +139,8 @@ class NamePath(MyFrame):
         if len(cfg.IMAGES_SRC) < 2:
             cfg.IMAGES_SRC.append(Globals.src)
 
-class CopyCompare(MyFrame):
+
+class ImgButtons(MyFrame):
     """
     Tkinter frame with button that calls images compare method.
     """
@@ -197,7 +199,7 @@ class CopyCompare(MyFrame):
         subprocess.check_output(["/usr/bin/open", path])
 
 
-class OpenCloseFrame(MyFrame):
+class CloseButton(MyFrame):
     """
     Creates tkinter frame for open and close buttons.
     * param `master`: tkinter frame.

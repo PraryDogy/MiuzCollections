@@ -22,6 +22,7 @@ class Globals:
     """
     Stores global variables.
     """
+    settings_win = tkinter.Toplevel
     gen_frame = tkinter.Frame
     adv_frame = tkinter.Frame
     gen_btn = tkinter.Button
@@ -36,6 +37,7 @@ class Settings(tkinter.Toplevel):
 
     def __init__(self):
         tkinter.Toplevel.__init__(self, cfg.ROOT, bg=cfg.BGCOLOR)
+        Globals.settings_win = self
         cfg.ROOT.eval(f'tk::PlaceWindow {self} center')
 
         self.withdraw()
@@ -128,6 +130,9 @@ class BelowMenu(MyFrame):
         cancel_btn.pack(side=tkinter.LEFT)
 
     def cancel(self):
+        """
+        Cancel button command.
+        """
         self.winfo_toplevel().destroy()
         Globals.inserts = []
 
@@ -155,6 +160,9 @@ class BelowMenu(MyFrame):
         self.winfo_toplevel().destroy()
 
     def values_check(self, values):
+        """
+        Check path exists, if not exists show error gui.
+        """
         if not os.path.exists(values[0]):
             self.error_gui(values[0])
             return False
@@ -167,6 +175,9 @@ class BelowMenu(MyFrame):
         return True
 
     def error_gui(self, path_check):
+        """
+        Error gui.
+        """
         win = tkinter.Toplevel(bg=cfg.BGCOLOR, padx=15, pady=15)
         win.withdraw()
         win.resizable(0,0)
@@ -179,6 +190,7 @@ class BelowMenu(MyFrame):
         def cmd():
             win.grab_release()
             win.destroy()
+            Globals.settings_win.grab_set()
 
         close = MyButton(win, text='Закрыть')
         close.cmd(lambda e: cmd())
