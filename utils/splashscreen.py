@@ -10,7 +10,7 @@ import sqlalchemy
 from database import Config, Dbase
 
 from .scaner import UpdateCollections, UpdateRetouched
-from .utils import MyButton, MyLabel, SmbChecker
+from .utils import MyButton, MyLabel, SmbChecker, place_center
 
 
 class SplashScreen:
@@ -36,6 +36,7 @@ class Gui(tkinter.Toplevel):
     """
     def __init__(self):
         tkinter.Toplevel.__init__(self, bg=cfg.BGCOLOR)
+        cfg.ROOT.eval(f'tk::PlaceWindow {self} center')
         self.withdraw()
 
         self.protocol("WM_DELETE_WINDOW", self.stop)
@@ -58,7 +59,11 @@ class Gui(tkinter.Toplevel):
         skip_btn.cmd(lambda e: self.stop())
         skip_btn.pack(pady=(0, 10))
 
-        cfg.ROOT.eval(f'tk::PlaceWindow {self} center')
+        if cfg.ROOT.state() != 'withdrawn':
+            place_center(self)
+        else:
+            cfg.ROOT.eval(f'tk::PlaceWindow {self} center')
+
         self.deiconify()
         self.grab_set()
 

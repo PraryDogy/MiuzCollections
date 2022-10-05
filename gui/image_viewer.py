@@ -119,13 +119,13 @@ class ImgInfo(MyFrame):
         filesize = round(os.path.getsize(Globals.src)/(1024*1024), 2)
 
         filemod = datetime.fromtimestamp(os.path.getmtime(Globals.src))
-        filemod = filemod.strftime("%H:%M:%S %d-%m-%Y")
+        filemod = filemod.strftime("%d-%m-%Y, %H:%M:%S")
         img_w, img_h = Globals.curr_img.width, Globals.curr_img.height
         name = Globals.src.split(os.sep)[-1]
 
         txt = (f'Коллекция: {get_coll_name(Globals.src)}'
                 f'\nИмя: {name}'
-                f'\nРазрешение: {img_w}x{img_h}'
+                f'\nРазрешение: {img_w} x {img_h}'
                 f'\nРазмер: {filesize} мб'
                 f'\nДата изменения: {filemod}')
 

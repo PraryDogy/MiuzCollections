@@ -4,6 +4,7 @@ Gui for status bar.
 
 import tkinter
 
+import cfg
 import sqlalchemy
 from database import Config, Dbase
 from utils.splashscreen import SplashScreen
@@ -85,7 +86,7 @@ class StatusBar(MyFrame, BtnCmd):
         UpdateSection(self)
         GridSection(self)
         ClmnSection(self)
-
+        AllWindows(self)
 
 class SettingsSection(MyLabel, MyButton, BtnCmd):
     """
@@ -158,3 +159,23 @@ class ClmnSection(MyLabel, MyButton, BtnCmd):
         self.cmd(lambda e: self.more_less(
             delta=+1, min=1, max=10, db_name='clmns'))
         self.pack(side=tkinter.LEFT, padx=(0, 15))
+
+
+class AllWindows(MyLabel, MyButton):
+    """
+    Show all windows button
+    """
+    def __init__(self, master):
+        MyLabel.__init__(self, master, text="Позазать все")
+        self.pack(side=tkinter.LEFT)
+
+        MyButton.__init__(self, master, text='֍', padx=5)
+        self.configure(width=5, height=1)
+        self.cmd(lambda e: self.show_all(self))
+        self.pack(side=tkinter.LEFT, padx=(0, 15))
+
+    def show_all(self, btn):
+        btn.press()
+        for k, v in cfg.ROOT.children.items():
+            if 'imagepreview' in k:
+                v.lift()

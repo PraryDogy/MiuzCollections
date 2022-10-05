@@ -13,7 +13,8 @@ import sqlalchemy
 import tkmacosx
 from database import Config, Dbase
 from PIL import Image, ImageTk
-from utils.utils import MyButton, MyFrame, MyLabel, my_copy, my_paste
+from utils.utils import (MyButton, MyFrame, MyLabel, my_copy, my_paste,
+                         place_center)
 
 from .descriptions import descriptions
 
@@ -40,15 +41,15 @@ class Settings(tkinter.Toplevel):
         Globals.settings_win = self
         cfg.ROOT.eval(f'tk::PlaceWindow {self} center')
 
+        self.protocol("WM_DELETE_WINDOW", self.destroy)
+        self.bind('<Command-w>', lambda e: self.destroy())
+        self.bind('<Command-q>', lambda e: quit())
+
         self.withdraw()
         self.resizable(0,0)
         self.title('Настройки')
         self.geometry('570x650')
         self.configure(padx=10, pady=10)
-
-        self.protocol("WM_DELETE_WINDOW", self.destroy)
-        self.bind('<Command-w>', lambda e: self.destroy())
-        self.bind('<Command-q>', lambda e: quit())
 
         frame_up = MyFrame(self)
         frame_up.pack(fill=tkinter.BOTH, expand=True)
@@ -63,12 +64,8 @@ class Settings(tkinter.Toplevel):
 
         BelowMenu(frame_bott).pack(pady=(10,0))
 
-        cfg.ROOT.update_idletasks()
-        x, y = cfg.ROOT.winfo_x(), cfg.ROOT.winfo_y()
-        xx = x + cfg.ROOT.winfo_width()//2-self.winfo_width()//2
-        yy = y + cfg.ROOT.winfo_height()//2-self.winfo_height()//2
+        place_center(self)
 
-        self.geometry(f'+{xx}+{yy}')
         self.deiconify()
         self.grab_set()
 

@@ -18,6 +18,19 @@ import sqlalchemy
 import database
 
 
+def place_center(top_level):
+    """
+    Place new tkinter window to center relavive main window.
+    * param `top_level`: tkinter.TopLevel
+    """
+    cfg.ROOT.update_idletasks()
+    x, y = cfg.ROOT.winfo_x(), cfg.ROOT.winfo_y()
+    xx = x + cfg.ROOT.winfo_width()//2-top_level.winfo_width()//2
+    yy = y + cfg.ROOT.winfo_height()//2-top_level.winfo_height()//2
+
+    top_level.geometry(f'+{xx}+{yy}')
+
+
 def create_thumb(src):
     """
     Returns list of img objects with sizes: 150, 200, 250, 300
