@@ -107,7 +107,7 @@ class Thumbs(Dbase.base):
     """
     Sqlalchemy model.
 
-    *columns: img150, img200, img250, img300, src, size, created, modified,
+    *columns: img150, img200, src, size, created, modified,
     collection
     """
 
@@ -115,8 +115,6 @@ class Thumbs(Dbase.base):
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
     img150 = sqlalchemy.Column(sqlalchemy.LargeBinary)
     img200 = sqlalchemy.Column(sqlalchemy.LargeBinary)
-    img250 = sqlalchemy.Column(sqlalchemy.LargeBinary)
-    img300 = sqlalchemy.Column(sqlalchemy.LargeBinary)
     src = sqlalchemy.Column(sqlalchemy.Text)
     size = sqlalchemy.Column(sqlalchemy.Integer)
     created = sqlalchemy.Column(sqlalchemy.Integer)

@@ -33,7 +33,7 @@ def place_center(top_level):
 
 def create_thumb(src):
     """
-    Returns list of img objects with sizes: 150, 200, 250, 300
+    Returns list of img objects with sizes: 150, 200
     """
     img = cv2.imread(src)
     width, height = img.shape[1], img.shape[0]
@@ -48,7 +48,7 @@ def create_thumb(src):
 
     resized = []
 
-    for size in [(150, 150), (200, 200), (250, 250), (300, 300)]:
+    for size in [(150, 150), (200, 200)]:
         newsize = cv2.resize(
             new_img, size, interpolation = cv2.INTER_AREA)
         encoded = cv2.imencode('.jpg', newsize)[1].tobytes()
@@ -280,11 +280,10 @@ def insert_row(**kw):
     * param `coll`: name of collection created with `get_coll_name`
     """
 
-    img150, img200, img250, img300 = create_thumb(kw['src'])
+    img150, img200 = create_thumb(kw['src'])
 
     values = {
         'img150':img150, 'img200':img200,
-        'img250':img250, 'img300':img300,
         'src':kw['src'], 'size':kw['size'],
         'created':kw['birth'], 'modified':kw['mod'],
         'collection':kw['coll']}

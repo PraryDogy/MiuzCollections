@@ -128,13 +128,13 @@ class GridSection(MyLabel, MyButton, BtnCmd):
         MyButton.__init__(self, master, text='-', padx=5)
         self.configure(width=5, height=1)
         self.cmd(lambda e: self.more_less(
-            delta=-50, min=150, max=300, db_name='size'))
+            delta=-50, min=150, max=200, db_name='size'))
         self.pack(side=tkinter.LEFT, padx=(0, 15))
 
         MyButton.__init__(self, master, text='+', padx=5)
         self.configure(width=5, height=1, )
         self.cmd(lambda e: self.more_less(
-            delta=+50, min=150, max=300, db_name='size'))
+            delta=+50, min=150, max=200, db_name='size'))
         self.pack(side=tkinter.LEFT, padx=(0, 15))
 
 
@@ -166,7 +166,7 @@ class AllWindows(MyLabel, MyButton):
     Show all windows button
     """
     def __init__(self, master):
-        MyLabel.__init__(self, master, text="Позазать все")
+        MyLabel.__init__(self, master, text="Все окна")
         self.pack(side=tkinter.LEFT)
 
         MyButton.__init__(self, master, text='֍', padx=5)

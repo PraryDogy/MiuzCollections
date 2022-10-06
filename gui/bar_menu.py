@@ -5,7 +5,7 @@ Mac osx bar menus.
 import tkinter
 
 import cfg
-from utils.utils import MyButton, MyLabel
+from utils.utils import MyButton, MyLabel, place_center
 
 from .settings import Settings
 
@@ -22,7 +22,6 @@ class BarMenu(tkinter.Menu):
 
         self.add_command(
             label='Настройки', command=Settings)
-        self.add_command(label="Контакты", command=self.contact)
         self.add_command(label="О программе", command=self.about)
         self.add_separator()
         self.add_command(label="Выход", command=cfg.ROOT.destroy)
@@ -51,32 +50,13 @@ class BarMenu(tkinter.Menu):
             'Created by Evgeny Loshkarev'
             '\nCopyright © 2022 MIUZ Diamonds.'
             '\nAll rights reserved.'
-            '\n'
             )
 
         author = MyLabel(new_win, text=name+made)
         author.pack()
 
-        close_btn = MyButton(new_win)
-        close_btn.configure(height=2, width=17, text='Закрыть')
-        close_btn.cmd(lambda e: new_win.destroy())
-        close_btn.pack()
-
-        cfg.ROOT.eval(f'tk::PlaceWindow {new_win} center')
-        new_win.deiconify()
-        new_win.grab_set()
-
-    def contact(self):
-        """
-        Creates tkinter toplevel with author's contacts.
-        """
-        new_win = tkinter.Toplevel(
-            cfg.ROOT, bg=cfg.BGCOLOR, pady=10, padx=10)
-        new_win.withdraw()
-        new_win.title('Поддержка')
-
         descr = (
-            '\nEmail: evlosh@gmail.com'
+            'Email: evlosh@gmail.com'
             '\nTelegram: evlosh'
             '\n'
         )
@@ -89,6 +69,6 @@ class BarMenu(tkinter.Menu):
         close_btn.cmd(lambda e: new_win.destroy())
         close_btn.pack()
 
-        cfg.ROOT.eval(f'tk::PlaceWindow {new_win} center')
+        place_center(new_win)
         new_win.deiconify()
         new_win.grab_set()

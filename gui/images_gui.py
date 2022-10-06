@@ -4,6 +4,7 @@ Gui menu and images grid.
 
 import os
 import re
+import subprocess
 import tkinter
 import traceback
 from datetime import datetime
@@ -135,7 +136,7 @@ class MenuButtons(object):
         for name_btn, name_coll in for_btns:
 
             btn = MyButton(master, text=name_btn)
-            btn.configure(height=1, width=12)
+            btn.configure(height=1, width=12 ,pady=1)
             btn.pack(pady=(0, 10))
             btns.append(btn)
 
@@ -165,6 +166,12 @@ class MenuButtons(object):
         * param `btn`: tkinter curren button object
         * param `btns`: list of created tkinter buttons
         """
+
+        if btn['bg'] == cfg.BGPRESSED:
+            for i in cfg.COLL_FOLDERS:
+                coll_path = os.path.join(os.sep, i, coll)
+                subprocess.check_output(["/usr/bin/open", coll_path])
+            return
 
         for btn_item in btns:
             btn_item['bg'] = cfg.BGBUTTON

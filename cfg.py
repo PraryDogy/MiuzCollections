@@ -8,10 +8,10 @@ import tkinter
 
 # app info
 APP_NAME = 'MiuzGallery'
-APP_VER = '2.9.5'
+APP_VER = '2.9.7'
 
 # database info
-DB_VER = '2.6.1'
+DB_VER = '2.6.2'
 DB_DIR = os.path.join(
     os.path.expanduser('~'), 'Library', 'Application Support', 'Miuz Gallery')
 DB_NAME = f'database{DB_VER}.db'
