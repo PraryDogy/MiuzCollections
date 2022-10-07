@@ -12,6 +12,11 @@ from .bar_menu import BarMenu
 from .status_bar import StatusBar
 
 
+def unhide():
+    cfg.ROOT.deiconify()
+
+
+
 class MainGui:
     """
     Configures root window.
@@ -19,7 +24,7 @@ class MainGui:
     """
     def __init__(self):
         cfg.ROOT.createcommand(
-            'tk::mac::ReopenApplication', cfg.ROOT.deiconify)
+            'tk::mac::ReopenApplication', unhide)
 
         cfg.ROOT.title('MiuzGallery')
         cfg.ROOT.configure(bg=cfg.BGCOLOR, padx=15, pady=0)

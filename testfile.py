@@ -1,8 +1,5 @@
-import sqlalchemy
-
-
-engine = sqlalchemy.create_engine('sqlite:///Users/Loshkarev/Library/Application Support/Miuz Gallery/database2.6.1.db')
-conn = engine.connect()
-
-
-q = ""
+medved = WhiteBear()
+small_children = [i for i in medved.children if i.age < 16]
+if len(small_children) >= 3:
+    medved.give_beer(3)
+    medved.patriot = True
