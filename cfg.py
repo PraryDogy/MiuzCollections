@@ -44,6 +44,9 @@ defaults = {
     'FILE_AGE':60
     }
 
+if not os.path.exists(DB_DIR):
+    os.mkdir(DB_DIR)
+
 if os.path.exists(os.path.join(DB_DIR, 'cfg.json')):
     with open(os.path.join(DB_DIR, 'cfg.json'), 'r') as file:
         data = json.load(file)

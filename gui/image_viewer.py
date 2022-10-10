@@ -125,6 +125,7 @@ class ImgInfo(MyFrame):
 
         txt = (f'Коллекция: {get_coll_name(Globals.src)}'
                 f'\nИмя: {name}'
+                f'\nПуть: {Globals.src}'
                 f'\nРазрешение: {img_w} x {img_h}'
                 f'\nРазмер: {filesize} мб'
                 f'\nДата изменения: {filemod}')
@@ -172,7 +173,7 @@ class ImgButtons(MyFrame):
         btn.press()
         if len(cfg.IMAGES_COMPARE) < 2:
             old_txt = Globals.path_lbl['text']
-            txt = '\n\nОткройте второе изображение\n\n'
+            txt = '\n\n\nОткройте второе изображение\n\n'
             Globals.path_lbl['text'] = txt
             cfg.ROOT.after(
                 1500, lambda: Globals.path_lbl.configure(text=old_txt))
