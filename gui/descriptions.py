@@ -10,14 +10,14 @@ PHOTO_DIR = (
     '\nНапример: /Путь/к/фото/AllPhotos'
     )
 
-COLL_FOLDER = (
+COLL_FOLDERS = (
     'Путь к папке с коллекциями. Если их несколько,'
     '\nукажите через запятую.'
     '\nНапример:'
     '\n/Путь/к/коллекциям,/Еще/Путь/к/коллекциям'
     )
 
-RT_FOLDER = (
+RT_NAME = (
     'Имя папки с ретушью.'
     '\nПодразумевается, что внутри папки с таким'
     '\именем будут отретушированные фото.'
@@ -37,5 +37,9 @@ FILE_AGE = (
     '\nза все время в основных настройках.'
     )
 
-
-descriptions = [PHOTO_DIR, COLL_FOLDER, RT_FOLDER, FILE_AGE]
+descriptions = {
+    'PHOTO_DIR': PHOTO_DIR,
+    'COLL_FOLDERS': COLL_FOLDERS,
+    'RT_NAME': RT_NAME,
+    'FILE_AGE': FILE_AGE
+    }

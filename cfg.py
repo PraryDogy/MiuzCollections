@@ -39,7 +39,10 @@ YADISK_DIR = os.path.join(os.sep, 'miuzgall')
 defaults = {
     'PHOTO_DIR': os.path.join(
         os.sep, 'Volumes', 'Shares', 'Marketing', 'Photo'),
-    'COLL_FOLDERS': ['/Volumes/Shares/Marketing/Photo/_Collections'],
+    'COLL_FOLDERS': [
+        os.path.join(
+            os.sep, 'Volumes', 'Shares', 'Marketing', 'Photo', '_Collections')
+        ],
     'RT_FOLDER': 'Retouch',
     'FILE_AGE':60
     }

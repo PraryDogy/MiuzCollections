@@ -31,6 +31,9 @@ class Globals:
     adv_btn = tkinter.Button
     inserts = []
 
+    PHOTO_DIR = str
+    COLL_FOLDER = str
+
 
 class Settings(tkinter.Toplevel):
     """
@@ -47,7 +50,7 @@ class Settings(tkinter.Toplevel):
         self.bind('<Command-q>', lambda e: quit())
 
         self.withdraw()
-        self.resizable(0,0)
+        # self.resizable(0,0)
         self.title('Настройки')
         self.geometry('570x650')
         self.configure(padx=10, pady=10)
@@ -292,45 +295,106 @@ class Expert(tkmacosx.SFrame):
 
         descr_list = []
 
-        for _, value in data.items():
-            desrc_input = MyLabel(self, justify=tkinter.LEFT, wraplength=340)
-            desrc_input.pack(anchor=tkinter.W, pady=(0, 10))
-            descr_list.append(desrc_input)
+        gallery_descr = MyLabel(
+            self, text=descriptions['PHOTO_DIR'], justify=tkinter.LEFT,
+            anchor=tkinter.W)
+        gallery_descr.pack(anchor=tkinter.W)
 
-            text_input = tkinter.Entry(self, bg=cfg.BGBUTTON, fg=cfg.FONTCOLOR,
-                insertbackground=cfg.FONTCOLOR, selectbackground=cfg.BGPRESSED,
-                highlightthickness=5, highlightbackground=cfg.BGBUTTON,
-                highlightcolor=cfg.BGBUTTON, bd=0, justify='center', width=35)
+        gallery_frame = MyFrame(self)
+        gallery_frame.pack(fill=tkinter.X)
 
-            text_input.insert(0, value)
-            text_input.pack(pady=(0, 10))
-            Globals.inserts.append(text_input)
+        gallery_btn = MyButton(gallery_frame, text='Обзор')
+        gallery_btn.pack(side=tkinter.LEFT, anchor=tkinter.W, pady=(10, 0))
+        gallery_btn.configure(height=1, width=9)
 
-            frame_btns = MyFrame(self)
-            frame_btns.pack()
+        gallery_lbl = MyLabel(
+            gallery_frame, text=data['PHOTO_DIR'], justify=tkinter.LEFT,
+            anchor=tkinter.W)
+        gallery_lbl.pack(
+            side=tkinter.LEFT, anchor=tkinter.W, 
+            padx=(10, 0), pady=(10, 0))
 
-            btn_copy = MyButton(frame_btns, text='Копировать')
-            btn_copy.configure(height=1, width=9)
-            btn_copy.cmd(
-                lambda e, x=text_input, y=btn_copy: self.copy_input(x, y))
-            btn_copy.pack(side=tkinter.LEFT, padx=(0, 10))
+        gallery_btn.cmd(
+            lambda e: self.select_path(gallery_lbl, 'PHOTO_DIR'))
 
-            btn_paste = MyButton(frame_btns, text='Вставить')
-            btn_paste.configure(height=1, width=9)
-            btn_paste.cmd(
-                lambda e, x=text_input, y=btn_paste: self.paste_input(x, y))
-            btn_paste.pack(side=tkinter.RIGHT, padx=(0, 10))
+        sep = Separator(self, orient='horizontal')
+        sep.pack(padx=40, pady=20, fill=tkinter.X)
 
-            sep = Separator(self, orient='horizontal')
-            sep.pack(padx=40, pady=20, fill=tkinter.X)
+        coll_descr = MyLabel(
+            self, text=descriptions['COLL_FOLDERS'], justify=tkinter.LEFT,
+            anchor=tkinter.W)
+        coll_descr.pack(anchor=tkinter.W)
 
-        for descr_input, descr in zip(descr_list, descriptions):
-            descr_input['text']=descr
+        coll_frame = MyFrame(self)
+        coll_frame.pack(fill=tkinter.X, pady=(0, 10))
 
-        restore_btn = MyButton(self, text='По умолчанию')
-        restore_btn.configure(height=1, width=12)
-        restore_btn.cmd(lambda e, x=restore_btn: self.restore(x))
-        restore_btn.pack(pady=(0, 15))
+        coll_btn = MyButton(coll_frame, text='Обзор')
+        coll_btn.pack(side=tkinter.LEFT, anchor=tkinter.W, pady=(10, 0))
+        coll_btn.configure(height=1, width=9)
+
+        coll_lbl = MyLabel(
+            coll_frame, text=data['COLL_FOLDERS'][0], justify=tkinter.LEFT,
+            anchor=tkinter.W)
+        coll_lbl.pack(
+            side=tkinter.LEFT, anchor=tkinter.W, 
+            padx=(10, 0), pady=(10, 0))
+
+        coll_btn.cmd(
+            lambda e: self.select_path(gallery_lbl, 'COLL_FOLDERS'))
+
+        sep2 = Separator(self, orient='horizontal')
+        sep2.pack(padx=40, pady=20, fill=tkinter.X)
+
+
+        # for _, value in data.items():
+        #     desrc_input = MyLabel(self, justify=tkinter.LEFT, wraplength=340)
+        #     desrc_input.pack(anchor=tkinter.W, pady=(0, 10))
+        #     descr_list.append(desrc_input)
+
+        #     text_input = tkinter.Entry(self, bg=cfg.BGBUTTON, fg=cfg.FONTCOLOR,
+        #         insertbackground=cfg.FONTCOLOR, selectbackground=cfg.BGPRESSED,
+        #         highlightthickness=5, highlightbackground=cfg.BGBUTTON,
+        #         highlightcolor=cfg.BGBUTTON, bd=0, justify='center', width=35)
+
+        #     text_input.insert(0, value)
+        #     text_input.pack(pady=(0, 10))
+        #     Globals.inserts.append(text_input)
+
+        #     frame_btns = MyFrame(self)
+        #     frame_btns.pack()
+
+        #     btn_copy = MyButton(frame_btns, text='Копировать')
+        #     btn_copy.configure(height=1, width=9)
+        #     btn_copy.cmd(
+        #         lambda e, x=text_input, y=btn_copy: self.copy_input(x, y))
+        #     btn_copy.pack(side=tkinter.LEFT, padx=(0, 10))
+
+        #     btn_paste = MyButton(frame_btns, text='Вставить')
+        #     btn_paste.configure(height=1, width=9)
+        #     btn_paste.cmd(
+        #         lambda e, x=text_input, y=btn_paste: self.paste_input(x, y))
+        #     btn_paste.pack(side=tkinter.RIGHT, padx=(0, 10))
+
+        #     sep = Separator(self, orient='horizontal')
+        #     sep.pack(padx=40, pady=20, fill=tkinter.X)
+
+        # for descr_input, descr in zip(descr_list, descriptions):
+        #     descr_input['text']=descr
+
+        # restore_btn = MyButton(self, text='По умолчанию')
+        # restore_btn.configure(height=1, width=12)
+        # restore_btn.cmd(lambda e, x=restore_btn: self.restore(x))
+        # restore_btn.pack(pady=(0, 15))
+
+    def select_path(self, lbl, globals_dir):
+        path = filedialog.askdirectory()
+
+        if len(path) == 0:
+            return
+
+        lbl['text'] = path
+        print(path)
+        setattr(Globals, globals_dir, path)
 
     def restore(self, btn):
         """

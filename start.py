@@ -19,5 +19,6 @@ def load_all():
     Globals.images_reset()
 
 cfg.ROOT.after(1, load_all)
+
 cfg.ROOT.mainloop()
 

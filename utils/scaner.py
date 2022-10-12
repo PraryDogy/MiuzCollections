@@ -270,20 +270,21 @@ class UpdateCollections():
     Updates the database.
     """
     def __init__(self):
-        cfg.LIVE_LBL['text'] = '10%'
+        cfg.LIVE_LBL['fg'] = cfg.FONTCOLOR
+        cfg.LIVE_LBL['text'] = 'Обновление 10%'
         coll_dirs = SearchDirs().colls()
         images = SearchImages(coll_dirs)
 
-        cfg.LIVE_LBL['text'] = '20%'
+        cfg.LIVE_LBL['text'] = 'Обновление 20%'
         DbUpdate().removed()
 
-        cfg.LIVE_LBL['text'] = '30%'
+        cfg.LIVE_LBL['text'] = 'Обновление 30%'
         DbUpdate().modified()
 
-        cfg.LIVE_LBL['text'] = '40%'
+        cfg.LIVE_LBL['text'] = 'Обновление 40%'
         DbUpdate().added(images)
 
-        cfg.LIVE_LBL['text'] = '50%'
+        cfg.LIVE_LBL['text'] = 'Обновление 50%'
         DbUpdate().moved(images)
 
 
@@ -298,7 +299,7 @@ class UpdateRetouched():
     than `cfg.FILE_AGE` value
     """
     def __init__(self, aged):
-        cfg.LIVE_LBL['text'] = '60%'
+        cfg.LIVE_LBL['text'] = 'Обновление 60%'
 
         if aged:
             aged_dirs = SearchDirs().retouched(
@@ -308,11 +309,15 @@ class UpdateRetouched():
 
         images = SearchImages(aged_dirs)
 
-        cfg.LIVE_LBL['text'] = '70%'
+        cfg.LIVE_LBL['text'] = 'Обновление 70%'
         DbUpdate().removed()
 
-        cfg.LIVE_LBL['text'] = '80%'
+        cfg.LIVE_LBL['text'] = 'Обновление 80%'
         DbUpdate().modified()
 
-        cfg.LIVE_LBL['text'] = '90%'
+        cfg.LIVE_LBL['text'] = 'Обновление 90%'
         DbUpdate().added(images)
+
+        cfg.LIVE_LBL['fg'] = cfg.BGCOLOR
+
+        # cfg.LIVE_LBL['text'] = ''

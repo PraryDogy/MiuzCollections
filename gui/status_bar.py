@@ -35,8 +35,12 @@ class BtnCmd:
             return
 
         btn.press()
+        btn.unbind('<Button-1>')
+
         SplashScreen()
         Globals.images_reset()
+
+        btn.cmd(lambda e: self.updater(self))
 
     def more_less(self, **kw):
         """
@@ -87,6 +91,8 @@ class StatusBar(MyFrame, BtnCmd):
         GridSection(self)
         ClmnSection(self)
         AllWindows(self)
+        DynamicSection(self)
+
 
 class SettingsSection(MyLabel, MyButton, BtnCmd):
     """
@@ -179,3 +185,10 @@ class AllWindows(MyLabel, MyButton):
         for k, v in cfg.ROOT.children.items():
             if 'imagepreview' in k:
                 v.lift()
+
+class DynamicSection(MyLabel):
+    def __init__(self, master):
+        MyLabel.__init__(self, master, text='Обновление 00%')
+        self['fg'] = cfg.BGCOLOR
+        self.pack(side=tkinter.LEFT)
+        cfg.LIVE_LBL = self
