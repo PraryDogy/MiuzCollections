@@ -17,7 +17,7 @@ COLL_FOLDERS = (
     '\n/Путь/к/коллекциям,/Еще/Путь/к/коллекциям'
     )
 
-RT_NAME = (
+RT_FOLDER = (
     'Имя папки с ретушью.'
     '\nПодразумевается, что внутри папки с таким'
     '\именем будут отретушированные фото.'
@@ -40,6 +40,6 @@ FILE_AGE = (
 descriptions = {
     'PHOTO_DIR': PHOTO_DIR,
     'COLL_FOLDERS': COLL_FOLDERS,
-    'RT_NAME': RT_NAME,
+    'RT_FOLDER': RT_FOLDER,
     'FILE_AGE': FILE_AGE
     }

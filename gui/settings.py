@@ -4,6 +4,7 @@ Tkinter toplevel gui with app settings.
 
 import json
 import os
+import shutil
 import sys
 import tkinter
 from tkinter import filedialog
@@ -19,20 +20,20 @@ from utils.utils import (MyButton, MyFrame, MyLabel, my_copy, my_paste,
 
 from .descriptions import descriptions
 
+with open(os.path.join(cfg.DB_DIR, 'cfg.json'), 'r') as file:
+    config = json.load(file)
 
-class Globals:
-    """
-    Stores global variables.
-    """
-    settings_win = tkinter.Toplevel
-    gen_frame = tkinter.Frame
-    adv_frame = tkinter.Frame
-    gen_btn = tkinter.Button
-    adv_btn = tkinter.Button
-    inserts = []
-
-    PHOTO_DIR = str
-    COLL_FOLDER = str
+widgets = {
+    'settings_win': tkinter.Toplevel,
+    'gen_frame': tkinter.Frame,
+    'adv_frame': tkinter.Frame,
+    'gen_btn': tkinter.Button,
+    'adv_btn': tkinter.Button,
+    'PHOTODIR_LBL': tkinter.Label,
+    'COLLFOLDERS_LBL': tkinter.Label,
+    'RTFOLDER_ENTRY': tkinter.Entry,
+    'FILEAGE_ENTRY':tkinter.Entry,
+    }
 
 
 class Settings(tkinter.Toplevel):
@@ -42,7 +43,7 @@ class Settings(tkinter.Toplevel):
 
     def __init__(self):
         tkinter.Toplevel.__init__(self, cfg.ROOT, bg=cfg.BGCOLOR)
-        Globals.settings_win = self
+        widgets['settings_win'] = self
         cfg.ROOT.eval(f'tk::PlaceWindow {self} center')
 
         self.protocol("WM_DELETE_WINDOW", self.destroy)
@@ -81,20 +82,20 @@ class LeftMenu(MyFrame):
     """
     def __init__(self, master):
         MyFrame.__init__(self, master)
-        Globals.gen_btn = MyButton(self, text='Основные')
-        Globals.gen_btn.configure(bg=cfg.BGPRESSED)
+        widgets['gen_btn'] = MyButton(self, text='Основные')
+        widgets['gen_btn'].configure(bg=cfg.BGPRESSED)
 
-        Globals.gen_btn.cmd(lambda e: self.change(
-            kill=Globals.adv_frame, pack=Globals.gen_frame,
-            press=Globals.gen_btn, clear=Globals.adv_btn))
-        Globals.gen_btn.pack()
+        widgets['gen_btn'].cmd(lambda e: self.change(
+            kill=widgets['adv_frame'], pack=widgets['gen_frame'],
+            press=widgets['gen_btn'], clear=widgets['adv_btn']))
+        widgets['gen_btn'].pack()
 
-        Globals.adv_btn = MyButton(self, text = 'Дополнительно')
+        widgets['adv_btn'] = MyButton(self, text = 'Дополнительно')
 
-        Globals.adv_btn.cmd(lambda e: self.change(
-            kill=Globals.gen_frame, pack=Globals.adv_frame,
-            press=Globals.adv_btn, clear=Globals.gen_btn))
-        Globals.adv_btn.pack()
+        widgets['adv_btn'].cmd(lambda e: self.change(
+            kill=widgets['gen_frame'], pack=widgets['adv_frame'],
+            press=widgets['adv_btn'], clear=widgets['gen_btn']))
+        widgets['adv_btn'].pack()
 
     def change(self, **kw):
         """
@@ -135,76 +136,22 @@ class BelowMenu(MyFrame):
         Cancel button command.
         """
         self.winfo_toplevel().destroy()
-        Globals.inserts = []
 
     def save_settings(self):
         """
         Get text from all text fields in advanced settings and save to
         cfg.json
         """
-        with open(os.path.join(cfg.DB_DIR, 'cfg.json'), 'r') as file:
-            data = json.load(file)
 
-        new_values = [i.get() for i in Globals.inserts]
-        new_values[1] = new_values[1].split(',')
-
-        if not self.values_check(new_values):
-            return
-
-        for key, ins in zip(data, new_values):
-            data[key] = ins
+        config['PHOTO_DIR'] = widgets['PHOTODIR_LBL']['text']
+        config['COLL_FOLDERS'] = [widgets['COLLFOLDERS_LBL']['text']]
+        config['RT_FOLDER'] = widgets['RTFOLDER_ENTRY'].get()
+        config['FILE_AGE'] = widgets['FILEAGE_ENTRY'].get()
 
         with open(os.path.join(cfg.DB_DIR, 'cfg.json'), 'w') as file:
-            json.dump(data, file, indent=4)
+            json.dump(config, file, indent=4)
 
-        Globals.inserts = []
         self.winfo_toplevel().destroy()
-
-    def values_check(self, values):
-        """
-        Check path exists, if not exists show error gui.
-        """
-        if not os.path.exists(values[0]):
-            self.error_gui(values[0])
-            return False
-
-        for i in values[1]:
-            if not os.path.exists(i):
-                self.error_gui(i)
-                return False
-
-        return True
-
-    def error_gui(self, path_check):
-        """
-        Error gui.
-        """
-        win = tkinter.Toplevel(bg=cfg.BGCOLOR, padx=15, pady=15)
-        win.withdraw()
-        win.resizable(0,0)
-
-        msg = MyLabel(
-            win, text = f'Такого пути не существует:\n{path_check}',
-            wraplength=350)
-        msg.pack()
-
-        def cmd():
-            win.grab_release()
-            win.destroy()
-            Globals.settings_win.grab_set()
-
-        close = MyButton(win, text='Закрыть')
-        close.cmd(lambda e: cmd())
-        close.pack(pady=(10, 0))
-
-        cfg.ROOT.update_idletasks()
-        x, y = cfg.ROOT.winfo_x(), cfg.ROOT.winfo_y()
-        xx = x + cfg.ROOT.winfo_width()//2-self.winfo_width()//2
-        yy = y + cfg.ROOT.winfo_height()//2-self.winfo_height()//2
-        win.geometry(f'+{xx}+{yy}')
-        win.deiconify()
-        win.protocol("WM_DELETE_WINDOW", cmd)
-        win.grab_set()
 
 
 class General(MyFrame):
@@ -214,7 +161,7 @@ class General(MyFrame):
     """
     def __init__(self, master):
         MyFrame.__init__(self, master, padx=15)
-        Globals.gen_frame = self
+        widgets['gen_frame'] = self
 
         title = MyLabel(self, text='Основные', font=('Arial', 22, 'bold'))
         title.pack(pady=10)
@@ -285,116 +232,102 @@ class Expert(tkmacosx.SFrame):
         tkmacosx.SFrame.__init__(self, master, padx=15)
         self.configure(bg=cfg.BGCOLOR, scrollbarwidth=7)
         self.configure(avoidmousewheel=(self))
-        Globals.adv_frame = self
+        widgets['adv_frame'] = self
 
         title = MyLabel(self, text='Дополнительно', font=('Arial', 22, 'bold'))
         title.pack(pady=10)
 
-        with open(os.path.join(cfg.DB_DIR, 'cfg.json'), 'r') as file:
-            data = json.load(file)
+        for descr, value, widget in zip(
+            [descriptions['PHOTO_DIR'], descriptions['COLL_FOLDERS']],
+            [config['PHOTO_DIR'], config['COLL_FOLDERS']],
+            ['PHOTODIR_LBL', 'COLLFOLDERS_LBL']):
 
-        descr_list = []
+            gallery_descr = MyLabel(
+                self, text=descr, justify=tkinter.LEFT, anchor=tkinter.W)
+            gallery_descr.pack(anchor=tkinter.W)
 
-        gallery_descr = MyLabel(
-            self, text=descriptions['PHOTO_DIR'], justify=tkinter.LEFT,
-            anchor=tkinter.W)
-        gallery_descr.pack(anchor=tkinter.W)
+            gallery_frame = MyFrame(self)
+            gallery_frame.pack(fill=tkinter.X)
 
-        gallery_frame = MyFrame(self)
-        gallery_frame.pack(fill=tkinter.X)
-
-        gallery_btn = MyButton(gallery_frame, text='Обзор')
-        gallery_btn.pack(side=tkinter.LEFT, anchor=tkinter.W, pady=(10, 0))
-        gallery_btn.configure(height=1, width=9)
-
-        gallery_lbl = MyLabel(
-            gallery_frame, text=data['PHOTO_DIR'], justify=tkinter.LEFT,
-            anchor=tkinter.W)
-        gallery_lbl.pack(
-            side=tkinter.LEFT, anchor=tkinter.W, 
-            padx=(10, 0), pady=(10, 0))
-
-        gallery_btn.cmd(
-            lambda e: self.select_path(gallery_lbl, 'PHOTO_DIR'))
-
-        sep = Separator(self, orient='horizontal')
-        sep.pack(padx=40, pady=20, fill=tkinter.X)
-
-        coll_descr = MyLabel(
-            self, text=descriptions['COLL_FOLDERS'], justify=tkinter.LEFT,
-            anchor=tkinter.W)
-        coll_descr.pack(anchor=tkinter.W)
-
-        coll_frame = MyFrame(self)
-        coll_frame.pack(fill=tkinter.X, pady=(0, 10))
-
-        coll_btn = MyButton(coll_frame, text='Обзор')
-        coll_btn.pack(side=tkinter.LEFT, anchor=tkinter.W, pady=(10, 0))
-        coll_btn.configure(height=1, width=9)
-
-        coll_lbl = MyLabel(
-            coll_frame, text=data['COLL_FOLDERS'][0], justify=tkinter.LEFT,
-            anchor=tkinter.W)
-        coll_lbl.pack(
-            side=tkinter.LEFT, anchor=tkinter.W, 
-            padx=(10, 0), pady=(10, 0))
-
-        coll_btn.cmd(
-            lambda e: self.select_path(gallery_lbl, 'COLL_FOLDERS'))
-
-        sep2 = Separator(self, orient='horizontal')
-        sep2.pack(padx=40, pady=20, fill=tkinter.X)
+            gallery_btn = MyButton(gallery_frame, text='Обзор')
+            gallery_btn.pack(side=tkinter.LEFT, anchor=tkinter.W, pady=(10, 0))
+            gallery_btn.configure(height=1, width=9)
 
 
-        # for _, value in data.items():
-        #     desrc_input = MyLabel(self, justify=tkinter.LEFT, wraplength=340)
-        #     desrc_input.pack(anchor=tkinter.W, pady=(0, 10))
-        #     descr_list.append(desrc_input)
+            widgets[widget] = MyLabel(
+                gallery_frame, text=value, justify=tkinter.LEFT,
+                anchor=tkinter.W)
+            widgets[widget].pack(
+                side=tkinter.LEFT, anchor=tkinter.W, 
+                padx=(10, 0), pady=(10, 0))
 
-        #     text_input = tkinter.Entry(self, bg=cfg.BGBUTTON, fg=cfg.FONTCOLOR,
-        #         insertbackground=cfg.FONTCOLOR, selectbackground=cfg.BGPRESSED,
-        #         highlightthickness=5, highlightbackground=cfg.BGBUTTON,
-        #         highlightcolor=cfg.BGBUTTON, bd=0, justify='center', width=35)
+            gallery_btn.cmd(
+                lambda e, x=widgets[widget]: self.select_path(x))
 
-        #     text_input.insert(0, value)
-        #     text_input.pack(pady=(0, 10))
-        #     Globals.inserts.append(text_input)
+            sep = Separator(self, orient='horizontal')
+            sep.pack(padx=40, pady=20, fill=tkinter.X)
 
-        #     frame_btns = MyFrame(self)
-        #     frame_btns.pack()
 
-        #     btn_copy = MyButton(frame_btns, text='Копировать')
-        #     btn_copy.configure(height=1, width=9)
-        #     btn_copy.cmd(
-        #         lambda e, x=text_input, y=btn_copy: self.copy_input(x, y))
-        #     btn_copy.pack(side=tkinter.LEFT, padx=(0, 10))
+        for descr, value, widget in zip(
+            [descriptions['RT_FOLDER'], descriptions['FILE_AGE']],
+            [config['RT_FOLDER'], config['FILE_AGE']],
+            ['RTFOLDER_ENTRY', 'FILEAGE_ENTRY']):
 
-        #     btn_paste = MyButton(frame_btns, text='Вставить')
-        #     btn_paste.configure(height=1, width=9)
-        #     btn_paste.cmd(
-        #         lambda e, x=text_input, y=btn_paste: self.paste_input(x, y))
-        #     btn_paste.pack(side=tkinter.RIGHT, padx=(0, 10))
+            lbl = MyLabel(
+                self, justify=tkinter.LEFT, wraplength=340, text=descr)
+            lbl.pack(anchor=tkinter.W, pady=(0, 10))
 
-        #     sep = Separator(self, orient='horizontal')
-        #     sep.pack(padx=40, pady=20, fill=tkinter.X)
+            widgets[widget] = tkinter.Entry(
+                self, bg=cfg.BGBUTTON, fg=cfg.FONTCOLOR,
+                insertbackground=cfg.FONTCOLOR, selectbackground=cfg.BGPRESSED,
+                highlightthickness=5, highlightbackground=cfg.BGBUTTON,
+                highlightcolor=cfg.BGBUTTON, bd=0, justify='center', width=35)
 
-        # for descr_input, descr in zip(descr_list, descriptions):
-        #     descr_input['text']=descr
+            widgets[widget].insert(0, value)
+            widgets[widget].pack(pady=(0, 10))
 
-        # restore_btn = MyButton(self, text='По умолчанию')
-        # restore_btn.configure(height=1, width=12)
-        # restore_btn.cmd(lambda e, x=restore_btn: self.restore(x))
-        # restore_btn.pack(pady=(0, 15))
+            frame_btns = MyFrame(self)
+            frame_btns.pack()
 
-    def select_path(self, lbl, globals_dir):
+            btn_copy = MyButton(frame_btns, text='Копировать')
+            btn_copy.configure(height=1, width=9)
+            btn_copy.cmd(
+                lambda e, x=widget, y=btn_copy: self.copy_input(x, y))
+            btn_copy.pack(side=tkinter.LEFT, padx=(0, 10))
+
+            btn_paste = MyButton(frame_btns, text='Вставить')
+            btn_paste.configure(height=1, width=9)
+            btn_paste.cmd(
+                lambda e, x=widget, y=btn_paste: self.paste_input(x))
+            btn_paste.pack(side=tkinter.RIGHT, padx=(0, 10))
+
+            sep = Separator(self, orient='horizontal')
+            sep.pack(padx=40, pady=20, fill=tkinter.X)
+
+        rest_frame = MyFrame(self)
+        rest_frame.pack(pady=(0, 15))
+
+        restore_btn = MyButton(rest_frame, text='По умолчанию')
+        restore_btn.configure(height=1, width=12)
+        restore_btn.cmd(lambda e, x=restore_btn: self.restore(x))
+        restore_btn.pack(side=tkinter.LEFT, padx=(0, 15))
+
+        reset_button = MyButton(rest_frame, text='Полный сброс')
+        reset_button.configure(height=1, width=12)
+        reset_button.cmd(lambda e: self.full_reset())
+        reset_button.pack(side=tkinter.LEFT)
+
+    def full_reset(self):
+        shutil.rmtree(cfg.DB_DIR)
+        os.execv(sys.executable, ['python'] + sys.argv)
+
+    def select_path(self, widget):
         path = filedialog.askdirectory()
 
         if len(path) == 0:
             return
 
-        lbl['text'] = path
-        print(path)
-        setattr(Globals, globals_dir, path)
+        widget['text'] = path
 
     def restore(self, btn):
         """
@@ -403,13 +336,23 @@ class Expert(tkmacosx.SFrame):
         * param `btn`: current tkinter button
         """
         btn.press()
-        data = cfg.defaults
-        with open(os.path.join(cfg.DB_DIR, 'cfg.json'), 'w') as file:
-            json.dump(data, file, indent=4)
 
-        for item, ins in zip(data.values(), Globals.inserts):
-            ins.delete(0, 'end')
-            ins.insert(0, item)
+        for widget, default, value in zip(
+            [widgets['PHOTODIR_LBL'], widgets['COLLFOLDERS_LBL']],
+            [cfg.defaults['PHOTO_DIR'], cfg.defaults['COLL_FOLDERS']],
+            ['PHOTO_DIR', 'COLL_FOLDERS']):
+
+            widget['text'] = default
+            config[value] = default
+
+        for widget, default, value in zip(
+            [widgets['RTFOLDER_ENTRY'], widgets['FILEAGE_ENTRY']],
+            [cfg.defaults['RT_FOLDER'], cfg.defaults['FILE_AGE']],
+            ['RT_FOLDER', 'FILE_AGE']):
+
+            widget.delete(0, 'end')
+            widget.insert(0, default)
+            config[value] = default
 
     def copy_input(self, ins, btn):
         """
