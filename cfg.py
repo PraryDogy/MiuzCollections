@@ -52,13 +52,13 @@ if not os.path.exists(DB_DIR):
 
 if os.path.exists(os.path.join(DB_DIR, 'cfg.json')):
     with open(os.path.join(DB_DIR, 'cfg.json'), 'r') as file:
-        data = json.load(file)
+        config = json.load(file)
 else:
     with open(os.path.join(DB_DIR, 'cfg.json'), 'w') as file:
         json.dump(defaults, file, indent=4,)
-        data = defaults
+        config = defaults
 
-PHOTO_DIR = data['PHOTO_DIR']
-COLL_FOLDERS = data['COLL_FOLDERS']
-RT_FOLDER = data['RT_FOLDER']
-FILE_AGE = data['FILE_AGE']
+PHOTO_DIR = config['PHOTO_DIR']
+COLL_FOLDERS = config['COLL_FOLDERS']
+RT_FOLDER = config['RT_FOLDER']
+FILE_AGE = config['FILE_AGE']

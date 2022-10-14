@@ -42,7 +42,7 @@ class BarMenu(tkinter.Menu):
         new_win.title('О программе')
 
         name = (
-            f'MiuzGallery {cfg.APP_VER}'
+            f'{cfg.APP_NAME} {cfg.APP_VER}'
             '\n\n'
             )
 

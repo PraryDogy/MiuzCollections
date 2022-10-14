@@ -20,8 +20,6 @@ from utils.utils import (MyButton, MyFrame, MyLabel, my_copy, my_paste,
 
 from .descriptions import descriptions
 
-with open(os.path.join(cfg.DB_DIR, 'cfg.json'), 'r') as file:
-    config = json.load(file)
 
 widgets = {
     'PHOTODIR_LBL': tkinter.Label,
@@ -63,7 +61,7 @@ class Settings(tkinter.Toplevel):
 
         General(scrollable)
         Expert(scrollable)
-        BelowMenu(self).pack(pady=(10,0))
+        BelowMenu(self).pack(pady=(10,0), padx=(0, 19))
 
         place_center(self)
         self.deiconify()
@@ -81,8 +79,8 @@ class General(MyFrame):
 
         txt1 = (
             'При запуске программа сканирует и обновляет фото всех коллекций '
-            f'за последние {cfg.FILE_AGE} дней. Нажмите "Обновить", чтобы '
-            'повторно запустить сканирование.'
+            f'за последние {cfg.FILE_AGE} дней. Нажмите "Обновить", чтобы'
+            ' повторно запустить сканирование.'
             )
 
         descr_updater = MyLabel(master)
@@ -115,8 +113,9 @@ class General(MyFrame):
         descr_scan.pack(pady=(0, 10), anchor=tkinter.W)
 
         scan_btn = MyButton(master, text='Полное сканирование')
+        scan_btn.configure(height=1, width=17)
         scan_btn.cmd(lambda e: self.full_scan())
-        scan_btn.pack(anchor='center')
+        scan_btn.pack()
 
         sep = Separator(master, orient='horizontal')
         sep.pack(padx=40, pady=(25, 20), fill=tkinter.X)
@@ -142,7 +141,7 @@ class Expert(tkmacosx.SFrame):
 
         for descr, value, widget in zip(
             [descriptions['PHOTO_DIR'], descriptions['COLL_FOLDERS']],
-            [config['PHOTO_DIR'], config['COLL_FOLDERS']],
+            [cfg.config['PHOTO_DIR'], cfg.config['COLL_FOLDERS']],
             ['PHOTODIR_LBL', 'COLLFOLDERS_LBL']):
 
             gallery_descr = MyLabel(
@@ -150,22 +149,16 @@ class Expert(tkmacosx.SFrame):
                 wraplength=widgets['text_length'])
             gallery_descr.pack(anchor=tkinter.W)
 
-            gallery_frame = MyFrame(master)
-            gallery_frame.pack(fill=tkinter.X)
-
-            gallery_btn = MyButton(gallery_frame, text='Обзор')
-            gallery_btn.pack(
-                side=tkinter.LEFT, anchor=tkinter.W,
-                pady=(5, 0), padx=(5, 0))
-            gallery_btn.configure(height=1, width=9)
-
-
             widgets[widget] = MyLabel(
-                gallery_frame, text=value, justify=tkinter.LEFT,
+                master, text=value, justify=tkinter.LEFT,
                 wraplength=widgets['text_length'])
             widgets[widget].pack(
-                side=tkinter.LEFT, anchor=tkinter.W, 
                 padx=(10, 0), pady=(5, 0))
+
+            gallery_btn = MyButton(master, text='Обзор')
+            gallery_btn.pack(
+                pady=(5, 0), padx=(5, 0))
+            gallery_btn.configure(height=1, width=9)
 
             gallery_btn.cmd(
                 lambda e, x=widgets[widget]: self.select_path(x))
@@ -176,7 +169,7 @@ class Expert(tkmacosx.SFrame):
 
         for descr, value, widget in zip(
             [descriptions['RT_FOLDER'], descriptions['FILE_AGE']],
-            [config['RT_FOLDER'], config['FILE_AGE']],
+            [cfg.config['RT_FOLDER'], cfg.config['FILE_AGE']],
             ['RTFOLDER_ENTRY', 'FILEAGE_ENTRY']):
 
             lbl = MyLabel(
@@ -261,7 +254,7 @@ class Expert(tkmacosx.SFrame):
             ['PHOTO_DIR', 'COLL_FOLDERS']):
 
             widget['text'] = default
-            config[value] = default
+            cfg.config[value] = default
 
         for widget, default, value in zip(
             [widgets['RTFOLDER_ENTRY'], widgets['FILEAGE_ENTRY']],
@@ -270,7 +263,7 @@ class Expert(tkmacosx.SFrame):
 
             widget.delete(0, 'end')
             widget.insert(0, default)
-            config[value] = default
+            cfg.config[value] = default
 
     def copy_input(self, ins, btn):
         """
@@ -320,12 +313,12 @@ class BelowMenu(MyFrame):
         cfg.json
         """
 
-        config['PHOTO_DIR'] = widgets['PHOTODIR_LBL']['text']
-        config['COLL_FOLDERS'] = [widgets['COLLFOLDERS_LBL']['text']]
-        config['RT_FOLDER'] = widgets['RTFOLDER_ENTRY'].get()
-        config['FILE_AGE'] = widgets['FILEAGE_ENTRY'].get()
+        cfg.config['PHOTO_DIR'] = widgets['PHOTODIR_LBL']['text']
+        cfg.config['COLL_FOLDERS'] = [widgets['COLLFOLDERS_LBL']['text']]
+        cfg.config['RT_FOLDER'] = widgets['RTFOLDER_ENTRY'].get()
+        cfg.config['FILE_AGE'] = widgets['FILEAGE_ENTRY'].get()
 
         with open(os.path.join(cfg.DB_DIR, 'cfg.json'), 'w') as file:
-            json.dump(config, file, indent=4)
+            json.dump(cfg.config, file, indent=4)
 
         self.winfo_toplevel().destroy()
