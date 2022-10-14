@@ -60,6 +60,7 @@ class ImagesCompare(tkinter.Toplevel):
         self.protocol("WM_DELETE_WINDOW", lambda: on_closing(self))
         self.bind('<Command-w>', lambda e: on_closing(self))
         self.bind('<Command-q>', lambda e: quit())
+        self.bind('<Escape>', lambda e: on_closing(self))
 
         self.configure(bg=cfg.BGCOLOR, padx=15, pady=15)
         self.resizable(0,0)

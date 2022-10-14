@@ -55,6 +55,7 @@ class ImagePreview(tkinter.Toplevel):
 
         self.protocol("WM_DELETE_WINDOW", lambda: on_closing(self))
         self.bind('<Command-w>', lambda e: on_closing(self))
+        self.bind('<Escape>', lambda e: on_closing(self))
         self.bind('<Command-q>', lambda e: quit())
 
         self.configure(bg=cfg.BGCOLOR, padx=15, pady=15)

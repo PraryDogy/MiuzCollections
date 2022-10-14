@@ -24,15 +24,11 @@ with open(os.path.join(cfg.DB_DIR, 'cfg.json'), 'r') as file:
     config = json.load(file)
 
 widgets = {
-    'settings_win': tkinter.Toplevel,
-    'gen_frame': tkinter.Frame,
-    'adv_frame': tkinter.Frame,
-    'gen_btn': tkinter.Button,
-    'adv_btn': tkinter.Button,
     'PHOTODIR_LBL': tkinter.Label,
     'COLLFOLDERS_LBL': tkinter.Label,
     'RTFOLDER_ENTRY': tkinter.Entry,
     'FILEAGE_ENTRY':tkinter.Entry,
+    'text_length': 1,
     }
 
 
@@ -43,115 +39,35 @@ class Settings(tkinter.Toplevel):
 
     def __init__(self):
         tkinter.Toplevel.__init__(self, cfg.ROOT, bg=cfg.BGCOLOR)
-        widgets['settings_win'] = self
         cfg.ROOT.eval(f'tk::PlaceWindow {self} center')
 
         self.protocol("WM_DELETE_WINDOW", self.destroy)
         self.bind('<Command-w>', lambda e: self.destroy())
+        self.bind('<Escape>', lambda e: self.destroy())
         self.bind('<Command-q>', lambda e: quit())
 
         self.withdraw()
-        # self.resizable(0,0)
+        self.resizable(0,0)
         self.title('Настройки')
-        self.geometry('570x650')
-        self.configure(padx=10, pady=10)
+        self.configure(padx=20, pady=10)
+        self.geometry(
+            f'{int(cfg.ROOT.winfo_width()*0.5)}x'
+            f'{int(cfg.ROOT.winfo_height()*0.8)}')
 
-        frame_up = MyFrame(self)
-        frame_up.pack(fill=tkinter.BOTH, expand=True)
+        cfg.ROOT.update_idletasks()
+        widgets['text_length'] = int(self.winfo_width()*0.9)
 
-        frame_bott = MyFrame(self)
-        frame_bott.pack()
+        scrollable = tkmacosx.SFrame(
+            self, bg=cfg.BGCOLOR, scrollbarwidth=7)
+        scrollable.pack(fill=tkinter.BOTH, expand=True)
 
-        LeftMenu(frame_up).pack(side=tkinter.LEFT, padx=(0, 10))
-
-        General(frame_up).pack(fill=tkinter.BOTH, expand=True)
-        Expert(frame_up)
-
-        BelowMenu(frame_bott).pack(pady=(10,0))
+        General(scrollable)
+        Expert(scrollable)
+        BelowMenu(self).pack(pady=(10,0))
 
         place_center(self)
-
         self.deiconify()
         self.grab_set()
-
-
-class LeftMenu(MyFrame):
-    """
-    Menu with buttons "General settins" and "Advanced settings".
-    param `master`: tkinter frame.
-    """
-    def __init__(self, master):
-        MyFrame.__init__(self, master)
-        widgets['gen_btn'] = MyButton(self, text='Основные')
-        widgets['gen_btn'].configure(bg=cfg.BGPRESSED)
-
-        widgets['gen_btn'].cmd(lambda e: self.change(
-            kill=widgets['adv_frame'], pack=widgets['gen_frame'],
-            press=widgets['gen_btn'], clear=widgets['adv_btn']))
-        widgets['gen_btn'].pack()
-
-        widgets['adv_btn'] = MyButton(self, text = 'Дополнительно')
-
-        widgets['adv_btn'].cmd(lambda e: self.change(
-            kill=widgets['gen_frame'], pack=widgets['adv_frame'],
-            press=widgets['adv_btn'], clear=widgets['gen_btn']))
-        widgets['adv_btn'].pack()
-
-    def change(self, **kw):
-        """
-        Destroys frame, creates new one.
-        Press button with created frame and clear button with destroyed frame.
-
-        * params: `kill`, `pack`, `press`, `clear`
-        * param `kill`: tkinter frame for destroy
-        * param `pack`: tkinter frame for pack: fill both, expand is True
-        * param `press`: changes tkinter button bg to cfg.BGPRESSED
-        * param `clear`: changes tkinter button bg to cfg.BGBUTTON
-        """
-        kw['kill'].pack_forget()
-        kw['pack'].pack(fill=tkinter.BOTH, expand=True)
-
-        kw['press'].configure(bg=cfg.BGPRESSED)
-        kw['clear'].configure(bg=cfg.BGBUTTON)
-
-
-class BelowMenu(MyFrame):
-    """
-    Creates tkinter frame with save settings button and close button.
-    * param `master`: tkinter frame
-    """
-    def __init__(self, master):
-        MyFrame.__init__(self, master)
-
-        save_btn = MyButton(self, text='Сохранить')
-        save_btn.cmd(lambda e: self.save_settings())
-        save_btn.pack(side=tkinter.LEFT, padx=10)
-
-        cancel_btn = MyButton(self, text='Отмена')
-        cancel_btn.cmd(lambda e: self.cancel())
-        cancel_btn.pack(side=tkinter.LEFT)
-
-    def cancel(self):
-        """
-        Cancel button command.
-        """
-        self.winfo_toplevel().destroy()
-
-    def save_settings(self):
-        """
-        Get text from all text fields in advanced settings and save to
-        cfg.json
-        """
-
-        config['PHOTO_DIR'] = widgets['PHOTODIR_LBL']['text']
-        config['COLL_FOLDERS'] = [widgets['COLLFOLDERS_LBL']['text']]
-        config['RT_FOLDER'] = widgets['RTFOLDER_ENTRY'].get()
-        config['FILE_AGE'] = widgets['FILEAGE_ENTRY'].get()
-
-        with open(os.path.join(cfg.DB_DIR, 'cfg.json'), 'w') as file:
-            json.dump(config, file, indent=4)
-
-        self.winfo_toplevel().destroy()
 
 
 class General(MyFrame):
@@ -160,20 +76,19 @@ class General(MyFrame):
     * param `master`: tkinter frame
     """
     def __init__(self, master):
-        MyFrame.__init__(self, master, padx=15)
-        widgets['gen_frame'] = self
-
-        title = MyLabel(self, text='Основные', font=('Arial', 22, 'bold'))
+        title = MyLabel(master, text='Основные', font=('Arial', 22, 'bold'))
         title.pack(pady=10)
 
         txt1 = (
-            'При запуске программа сканирует и обновляет фото'
-            f'\nвсех коллекций за последние {cfg.FILE_AGE} дней.'
-            '\nНажмите "Обновить", чтобы повторно запустить сканирование.')
+            'При запуске программа сканирует и обновляет фото всех коллекций '
+            f'за последние {cfg.FILE_AGE} дней. Нажмите "Обновить", чтобы '
+            'повторно запустить сканирование.'
+            )
 
-        descr_updater = MyLabel(self)
+        descr_updater = MyLabel(master)
         descr_updater.configure(
-            text=txt1, justify=tkinter.LEFT, wraplength=350)
+            text=txt1, justify=tkinter.LEFT,
+            wraplength=widgets['text_length'])
         descr_updater.pack(pady=(0, 10), anchor=tkinter.W)
 
         img_path = os.path.join(os.path.dirname(__file__), 'upd.png')
@@ -181,39 +96,30 @@ class General(MyFrame):
         img_copy= img_src.copy()
         img_tk = ImageTk.PhotoImage(img_copy)
 
-        img_lbl = MyLabel(self)
+        img_lbl = MyLabel(master)
         img_lbl.configure(image=img_tk)
         img_lbl.pack()
         img_lbl.image_names = img_tk
 
-        sep = Separator(self, orient='horizontal')
+        sep = Separator(master, orient='horizontal')
         sep.pack(padx=40, pady=20, fill=tkinter.X)
 
         txt2 = (
-            'Нажмите "Полное сканирование", чтобы обновить'
-            '\nфотографии всех коллекций за все время c 2018 года.')
-        descr_scan = MyLabel(self)
+            'Нажмите "Полное сканирование", чтобы обновить фотографии всех '
+            'коллекций за все время c 2018 года.'
+            )
+        descr_scan = MyLabel(master)
         descr_scan.configure(
-            text=txt2, justify=tkinter.LEFT, wraplength=350)
+            text=txt2, justify=tkinter.LEFT,
+            wraplength=widgets['text_length'])
         descr_scan.pack(pady=(0, 10), anchor=tkinter.W)
 
-        scan_btn = MyButton(self, text='Полное сканирование')
+        scan_btn = MyButton(master, text='Полное сканирование')
         scan_btn.cmd(lambda e: self.full_scan())
         scan_btn.pack(anchor='center')
 
-        sep = Separator(self, orient='horizontal')
+        sep = Separator(master, orient='horizontal')
         sep.pack(padx=40, pady=(25, 20), fill=tkinter.X)
-
-        author_txt = (
-            f'{cfg.APP_NAME} {cfg.APP_VER}'
-            '\nCreated by Evgeny Loshkarev'
-            '\nCopyright © 2022 MIUZ Diamonds.'
-            '\nAll rights reserved.')
-
-        author_lbl = MyLabel(self)
-        author_lbl.configure(
-            text=author_txt, justify=tkinter.LEFT)
-        author_lbl.pack(anchor=tkinter.W)
 
     def full_scan(self):
         """
@@ -229,12 +135,9 @@ class Expert(tkmacosx.SFrame):
     Tkinter frame with advanced app settings.
     """
     def __init__(self, master):
-        tkmacosx.SFrame.__init__(self, master, padx=15)
-        self.configure(bg=cfg.BGCOLOR, scrollbarwidth=7)
-        self.configure(avoidmousewheel=(self))
-        widgets['adv_frame'] = self
 
-        title = MyLabel(self, text='Дополнительно', font=('Arial', 22, 'bold'))
+        title = MyLabel(
+            master, text='Дополнительно',font=('Arial', 22, 'bold'))
         title.pack(pady=10)
 
         for descr, value, widget in zip(
@@ -243,28 +146,31 @@ class Expert(tkmacosx.SFrame):
             ['PHOTODIR_LBL', 'COLLFOLDERS_LBL']):
 
             gallery_descr = MyLabel(
-                self, text=descr, justify=tkinter.LEFT, anchor=tkinter.W)
+                master, text=descr, justify=tkinter.LEFT,
+                wraplength=widgets['text_length'])
             gallery_descr.pack(anchor=tkinter.W)
 
-            gallery_frame = MyFrame(self)
+            gallery_frame = MyFrame(master)
             gallery_frame.pack(fill=tkinter.X)
 
             gallery_btn = MyButton(gallery_frame, text='Обзор')
-            gallery_btn.pack(side=tkinter.LEFT, anchor=tkinter.W, pady=(10, 0))
+            gallery_btn.pack(
+                side=tkinter.LEFT, anchor=tkinter.W,
+                pady=(5, 0), padx=(5, 0))
             gallery_btn.configure(height=1, width=9)
 
 
             widgets[widget] = MyLabel(
                 gallery_frame, text=value, justify=tkinter.LEFT,
-                anchor=tkinter.W)
+                wraplength=widgets['text_length'])
             widgets[widget].pack(
                 side=tkinter.LEFT, anchor=tkinter.W, 
-                padx=(10, 0), pady=(10, 0))
+                padx=(10, 0), pady=(5, 0))
 
             gallery_btn.cmd(
                 lambda e, x=widgets[widget]: self.select_path(x))
 
-            sep = Separator(self, orient='horizontal')
+            sep = Separator(master, orient='horizontal')
             sep.pack(padx=40, pady=20, fill=tkinter.X)
 
 
@@ -274,11 +180,12 @@ class Expert(tkmacosx.SFrame):
             ['RTFOLDER_ENTRY', 'FILEAGE_ENTRY']):
 
             lbl = MyLabel(
-                self, justify=tkinter.LEFT, wraplength=340, text=descr)
+                master, justify=tkinter.LEFT,
+                wraplength=widgets['text_length'], text=descr)
             lbl.pack(anchor=tkinter.W, pady=(0, 10))
 
             widgets[widget] = tkinter.Entry(
-                self, bg=cfg.BGBUTTON, fg=cfg.FONTCOLOR,
+                master, bg=cfg.BGBUTTON, fg=cfg.FONTCOLOR,
                 insertbackground=cfg.FONTCOLOR, selectbackground=cfg.BGPRESSED,
                 highlightthickness=5, highlightbackground=cfg.BGBUTTON,
                 highlightcolor=cfg.BGBUTTON, bd=0, justify='center', width=35)
@@ -286,7 +193,7 @@ class Expert(tkmacosx.SFrame):
             widgets[widget].insert(0, value)
             widgets[widget].pack(pady=(0, 10))
 
-            frame_btns = MyFrame(self)
+            frame_btns = MyFrame(master)
             frame_btns.pack()
 
             btn_copy = MyButton(frame_btns, text='Копировать')
@@ -301,10 +208,10 @@ class Expert(tkmacosx.SFrame):
                 lambda e, x=widget, y=btn_paste: self.paste_input(x))
             btn_paste.pack(side=tkinter.RIGHT, padx=(0, 10))
 
-            sep = Separator(self, orient='horizontal')
+            sep = Separator(master, orient='horizontal')
             sep.pack(padx=40, pady=20, fill=tkinter.X)
 
-        rest_frame = MyFrame(self)
+        rest_frame = MyFrame(master)
         rest_frame.pack(pady=(0, 15))
 
         restore_btn = MyButton(rest_frame, text='По умолчанию')
@@ -316,6 +223,17 @@ class Expert(tkmacosx.SFrame):
         reset_button.configure(height=1, width=12)
         reset_button.cmd(lambda e: self.full_reset())
         reset_button.pack(side=tkinter.LEFT)
+
+        author_txt = (
+            f'{cfg.APP_NAME} {cfg.APP_VER}'
+            '\nCreated by Evgeny Loshkarev'
+            '\nCopyright © 2022 MIUZ Diamonds.'
+            '\nAll rights reserved.')
+
+        author_lbl = MyLabel(master)
+        author_lbl.configure(
+            text=author_txt, justify=tkinter.LEFT)
+        author_lbl.pack(anchor=tkinter.W, pady=(0, 10))
 
     def full_reset(self):
         shutil.rmtree(cfg.DB_DIR)
@@ -372,3 +290,42 @@ class Expert(tkmacosx.SFrame):
         btn.press()
         ins.delete(0, 'end')
         ins.insert(0, my_paste())
+
+
+class BelowMenu(MyFrame):
+    """
+    Creates tkinter frame with save settings button and close button.
+    * param `master`: tkinter frame
+    """
+    def __init__(self, master):
+        MyFrame.__init__(self, master)
+
+        save_btn = MyButton(self, text='Сохранить')
+        save_btn.cmd(lambda e: self.save_settings())
+        save_btn.pack(side=tkinter.LEFT, padx=10)
+
+        cancel_btn = MyButton(self, text='Отмена')
+        cancel_btn.cmd(lambda e: self.cancel())
+        cancel_btn.pack(side=tkinter.LEFT)
+
+    def cancel(self):
+        """
+        Cancel button command.
+        """
+        self.winfo_toplevel().destroy()
+
+    def save_settings(self):
+        """
+        Get text from all text fields in advanced settings and save to
+        cfg.json
+        """
+
+        config['PHOTO_DIR'] = widgets['PHOTODIR_LBL']['text']
+        config['COLL_FOLDERS'] = [widgets['COLLFOLDERS_LBL']['text']]
+        config['RT_FOLDER'] = widgets['RTFOLDER_ENTRY'].get()
+        config['FILE_AGE'] = widgets['FILEAGE_ENTRY'].get()
+
+        with open(os.path.join(cfg.DB_DIR, 'cfg.json'), 'w') as file:
+            json.dump(config, file, indent=4)
+
+        self.winfo_toplevel().destroy()
