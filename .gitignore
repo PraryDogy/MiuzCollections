@@ -6,3 +6,4 @@ SamplePhotos/
 dist/
 build/
 __Dist/
+database.db
