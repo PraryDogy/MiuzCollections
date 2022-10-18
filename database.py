@@ -55,31 +55,3 @@ class Config(Dbase.base):
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
     name = sqlalchemy.Column(sqlalchemy.Text)
     value = sqlalchemy.Column(sqlalchemy.Text)
-
-
-class Utils:
-    """
-    Methods for database.
-
-    *method create: removes all tables, creates new,
-    *method fill_config: fills "Config" table with default values
-    """
-    def create(self):
-        """
-        Removes all tables and create tables: Config, Thumbs
-        """
-
-        Dbase.base.metadata.drop_all(Dbase.conn)
-        Dbase.base.metadata.create_all(Dbase.conn)
-
-    def fill_config(self):
-        """Fill Config table with necessary values."""
-
-        cfg_values = [
-            {'name':'currColl', 'value': 'last'},
-            {'name':'size', 'value': '150'},
-            {'name':'typeScan', 'value': 'full'},
-        ]
-
-        insert = sqlalchemy.insert(Config).values(cfg_values)
-        Dbase.conn.execute(insert)
