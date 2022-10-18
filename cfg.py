@@ -4,18 +4,16 @@ Global variables & settings.
 
 import json
 import os
+import shutil
 import tkinter
-
 
 # app info
 APP_NAME = 'MiuzGallery'
 APP_VER = '2.9.9'
 
 # database info
-DB_VER = '2.6.2'
 DB_DIR = os.path.join(
     os.path.expanduser('~'), 'Library', 'Application Support', 'Miuz Gallery')
-DB_NAME = f'database{DB_VER}.db'
 
 FONTCOLOR = "#E2E2E2"
 BGCOLOR = "#222222"
@@ -66,6 +64,13 @@ def create_json():
 
 if not os.path.exists(DB_DIR):
     os.mkdir(DB_DIR)
+
+if not os.path.exists(os.path.join(DB_DIR, 'database.db')):
+    shutil.copyfile(
+        os.path.join(os.path.dirname(__file__), 'database.db'),
+        os.path.join(DB_DIR, 'database.db'),
+        )
+
 
 if os.path.exists(os.path.join(DB_DIR, 'cfg.json')):
     with open(os.path.join(DB_DIR, 'cfg.json'), 'r') as file:
