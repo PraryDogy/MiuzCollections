@@ -9,7 +9,7 @@ import tkinter
 
 # app info
 APP_NAME = 'MiuzGallery'
-APP_VER = '2.9.9'
+APP_VER = '3.0.1'
 
 # database info
 DB_DIR = os.path.join(
