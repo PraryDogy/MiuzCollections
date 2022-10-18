@@ -21,56 +21,53 @@ from utils.utils import MyButton, MyFrame, MyLabel
 from .image_viewer import ImagePreview
 
 
-class Globals:
+def get_curr_coll():
     """
-    Variables for current module
+    Returns name of selected collection.
+    Loads from Database > Config > currColl > value.
     """
-    # bind reset function for thumbnails frame: Images().Reset()
-    images_reset = object
+    return Dbase.conn.execute(sqlalchemy.select(Config.value).where(
+        Config.name=='currColl')).first()[0]
 
-    def get_curr_coll(self):
-        """
-        Returns name of selected collection.
-        Loads from Database > Config > currColl > value.
-        """
-        return Dbase.conn.execute(sqlalchemy.select(Config.value).where(
-            Config.name=='currColl')).first()[0]
 
-    def get_size(self):
-        """
-        Returns int selected thumbnails size.
-        Loads from Database > Config > size > value
-        """
-        return int(Dbase.conn.execute(sqlalchemy.select(Config.value).where(
-            Config.name=='size')).first()[0])
+def get_size():
+    """
+    Returns int selected thumbnails size.
+    Loads from Database > Config > size > value
+    """
+    return int(Dbase.conn.execute(sqlalchemy.select(Config.value).where(
+        Config.name=='size')).first()[0])
 
-    def upd_curr_coll(self, coll):
-        """
-        Updates Database > Config > currColl > value
-        * param `coll`: str selected collection name
-        """
-        Dbase.conn.execute(sqlalchemy.update(Config).where(
-            Config.name=='currColl').values(value=coll))
 
-    def load_last(self, img_size):
-        """
-        Returns tuples list (image, image source, image modified time).
-        * param `img_size`: Thumbs.__dict__['img'+ `Globals().get_size()`]
-        """
-        return Dbase.conn.execute(sqlalchemy.select(
-            img_size, Thumbs.src, Thumbs.modified).order_by(
-                        -Thumbs.modified).limit(60)).fetchall()
+def upd_curr_coll(coll):
+    """
+    Updates Database > Config > currColl > value
+    * param `coll`: str selected collection name
+    """
+    Dbase.conn.execute(sqlalchemy.update(Config).where(
+        Config.name=='currColl').values(value=coll))
 
-    def load_curr_coll(self, img_size, curr_coll):
-        """
-        Returns tuples list (image, image source, image modified time).
-        * param `img_size`: Thumbs.__dict__['img'+ `Globals().get_size()`]
-        * param `curr_coll`: from `Globals().get_curr_coll()`
-        """
-        return Dbase.conn.execute(sqlalchemy.select(
-            img_size, Thumbs.src, Thumbs.modified).where(
-                Thumbs.collection==curr_coll).order_by(
-                    -Thumbs.modified)).fetchall()
+
+def load_last(img_size):
+    """
+    Returns tuples list (image, image source, image modified time).
+    * param `img_size`: Thumbs.__dict__['img'+ `Globals().get_size()`]
+    """
+    return Dbase.conn.execute(sqlalchemy.select(
+        img_size, Thumbs.src, Thumbs.modified).order_by(
+                    -Thumbs.modified).limit(60)).fetchall()
+
+
+def load_curr_coll(img_size, curr_coll):
+    """
+    Returns tuples list (image, image source, image modified time).
+    * param `img_size`: Thumbs.__dict__['img'+ `Globals().get_size()`]
+    * param `curr_coll`: from `Globals().get_curr_coll()`
+    """
+    return Dbase.conn.execute(sqlalchemy.select(
+        img_size, Thumbs.src, Thumbs.modified).where(
+            Thumbs.collection==curr_coll).order_by(
+                -Thumbs.modified)).fetchall()
 
 
 class Gallery(MyFrame):
@@ -80,24 +77,13 @@ class Gallery(MyFrame):
     """
     def __init__(self, master):
         MyFrame.__init__(self, master)
-        MenuFrame(self).pack(
+        MenuButtons(self).pack(
             pady=(0, 0), padx=(0, 15), side=tkinter.LEFT, fill=tkinter.Y)
         ImagesFrame(self).pack(
             expand=True, fill=tkinter.BOTH, side=tkinter.RIGHT)
 
 
-class MenuFrame(tkmacosx.SFrame):
-    """
-    Creates tkinter scrollable Frame for menu.
-    * param `master`: tkinter frame
-    """
-    def __init__(self, master):
-        tkmacosx.SFrame.__init__(
-            self, master, bg=cfg.BGCOLOR, scrollbarwidth=7, width=150)
-
-        MenuButtons(self)
-
-class MenuButtons(object):
+class MenuButtons(tkmacosx.SFrame):
     """
     Creates tkinter buttons with vertical pack.
     Buttons based on list of collections.
@@ -105,18 +91,21 @@ class MenuButtons(object):
     * param `master`: tkinter frame
     """
     def __init__(self, master):
+        tkmacosx.SFrame.__init__(
+            self, master, bg=cfg.BGCOLOR, scrollbarwidth=7, width=150)
+
         img_src = Image.open(
             os.path.join(os.path.dirname(__file__), 'logo.png'))
 
         img_tk= ImageTk.PhotoImage(img_src)
 
-        img_lbl = MyLabel(master)
+        img_lbl = MyLabel(self)
         img_lbl.configure(image=img_tk)
         img_lbl.pack(pady=(0, 0))
         img_lbl.image_names = img_tk
 
         company_name = MyLabel(
-            master, text='Коллекции', font=('Arial', 18, 'bold'))
+            self, text='Коллекции', font=('Arial', 18, 'bold'))
         company_name.pack(pady=(15, 20))
 
         __res = Dbase.conn.execute(
@@ -131,11 +120,11 @@ class MenuButtons(object):
             for_btns.append((name_btn[:13], coll_item))
         for_btns.sort()
 
-        curr_coll = Globals().get_curr_coll()
+        curr_coll = get_curr_coll()
         btns = []
         for name_btn, name_coll in for_btns:
 
-            btn = MyButton(master, text=name_btn)
+            btn = MyButton(self, text=name_btn)
             btn.configure(height=1, width=12 ,pady=1)
             btn.pack(pady=(0, 10))
             btns.append(btn)
@@ -146,7 +135,7 @@ class MenuButtons(object):
             btn.cmd(lambda e, coll=name_coll, btn=btn, btns=btns:
                     self.__open_coll(coll, btn, btns))
 
-        last_imgs = MyButton(master, text='Последние')
+        last_imgs = MyButton(self, text='Последние')
         last_imgs.configure(height=1, width=12)
         last_imgs.cmd(lambda e: self.__open_coll('last', last_imgs, btns))
         last_imgs.pack(pady=(0, 10))
@@ -176,8 +165,8 @@ class MenuButtons(object):
             btn_item['bg'] = cfg.BGBUTTON
         btn['bg'] = cfg.BGPRESSED
 
-        Globals().upd_curr_coll(coll)
-        Globals.images_reset()
+        upd_curr_coll(coll)
+        cfg.IMAGES_RESET()
 
 
 class ImagesFrame(tkmacosx.SFrame):
@@ -187,16 +176,12 @@ class ImagesFrame(tkmacosx.SFrame):
     """
     def __init__(self, master):
         self.master = master
-        Globals.images_reset = self.reset
+        cfg.IMAGES_RESET = self.reset
 
         tkmacosx.SFrame.__init__(
             self, master, bg=cfg.BGCOLOR, scrollbarwidth=7)
 
         ImagesThumbs(self)
-
-        self.update_idletasks()
-        w = self.winfo_reqwidth()
-        self.configure(width=w*1.03)
 
     def reset(self):
         """
@@ -215,18 +200,20 @@ class ImagesThumbs(object):
     * param `master`: tkmacosx scrollable frame.
     """
     def __init__(self, master):
-        clmns = Dbase.conn.execute(sqlalchemy.select(
-                Config.value).where(Config.name=='clmns')).first()[0]
-        clmns = int(clmns)
+        w = int(cfg.config["ROOT_SIZE"].split('x')[0])
+        clmns = ((w)//158)-1
 
-        img_size = Thumbs.__dict__[f'img{Globals().get_size()}']
-        curr_coll = Globals().get_curr_coll()
+        print(w)
+        print(clmns)
+
+        img_size = Thumbs.__dict__[f'img{get_size()}']
+        curr_coll = get_curr_coll()
 
         if curr_coll == 'last':
-            res = Globals().load_last(img_size)
+            res = load_last(img_size)
 
         else:
-            res = Globals().load_curr_coll(img_size, curr_coll)
+            res = load_curr_coll(img_size, curr_coll)
 
         title = MyLabel(
             master, text=curr_coll, font=('Arial', 45, 'bold'))
@@ -293,7 +280,7 @@ class ImagesThumbs(object):
 
         if len(thumbs) < clmns and len(thumbs) != 0:
             year = thumbs[-1][-1]
-            size = Globals().get_size()
+            size = get_size()
 
             for _ in range(0, clmns-len(thumbs)):
                 new = Image.new('RGB', (size, size), cfg.BGCOLOR)

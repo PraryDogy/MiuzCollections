@@ -23,8 +23,12 @@ def save_size():
     cfg.ROOT.update_idletasks()
     w = cfg.ROOT.winfo_width()
     h = cfg.ROOT.winfo_height()
+    x = cfg.ROOT.winfo_x()
+    y = cfg.ROOT.winfo_y()
+
     cfg.config['ROOT_SIZE'] = f'{w}x{h}'
-    
+    cfg.config['ROOT_POS'] = f'+{x}+{y}'
+
     with open(os.path.join(cfg.DB_DIR, 'cfg.json'), 'w') as file:
         json.dump(cfg.config, file, indent=4,)
 

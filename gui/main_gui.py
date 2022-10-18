@@ -23,7 +23,7 @@ class MainGui:
         cfg.ROOT.configure(bg=cfg.BGCOLOR, padx=15, pady=0)
 
         cfg.ROOT.createcommand(
-            'tk::mac::ReopenApplication', lambda e: cfg.ROOT.deiconify())
+            'tk::mac::ReopenApplication', lambda: cfg.ROOT.deiconify())
         cfg.ROOT.createcommand("tk::mac::Quit" , self.on_exit)
         cfg.ROOT.bind('<Command-w>', lambda e: cfg.ROOT.iconify())
         cfg.ROOT.protocol("WM_DELETE_WINDOW", self.on_exit)
@@ -44,7 +44,7 @@ class MainGui:
         w = cfg.ROOT.winfo_width()
         h = int(cfg.ROOT.winfo_screenheight()*0.8)
 
-        cfg.ROOT.geometry(f'{cfg.config["ROOT_SIZE"]}+{x}+{y}')
+        cfg.ROOT.geometry(f'{cfg.config["ROOT_SIZE"]}{cfg.config["ROOT_POS"]}')
 
     def on_exit(self):
         cfg.FLAG = False

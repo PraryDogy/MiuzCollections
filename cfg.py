@@ -6,6 +6,7 @@ import json
 import os
 import tkinter
 
+
 # app info
 APP_NAME = 'MiuzGallery'
 APP_VER = '2.9.9'
@@ -26,6 +27,7 @@ ROOT = tkinter.Tk()
 ROOT.withdraw()
 LIVE_LBL = tkinter.Label
 FLAG = True
+IMAGES_RESET = object
 
 IMAGES_COMPARE = set()
 IMAGES_INFO = []
@@ -37,6 +39,7 @@ YADISK_DIR = os.path.join(os.sep, 'miuzgall')
 
 
 def default_size():
+    ROOT.update_idletasks()
     if ROOT.winfo_screenwidth() > 150*8:
         return f'{150*8}x{int(ROOT.winfo_screenheight()*0.8)}'
     else:
@@ -50,11 +53,11 @@ def defaults():
         'PHOTO_DIR': os.path.join(
             os.sep, 'Volumes', 'Shares', 'Marketing', 'Photo'),
         'COLL_FOLDER': os.path.join(
-            os.sep, 'Volumes', 'Shares', 'Marketing', 'Photo', 
-            '_Collections'),
+            os.sep, 'Volumes', 'Shares', 'Marketing', 'Photo', '_Collections'),
         'RT_FOLDER': 'Retouch',
         'FILE_AGE': 60,
-        'ROOT_SIZE': default_size()
+        'ROOT_SIZE': default_size(),
+        'ROOT_POS': '+0+0'
         }
 
 
@@ -71,7 +74,6 @@ if not os.path.exists(DB_DIR):
 if os.path.exists(os.path.join(DB_DIR, 'cfg.json')):
     with open(os.path.join(DB_DIR, 'cfg.json'), 'r') as file:
         config = json.load(file)
-
 else:
     config = create_json()
 
