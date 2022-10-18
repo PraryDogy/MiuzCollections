@@ -168,9 +168,8 @@ class MenuButtons(object):
         """
 
         if btn['bg'] == cfg.BGPRESSED:
-            for i in cfg.COLL_FOLDERS:
-                coll_path = os.path.join(os.sep, i, coll)
-                subprocess.check_output(["/usr/bin/open", coll_path])
+            coll_path = os.path.join(os.sep, cfg.config['COLL_FOLDER'], coll)
+            subprocess.check_output(["/usr/bin/open", coll_path])
             return
 
         for btn_item in btns:

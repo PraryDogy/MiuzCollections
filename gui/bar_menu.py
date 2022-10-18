@@ -2,6 +2,7 @@
 Mac osx bar menus.
 """
 
+from hashlib import new
 import tkinter
 
 import cfg
@@ -32,6 +33,9 @@ class BarMenu(tkinter.Menu):
 
         cfg.ROOT.configure(menu=menubar)
 
+    def on_closing(self, win):
+        win.destroy()
+
     def about(self):
         """
         Creates tkinter toplevel with info about app.
@@ -40,6 +44,10 @@ class BarMenu(tkinter.Menu):
             cfg.ROOT, bg=cfg.BGCOLOR, pady=10, padx=10)
         new_win.withdraw()
         new_win.title('О программе')
+
+        new_win.protocol("WM_DELETE_WINDOW", lambda: self.on_closing(new_win))
+        new_win.bind('<Command-w>', lambda e: self.on_closing(new_win))
+        new_win.bind('<Escape>', lambda e: self.on_closing(new_win))
 
         name = (
             f'{cfg.APP_NAME} {cfg.APP_VER}'

@@ -35,17 +35,35 @@ IMAGES_SRC = []
 YADISK_TOKEN = "AQAAAAARTU_6AAgMRGzO_kyAykpGqUubuGuraCg"
 YADISK_DIR = os.path.join(os.sep, 'miuzgall')
 
-# There is default values on 22.08.2022
-defaults = {
-    'PHOTO_DIR': os.path.join(
-        os.sep, 'Volumes', 'Shares', 'Marketing', 'Photo'),
-    'COLL_FOLDERS': [
-        os.path.join(
-            os.sep, 'Volumes', 'Shares', 'Marketing', 'Photo', '_Collections')
-        ],
-    'RT_FOLDER': 'Retouch',
-    'FILE_AGE':60
-    }
+
+def default_size():
+    if ROOT.winfo_screenwidth() > 150*8:
+        return f'{150*8}x{int(ROOT.winfo_screenheight()*0.8)}'
+    else:
+        w = int(ROOT.winfo_screenwidth()*0.7)
+        h = int(ROOT.winfo_screenheight()*0.8)
+        return f'{w}x{h}'
+
+
+def defaults():
+    return {
+        'PHOTO_DIR': os.path.join(
+            os.sep, 'Volumes', 'Shares', 'Marketing', 'Photo'),
+        'COLL_FOLDER': os.path.join(
+            os.sep, 'Volumes', 'Shares', 'Marketing', 'Photo', 
+            '_Collections'),
+        'RT_FOLDER': 'Retouch',
+        'FILE_AGE': 60,
+        'ROOT_SIZE': default_size()
+        }
+
+
+def create_json():
+    with open(os.path.join(DB_DIR, 'cfg.json'), 'w') as file:
+        defaul = defaults()
+        json.dump(defaul, file, indent=4,)
+        return defaul
+
 
 if not os.path.exists(DB_DIR):
     os.mkdir(DB_DIR)
@@ -53,12 +71,14 @@ if not os.path.exists(DB_DIR):
 if os.path.exists(os.path.join(DB_DIR, 'cfg.json')):
     with open(os.path.join(DB_DIR, 'cfg.json'), 'r') as file:
         config = json.load(file)
-else:
-    with open(os.path.join(DB_DIR, 'cfg.json'), 'w') as file:
-        json.dump(defaults, file, indent=4,)
-        config = defaults
 
-PHOTO_DIR = config['PHOTO_DIR']
-COLL_FOLDERS = config['COLL_FOLDERS']
-RT_FOLDER = config['RT_FOLDER']
-FILE_AGE = config['FILE_AGE']
+else:
+    config = create_json()
+
+for i in defaults().keys():
+    try:
+        config[i]
+    except KeyError:
+        config = create_json()
+
+

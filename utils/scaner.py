@@ -26,7 +26,7 @@ class SearchDirs(list):
         in `cfg.PHOTO_DIR`
         Looking for all folders in year named folders.
         """
-        photo_dir = os.path.join(os.sep, *cfg.PHOTO_DIR.split('/'))
+        photo_dir = os.path.join(os.sep, *cfg.config['PHOTO_DIR'].split('/'))
 
         base_dirs = []
         for r in range(2018, datetime.datetime.now().year + 1):
@@ -48,7 +48,7 @@ class SearchDirs(list):
         * param `list_dirs`: list of path like objects
         """
         now = datetime.datetime.now().replace(microsecond=0)
-        delta = datetime.timedelta(days=int(cfg.FILE_AGE))
+        delta = datetime.timedelta(days=int(cfg.config['FILE_AGE']))
         file_age = now - delta
 
         aged_years = []
@@ -64,13 +64,12 @@ class SearchDirs(list):
     def colls(self):
         """
         Returns list of dirs.
-        Looking for all folders in `cfg.COLL_FOLDERS`
+        Looking for all folders in `cfg.COLL_FOLDER`
         """
         colls = []
 
-        for sub_coll in cfg.COLL_FOLDERS:
-            for i in os.listdir(sub_coll):
-                colls.append(os.path.join(sub_coll, i))
+        for sub_coll in os.listdir(cfg.config['COLL_FOLDER']):
+            colls.append(os.path.join(cfg.config['COLL_FOLDER'], sub_coll))
 
         return colls
 
@@ -90,7 +89,7 @@ class SearchDirs(list):
                 if not cfg.FLAG:
                     return
 
-                if os.path.join(os.sep, cfg.RT_FOLDER) in root:
+                if os.path.join(os.sep, cfg.config['RT_FOLDER']) in root:
                     retouched.append(root)
 
         return retouched

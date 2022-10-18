@@ -10,7 +10,7 @@ import tkinter
 import cfg
 from PIL import Image, ImageTk
 from utils.utils import (MyButton, MyFrame, MyLabel, SmbChecker,
-                         get_coll_name, my_copy)
+                         get_coll_name, my_copy, save_size)
 from .images_compare import ImagesCompare
 
 class Globals:
@@ -56,7 +56,6 @@ class ImagePreview(tkinter.Toplevel):
         self.protocol("WM_DELETE_WINDOW", lambda: on_closing(self))
         self.bind('<Command-w>', lambda e: on_closing(self))
         self.bind('<Escape>', lambda e: on_closing(self))
-        self.bind('<Command-q>', lambda e: quit())
 
         self.configure(bg=cfg.BGCOLOR, padx=15, pady=15)
         self.resizable(0,0)

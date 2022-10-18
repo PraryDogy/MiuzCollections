@@ -16,6 +16,17 @@ import cfg
 import cv2
 import sqlalchemy
 import database
+import json
+
+def save_size():
+    print('save')
+    cfg.ROOT.update_idletasks()
+    w = cfg.ROOT.winfo_width()
+    h = cfg.ROOT.winfo_height()
+    cfg.config['ROOT_SIZE'] = f'{w}x{h}'
+    
+    with open(os.path.join(cfg.DB_DIR, 'cfg.json'), 'w') as file:
+        json.dump(cfg.config, file, indent=4,)
 
 
 def place_center(top_level):
@@ -92,7 +103,8 @@ class SmbChecker(tkinter.Toplevel):
         """
         Same as `SmbChecker.__doc__`
         """
-        if not os.path.exists(os.path.join(os.sep, *cfg.PHOTO_DIR.split('/'))):
+        if not os.path.exists(
+            os.path.join(os.sep, *cfg.config['PHOTO_DIR'].split('/'))):
             self.gui()
             return False
         self.destroy()
@@ -263,9 +275,8 @@ def get_coll_name(src):
     ```
     """
     coll_name = 'noCollection'
-    for i in cfg.COLL_FOLDERS:
-        if i in src:
-            coll_name = src.split(i)[-1].split(os.sep)[1]
+    if cfg.config['COLL_FOLDER'] in src:
+        coll_name = src.split(cfg.config['COLL_FOLDER'])[-1].split(os.sep)[1]
     return coll_name
 
 

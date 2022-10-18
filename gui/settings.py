@@ -79,8 +79,8 @@ class General(MyFrame):
 
         txt1 = (
             'При запуске программа сканирует и обновляет фото всех коллекций '
-            f'за последние {cfg.FILE_AGE} дней. Нажмите "Обновить", чтобы'
-            ' повторно запустить сканирование.'
+            f'за последние {cfg.config["FILE_AGE"]} дней. Нажмите "Обновить", '
+            'чтобы повторно запустить сканирование.'
             )
 
         descr_updater = MyLabel(master)
@@ -140,8 +140,8 @@ class Expert(tkmacosx.SFrame):
         title.pack(pady=10)
 
         for descr, value, widget in zip(
-            [descriptions['PHOTO_DIR'], descriptions['COLL_FOLDERS']],
-            [cfg.config['PHOTO_DIR'], cfg.config['COLL_FOLDERS']],
+            [descriptions['PHOTO_DIR'], descriptions['COLL_FOLDER']],
+            [cfg.config['PHOTO_DIR'], cfg.config['COLL_FOLDER']],
             ['PHOTODIR_LBL', 'COLLFOLDERS_LBL']):
 
             gallery_descr = MyLabel(
@@ -250,8 +250,8 @@ class Expert(tkmacosx.SFrame):
 
         for widget, default, value in zip(
             [widgets['PHOTODIR_LBL'], widgets['COLLFOLDERS_LBL']],
-            [cfg.defaults['PHOTO_DIR'], cfg.defaults['COLL_FOLDERS']],
-            ['PHOTO_DIR', 'COLL_FOLDERS']):
+            [cfg.defaults['PHOTO_DIR'], cfg.defaults['COLL_FOLDER']],
+            ['PHOTO_DIR', 'COLL_FOLDER']):
 
             widget['text'] = default
             cfg.config[value] = default
@@ -314,7 +314,7 @@ class BelowMenu(MyFrame):
         """
 
         cfg.config['PHOTO_DIR'] = widgets['PHOTODIR_LBL']['text']
-        cfg.config['COLL_FOLDERS'] = [widgets['COLLFOLDERS_LBL']['text']]
+        cfg.config['COLL_FOLDER'] = widgets['COLLFOLDERS_LBL']['text']
         cfg.config['RT_FOLDER'] = widgets['RTFOLDER_ENTRY'].get()
         cfg.config['FILE_AGE'] = widgets['FILEAGE_ENTRY'].get()
 

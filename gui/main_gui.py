@@ -10,11 +10,7 @@ import cfg
 from .images_gui import Gallery
 from .bar_menu import BarMenu
 from .status_bar import StatusBar
-
-
-def unhide():
-    cfg.ROOT.deiconify()
-
+from utils.utils import save_size
 
 
 class MainGui:
@@ -23,12 +19,14 @@ class MainGui:
     Loads images_gui, status_bar and mac osx menu_bar.
     """
     def __init__(self):
-        cfg.ROOT.createcommand(
-            'tk::mac::ReopenApplication', unhide)
-
         cfg.ROOT.title('MiuzGallery')
         cfg.ROOT.configure(bg=cfg.BGCOLOR, padx=15, pady=0)
+
+        cfg.ROOT.createcommand(
+            'tk::mac::ReopenApplication', lambda e: cfg.ROOT.deiconify())
+        cfg.ROOT.createcommand("tk::mac::Quit" , self.on_exit)
         cfg.ROOT.bind('<Command-w>', lambda e: cfg.ROOT.iconify())
+        cfg.ROOT.protocol("WM_DELETE_WINDOW", self.on_exit)
 
         Separator(cfg.ROOT, orient='horizontal').pack(
             fill=tkinter.X, pady=(30, 20))
@@ -46,4 +44,9 @@ class MainGui:
         w = cfg.ROOT.winfo_width()
         h = int(cfg.ROOT.winfo_screenheight()*0.8)
 
-        cfg.ROOT.geometry(f'{w}x{h}+{x}+{y}')
+        cfg.ROOT.geometry(f'{cfg.config["ROOT_SIZE"]}+{x}+{y}')
+
+    def on_exit(self):
+        cfg.FLAG = False
+        save_size()
+        quit()
