@@ -2,9 +2,7 @@
 File scaner and database thumbnails updater with gui.
 """
 
-from cgitb import text
 import threading
-import tkinter
 
 import cfg
 import sqlalchemy
@@ -27,6 +25,7 @@ class SplashScreen:
         while task.is_alive():
             cfg.ROOT.update()
 
+        cfg.IMAGES_RESET()
 
 class Scan(threading.Thread):
     """

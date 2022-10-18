@@ -41,7 +41,6 @@ setup(
         'opencv-python',
         'Pillow',
         'SQLAlchemy',
-        'yadisk'
         ]
     )
 

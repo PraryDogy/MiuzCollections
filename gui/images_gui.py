@@ -79,7 +79,7 @@ class Gallery(MyFrame):
         MyFrame.__init__(self, master)
         MenuButtons(self).pack(
             pady=(0, 0), padx=(0, 15), side=tkinter.LEFT, fill=tkinter.Y)
-        ImagesFrame(self).pack(
+        ImagesThumbs(self).pack(
             expand=True, fill=tkinter.BOTH, side=tkinter.RIGHT)
 
 
@@ -169,10 +169,12 @@ class MenuButtons(tkmacosx.SFrame):
         cfg.IMAGES_RESET()
 
 
-class ImagesFrame(tkmacosx.SFrame):
+class ImagesThumbs(tkmacosx.SFrame):
     """
-    Creates tkinter scrollable frame for images.
-    * param `master`: tkinter frame
+    Creates images grid based on database thumbnails.
+    Grid is labels with images created with pack method.
+    Number of columns in each row based on Database > Config > clmns > value.
+    * param `master`: tkmacosx scrollable frame.
     """
     def __init__(self, master):
         self.master = master
@@ -181,25 +183,6 @@ class ImagesFrame(tkmacosx.SFrame):
         tkmacosx.SFrame.__init__(
             self, master, bg=cfg.BGCOLOR, scrollbarwidth=7)
 
-        ImagesThumbs(self)
-
-    def reset(self):
-        """
-        Destroys self.Run init again
-        """
-        self.destroy()
-        ImagesFrame(self.master).pack(
-            expand=True, fill=tkinter.BOTH, side=tkinter.RIGHT)
-
-
-class ImagesThumbs(object):
-    """
-    Creates images grid based on database thumbnails.
-    Grid is labels with images created with pack method.
-    Number of columns in each row based on Database > Config > clmns > value.
-    * param `master`: tkmacosx scrollable frame.
-    """
-    def __init__(self, master):
         w = int(cfg.config["ROOT_SIZE"].split('x')[0])
         clmns = ((w)//158)-1
 
@@ -216,7 +199,7 @@ class ImagesThumbs(object):
             res = load_curr_coll(img_size, curr_coll)
 
         title = MyLabel(
-            master, text=curr_coll, font=('Arial', 45, 'bold'))
+            self, text=curr_coll, font=('Arial', 45, 'bold'))
         title.pack(pady=(0, 15))
 
         if curr_coll == 'last':
@@ -230,10 +213,19 @@ class ImagesThumbs(object):
         for y in self.split_years(thumbs):
 
             year_label = MyLabel(
-                master, text=y[-1][-1], font=('Arial', 35, 'bold'))
+                self, text=y[-1][-1], font=('Arial', 35, 'bold'))
             year_label.pack(pady=(15, 15))
 
-            self.pack_rows(self.fill_empty(y, clmns), clmns, master)
+            self.pack_rows(self.fill_empty(y, clmns), clmns, self)
+
+    def reset(self):
+        """
+        Destroys self.Run init again
+        """
+        print('eee')
+        self.destroy()
+        ImagesThumbs(self.master).pack(
+            expand=True, fill=tkinter.BOTH, side=tkinter.RIGHT)
 
     def load_thumbs(self, all_images):
         """

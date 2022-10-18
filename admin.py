@@ -1,20 +1,4 @@
-import os
-
-import yadisk
-
-import cfg
 import database
-
-
-def upload_db():
-    """Uploads database file to yandex disk.
-    """
-
-    yandex = yadisk.YaDisk(token=cfg.YADISK_TOKEN)
-    db_path = os.path.join(cfg.DB_DIR, cfg.DB_NAME)
-
-    with open(db_path, "rb") as f:
-        yandex.upload(f, os.path.join(cfg.YADISK_DIR, cfg.DB_NAME))
 
 
 def print_alive(name_func='', what_print=''):

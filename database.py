@@ -3,13 +3,12 @@ Database module.
 """
 
 import os
+import shutil
 import threading
 import tkinter
-import traceback
 
 import sqlalchemy
 import sqlalchemy.ext.declarative
-import yadisk
 
 import cfg
 from utils.utils import MyLabel
@@ -58,18 +57,10 @@ class DbChecker(tkinter.Toplevel):
         create new one with tables and values if download fails.
         """
 
-        yandex = yadisk.YaDisk(token=cfg.YADISK_TOKEN)
-        local_dir = os.path.join(cfg.DB_DIR, cfg.DB_NAME)
-        ya_dir = os.path.join(cfg.YADISK_DIR, cfg.DB_NAME)
-
-        try:
-            yandex.download(ya_dir, local_dir)
-
-        except yadisk.exceptions.PathNotFoundError:
-            adm = Utils()
-            adm.create()
-            adm.fill_config()
-            print(traceback.format_exc())
+        shutil.copyfile(
+            os.path.join(os.path.dirname(__file__), 'database.db'),
+            os.path.join(cfg.DB_DIR, cfg.DB_NAME),
+            )
 
     def __gui(self):
         """
@@ -107,14 +98,13 @@ class Thumbs(Dbase.base):
     """
     Sqlalchemy model.
 
-    *columns: img150, img200, src, size, created, modified,
+    *columns: img150, src, size, created, modified,
     collection
     """
 
     __tablename__ = 'thumbs'
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
     img150 = sqlalchemy.Column(sqlalchemy.LargeBinary)
-    img200 = sqlalchemy.Column(sqlalchemy.LargeBinary)
     src = sqlalchemy.Column(sqlalchemy.Text)
     size = sqlalchemy.Column(sqlalchemy.Integer)
     created = sqlalchemy.Column(sqlalchemy.Integer)
@@ -154,11 +144,8 @@ class Utils:
         """Fill Config table with necessary values."""
 
         cfg_values = [
-            {'name':'currColl', 'value': 'noCollection'},
-            {'name':'clmns', 'value': '7'},
+            {'name':'currColl', 'value': 'last'},
             {'name':'size', 'value': '150'},
-            {'name':'smallScan', 'value': 'true'},
-            {'name':'menuClmn', 'value': '1'},
             {'name':'typeScan', 'value': 'full'},
         ]
 

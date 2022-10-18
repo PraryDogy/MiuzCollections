@@ -33,10 +33,6 @@ IMAGES_COMPARE = set()
 IMAGES_INFO = []
 IMAGES_SRC = []
 
-# for downloading database from Yandex Disk
-YADISK_TOKEN = "AQAAAAARTU_6AAgMRGzO_kyAykpGqUubuGuraCg"
-YADISK_DIR = os.path.join(os.sep, 'miuzgall')
-
 
 def default_size():
     ROOT.update_idletasks()

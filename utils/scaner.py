@@ -318,5 +318,3 @@ class UpdateRetouched():
         DbUpdate().added(images)
 
         cfg.LIVE_LBL['fg'] = cfg.BGCOLOR
-
-        # cfg.LIVE_LBL['text'] = ''

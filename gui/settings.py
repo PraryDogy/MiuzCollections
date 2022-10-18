@@ -13,7 +13,7 @@ from tkinter.ttk import Separator
 import cfg
 import sqlalchemy
 import tkmacosx
-from database import Config, Dbase
+from database import Config, Dbase, Utils
 from PIL import Image, ImageTk
 from utils.utils import (MyButton, MyFrame, MyLabel, my_copy, my_paste,
                          place_center)
@@ -124,6 +124,8 @@ class General(MyFrame):
         """
         Reload app and run Utils Scaner with full scan method.
         """
+        Utils().create()
+        Utils().fill_config()
         Dbase.conn.execute(sqlalchemy.update(Config).where(
             Config.name=='typeScan').values(value='full'))
         os.execv(sys.executable, ['python'] + sys.argv)
