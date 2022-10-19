@@ -35,7 +35,7 @@ def on_closing(obj=tkinter.Frame):
         in_fosus = cfg.ROOT.focus_get()
 
         img_frame = in_fosus.children['!imageframe']
-        img_info = in_fosus.children['!imginfo'].children['!mylabel']['text']
+        img_info = in_fosus.children['!imginfo']['text']
         img_src = in_fosus.children['!imgsrc']['text']
 
         cfg.IMAGE_FRAMES.remove(img_frame)
@@ -122,16 +122,16 @@ class ImageFrame(MyLabel):
         self.image_names = img_tk
 
 
-class ImgInfo(MyFrame):
+class ImgInfo(MyLabel):
     """
     Creates tkinter frame.
     * param `master`: tkinter top level.
     """
     def __init__(self, master):
-        MyFrame.__init__(self, master)
+        MyLabel.__init__(self, master)
+        vars['img_info'] = self
 
         filesize = round(os.path.getsize(vars['img_src'])/(1024*1024), 2)
-
         filemod = datetime.fromtimestamp(os.path.getmtime(vars['img_src']))
         filemod = filemod.strftime("%d-%m-%Y, %H:%M:%S")
         img_w, img_h = vars['curr_img'].width, vars['curr_img'].height
@@ -144,9 +144,8 @@ class ImgInfo(MyFrame):
                 f'\nРазмер: {filesize} мб'
                 f'\nДата изменения: {filemod}')
 
-        vars['img_info'] = MyLabel(
-            self, text=txt, justify=tkinter.LEFT, anchor=tkinter.W, width=50)
-        vars['img_info'].pack(side=tkinter.LEFT)
+        self.configure(
+            text=txt, justify=tkinter.LEFT, anchor=tkinter.W, width=50)
 
 
 class ImgButtons(MyFrame):
