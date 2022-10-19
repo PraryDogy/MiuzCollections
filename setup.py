@@ -14,7 +14,6 @@ import cfg
 
 APP = ['start.py']
 DATA_FILES = [
-    os.path.join(os.path.dirname(__file__), 'gui', 'upd.png'),
     os.path.join(os.path.dirname(__file__), 'gui', 'logo.png'),
     os.path.join(os.path.dirname(__file__), 'database.db'),
     ]
