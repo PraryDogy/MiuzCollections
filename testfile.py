@@ -1,3 +1,14 @@
-w = 600
+import tkinter
+from PIL import Image
 
-print(w//150)
+class Globals:
+    """
+    Stores variables
+    """
+    src = str
+    curr_img = Image
+    path_lbl = tkinter.Label
+    copy_compare_w = tkinter
+
+
+print(Globals.__dict__)

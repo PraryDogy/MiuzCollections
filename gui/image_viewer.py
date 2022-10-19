@@ -2,37 +2,42 @@
 Gui for view image.
 """
 
-from datetime import datetime
 import os
 import subprocess
 import tkinter
+from datetime import datetime
 
 import cfg
 from PIL import Image, ImageTk
-from utils.utils import (MyButton, MyFrame, MyLabel, SmbChecker,
-                         get_coll_name, my_copy, save_size)
+from utils.utils import (MyButton, MyFrame, MyLabel, SmbChecker, get_coll_name,
+                         my_copy)
+
 from .images_compare import ImagesCompare
 
-class Globals:
-    """
-    Stores variables
-    """
-    src = str
-    curr_img = Image
-    path_lbl = tkinter.Label
-    copy_compare_w = tkinter
+vars = {
+    'img_src': str, 
+    'curr_img': Image,
+    'path_lbl': tkinter.Label, 
+    'img_frame': tkinter.Frame
+    }
 
-def on_closing(obj):
+
+def on_closing(obj=tkinter.Frame):
     """
     Destroys current tkinter toplevel.
     Clears `cfg.IMAGES_COMPARE` list.
     * param `obj`: tkinter toplevel
     """
-    image_frame = [v for k, v in obj.children.items() if 'imageframe' in k]
-    try:
-        cfg.IMAGES_COMPARE.remove(image_frame[0])
-    except KeyError:
-        pass
+
+    if vars['img_frame'] in cfg.IMAGE_FRAMES:
+        cfg.IMAGE_FRAMES.remove(vars['img_frame'])
+
+    if vars['path_lbl']['text'] in cfg.IMAGES_INFO:
+        cfg.IMAGES_INFO.remove(vars['path_lbl']['text'])
+    
+    if vars['img_src'] in cfg.IMAGES_SRC:
+        cfg.IMAGES_SRC.remove(vars['img_src'])
+
     obj.destroy()
 
 
@@ -42,7 +47,7 @@ class ImagePreview(tkinter.Toplevel):
     * param `src`: source path of image.
     """
     def __init__(self, src):
-        Globals.src = src
+        vars['img_src'] = src
 
         tkinter.Toplevel.__init__(self)
         self.withdraw()
@@ -70,11 +75,17 @@ class ImagePreview(tkinter.Toplevel):
         cfg.ROOT.update_idletasks()
 
         self.geometry(f'+{cfg.ROOT.winfo_x() + 100}+{cfg.ROOT.winfo_y()}')
-        self.deiconify()
 
         for k, v in cfg.ROOT.children.items():
             if 'preview' in k:
                 v.lift()
+
+        if len (cfg.IMAGE_FRAMES) < 2:
+            cfg.IMAGE_FRAMES.add(vars['img_frame'])
+            cfg.IMAGES_INFO.append(vars['path_lbl']['text'])
+            cfg.IMAGES_SRC.append(vars['img_src'])
+
+        self.deiconify()
 
 
 class ImageFrame(MyLabel):
@@ -83,14 +94,14 @@ class ImageFrame(MyLabel):
     * param `master`: tkinter toplevel.
     """
     def __init__(self, master):
-        Globals.curr_img = Image.open(Globals.src)
-        img_copy = Globals.curr_img.copy()
-
         MyLabel.__init__(self, master, borderwidth=0)
-        self['bg']='black'
-        self.bind("<Configure>", lambda e: self.resize(e, img_copy))
+        vars['img_frame'] = self
+        vars['curr_img'] = Image.open(vars['img_src'])
 
-    def resize(self, e, img):
+        self['bg']='black'
+        self.bind("<Configure>", lambda e: self.resize(e))
+
+    def resize(self, e):
         """
         Fits image to label size.
         * param `img`: current image.
@@ -98,14 +109,11 @@ class ImageFrame(MyLabel):
         self.unbind("<Configure>")
 
         size = (e.width, e.height)
-        img.thumbnail(size)
-        img_tk = ImageTk.PhotoImage(img)
+        vars['curr_img'].thumbnail(size)
+        img_tk = ImageTk.PhotoImage(vars['curr_img'])
 
         self.configure(image=img_tk)
         self.image_names = img_tk
-
-        if len(cfg.IMAGES_COMPARE) < 2:
-            cfg.IMAGES_COMPARE.add(self)
 
 
 class ImgInfo(MyFrame):
@@ -116,29 +124,23 @@ class ImgInfo(MyFrame):
     def __init__(self, master):
         MyFrame.__init__(self, master)
 
-        filesize = round(os.path.getsize(Globals.src)/(1024*1024), 2)
+        filesize = round(os.path.getsize(vars['img_src'])/(1024*1024), 2)
 
-        filemod = datetime.fromtimestamp(os.path.getmtime(Globals.src))
+        filemod = datetime.fromtimestamp(os.path.getmtime(vars['img_src']))
         filemod = filemod.strftime("%d-%m-%Y, %H:%M:%S")
-        img_w, img_h = Globals.curr_img.width, Globals.curr_img.height
-        name = Globals.src.split(os.sep)[-1]
+        img_w, img_h = vars['curr_img'].width, vars['curr_img'].height
+        name = vars['img_src'].split(os.sep)[-1]
 
-        txt = (f'Коллекция: {get_coll_name(Globals.src)}'
+        txt = (f'Коллекция: {get_coll_name(vars["img_src"])}'
                 f'\nИмя: {name}'
-                f'\nПуть: {Globals.src}'
+                f'\nПуть: {vars["img_src"]}'
                 f'\nРазрешение: {img_w} x {img_h}'
                 f'\nРазмер: {filesize} мб'
                 f'\nДата изменения: {filemod}')
 
-        Globals.path_lbl = MyLabel(
+        vars['path_lbl'] = MyLabel(
             self, text=txt, justify=tkinter.LEFT)
-        Globals.path_lbl.pack(side=tkinter.LEFT)
-
-        if len(cfg.IMAGES_INFO) < 2:
-            cfg.IMAGES_INFO.append(txt)
-
-        if len(cfg.IMAGES_SRC) < 2:
-            cfg.IMAGES_SRC.append(Globals.src)
+        vars['path_lbl'].pack(side=tkinter.LEFT)
 
 
 class ImgButtons(MyFrame):
@@ -159,7 +161,7 @@ class ImgButtons(MyFrame):
         comp_btn.cmd(lambda e: self.compare(comp_btn))
         comp_btn.pack(side=tkinter.RIGHT)
 
-        if os.path.exists(Globals.src):
+        if os.path.exists(vars['img_src']):
             open_btn = MyButton(self, text='Папка с фото')
             open_btn.configure(height=1, width=b_wight)
             open_btn.cmd(lambda e: self.open_folder(open_btn))
@@ -171,12 +173,12 @@ class ImgButtons(MyFrame):
         * param `btn`: current tkinter button.
         """
         btn.press()
-        if len(cfg.IMAGES_COMPARE) < 2:
-            old_txt = Globals.path_lbl['text']
+        if len(cfg.IMAGE_FRAMES) < 2:
+            old_txt = vars['path_lbl']['text']
             txt = '\n\n\nОткройте второе изображение\n\n'
-            Globals.path_lbl['text'] = txt
+            vars['path_lbl']['text'] = txt
             cfg.ROOT.after(
-                1500, lambda: Globals.path_lbl.configure(text=old_txt))
+                1500, lambda: vars['path_lbl'].configure(text=old_txt))
             return
         ImagesCompare()
 
@@ -187,7 +189,7 @@ class ImgButtons(MyFrame):
         * param `btn`: current tkinter button.
         """
         btn.press()
-        my_copy(Globals.src.split('/')[-1].split('.')[0])
+        my_copy(vars['img_src'].split('/')[-1].split('.')[0])
 
     def open_folder(self, btn):
         """
@@ -196,19 +198,16 @@ class ImgButtons(MyFrame):
         * param `btn`: current tkinter button.
         """
         btn.press()
-        path = '/'.join(Globals.src.split('/')[:-1])
+        path = '/'.join(vars['img_src'].split('/')[:-1])
         subprocess.check_output(["/usr/bin/open", path])
 
 
-class CloseButton(MyFrame):
+class CloseButton(MyButton):
     """
     Creates tkinter frame for open and close buttons.
     * param `master`: tkinter frame.
     """
     def __init__(self, master):
-        MyFrame.__init__(self, master)
-
-        close = MyButton(self, text='Закрыть')
-        close.configure(height=2)
-        close.cmd(lambda e: on_closing(self.winfo_toplevel()))
-        close.pack(side=tkinter.RIGHT)
+        MyButton.__init__(self, master, text='Закрыть')
+        self.configure(height=2)
+        self.cmd(lambda e: on_closing(self.winfo_toplevel()))

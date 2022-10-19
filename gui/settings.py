@@ -21,7 +21,7 @@ from utils.utils import (MyButton, MyFrame, MyLabel, my_copy, my_paste,
 from .descriptions import descriptions
 
 
-widgets = {
+vars = {
     'PHOTODIR_LBL': tkinter.Label,
     'COLLFOLDERS_LBL': tkinter.Label,
     'RTFOLDER_ENTRY': tkinter.Entry,
@@ -53,7 +53,7 @@ class Settings(tkinter.Toplevel):
             f'{int(cfg.ROOT.winfo_height()*0.8)}')
 
         cfg.ROOT.update_idletasks()
-        widgets['text_length'] = int(self.winfo_width()*0.9)
+        vars['text_length'] = int(self.winfo_width()*0.9)
 
         scrollable = tkmacosx.SFrame(
             self, bg=cfg.BGCOLOR, scrollbarwidth=7)
@@ -86,7 +86,7 @@ class General(MyFrame):
         descr_updater = MyLabel(master)
         descr_updater.configure(
             text=txt1, justify=tkinter.LEFT,
-            wraplength=widgets['text_length'])
+            wraplength=vars['text_length'])
         descr_updater.pack(pady=(0, 10), anchor=tkinter.W)
 
         txt2 = (
@@ -96,7 +96,7 @@ class General(MyFrame):
         descr_scan = MyLabel(master)
         descr_scan.configure(
             text=txt2, justify=tkinter.LEFT,
-            wraplength=widgets['text_length'])
+            wraplength=vars['text_length'])
         descr_scan.pack(pady=(0, 5), anchor=tkinter.W)
 
         scan_btn = MyButton(master, text='Полное сканирование')
@@ -129,13 +129,13 @@ class Expert(tkmacosx.SFrame):
 
             gallery_descr = MyLabel(
                 master, text=descr, justify=tkinter.LEFT,
-                wraplength=widgets['text_length'])
+                wraplength=vars['text_length'])
             gallery_descr.pack(anchor=tkinter.W)
 
-            widgets[widget] = MyLabel(
+            vars[widget] = MyLabel(
                 master, text=value, justify=tkinter.LEFT,
-                wraplength=widgets['text_length'])
-            widgets[widget].pack(
+                wraplength=vars['text_length'])
+            vars[widget].pack(
                 padx=(10, 0), pady=(5, 0))
 
             gallery_btn = MyButton(master, text='Обзор')
@@ -144,7 +144,7 @@ class Expert(tkmacosx.SFrame):
             gallery_btn.configure(height=1, width=9)
 
             gallery_btn.cmd(
-                lambda e, x=widgets[widget]: self.select_path(x))
+                lambda e, x=vars[widget]: self.select_path(x))
 
             sep = Separator(master, orient='horizontal')
             sep.pack(padx=40, pady=20, fill=tkinter.X)
@@ -157,17 +157,17 @@ class Expert(tkmacosx.SFrame):
 
             lbl = MyLabel(
                 master, justify=tkinter.LEFT,
-                wraplength=widgets['text_length'], text=descr)
+                wraplength=vars['text_length'], text=descr)
             lbl.pack(anchor=tkinter.W, pady=(0, 10))
 
-            widgets[widget] = tkinter.Entry(
+            vars[widget] = tkinter.Entry(
                 master, bg=cfg.BGBUTTON, fg=cfg.FONTCOLOR,
                 insertbackground=cfg.FONTCOLOR, selectbackground=cfg.BGPRESSED,
                 highlightthickness=5, highlightbackground=cfg.BGBUTTON,
                 highlightcolor=cfg.BGBUTTON, bd=0, justify='center', width=35)
 
-            widgets[widget].insert(0, value)
-            widgets[widget].pack(pady=(0, 10))
+            vars[widget].insert(0, value)
+            vars[widget].pack(pady=(0, 10))
 
             frame_btns = MyFrame(master)
             frame_btns.pack()
@@ -221,7 +221,7 @@ class Expert(tkmacosx.SFrame):
         btn.press()
 
         for widget, default, value in zip(
-            [widgets['PHOTODIR_LBL'], widgets['COLLFOLDERS_LBL']],
+            [vars['PHOTODIR_LBL'], vars['COLLFOLDERS_LBL']],
             [cfg.defaults['PHOTO_DIR'], cfg.defaults['COLL_FOLDER']],
             ['PHOTO_DIR', 'COLL_FOLDER']):
 
@@ -229,7 +229,7 @@ class Expert(tkmacosx.SFrame):
             cfg.config[value] = default
 
         for widget, default, value in zip(
-            [widgets['RTFOLDER_ENTRY'], widgets['FILEAGE_ENTRY']],
+            [vars['RTFOLDER_ENTRY'], vars['FILEAGE_ENTRY']],
             [cfg.defaults['RT_FOLDER'], cfg.defaults['FILE_AGE']],
             ['RT_FOLDER', 'FILE_AGE']):
 
@@ -285,10 +285,10 @@ class BelowMenu(MyFrame):
         cfg.json
         """
 
-        cfg.config['PHOTO_DIR'] = widgets['PHOTODIR_LBL']['text']
-        cfg.config['COLL_FOLDER'] = widgets['COLLFOLDERS_LBL']['text']
-        cfg.config['RT_FOLDER'] = widgets['RTFOLDER_ENTRY'].get()
-        cfg.config['FILE_AGE'] = widgets['FILEAGE_ENTRY'].get()
+        cfg.config['PHOTO_DIR'] = vars['PHOTODIR_LBL']['text']
+        cfg.config['COLL_FOLDER'] = vars['COLLFOLDERS_LBL']['text']
+        cfg.config['RT_FOLDER'] = vars['RTFOLDER_ENTRY'].get()
+        cfg.config['FILE_AGE'] = vars['FILEAGE_ENTRY'].get()
 
         with open(os.path.join(cfg.DB_DIR, 'cfg.json'), 'w') as file:
             json.dump(cfg.config, file, indent=4)

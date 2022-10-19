@@ -2,7 +2,6 @@
 Mac osx bar menus.
 """
 
-from hashlib import new
 import tkinter
 
 import cfg

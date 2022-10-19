@@ -10,7 +10,7 @@ def images_list():
     Returns list of tkinter image objects.
     `cfg.IMAGES_COMPARE` is set with tkinter image labels.
     """
-    return [i.__dict__['image_names'] for i in list(cfg.IMAGES_COMPARE)]
+    return [i.__dict__['image_names'] for i in list(cfg.IMAGE_FRAMES)]
 
 
 def on_closing(obj):
@@ -22,7 +22,7 @@ def on_closing(obj):
 
     prevs = [v for k, v in cfg.ROOT.children.items() if "preview" in k]
     [i.destroy() for i in prevs]
-    cfg.IMAGES_COMPARE.clear()
+    cfg.IMAGE_FRAMES.clear()
     cfg.IMAGES_INFO.clear()
     cfg.IMAGES_SRC.clear()
     obj.destroy()

@@ -7,11 +7,10 @@ import os
 import shutil
 import tkinter
 
-from numpy import cfloat
 
 # app info
 APP_NAME = 'MiuzGallery'
-APP_VER = '3.0.1'
+APP_VER = '3.0.2'
 
 # database info
 DB_DIR = os.path.join(
@@ -29,7 +28,7 @@ LIVE_LBL = tkinter.Label
 FLAG = True
 IMAGES_RESET = object
 
-IMAGES_COMPARE = set()
+IMAGE_FRAMES = set()
 IMAGES_INFO = []
 IMAGES_SRC = []
 
