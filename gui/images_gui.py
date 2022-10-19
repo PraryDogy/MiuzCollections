@@ -205,7 +205,6 @@ class ImagesThumbs(tkmacosx.SFrame):
         """
         Destroys self.Run init again
         """
-        print('reset')
         w, h = cfg.ROOT.winfo_width(), cfg.ROOT.winfo_height()
         cfg.config['ROOT_SIZE'] = f'{w}x{h}'
         self.destroy()

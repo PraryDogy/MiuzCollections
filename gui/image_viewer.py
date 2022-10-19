@@ -6,6 +6,7 @@ import os
 import subprocess
 import tkinter
 from datetime import datetime
+from turtle import width
 
 import cfg
 from PIL import Image, ImageTk
@@ -16,9 +17,9 @@ from .images_compare import ImagesCompare
 
 vars = {
     'img_src': str, 
+    'img_info': tkinter.Label,
+    'img_frame': tkinter.Frame,
     'curr_img': Image,
-    'path_lbl': tkinter.Label, 
-    'img_frame': tkinter.Frame
     }
 
 
@@ -29,14 +30,17 @@ def on_closing(obj=tkinter.Frame):
     * param `obj`: tkinter toplevel
     """
 
-    if vars['img_frame'] in cfg.IMAGE_FRAMES:
-        cfg.IMAGE_FRAMES.remove(vars['img_frame'])
+    if len(cfg.IMAGE_FRAMES) < 2:
 
-    if vars['path_lbl']['text'] in cfg.IMAGES_INFO:
-        cfg.IMAGES_INFO.remove(vars['path_lbl']['text'])
-    
-    if vars['img_src'] in cfg.IMAGES_SRC:
-        cfg.IMAGES_SRC.remove(vars['img_src'])
+        in_fosus = cfg.ROOT.focus_get()
+
+        img_frame = in_fosus.children['!imageframe']
+        img_info = in_fosus.children['!imginfo'].children['!mylabel']['text']
+        img_src = in_fosus.children['!imgsrc']['text']
+
+        cfg.IMAGE_FRAMES.remove(img_frame)
+        cfg.IMAGES_INFO.remove(img_info)
+        cfg.IMAGES_SRC.remove(img_src)
 
     obj.destroy()
 
@@ -67,6 +71,7 @@ class ImagePreview(tkinter.Toplevel):
         side = int(cfg.ROOT.winfo_screenheight()*0.8)
         self.geometry(f'{side}x{side}')
 
+        ImgSrc(self)
         ImageFrame(self).pack(fill=tkinter.BOTH, expand=True)
         ImgButtons(self).pack(pady=(15, 15))
         ImgInfo(self).pack(pady=(0, 15), padx=15)
@@ -76,16 +81,17 @@ class ImagePreview(tkinter.Toplevel):
 
         self.geometry(f'+{cfg.ROOT.winfo_x() + 100}+{cfg.ROOT.winfo_y()}')
 
-        for k, v in cfg.ROOT.children.items():
-            if 'preview' in k:
-                v.lift()
-
         if len (cfg.IMAGE_FRAMES) < 2:
             cfg.IMAGE_FRAMES.add(vars['img_frame'])
-            cfg.IMAGES_INFO.append(vars['path_lbl']['text'])
+            cfg.IMAGES_INFO.append(vars['img_info']['text'])
             cfg.IMAGES_SRC.append(vars['img_src'])
 
         self.deiconify()
+
+
+class ImgSrc(MyLabel):
+    def __init__(self, master):
+        MyLabel.__init__(self, master, text=vars['img_src'])
 
 
 class ImageFrame(MyLabel):
@@ -138,9 +144,9 @@ class ImgInfo(MyFrame):
                 f'\nРазмер: {filesize} мб'
                 f'\nДата изменения: {filemod}')
 
-        vars['path_lbl'] = MyLabel(
-            self, text=txt, justify=tkinter.LEFT)
-        vars['path_lbl'].pack(side=tkinter.LEFT)
+        vars['img_info'] = MyLabel(
+            self, text=txt, justify=tkinter.LEFT, anchor=tkinter.W, width=50)
+        vars['img_info'].pack(side=tkinter.LEFT)
 
 
 class ImgButtons(MyFrame):
@@ -174,11 +180,11 @@ class ImgButtons(MyFrame):
         """
         btn.press()
         if len(cfg.IMAGE_FRAMES) < 2:
-            old_txt = vars['path_lbl']['text']
+            old_txt = vars['img_info']['text']
             txt = '\n\n\nОткройте второе изображение\n\n'
-            vars['path_lbl']['text'] = txt
+            vars['img_info']['text'] = txt
             cfg.ROOT.after(
-                1500, lambda: vars['path_lbl'].configure(text=old_txt))
+                1500, lambda: vars['img_info'].configure(text=old_txt))
             return
         ImagesCompare()
 
