@@ -13,7 +13,7 @@ from tkinter.ttk import Separator
 import cfg
 import sqlalchemy
 import tkmacosx
-from database import Config, Dbase, Utils
+from database import Config, Dbase
 from PIL import Image, ImageTk
 from utils.utils import (MyButton, MyFrame, MyLabel, my_copy, my_paste,
                          place_center)
@@ -79,8 +79,8 @@ class General(MyFrame):
 
         txt1 = (
             'При запуске программа сканирует и обновляет фото всех коллекций '
-            f'за последние {cfg.config["FILE_AGE"]} дней. Нажмите "Обновить", '
-            'чтобы повторно запустить сканирование.'
+            f'за последние {cfg.config["FILE_AGE"]} дней. Нажмите "Обновить" '
+            'в правом нижнем углу, чтобы повторно запустить сканирование.'
             )
 
         descr_updater = MyLabel(master)
@@ -88,19 +88,6 @@ class General(MyFrame):
             text=txt1, justify=tkinter.LEFT,
             wraplength=widgets['text_length'])
         descr_updater.pack(pady=(0, 10), anchor=tkinter.W)
-
-        img_path = os.path.join(os.path.dirname(__file__), 'upd.png')
-        img_src = Image.open(img_path)
-        img_copy= img_src.copy()
-        img_tk = ImageTk.PhotoImage(img_copy)
-
-        img_lbl = MyLabel(master)
-        img_lbl.configure(image=img_tk)
-        img_lbl.pack()
-        img_lbl.image_names = img_tk
-
-        sep = Separator(master, orient='horizontal')
-        sep.pack(padx=40, pady=20, fill=tkinter.X)
 
         txt2 = (
             'Нажмите "Полное сканирование", чтобы обновить фотографии всех '
@@ -110,7 +97,7 @@ class General(MyFrame):
         descr_scan.configure(
             text=txt2, justify=tkinter.LEFT,
             wraplength=widgets['text_length'])
-        descr_scan.pack(pady=(0, 10), anchor=tkinter.W)
+        descr_scan.pack(pady=(0, 5), anchor=tkinter.W)
 
         scan_btn = MyButton(master, text='Полное сканирование')
         scan_btn.configure(height=1, width=17)
@@ -124,8 +111,6 @@ class General(MyFrame):
         """
         Reload app and run Utils Scaner with full scan method.
         """
-        Utils().create()
-        Utils().fill_config()
         Dbase.conn.execute(sqlalchemy.update(Config).where(
             Config.name=='typeScan').values(value='full'))
         os.execv(sys.executable, ['python'] + sys.argv)
@@ -136,10 +121,6 @@ class Expert(tkmacosx.SFrame):
     Tkinter frame with advanced app settings.
     """
     def __init__(self, master):
-
-        title = MyLabel(
-            master, text='Дополнительно',font=('Arial', 22, 'bold'))
-        title.pack(pady=10)
 
         for descr, value, widget in zip(
             [descriptions['PHOTO_DIR'], descriptions['COLL_FOLDER']],
@@ -218,17 +199,6 @@ class Expert(tkmacosx.SFrame):
         reset_button.configure(height=1, width=12)
         reset_button.cmd(lambda e: self.full_reset())
         reset_button.pack(side=tkinter.LEFT)
-
-        author_txt = (
-            f'{cfg.APP_NAME} {cfg.APP_VER}'
-            '\nCreated by Evgeny Loshkarev'
-            '\nCopyright © 2022 MIUZ Diamonds.'
-            '\nAll rights reserved.')
-
-        author_lbl = MyLabel(master)
-        author_lbl.configure(
-            text=author_txt, justify=tkinter.LEFT)
-        author_lbl.pack(anchor=tkinter.W, pady=(0, 10))
 
     def full_reset(self):
         shutil.rmtree(cfg.DB_DIR)

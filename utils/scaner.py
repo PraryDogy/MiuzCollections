@@ -5,13 +5,14 @@
 import datetime
 import os
 import sys
+import threading
 
 import cfg
 import sqlalchemy
 from admin import print_alive
-from database import Dbase, Thumbs
+from database import Dbase, Thumbs, Config
 
-from .utils import get_coll_name, insert_row
+from .utils import get_coll_name, insert_row, SmbChecker
 
 
 class SearchDirs(list):
@@ -318,3 +319,39 @@ class UpdateRetouched():
         DbUpdate().added(images)
 
         cfg.LIVE_LBL['fg'] = cfg.BGCOLOR
+
+
+class Scaner(threading.Thread):
+    """
+    Scans files, updates thumbnails database, threading.
+    Block code execution while thread is alive, but not block GUI.
+    Reset images gallery.
+    """
+    def __init__(self):
+        if not SmbChecker().check():
+            return
+
+        threading.Thread.__init__(self, target=self.__scan)
+        self.start()
+
+        while self.is_alive():
+            cfg.ROOT.update()
+
+    def __scan(self):
+        """Run Files Scaner & Database Updater from utils"""
+
+        cfg.FLAG = True
+        type_scan = Dbase.conn.execute(sqlalchemy.select(Config.value).where(
+            Config.name=='typeScan')).first()[0]
+
+        UpdateCollections()
+
+        if type_scan == 'full':
+            Dbase.conn.execute(sqlalchemy.update(Config).where(
+                Config.name=='typeScan').values(value=''))
+            UpdateRetouched(aged=False)
+            return
+
+        UpdateRetouched(aged=True)
+
+        cfg.IMAGES_RESET()

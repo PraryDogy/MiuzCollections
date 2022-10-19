@@ -19,12 +19,9 @@ import database
 import json
 
 def save_size():
-    print('save')
     cfg.ROOT.update_idletasks()
-    w = cfg.ROOT.winfo_width()
-    h = cfg.ROOT.winfo_height()
-    x = cfg.ROOT.winfo_x()
-    y = cfg.ROOT.winfo_y()
+    w, h = cfg.ROOT.winfo_width(), cfg.ROOT.winfo_height()
+    x, y = cfg.ROOT.winfo_x(), cfg.ROOT.winfo_y()
 
     cfg.config['ROOT_SIZE'] = f'{w}x{h}'
     cfg.config['ROOT_POS'] = f'+{x}+{y}'
@@ -33,15 +30,15 @@ def save_size():
         json.dump(cfg.config, file, indent=4,)
 
 
-def place_center(top_level):
+def place_center(top_level=tkinter.Toplevel):
     """
     Place new tkinter window to center relavive main window.
     * param `top_level`: tkinter.TopLevel
     """
     cfg.ROOT.update_idletasks()
     x, y = cfg.ROOT.winfo_x(), cfg.ROOT.winfo_y()
-    xx = x + cfg.ROOT.winfo_width()//2-top_level.winfo_width()//2
-    yy = y + cfg.ROOT.winfo_height()//2-top_level.winfo_height()//2
+    xx = x + cfg.ROOT.winfo_width()//2 - top_level.winfo_width()//2
+    yy = y + cfg.ROOT.winfo_height()//2 - top_level.winfo_height()//2
 
     top_level.geometry(f'+{xx}+{yy}')
 

@@ -4,7 +4,7 @@ Run file
 
 import cfg
 from gui import main_gui
-from utils.splashscreen import SplashScreen
+from utils.scaner import Scaner
 
 
 def load_all():
@@ -14,7 +14,7 @@ def load_all():
     """
     main_gui.MainGui()
     cfg.ROOT.deiconify()
-    SplashScreen()
+    Scaner()
 
 cfg.ROOT.after(1, load_all)
 

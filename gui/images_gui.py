@@ -30,15 +30,6 @@ def get_curr_coll():
         Config.name=='currColl')).first()[0]
 
 
-def get_size():
-    """
-    Returns int selected thumbnails size.
-    Loads from Database > Config > size > value
-    """
-    return int(Dbase.conn.execute(sqlalchemy.select(Config.value).where(
-        Config.name=='size')).first()[0])
-
-
 def upd_curr_coll(coll):
     """
     Updates Database > Config > currColl > value
@@ -48,24 +39,23 @@ def upd_curr_coll(coll):
         Config.name=='currColl').values(value=coll))
 
 
-def load_last(img_size):
+def load_last():
     """
     Returns tuples list (image, image source, image modified time).
-    * param `img_size`: Thumbs.__dict__['img'+ `Globals().get_size()`]
     """
     return Dbase.conn.execute(sqlalchemy.select(
-        img_size, Thumbs.src, Thumbs.modified).order_by(
+        Thumbs.img150, Thumbs.src, Thumbs.modified).order_by(
                     -Thumbs.modified).limit(60)).fetchall()
 
 
-def load_curr_coll(img_size, curr_coll):
+def load_curr_coll(curr_coll):
     """
     Returns tuples list (image, image source, image modified time).
     * param `img_size`: Thumbs.__dict__['img'+ `Globals().get_size()`]
     * param `curr_coll`: from `Globals().get_curr_coll()`
     """
     return Dbase.conn.execute(sqlalchemy.select(
-        img_size, Thumbs.src, Thumbs.modified).where(
+        Thumbs.img150, Thumbs.src, Thumbs.modified).where(
             Thumbs.collection==curr_coll).order_by(
                 -Thumbs.modified)).fetchall()
 
@@ -184,19 +174,9 @@ class ImagesThumbs(tkmacosx.SFrame):
             self, master, bg=cfg.BGCOLOR, scrollbarwidth=7)
 
         w = int(cfg.config["ROOT_SIZE"].split('x')[0])
-        clmns = ((w)//158)-1
+        self.clmns = ((w)//158)-1
 
-        print(w)
-        print(clmns)
-
-        img_size = Thumbs.__dict__[f'img{get_size()}']
         curr_coll = get_curr_coll()
-
-        if curr_coll == 'last':
-            res = load_last(img_size)
-
-        else:
-            res = load_curr_coll(img_size, curr_coll)
 
         title = MyLabel(
             self, text=curr_coll, font=('Arial', 45, 'bold'))
@@ -204,6 +184,9 @@ class ImagesThumbs(tkmacosx.SFrame):
 
         if curr_coll == 'last':
             title.configure(text='Последние добавленные')
+            res = load_last()
+        else:
+            res = load_curr_coll(curr_coll)
 
         thumbs = self.load_thumbs(res)
 
@@ -216,13 +199,15 @@ class ImagesThumbs(tkmacosx.SFrame):
                 self, text=y[-1][-1], font=('Arial', 35, 'bold'))
             year_label.pack(pady=(15, 15))
 
-            self.pack_rows(self.fill_empty(y, clmns), clmns, self)
+            self.pack_rows(self.fill_empty(y, self.clmns), self.clmns, self)
 
     def reset(self):
         """
         Destroys self.Run init again
         """
-        print('eee')
+        print('reset')
+        w, h = cfg.ROOT.winfo_width(), cfg.ROOT.winfo_height()
+        cfg.config['ROOT_SIZE'] = f'{w}x{h}'
         self.destroy()
         ImagesThumbs(self.master).pack(
             expand=True, fill=tkinter.BOTH, side=tkinter.RIGHT)
@@ -272,10 +257,9 @@ class ImagesThumbs(tkmacosx.SFrame):
 
         if len(thumbs) < clmns and len(thumbs) != 0:
             year = thumbs[-1][-1]
-            size = get_size()
 
             for _ in range(0, clmns-len(thumbs)):
-                new = Image.new('RGB', (size, size), cfg.BGCOLOR)
+                new = Image.new('RGB', (150, 150), cfg.BGCOLOR)
                 photo = ImageTk.PhotoImage(new)
                 thumbs.append((photo, None, year))
 

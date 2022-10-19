@@ -5,8 +5,8 @@ Gui for status bar.
 import tkinter
 
 import cfg
-from utils.splashscreen import SplashScreen
 from utils.utils import MyButton, MyFrame, MyLabel, SmbChecker
+from utils.scaner import Scaner
 
 from .settings import Settings
 
@@ -34,8 +34,7 @@ class BtnCmd:
         btn.press()
         btn.unbind('<Button-1>')
 
-        SplashScreen()
-        cfg.IMAGES_RESET()
+        Scaner()
 
         btn.cmd(lambda e: self.updater(self))
 
@@ -47,10 +46,9 @@ class StatusBar(MyFrame, BtnCmd):
     def __init__(self, master):
         MyFrame.__init__(self, master)
 
-        SettingsSection(self)
-        UpdateSection(self)
-        AllWindows(self)
         DynamicSection(self)
+        UpdateSection(self)
+        SettingsSection(self)
 
 
 class SettingsSection(MyLabel, MyButton, BtnCmd):
@@ -58,13 +56,10 @@ class SettingsSection(MyLabel, MyButton, BtnCmd):
     Tkinter frame with button function open gui settings and description.
     """
     def __init__(self, master):
-        MyLabel.__init__(self, master, text='Настройки')
-        self.pack(side=tkinter.LEFT)
-
         MyButton.__init__(self, master, text='⚙', padx=5)
         self.configure(width=5, height=1)
         self.cmd(lambda e: self.open_settings(self))
-        self.pack(side=tkinter.LEFT, padx=(0, 15))
+        self.pack(side=tkinter.LEFT, padx=(0, 0))
 
 
 class UpdateSection(MyLabel, MyButton, BtnCmd):
@@ -72,37 +67,15 @@ class UpdateSection(MyLabel, MyButton, BtnCmd):
     Tkinter frame with button function update collections and description.
     """
     def __init__(self, master):
-        MyLabel.__init__(self, master, text='Обновить')
-        self.pack(side=tkinter.LEFT)
-
         MyButton.__init__(self, master, text='⟲', padx=5)
         self.configure(width=5, height=1, )
         self.cmd(lambda e: self.updater(self))
         self.pack(side=tkinter.LEFT, padx=(0, 15))
 
 
-class AllWindows(MyLabel, MyButton):
-    """
-    Show all windows button
-    """
-    def __init__(self, master):
-        MyLabel.__init__(self, master, text="Все окна")
-        self.pack(side=tkinter.LEFT)
-
-        MyButton.__init__(self, master, text='֍', padx=5)
-        self.configure(width=5, height=1)
-        self.cmd(lambda e: self.show_all(self))
-        self.pack(side=tkinter.LEFT, padx=(0, 15))
-
-    def show_all(self, btn):
-        btn.press()
-        for k, v in cfg.ROOT.children.items():
-            if 'imagepreview' in k:
-                v.lift()
-
 class DynamicSection(MyLabel):
     def __init__(self, master):
         MyLabel.__init__(self, master, text='Обновление 00%')
         self['fg'] = cfg.BGCOLOR
-        self.pack(side=tkinter.LEFT)
+        self.pack(side=tkinter.LEFT, padx=(0, 15))
         cfg.LIVE_LBL = self

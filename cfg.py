@@ -7,6 +7,8 @@ import os
 import shutil
 import tkinter
 
+from numpy import cfloat
+
 # app info
 APP_NAME = 'MiuzGallery'
 APP_VER = '3.0.1'
@@ -40,7 +42,6 @@ def default_size():
         w = int(ROOT.winfo_screenwidth()*0.7)
         h = int(ROOT.winfo_screenheight()*0.8)
         return f'{w}x{h}'
-
 
 def defaults():
     return {
@@ -83,5 +84,3 @@ for i in defaults().keys():
         config[i]
     except KeyError:
         config = create_json()
-
-
