@@ -9,7 +9,7 @@ from utils.scaner import Scaner
 
 def load_all():
     """
-    Loads splashscreen with thumbnails updater first.
+    Loads splashscreen with thumbnails updater first.≥
     Then loads main gui with thumbnails.
     """
     main_gui.MainGui()

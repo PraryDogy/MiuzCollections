@@ -16,10 +16,10 @@ from utils.utils import (MyButton, MyFrame, MyLabel, SmbChecker, get_coll_name,
 from .images_compare import ImagesCompare
 
 vars = {
-    'img_src': str, 
-    'img_info': tkinter.Label,
-    'img_frame': tkinter.Frame,
-    'curr_img': Image,
+    'img_src': '', 
+    'img_info': '',
+    'img_frame': '',
+    'curr_img': '',
     }
 
 
@@ -29,18 +29,6 @@ def on_closing(obj=tkinter.Frame):
     Clears `cfg.IMAGES_COMPARE` list.
     * param `obj`: tkinter toplevel
     """
-
-    if len(cfg.IMAGE_FRAMES) < 2:
-
-        in_fosus = cfg.ROOT.focus_get()
-
-        img_frame = in_fosus.children['!imageframe']
-        img_info = in_fosus.children['!imginfo']['text']
-        img_src = in_fosus.children['!imgsrc']['text']
-
-        cfg.IMAGE_FRAMES.remove(img_frame)
-        cfg.IMAGES_INFO.remove(img_info)
-        cfg.IMAGES_SRC.remove(img_src)
 
     obj.destroy()
 
@@ -80,12 +68,6 @@ class ImagePreview(tkinter.Toplevel):
         cfg.ROOT.update_idletasks()
 
         self.geometry(f'+{cfg.ROOT.winfo_x() + 100}+{cfg.ROOT.winfo_y()}')
-
-        if len (cfg.IMAGE_FRAMES) < 2:
-            cfg.IMAGE_FRAMES.add(vars['img_frame'])
-            cfg.IMAGES_INFO.append(vars['img_info']['text'])
-            cfg.IMAGES_SRC.append(vars['img_src'])
-
         self.deiconify()
 
 
@@ -119,7 +101,7 @@ class ImageFrame(MyLabel):
         img_tk = ImageTk.PhotoImage(vars['curr_img'])
 
         self.configure(image=img_tk)
-        self.image_names = img_tk
+        self.image = img_tk
 
 
 class ImgInfo(MyLabel):
@@ -178,13 +160,20 @@ class ImgButtons(MyFrame):
         * param `btn`: current tkinter button.
         """
         btn.press()
-        if len(cfg.IMAGE_FRAMES) < 2:
+
+        prevs = [i for i in cfg.ROOT.children if 'preview' in i]
+        if len(prevs) != 2:
+
             old_txt = vars['img_info']['text']
-            txt = '\n\n\nОткройте второе изображение\n\n'
+            txt = '\n\n\nДолжно быть открыто только два изображения.\n\n'
             vars['img_info']['text'] = txt
+            vars['img_info']['anchor'] = tkinter.CENTER
             cfg.ROOT.after(
                 1500, lambda: vars['img_info'].configure(text=old_txt))
+            cfg.ROOT.after(
+                1500, lambda: vars['img_info'].configure(anchor=tkinter.W))
             return
+
         ImagesCompare()
 
     def copy_name(self, btn):
