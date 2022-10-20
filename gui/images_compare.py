@@ -1,16 +1,20 @@
+from calendar import c
 import subprocess
 import tkinter
+
+from numpy import var
 
 import cfg
 from utils.utils import MyButton, MyFrame, MyLabel, my_copy
 
-
-def images_list():
-    """
-    Returns list of tkinter image objects.
-    `cfg.IMAGES_COMPARE` is set with tkinter image labels.
-    """
-    return [i.__dict__['image_names'] for i in list(cfg.IMAGE_FRAMES)]
+vars = {
+    'img1': '',
+    'img2': '',
+    'curr_img': '',
+    'img_frame': '',
+    'img_info': '',
+    'img_width': ''
+    }
 
 
 def on_closing(obj):
@@ -22,25 +26,7 @@ def on_closing(obj):
 
     prevs = [v for k, v in cfg.ROOT.children.items() if "preview" in k]
     [i.destroy() for i in prevs]
-    cfg.IMAGE_FRAMES.clear()
-    cfg.IMAGES_INFO.clear()
-    cfg.IMAGES_SRC.clear()
     obj.destroy()
-
-
-class Globals:
-    """
-    Global variables.
-    * `curr_img`: tkinter image object from `images_list()` function.
-    * `curr_src`: image source path.
-    * `img_frame`: tkinter frame with `curr_img`
-    * `info_label`: tkinter label with image info from `image_viewer`
-    """
-    curr_img = tkinter.Image
-    curr_src = str
-
-    img_frame = tkinter.Label
-    info_label = tkinter.Label
 
 
 class ImagesCompare(tkinter.Toplevel):
@@ -53,6 +39,20 @@ class ImagesCompare(tkinter.Toplevel):
     def __init__(self):
         prevs = [v for k, v in cfg.ROOT.children.items() if "preview" in k]
         [i.withdraw() for i in prevs]
+
+        vars['img1'] = [
+            prevs[0].children['!imageframe']['image'],
+            prevs[0].children['!imginfo']['text'],
+            prevs[0].children['!imgsrc']['text']
+            ]
+
+        vars['img2'] = [
+            prevs[1].children['!imageframe']['image'],
+            prevs[1].children['!imginfo']['text'],
+            prevs[1].children['!imgsrc']['text']
+            ]
+
+        vars['curr_img'] = vars['img1']
 
         tkinter.Toplevel.__init__(self)
         self.withdraw()
@@ -69,7 +69,7 @@ class ImagesCompare(tkinter.Toplevel):
 
         ImageFrame(self).pack(fill=tkinter.BOTH, expand=True, pady=(0, 15))
         ImgButtons(self).pack(pady=(0, 15))
-        NamePath(self).pack(pady=(0, 15), anchor=tkinter.CENTER)
+        ImgInfo(self).pack(pady=(0, 15), anchor=tkinter.CENTER)
         CloseBtn(self).pack()
 
         cfg.ROOT.update_idletasks()
@@ -85,16 +85,11 @@ class ImageFrame(MyLabel):
     def __init__(self, master):
         MyLabel.__init__(self, master, borderwidth=0)
         self['bg']='black'
+        self['image'] = vars['curr_img'][0]
+        vars['img_frame'] = self
 
-        Globals.curr_img = images_list()[0]
-        Globals.img_frame = self
-        Globals.curr_src = cfg.IMAGES_SRC[0]
-
-        self.configure(
-            image=Globals.curr_img,
-            width=Globals.curr_img.height(),
-            height=Globals.curr_img.height()
-            )
+        w = self.winfo_reqwidth()
+        self.configure(width=w, height=w)
 
 
 class ImgButtons(MyFrame):
@@ -130,7 +125,7 @@ class ImgButtons(MyFrame):
         * param `btn`: current tkinter button.
         """
         btn.press()
-        get_name = Globals.curr_src.split('/')[-1].split('.')[0]
+        get_name = vars['curr_img'][2].split('/')[-1].split('.')[0]
         my_copy(get_name)
 
     def open_folder(self, btn):
@@ -140,7 +135,7 @@ class ImgButtons(MyFrame):
         * param `btn`: current tkinter button.
         """
         btn.press()
-        path = '/'.join(Globals.curr_src.split('/')[:-1])
+        path = '/'.join(vars['curr_img'][2].split('/')[:-1])
         subprocess.check_output(["/usr/bin/open", path])
 
     def switch_image(self, btn):
@@ -149,20 +144,16 @@ class ImgButtons(MyFrame):
         """
         btn.press()
 
-        Globals.curr_img = [
-            i for i in images_list() if i != Globals.curr_img][0]
+        for i in [vars['img1'], vars['img2']]:
+            if vars['curr_img'] != i:
+                vars['curr_img'] = i
 
-        Globals.curr_src = [
-            i for i in cfg.IMAGES_SRC if i != Globals.curr_src][0]
+                vars['img_frame']['image'] = vars['curr_img'][0]
+                vars['img_info']['text'] = vars['curr_img'][1]
 
-        image_info = [
-            i for i in cfg.IMAGES_INFO if i != Globals.info_label['text']][0]
+                return
 
-        Globals.img_frame.configure(image=Globals.curr_img)
-        Globals.info_label.configure(text=image_info)
-
-
-class NamePath(MyLabel):
+class ImgInfo(MyLabel):
     """
     Creates tkinter frame with image info.
     * param `master`: tkinter top level.
@@ -170,8 +161,8 @@ class NamePath(MyLabel):
     def __init__(self, master):
         MyLabel.__init__(
             self, master, anchor=tkinter.W, justify=tkinter.LEFT,
-            text=cfg.IMAGES_INFO[0], width=40)
-        Globals.info_label = self
+            text=vars['curr_img'][1], width=40)
+        vars['img_info'] = self
 
 
 class CloseBtn(MyButton):
