@@ -33,8 +33,7 @@ class MainGui:
             fill=tkinter.X, pady=(30, 20))
         Gallery(cfg.ROOT).pack(fill=tkinter.BOTH, expand=True,)
         Separator(cfg.ROOT, orient='horizontal').pack(fill=tkinter.X, pady=10)
-        StatusBar(cfg.ROOT).pack(
-            pady=(0, 10), side=tkinter.RIGHT)
+        StatusBar(cfg.ROOT).pack(pady=(0, 10))
 
         BarMenu()
 

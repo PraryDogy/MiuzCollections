@@ -3,6 +3,7 @@ Gui for status bar.
 """
 
 import tkinter
+from tkinter.ttk import Separator
 
 import cfg
 from scaner import Scaner
@@ -19,10 +20,20 @@ class StatusBar(MyFrame):
     def __init__(self, master):
         MyFrame.__init__(self, master)
 
-        DynamicSection(self)
-        UpdateSection(self)
+        FakeLabel(self)
         SettingsSection(self)
+        Separator(self, orient='vertical').pack(
+            fill=tkinter.Y, side=tkinter.LEFT, padx=(15, 15))
+        UpdateSection(self)
+        DynamicSection(self)
 
+
+class FakeLabel(MyLabel):
+    def __init__(self, master):
+        MyLabel.__init__(self, master, text='Обновление 00%')
+        self['fg'] = cfg.BGCOLOR
+        self.pack(side=tkinter.LEFT, padx=(0, 15))
+        cfg.LIVE_LBL = self
 
 class SettingsSection(MyLabel, MyButton):
     """
