@@ -5,7 +5,7 @@ Mac osx bar menus.
 import tkinter
 
 import cfg
-from utils.utils import MyButton, MyLabel, place_center
+from utils import MyButton, MyLabel, place_center
 
 from .settings import Settings
 
@@ -32,21 +32,19 @@ class BarMenu(tkinter.Menu):
 
         cfg.ROOT.configure(menu=menubar)
 
-    def on_closing(self, win):
-        win.destroy()
-
     def about(self):
         """
         Creates tkinter toplevel with info about app.
         """
         new_win = tkinter.Toplevel(
             cfg.ROOT, bg=cfg.BGCOLOR, pady=10, padx=10)
+        cfg.ROOT.eval(f'tk::PlaceWindow {self} center')
         new_win.withdraw()
         new_win.title('О программе')
 
-        new_win.protocol("WM_DELETE_WINDOW", lambda: self.on_closing(new_win))
-        new_win.bind('<Command-w>', lambda e: self.on_closing(new_win))
-        new_win.bind('<Escape>', lambda e: self.on_closing(new_win))
+        new_win.protocol("WM_DELETE_WINDOW", new_win.destroy)
+        new_win.bind('<Command-w>', lambda e: new_win.destroy())
+        new_win.bind('<Escape>', lambda e: new_win.destroy())
 
         name = (
             f'{cfg.APP_NAME} {cfg.APP_VER}'

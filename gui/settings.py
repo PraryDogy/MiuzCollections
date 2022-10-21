@@ -14,18 +14,15 @@ import cfg
 import sqlalchemy
 import tkmacosx
 from database import Config, Dbase
-from PIL import Image, ImageTk
-from utils.utils import (MyButton, MyFrame, MyLabel, my_copy, my_paste,
+from utils import (MyButton, MyFrame, MyLabel, my_copy, my_paste,
                          place_center)
-
-from .descriptions import descriptions
 
 
 vars = {
-    'PHOTODIR_LBL': tkinter.Label,
-    'COLLFOLDERS_LBL': tkinter.Label,
-    'RTFOLDER_ENTRY': tkinter.Entry,
-    'FILEAGE_ENTRY':tkinter.Entry,
+    'PHOTODIR_LBL': 'tkinter label',
+    'COLLFOLDERS_LBL': 'tkinter label',
+    'RTFOLDER_ENTRY': 'tkinter entry',
+    'FILEAGE_ENTRY':'tkinter entry',
     'text_length': 1,
     }
 
@@ -121,9 +118,11 @@ class Expert(tkmacosx.SFrame):
     Tkinter frame with advanced app settings.
     """
     def __init__(self, master):
+        txt1 = 'Путь к папке со всеми фото.'
+        txt2 = 'Путь к папке с коллекциями.'
 
         for descr, value, widget in zip(
-            [descriptions['PHOTO_DIR'], descriptions['COLL_FOLDER']],
+            [txt1, txt2],
             [cfg.config['PHOTO_DIR'], cfg.config['COLL_FOLDER']],
             ['PHOTODIR_LBL', 'COLLFOLDERS_LBL']):
 
@@ -149,9 +148,21 @@ class Expert(tkmacosx.SFrame):
             sep = Separator(master, orient='horizontal')
             sep.pack(padx=40, pady=20, fill=tkinter.X)
 
+        txt3 = (
+            'Имя папки с ретушью. Подразумевается, что внутри папки с этим '
+            'именем будут отретушированные фото.'
+            )
+
+        txt4 = (
+            'По умолчанию программа ищет отретушированные фотографии за '
+            f'последние {cfg.config["FILE_AGE"]} дней. Можно указать другое '
+            'количество дней. Чем больше дней, тем дольше сканирование. Можно '
+            'так же воспользоваться полным сканированием за все время в '
+            'основных настройках.'
+            )
 
         for descr, value, widget in zip(
-            [descriptions['RT_FOLDER'], descriptions['FILE_AGE']],
+            [txt3, txt4],
             [cfg.config['RT_FOLDER'], cfg.config['FILE_AGE']],
             ['RTFOLDER_ENTRY', 'FILEAGE_ENTRY']):
 

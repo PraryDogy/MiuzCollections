@@ -16,7 +16,7 @@ import sqlalchemy
 import tkmacosx
 from database import Config, Dbase, Thumbs
 from PIL import Image, ImageTk
-from utils.utils import MyButton, MyFrame, MyLabel
+from utils import MyButton, MyFrame, MyLabel
 
 from .image_viewer import ImagePreview
 
@@ -28,36 +28,6 @@ def get_curr_coll():
     """
     return Dbase.conn.execute(sqlalchemy.select(Config.value).where(
         Config.name=='currColl')).first()[0]
-
-
-def upd_curr_coll(coll):
-    """
-    Updates Database > Config > currColl > value
-    * param `coll`: str selected collection name
-    """
-    Dbase.conn.execute(sqlalchemy.update(Config).where(
-        Config.name=='currColl').values(value=coll))
-
-
-def load_last():
-    """
-    Returns tuples list (image, image source, image modified time).
-    """
-    return Dbase.conn.execute(sqlalchemy.select(
-        Thumbs.img150, Thumbs.src, Thumbs.modified).order_by(
-                    -Thumbs.modified).limit(60)).fetchall()
-
-
-def load_curr_coll(curr_coll):
-    """
-    Returns tuples list (image, image source, image modified time).
-    * param `img_size`: Thumbs.__dict__['img'+ `Globals().get_size()`]
-    * param `curr_coll`: from `Globals().get_curr_coll()`
-    """
-    return Dbase.conn.execute(sqlalchemy.select(
-        Thumbs.img150, Thumbs.src, Thumbs.modified).where(
-            Thumbs.collection==curr_coll).order_by(
-                -Thumbs.modified)).fetchall()
 
 
 class Gallery(MyFrame):
@@ -155,7 +125,9 @@ class MenuButtons(tkmacosx.SFrame):
             btn_item['bg'] = cfg.BGBUTTON
         btn['bg'] = cfg.BGPRESSED
 
-        upd_curr_coll(coll)
+        Dbase.conn.execute(sqlalchemy.update(Config).where(
+            Config.name=='currColl').values(value=coll))
+
         cfg.IMAGES_RESET()
 
 
@@ -184,9 +156,19 @@ class ImagesThumbs(tkmacosx.SFrame):
 
         if curr_coll == 'last':
             title.configure(text='Последние добавленные')
-            res = load_last()
+            res = Dbase.conn.execute(
+                sqlalchemy.select(
+                    Thumbs.img150, Thumbs.src, Thumbs.modified
+                    ).order_by(
+                    -Thumbs.modified).limit(120)).fetchall()
         else:
-            res = load_curr_coll(curr_coll)
+            res = Dbase.conn.execute(
+                sqlalchemy.select(
+                    Thumbs.img150, Thumbs.src, Thumbs.modified
+                    ).where(
+                    Thumbs.collection==curr_coll
+                    ).order_by(
+                        -Thumbs.modified)).fetchall()
 
         thumbs = self.load_thumbs(res)
 
@@ -199,7 +181,7 @@ class ImagesThumbs(tkmacosx.SFrame):
                 self, text=y[-1][-1], font=('Arial', 35, 'bold'))
             year_label.pack(pady=(15, 15))
 
-            self.pack_rows(self.fill_empty(y, self.clmns), self.clmns, self)
+            self.pack_rows(y, self.clmns, self)
 
     def reset(self):
         """
@@ -235,32 +217,6 @@ class ImagesThumbs(tkmacosx.SFrame):
 
             except Exception:
                 print(traceback.format_exc())
-
-        return thumbs
-
-    def fill_empty(self, thumbs, clmns):
-        """
-        Creates new images for thumbs list if thumbs list smaller than
-        collumn count.
-        Each new image has fill with cfg.BGCOLOR color and size based on
-        database > config > size > value
-
-        This is necessary so that the row with images has a fixed number of
-        columns and tkinter root doesn't change it's size
-        if the number of columns is too small.
-
-        * returns: list of tuples (img, src, year)
-        * param `thumbs`: list of tuples (img, src, year)
-        * param `clmns`: int from database > config > clmns > value
-        """
-
-        if len(thumbs) < clmns and len(thumbs) != 0:
-            year = thumbs[-1][-1]
-
-            for _ in range(0, clmns-len(thumbs)):
-                new = Image.new('RGB', (150, 150), cfg.BGCOLOR)
-                photo = ImageTk.PhotoImage(new)
-                thumbs.append((photo, None, year))
 
         return thumbs
 

@@ -10,9 +10,32 @@ import threading
 import cfg
 import sqlalchemy
 from admin import print_alive
-from database import Dbase, Thumbs, Config
+from database import Config, Dbase, Thumbs
+from gui.smb_checker import SmbChecker
 
-from .utils import get_coll_name, insert_row, SmbChecker
+from utils import create_thumb, get_coll_name, smb_check
+
+
+def insert_row(**kw):
+    """
+    Adds new line to Database > Thumbs with new thumbnails.
+    Creates thumbnails with `create_thumb` method from `utils`
+    * param `src`: Image's path
+    * param `size`: Image's size `int`
+    * param `birth`: Image's date created `int`
+    * param `mod`: Date last modified of image `int`
+    * param `coll`: name of collection created with `get_coll_name`
+    """
+
+    img150 = create_thumb(kw['src'])[0]
+
+    values = {
+        'img150': img150, 
+        'src':kw['src'], 'size':kw['size'],
+        'created':kw['birth'], 'modified':kw['mod'],
+        'collection':kw['coll']}
+
+    Dbase.conn.execute(sqlalchemy.insert(Thumbs).values(values))
 
 
 class SearchDirs(list):
@@ -267,7 +290,7 @@ class UpdateCollections():
     Public method.
     Collection dirs analysis.
     Searchs images.
-    Updates the database.
+    Updates the 
     """
     def __init__(self):
         cfg.LIVE_LBL['fg'] = cfg.FONTCOLOR
@@ -293,7 +316,7 @@ class UpdateRetouched():
     Public method.
     Collection dirs analysis.
     Searchs images.
-    Updates the database.
+    Updates the 
 
     * param `aged`: true = updates dirs created later
     than `cfg.FILE_AGE` value
@@ -328,7 +351,8 @@ class Scaner(threading.Thread):
     Reset images gallery.
     """
     def __init__(self):
-        if not SmbChecker().check():
+        if not smb_check():
+            SmbChecker()
             return
 
         threading.Thread.__init__(self, target=self.__scan)

@@ -10,7 +10,7 @@ import tkinter
 
 # app info
 APP_NAME = 'MiuzGallery'
-APP_VER = '3.0.4'
+APP_VER = '3.0.5'
 
 # database info
 DB_DIR = os.path.join(
@@ -28,9 +28,6 @@ LIVE_LBL = tkinter.Label
 FLAG = True
 IMAGES_RESET = object
 
-IMAGE_FRAMES = set()
-IMAGES_INFO = []
-IMAGES_SRC = []
 
 def default_size():
     ROOT.update_idletasks()

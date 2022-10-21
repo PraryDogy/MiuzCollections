@@ -5,41 +5,14 @@ Gui for status bar.
 import tkinter
 
 import cfg
-from utils.utils import MyButton, MyFrame, MyLabel, SmbChecker
-from utils.scaner import Scaner
+from scaner import Scaner
+from utils import MyButton, MyFrame, MyLabel, smb_check
 
 from .settings import Settings
+from .smb_checker import SmbChecker
 
 
-class BtnCmd:
-    """
-    Stores functions for status bar buttons.
-    """
-    def open_settings(self, btn=MyButton):
-        """
-        Opens settings gui.
-        * param `btn`: tkinter button
-        """
-        btn.press()
-        Settings()
-
-    def updater(self, btn=MyButton):
-        """
-        Run Updater from utils with Splashscreen gui from utils.
-        * param `btn`: tkinter button
-        """
-        if not SmbChecker().check():
-            return
-
-        btn.press()
-        btn.unbind('<Button-1>')
-
-        Scaner()
-
-        btn.cmd(lambda e: self.updater(self))
-
-
-class StatusBar(MyFrame, BtnCmd):
+class StatusBar(MyFrame):
     """
     Tkinter frame for all status bar gui items.
     """
@@ -51,7 +24,7 @@ class StatusBar(MyFrame, BtnCmd):
         SettingsSection(self)
 
 
-class SettingsSection(MyLabel, MyButton, BtnCmd):
+class SettingsSection(MyLabel, MyButton):
     """
     Tkinter frame with button function open gui settings and description.
     """
@@ -61,8 +34,16 @@ class SettingsSection(MyLabel, MyButton, BtnCmd):
         self.cmd(lambda e: self.open_settings(self))
         self.pack(side=tkinter.LEFT, padx=(0, 0))
 
+    def open_settings(self, btn):
+        """
+        Opens settings gui.
+        * param `btn`: tkinter button
+        """
+        btn.press()
+        Settings()
 
-class UpdateSection(MyLabel, MyButton, BtnCmd):
+
+class UpdateSection(MyLabel, MyButton):
     """
     Tkinter frame with button function update collections and description.
     """
@@ -71,6 +52,20 @@ class UpdateSection(MyLabel, MyButton, BtnCmd):
         self.configure(width=5, height=1, )
         self.cmd(lambda e: self.updater(self))
         self.pack(side=tkinter.LEFT, padx=(0, 15))
+
+    def updater(self, btn=MyButton):
+        """
+        Run Updater from utils with Splashscreen gui from 
+        * param `btn`: tkinter button
+        """
+        if not smb_check():
+            SmbChecker()
+            return
+
+        btn.press()
+        btn.unbind('<Button-1>')
+        Scaner()
+        btn.cmd(lambda e: self.updater(self))
 
 
 class DynamicSection(MyLabel):

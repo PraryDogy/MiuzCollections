@@ -1,19 +1,15 @@
-from calendar import c
 import subprocess
 import tkinter
 
-from numpy import var
-
 import cfg
-from utils.utils import MyButton, MyFrame, MyLabel, my_copy
+from utils import MyButton, MyFrame, MyLabel, my_copy, place_center
 
 vars = {
-    'img1': '',
-    'img2': '',
-    'curr_img': '',
-    'img_frame': '',
-    'img_info': '',
-    'img_width': ''
+    'img1': 'from tkinter top level: image, text, image src',
+    'img2': 'from tkinter top level: image, text, image src',
+    'curr_img': 'img1 or img2',
+    'img_frame': 'tkinter label with image',
+    'img_info': 'tkinter label with text',
     }
 
 
@@ -37,6 +33,20 @@ class ImagesCompare(tkinter.Toplevel):
     images
     """
     def __init__(self):
+        tkinter.Toplevel.__init__(self, bg=cfg.BGCOLOR, padx=15, pady=15)
+        cfg.ROOT.eval(f'tk::PlaceWindow {self} center')
+        self.withdraw()
+
+        self.protocol("WM_DELETE_WINDOW", lambda: on_closing(self))
+        self.bind('<Command-w>', lambda e: on_closing(self))
+        self.bind('<Command-q>', lambda e: quit())
+        self.bind('<Escape>', lambda e: on_closing(self))
+
+        self.resizable(0,0)
+        side = int(cfg.ROOT.winfo_screenheight()*0.8)
+        self.geometry(f'{side}x{side}')
+        cfg.ROOT.update_idletasks()
+
         prevs = [v for k, v in cfg.ROOT.children.items() if "preview" in k]
         [i.withdraw() for i in prevs]
 
@@ -54,26 +64,13 @@ class ImagesCompare(tkinter.Toplevel):
 
         vars['curr_img'] = vars['img1']
 
-        tkinter.Toplevel.__init__(self)
-        self.withdraw()
-
-        self.protocol("WM_DELETE_WINDOW", lambda: on_closing(self))
-        self.bind('<Command-w>', lambda e: on_closing(self))
-        self.bind('<Command-q>', lambda e: quit())
-        self.bind('<Escape>', lambda e: on_closing(self))
-
-        self.configure(bg=cfg.BGCOLOR, padx=15, pady=15)
-        self.resizable(0,0)
-        side = int(cfg.ROOT.winfo_screenheight()*0.8)
-        self.geometry(f'{side}x{side}')
-
         ImageFrame(self).pack(fill=tkinter.BOTH, expand=True, pady=(0, 15))
         ImgButtons(self).pack(pady=(0, 15))
         ImgInfo(self).pack(pady=(0, 15), anchor=tkinter.CENTER)
         CloseBtn(self).pack()
 
         cfg.ROOT.update_idletasks()
-        self.geometry(f'+{cfg.ROOT.winfo_x() + 100}+{cfg.ROOT.winfo_y()}')
+        place_center(self)
         self.deiconify()
 
 
@@ -88,6 +85,7 @@ class ImageFrame(MyLabel):
         self['image'] = vars['curr_img'][0]
         vars['img_frame'] = self
 
+        self.update_idletasks()
         w = self.winfo_reqwidth()
         self.configure(width=w, height=w)
 
@@ -174,3 +172,5 @@ class CloseBtn(MyButton):
         MyButton.__init__(self, master, text='Закрыть')
         self.configure(height=2)
         self.cmd(lambda e: on_closing(self.winfo_toplevel()))
+
+        print('3fdsdf')

@@ -13,12 +13,3 @@ def print_alive(name_func='', what_print=''):
 
     # print(name_func, what_print)
     return
-
-
-def clear_db():
-    """
-    Just clears database, create new one and fills created tables.
-    """
-
-    database.Utils().create()
-    database.Utils().fill_config()

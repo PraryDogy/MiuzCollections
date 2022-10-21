@@ -2,15 +2,16 @@
 This is general gui with all elements.
 """
 
+import json
+import os
 import tkinter
 from tkinter.ttk import Separator
 
 import cfg
 
-from .images_gui import Gallery
 from .bar_menu import BarMenu
+from .images_gui import Gallery
 from .status_bar import StatusBar
-from utils.utils import save_size
 
 
 class MainGui:
@@ -40,14 +41,19 @@ class MainGui:
         cfg.ROOT.update_idletasks()
         cfg.ROOT.eval(f'tk::PlaceWindow {cfg.ROOT} center')
 
-        x = cfg.ROOT.winfo_x()
-        y = 0
-        w = cfg.ROOT.winfo_width()
-        h = int(cfg.ROOT.winfo_screenheight()*0.8)
-
         cfg.ROOT.geometry(f'{cfg.config["ROOT_SIZE"]}{cfg.config["ROOT_POS"]}')
 
     def on_exit(self):
         cfg.FLAG = False
-        save_size()
+
+        cfg.ROOT.update_idletasks()
+        w, h = cfg.ROOT.winfo_width(), cfg.ROOT.winfo_height()
+        x, y = cfg.ROOT.winfo_x(), cfg.ROOT.winfo_y()
+
+        cfg.config['ROOT_SIZE'] = f'{w}x{h}'
+        cfg.config['ROOT_POS'] = f'+{x}+{y}'
+
+        with open(os.path.join(cfg.DB_DIR, 'cfg.json'), 'w') as file:
+            json.dump(cfg.config, file, indent=4,)
+        
         quit()

@@ -6,31 +6,21 @@ import os
 import subprocess
 import tkinter
 from datetime import datetime
-from turtle import width
 
 import cfg
 from PIL import Image, ImageTk
-from utils.utils import (MyButton, MyFrame, MyLabel, SmbChecker, get_coll_name,
-                         my_copy)
+from utils import (MyButton, MyFrame, MyLabel, get_coll_name, my_copy,
+                         smb_check, place_center)
 
 from .images_compare import ImagesCompare
+from .smb_checker import SmbChecker
 
 vars = {
-    'img_src': '', 
-    'img_info': '',
-    'img_frame': '',
-    'curr_img': '',
+    'img_src': 'tkinter label', 
+    'img_info': 'tkinter label',
+    'img_frame': 'tkinter label',
+    'curr_img': 'pillow image',
     }
-
-
-def on_closing(obj=tkinter.Frame):
-    """
-    Destroys current tkinter toplevel.
-    Clears `cfg.IMAGES_COMPARE` list.
-    * param `obj`: tkinter toplevel
-    """
-
-    obj.destroy()
 
 
 class ImagePreview(tkinter.Toplevel):
@@ -39,25 +29,26 @@ class ImagePreview(tkinter.Toplevel):
     * param `src`: source path of image.
     """
     def __init__(self, src):
-        vars['img_src'] = src
-
-        tkinter.Toplevel.__init__(self)
+        tkinter.Toplevel.__init__(self, bg=cfg.BGCOLOR, padx=15, pady=15)
+        cfg.ROOT.eval(f'tk::PlaceWindow {self} center')
         self.withdraw()
 
-        if not SmbChecker().check():
+        if not smb_check():
+            SmbChecker()
             return
 
         if src is None:
             return
 
-        self.protocol("WM_DELETE_WINDOW", lambda: on_closing(self))
-        self.bind('<Command-w>', lambda e: on_closing(self))
-        self.bind('<Escape>', lambda e: on_closing(self))
+        self.protocol("WM_DELETE_WINDOW", self.destroy)
+        self.bind('<Command-w>', lambda e: self.destroy())
+        self.bind('<Escape>', lambda e: self.destroy())
 
-        self.configure(bg=cfg.BGCOLOR, padx=15, pady=15)
         self.resizable(0,0)
         side = int(cfg.ROOT.winfo_screenheight()*0.8)
         self.geometry(f'{side}x{side}')
+
+        vars['img_src'] = src
 
         ImgSrc(self)
         ImageFrame(self).pack(fill=tkinter.BOTH, expand=True)
@@ -67,8 +58,9 @@ class ImagePreview(tkinter.Toplevel):
 
         cfg.ROOT.update_idletasks()
 
-        self.geometry(f'+{cfg.ROOT.winfo_x() + 100}+{cfg.ROOT.winfo_y()}')
+        place_center(self)
         self.deiconify()
+
 
 
 class ImgSrc(MyLabel):
@@ -84,7 +76,8 @@ class ImageFrame(MyLabel):
     def __init__(self, master):
         MyLabel.__init__(self, master, borderwidth=0)
         vars['img_frame'] = self
-        vars['curr_img'] = Image.open(vars['img_src'])
+        img = Image.open(vars['img_src'])
+        vars['curr_img'] = img.copy()
 
         self['bg']='black'
         self.bind("<Configure>", lambda e: self.resize(e))
@@ -204,4 +197,4 @@ class CloseButton(MyButton):
     def __init__(self, master):
         MyButton.__init__(self, master, text='Закрыть')
         self.configure(height=2)
-        self.cmd(lambda e: on_closing(self.winfo_toplevel()))
+        self.cmd(lambda e: self.winfo_toplevel().destroy())
