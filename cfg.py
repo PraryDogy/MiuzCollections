@@ -10,7 +10,7 @@ import tkinter
 
 # app info
 APP_NAME = 'MiuzGallery'
-APP_VER = '3.0.5'
+APP_VER = '3.0.6'
 
 # database info
 DB_DIR = os.path.join(

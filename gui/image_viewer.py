@@ -158,7 +158,7 @@ class ImgButtons(MyFrame):
         if len(prevs) != 2:
 
             old_txt = vars['img_info']['text']
-            txt = '\n\n\nДолжно быть открыто только два изображения.\n\n'
+            txt = '\n\n\nДолжно быть открыто два изображения.\n\n'
             vars['img_info']['text'] = txt
             vars['img_info']['anchor'] = tkinter.CENTER
             cfg.ROOT.after(

@@ -86,7 +86,7 @@ class ImageFrame(MyLabel):
         vars['img_frame'] = self
 
         self.update_idletasks()
-        w = self.winfo_reqwidth()
+        w = self.winfo_width()
         self.configure(width=w, height=w)
 
 
@@ -172,5 +172,3 @@ class CloseBtn(MyButton):
         MyButton.__init__(self, master, text='Закрыть')
         self.configure(height=2)
         self.cmd(lambda e: on_closing(self.winfo_toplevel()))
-
-        print('3fdsdf')
