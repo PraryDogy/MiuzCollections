@@ -86,7 +86,8 @@ if not os.path.exists(os.path.join(CFG_DIR, 'database.db')):
 if os.path.exists(os.path.join(CFG_DIR, 'cfg.json')):
     config = read_cfg()
 else:
-    config = encrypt_cfg(defaults())
+    encrypt_cfg(defaults())
+    config = defaults()
 
 for i in defaults().keys():
     try:
