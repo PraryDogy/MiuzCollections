@@ -19,7 +19,9 @@ KEY = 'QaovKbF1YpKCM9e-HE2wvn30lIqCbeYTUcONcdLpV18='
 
 # database info
 CFG_DIR = os.path.join(
-    os.path.expanduser('~'), 'Library', 'Application Support', 'Miuz Gallery')
+    os.path.expanduser('~'), 'Library/Application Support/Miuz Gallery')
+
+print(CFG_DIR)
 
 FONTCOLOR = "#E2E2E2"
 BGCOLOR = "#222222"
