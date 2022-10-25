@@ -2,3 +2,4 @@ opencv-python
 Pillow
 SQLAlchemy
 tkmacosx
+cryptography

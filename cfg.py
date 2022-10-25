@@ -13,7 +13,7 @@ from utils import encrypt_cfg
 
 # app info
 APP_NAME = 'MiuzGallery'
-APP_VER = '3.0.8'
+APP_VER = '3.0.9'
 
 KEY = 'QaovKbF1YpKCM9e-HE2wvn30lIqCbeYTUcONcdLpV18='
 
@@ -34,61 +34,50 @@ FLAG = True
 IMAGES_RESET = object
 
 
-def default_size():
-    ROOT.update_idletasks()
-    if ROOT.winfo_screenwidth() > 150*8:
-        return f'{150*8}x{int(ROOT.winfo_screenheight()*0.8)}'
-    else:
-        w = int(ROOT.winfo_screenwidth()*0.7)
-        h = int(ROOT.winfo_screenheight()*0.8)
-        return f'{w}x{h}'
-
-
 def defaults():
     return {
+        'APP_VER': APP_VER,
         'PHOTO_DIR': '/Volumes/Shares/Marketing/Photo',
         'COLL_FOLDER': '/Volumes/Shares/Marketing/Photo/_Collections',
         'RT_FOLDER': 'Retouch',
         'FILE_AGE': 60,
-        'ROOT_SIZE': default_size(),
+        'ROOT_SIZE': '500x500',
         'ROOT_POS': '+0+0',
         'CURR_COLL': 'last',
         'TYPE_SCAN': '',
         }
 
 
-def read_cfg():
+def read_cfg(what_read):
     """
     Decrypts `cfg.json` from `cfg.CFG_DIR` and returns dict.
     """
     key = Fernet(KEY)
-
-    with open(os.path.join(CFG_DIR, 'cfg.json'), 'rb') as file:
+    with open(what_read, 'rb') as file:
         data = file.read()
-
     try:
         return json.loads(key.decrypt(data).decode("utf-8"))
     except InvalidToken:
-        data = defaults()
-        encrypt_cfg(data)
-        return data
+        config = defaults()
+        encrypt_cfg(config)
 
+        shutil.copyfile(
+            os.path.join(os.path.dirname(__file__), 'database.db'),
+            os.path.join(CFG_DIR, 'database.db'))
 
-def copy_db():
-    shutil.copyfile(
-        os.path.join(os.path.dirname(__file__), 'database.db'),
-        os.path.join(CFG_DIR, 'database.db'))
+        return config
 
 
 if not os.path.exists(CFG_DIR):
     os.mkdir(CFG_DIR)
 
-if not os.path.exists(os.path.join(CFG_DIR, 'database.db')):
-    copy_db()
-
 if os.path.exists(os.path.join(CFG_DIR, 'cfg.json')):
-    config = read_cfg()
+    config = read_cfg(os.path.join(CFG_DIR, 'cfg.json'))
 else:
     config = defaults()
     encrypt_cfg(config)
 
+if not os.path.exists(os.path.join(CFG_DIR, 'database.db')):
+    shutil.copyfile(
+        os.path.join(os.path.dirname(__file__), 'database.db'),
+        os.path.join(CFG_DIR, 'database.db'))
