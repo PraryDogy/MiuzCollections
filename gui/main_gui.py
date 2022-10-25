@@ -8,6 +8,7 @@ import tkinter
 from tkinter.ttk import Separator
 
 import cfg
+from utils import encrypt_cfg
 
 from .bar_menu import BarMenu
 from .images_gui import Gallery
@@ -52,7 +53,6 @@ class MainGui:
         cfg.config['ROOT_SIZE'] = f'{w}x{h}'
         cfg.config['ROOT_POS'] = f'+{x}+{y}'
 
-        with open(os.path.join(cfg.DB_DIR, 'cfg.json'), 'w') as file:
-            json.dump(cfg.config, file, indent=4,)
+        encrypt_cfg(cfg.config)
         
         quit()

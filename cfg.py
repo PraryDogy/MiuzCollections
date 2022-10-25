@@ -6,14 +6,16 @@ import json
 import os
 import shutil
 import tkinter
-
+from utils import encrypt_cfg, decrypt_cfg
 
 # app info
 APP_NAME = 'MiuzGallery'
 APP_VER = '3.0.7'
 
+KEY = 'QaovKbF1YpKCM9e-HE2wvn30lIqCbeYTUcONcdLpV18='
+
 # database info
-DB_DIR = os.path.join(
+CFG_DIR = os.path.join(
     os.path.expanduser('~'), 'Library', 'Application Support', 'Miuz Gallery')
 
 FONTCOLOR = "#E2E2E2"
@@ -51,31 +53,22 @@ def defaults():
         }
 
 
-def create_json():
-    with open(os.path.join(DB_DIR, 'cfg.json'), 'w') as file:
-        defaul = defaults()
-        json.dump(defaul, file, indent=4,)
-        return defaul
+if not os.path.exists(CFG_DIR):
+    os.mkdir(CFG_DIR)
 
-
-if not os.path.exists(DB_DIR):
-    os.mkdir(DB_DIR)
-
-if not os.path.exists(os.path.join(DB_DIR, 'database.db')):
+if not os.path.exists(os.path.join(CFG_DIR, 'database.db')):
     shutil.copyfile(
         os.path.join(os.path.dirname(__file__), 'database.db'),
-        os.path.join(DB_DIR, 'database.db'),
+        os.path.join(CFG_DIR, 'database.db'),
         )
 
-
-if os.path.exists(os.path.join(DB_DIR, 'cfg.json')):
-    with open(os.path.join(DB_DIR, 'cfg.json'), 'r') as file:
-        config = json.load(file)
+if os.path.exists(os.path.join(CFG_DIR, 'cfg.json')):
+    config = decrypt_cfg()
 else:
-    config = create_json()
+    config = encrypt_cfg(defaults())
 
 for i in defaults().keys():
     try:
         config[i]
     except KeyError:
-        config = create_json()
+        config = encrypt_cfg(defaults())

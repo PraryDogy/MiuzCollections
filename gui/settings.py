@@ -2,7 +2,6 @@
 Tkinter toplevel gui with app settings.
 """
 
-import json
 import os
 import shutil
 import sys
@@ -14,9 +13,8 @@ import cfg
 import sqlalchemy
 import tkmacosx
 from database import Config, Dbase
-from utils import (MyButton, MyFrame, MyLabel, my_copy, my_paste,
-                         place_center)
-
+from utils import (MyButton, MyFrame, MyLabel, encrypt_cfg, my_copy, my_paste,
+                   place_center)
 
 vars = {
     'PHOTODIR_LBL': 'tkinter label',
@@ -212,7 +210,7 @@ class Expert(tkmacosx.SFrame):
         reset_button.pack(side=tkinter.LEFT)
 
     def full_reset(self):
-        shutil.rmtree(cfg.DB_DIR)
+        shutil.rmtree(cfg.CFG_DIR)
         os.execv(sys.executable, ['python'] + sys.argv)
 
     def select_path(self, widget):
@@ -301,7 +299,6 @@ class BelowMenu(MyFrame):
         cfg.config['RT_FOLDER'] = vars['RTFOLDER_ENTRY'].get()
         cfg.config['FILE_AGE'] = vars['FILEAGE_ENTRY'].get()
 
-        with open(os.path.join(cfg.DB_DIR, 'cfg.json'), 'w') as file:
-            json.dump(cfg.config, file, indent=4)
+        encrypt_cfg(cfg.config)
 
         self.winfo_toplevel().destroy()

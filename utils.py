@@ -8,12 +8,40 @@
 * MyLabel
 """
 
+import json
 import os
 import subprocess
 import tkinter
 
-import cfg
 import cv2
+from cryptography.fernet import Fernet
+
+import cfg
+
+
+def encrypt_cfg(data):
+    """
+    Converts dict with json dumps and enctypt converted with fernet module.
+    Writes enctypted data to `cfg.json` in `cfg.CFG_DIR`
+    *param `data`: python dict
+    """
+    key = Fernet(cfg.KEY)
+    encrypted = key.encrypt(json.dumps(data).encode("utf-8"))
+
+    with open(os.path.join(cfg.CFG_DIR, 'cfg.json'), 'wb') as file:
+        file.write(encrypted)
+
+
+def decrypt_cfg():
+    """
+    Decrypts `cfg.json` from `cfg.CFG_DIR` and returns dict.
+    """
+    key = Fernet(cfg.KEY)
+
+    with open(os.path.join(cfg.CFG_DIR, 'cfg.json'), 'rb') as file:
+        data = file.read()
+
+    return json.loads(key.decrypt(data).decode("utf-8"))
 
 
 def get_coll_name(src):
