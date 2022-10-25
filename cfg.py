@@ -10,7 +10,7 @@ from utils import encrypt_cfg, decrypt_cfg
 
 # app info
 APP_NAME = 'MiuzGallery'
-APP_VER = '3.0.7'
+APP_VER = '3.0.8'
 
 KEY = 'QaovKbF1YpKCM9e-HE2wvn30lIqCbeYTUcONcdLpV18='
 
