@@ -7,13 +7,13 @@ import os
 import sys
 import threading
 
-import cfg
 import sqlalchemy
-from admin import print_alive
-from database import Config, Dbase, Thumbs
-from gui.smb_checker import SmbChecker
 
-from utils import create_thumb, get_coll_name, smb_check
+import cfg
+from admin import print_alive
+from database import Dbase, Thumbs
+from gui.smb_checker import SmbChecker
+from utils import create_thumb, encrypt_cfg, get_coll_name, smb_check
 
 
 def insert_row(**kw):
@@ -365,14 +365,12 @@ class Scaner(threading.Thread):
         """Run Files Scaner & Database Updater from utils"""
 
         cfg.FLAG = True
-        type_scan = Dbase.conn.execute(sqlalchemy.select(Config.value).where(
-            Config.name=='typeScan')).first()[0]
 
         UpdateCollections()
 
-        if type_scan == 'full':
-            Dbase.conn.execute(sqlalchemy.update(Config).where(
-                Config.name=='typeScan').values(value=''))
+        if cfg.config['TYPE_SCAN'] == 'full':
+            cfg.config['TYPE_SCAN'] = ''
+            encrypt_cfg(cfg.config)
             UpdateRetouched(aged=False)
             return
 

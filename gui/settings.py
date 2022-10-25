@@ -10,9 +10,7 @@ from tkinter import filedialog
 from tkinter.ttk import Separator
 
 import cfg
-import sqlalchemy
 import tkmacosx
-from database import Config, Dbase
 from utils import (MyButton, MyFrame, MyLabel, encrypt_cfg, my_copy, my_paste,
                    place_center)
 
@@ -106,8 +104,8 @@ class General(MyFrame):
         """
         Reload app and run Utils Scaner with full scan method.
         """
-        Dbase.conn.execute(sqlalchemy.update(Config).where(
-            Config.name=='typeScan').values(value='full'))
+        cfg.config['TYPE_SCAN'] = 'full'
+        encrypt_cfg(cfg.config)
         os.execv(sys.executable, ['python'] + sys.argv)
 
 

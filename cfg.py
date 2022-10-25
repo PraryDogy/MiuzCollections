@@ -46,14 +46,14 @@ def default_size():
 
 def defaults():
     return {
-        'PHOTO_DIR': os.path.join(
-            os.sep, 'Volumes', 'Shares', 'Marketing', 'Photo'),
-        'COLL_FOLDER': os.path.join(
-            os.sep, 'Volumes', 'Shares', 'Marketing', 'Photo', '_Collections'),
+        'PHOTO_DIR': '/Volumes/Shares/Marketing/Photo',
+        'COLL_FOLDER': '/Volumes/Shares/Marketing/Photo/_Collections',
         'RT_FOLDER': 'Retouch',
         'FILE_AGE': 60,
         'ROOT_SIZE': default_size(),
-        'ROOT_POS': '+0+0'
+        'ROOT_POS': '+0+0',
+        'CURR_COLL': 'last',
+        'TYPE_SCAN': '',
         }
 
 
@@ -74,23 +74,21 @@ def read_cfg():
         return data
 
 
+def copy_db():
+    shutil.copyfile(
+        os.path.join(os.path.dirname(__file__), 'database.db'),
+        os.path.join(CFG_DIR, 'database.db'))
+
+
 if not os.path.exists(CFG_DIR):
     os.mkdir(CFG_DIR)
 
 if not os.path.exists(os.path.join(CFG_DIR, 'database.db')):
-    shutil.copyfile(
-        os.path.join(os.path.dirname(__file__), 'database.db'),
-        os.path.join(CFG_DIR, 'database.db'),
-        )
+    copy_db()
 
 if os.path.exists(os.path.join(CFG_DIR, 'cfg.json')):
     config = read_cfg()
 else:
-    encrypt_cfg(defaults())
     config = defaults()
+    encrypt_cfg(config)
 
-for i in defaults().keys():
-    try:
-        config[i]
-    except KeyError or TypeError:
-        config = encrypt_cfg(defaults())

@@ -14,20 +14,11 @@ import cv2
 import numpy
 import sqlalchemy
 import tkmacosx
-from database import Config, Dbase, Thumbs
+from database import Dbase, Thumbs
 from PIL import Image, ImageTk
 from utils import MyButton, MyFrame, MyLabel
 
 from .image_viewer import ImagePreview
-
-
-def get_curr_coll():
-    """
-    Returns name of selected collection.
-    Loads from Database > Config > currColl > value.
-    """
-    return Dbase.conn.execute(sqlalchemy.select(Config.value).where(
-        Config.name=='currColl')).first()[0]
 
 
 class Gallery(MyFrame):
@@ -80,7 +71,6 @@ class MenuButtons(tkmacosx.SFrame):
             for_btns.append((name_btn[:13], coll_item))
         for_btns.sort()
 
-        curr_coll = get_curr_coll()
         btns = []
         for name_btn, name_coll in for_btns:
 
@@ -89,7 +79,7 @@ class MenuButtons(tkmacosx.SFrame):
             btn.pack(pady=(0, 10))
             btns.append(btn)
 
-            if name_coll == curr_coll:
+            if name_coll == cfg.config['CURR_COLL']:
                 btn.configure(bg=cfg.BGPRESSED)
 
             btn.cmd(lambda e, coll=name_coll, btn=btn, btns=btns:
@@ -101,7 +91,7 @@ class MenuButtons(tkmacosx.SFrame):
         last_imgs.pack(pady=(0, 10))
         btns.append(last_imgs)
 
-        if curr_coll == 'last':
+        if cfg.config['CURR_COLL'] == 'last':
             last_imgs.configure(bg=cfg.BGPRESSED)
 
     def __open_coll(self, coll, btn, btns):
@@ -125,9 +115,7 @@ class MenuButtons(tkmacosx.SFrame):
             btn_item['bg'] = cfg.BGBUTTON
         btn['bg'] = cfg.BGPRESSED
 
-        Dbase.conn.execute(sqlalchemy.update(Config).where(
-            Config.name=='currColl').values(value=coll))
-
+        cfg.config['CURR_COLL'] = coll
         cfg.IMAGES_RESET()
 
 
@@ -148,13 +136,11 @@ class ImagesThumbs(tkmacosx.SFrame):
         w = int(cfg.config["ROOT_SIZE"].split('x')[0])
         self.clmns = ((w)//158)-1
 
-        curr_coll = get_curr_coll()
-
         title = MyLabel(
-            self, text=curr_coll, font=('Arial', 45, 'bold'))
+            self, text=cfg.config['CURR_COLL'], font=('Arial', 45, 'bold'))
         title.pack(pady=(0, 15))
 
-        if curr_coll == 'last':
+        if cfg.config['CURR_COLL'] == 'last':
             title.configure(text='Последние добавленные')
             res = Dbase.conn.execute(
                 sqlalchemy.select(
@@ -166,7 +152,7 @@ class ImagesThumbs(tkmacosx.SFrame):
                 sqlalchemy.select(
                     Thumbs.img150, Thumbs.src, Thumbs.modified
                     ).where(
-                    Thumbs.collection==curr_coll
+                    Thumbs.collection==cfg.config['CURR_COLL']
                     ).order_by(
                         -Thumbs.modified)).fetchall()
 

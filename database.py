@@ -42,16 +42,3 @@ class Thumbs(Dbase.base):
     created = sqlalchemy.Column(sqlalchemy.Integer)
     modified = sqlalchemy.Column(sqlalchemy.Integer)
     collection = sqlalchemy.Column(sqlalchemy.Text)
-
-
-class Config(Dbase.base):
-    """
-    Sqlalchemy model.
-
-    :param: name, value
-    """
-
-    __tablename__ = 'config'
-    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
-    name = sqlalchemy.Column(sqlalchemy.Text)
-    value = sqlalchemy.Column(sqlalchemy.Text)
