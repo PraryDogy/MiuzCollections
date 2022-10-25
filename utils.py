@@ -31,19 +31,6 @@ def encrypt_cfg(data):
     with open(os.path.join(cfg.CFG_DIR, 'cfg.json'), 'wb') as file:
         file.write(encrypted)
 
-
-def decrypt_cfg():
-    """
-    Decrypts `cfg.json` from `cfg.CFG_DIR` and returns dict.
-    """
-    key = Fernet(cfg.KEY)
-
-    with open(os.path.join(cfg.CFG_DIR, 'cfg.json'), 'rb') as file:
-        data = file.read()
-
-    return json.loads(key.decrypt(data).decode("utf-8"))
-
-
 def get_coll_name(src):
     """
     Returns collection name.

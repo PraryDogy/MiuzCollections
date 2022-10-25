@@ -6,7 +6,10 @@ import json
 import os
 import shutil
 import tkinter
-from utils import encrypt_cfg, decrypt_cfg
+
+from cryptography.fernet import Fernet, InvalidToken
+
+from utils import encrypt_cfg
 
 # app info
 APP_NAME = 'MiuzGallery'
@@ -40,6 +43,7 @@ def default_size():
         h = int(ROOT.winfo_screenheight()*0.8)
         return f'{w}x{h}'
 
+
 def defaults():
     return {
         'PHOTO_DIR': os.path.join(
@@ -53,6 +57,23 @@ def defaults():
         }
 
 
+def read_cfg():
+    """
+    Decrypts `cfg.json` from `cfg.CFG_DIR` and returns dict.
+    """
+    key = Fernet(KEY)
+
+    with open(os.path.join(CFG_DIR, 'cfg.json'), 'rb') as file:
+        data = file.read()
+
+    try:
+        return json.loads(key.decrypt(data).decode("utf-8"))
+    except InvalidToken:
+        data = defaults()
+        encrypt_cfg(data)
+        return data
+
+
 if not os.path.exists(CFG_DIR):
     os.mkdir(CFG_DIR)
 
@@ -63,12 +84,12 @@ if not os.path.exists(os.path.join(CFG_DIR, 'database.db')):
         )
 
 if os.path.exists(os.path.join(CFG_DIR, 'cfg.json')):
-    config = decrypt_cfg()
+    config = read_cfg()
 else:
     config = encrypt_cfg(defaults())
 
 for i in defaults().keys():
     try:
         config[i]
-    except KeyError:
+    except KeyError or TypeError:
         config = encrypt_cfg(defaults())
