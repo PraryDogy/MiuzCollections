@@ -28,7 +28,7 @@ def encrypt_cfg(data):
     key = Fernet(cfg.KEY)
     encrypted = key.encrypt(json.dumps(data).encode("utf-8"))
 
-    with open(os.path.join(cfg.CFG_DIR, 'cfg.json'), 'wb') as file:
+    with open(os.path.join(cfg.CFG_DIR, 'cfg'), 'wb') as file:
         file.write(encrypted)
 
 def get_coll_name(src):

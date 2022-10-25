@@ -21,8 +21,6 @@ KEY = 'QaovKbF1YpKCM9e-HE2wvn30lIqCbeYTUcONcdLpV18='
 CFG_DIR = os.path.join(
     os.path.expanduser('~'), 'Library/Application Support/Miuz Gallery')
 
-print(CFG_DIR)
-
 FONTCOLOR = "#E2E2E2"
 BGCOLOR = "#222222"
 BGBUTTON = "#434343"
@@ -73,8 +71,8 @@ def read_cfg(what_read):
 if not os.path.exists(CFG_DIR):
     os.mkdir(CFG_DIR)
 
-if os.path.exists(os.path.join(CFG_DIR, 'cfg.json')):
-    config = read_cfg(os.path.join(CFG_DIR, 'cfg.json'))
+if os.path.exists(os.path.join(CFG_DIR, 'cfg')):
+    config = read_cfg(os.path.join(CFG_DIR, 'cfg'))
 else:
     config = defaults()
     encrypt_cfg(config)
