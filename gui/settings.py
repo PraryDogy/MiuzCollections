@@ -210,7 +210,7 @@ class Expert(tkmacosx.SFrame):
         below_frame.pack(pady=(15, 15))
 
         save_btn = MyButton(below_frame, text='Сохранить')
-        save_btn.cmd(lambda e: self.save_settings())
+        save_btn.cmd(lambda e: self.save_settings(master))
         save_btn.pack(side=tkinter.LEFT, padx=(0, 10))
 
         cancel_btn = MyButton(below_frame, text='Отмена')
@@ -273,13 +273,13 @@ class Expert(tkmacosx.SFrame):
         ins.delete(0, 'end')
         ins.insert(0, my_paste())
 
-    def cancel(self, master: tkinter.Toplevel):
+    def cancel(self, master: tkinter.Frame):
         """
         Cancel button command.
         """
         master.winfo_toplevel().destroy()
 
-    def save_settings(self):
+    def save_settings(self, master: tkinter.Frame):
         """
         Get text from all text fields in advanced settings and save to
         cfg.json
@@ -292,4 +292,4 @@ class Expert(tkmacosx.SFrame):
 
         encrypt_cfg(cfg.config)
 
-        self.winfo_toplevel().destroy()
+        master.winfo_toplevel().destroy()
