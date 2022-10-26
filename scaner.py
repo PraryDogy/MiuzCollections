@@ -290,7 +290,7 @@ class UpdateCollections():
     Public method.
     Collection dirs analysis.
     Searchs images.
-    Updates the 
+    Updates the database thumbnails.
     """
     def __init__(self):
         cfg.LIVE_LBL['fg'] = cfg.FONTCOLOR
@@ -316,7 +316,7 @@ class UpdateRetouched():
     Public method.
     Collection dirs analysis.
     Searchs images.
-    Updates the 
+    Updates database thumbnails.
 
     * param `aged`: true = updates dirs created later
     than `cfg.FILE_AGE` value
@@ -365,7 +365,6 @@ class Scaner(threading.Thread):
         """Run Files Scaner & Database Updater from utils"""
 
         cfg.FLAG = True
-
         UpdateCollections()
 
         if cfg.config['TYPE_SCAN'] == 'full':
@@ -375,5 +374,5 @@ class Scaner(threading.Thread):
             return
 
         UpdateRetouched(aged=True)
-
+        Dbase.conn.execute('VACUUM')
         cfg.IMAGES_RESET()

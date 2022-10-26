@@ -8,6 +8,7 @@ import sys
 import tkinter
 from tkinter import filedialog
 from tkinter.ttk import Separator
+from turtle import width
 
 import cfg
 import tkmacosx
@@ -38,23 +39,22 @@ class Settings(tkinter.Toplevel):
         self.bind('<Command-q>', lambda e: quit())
 
         self.withdraw()
-        self.resizable(0,0)
         self.title('Настройки')
         self.configure(padx=20, pady=10)
         self.geometry(
-            f'{int(cfg.ROOT.winfo_width()*0.5)}x'
-            f'{int(cfg.ROOT.winfo_height()*0.8)}')
+            f'{int(cfg.ROOT.winfo_width()*0.4)}x'
+            f'{int(cfg.ROOT.winfo_height()*0.7)}')
 
         cfg.ROOT.update_idletasks()
         vars['text_length'] = int(self.winfo_width()*0.9)
 
         scrollable = tkmacosx.SFrame(
             self, bg=cfg.BGCOLOR, scrollbarwidth=7)
+
         scrollable.pack(fill=tkinter.BOTH, expand=True)
 
         General(scrollable)
         Expert(scrollable)
-        BelowMenu(self).pack(pady=(10,0), padx=(0, 19))
 
         place_center(self)
         self.deiconify()
@@ -114,18 +114,17 @@ class Expert(tkmacosx.SFrame):
     Tkinter frame with advanced app settings.
     """
     def __init__(self, master):
-        txt1 = 'Путь к папке со всеми фото.'
-        txt2 = 'Путь к папке с коллекциями.'
 
-        for descr, value, widget in zip(
-            [txt1, txt2],
+        for title, value, widget in zip(
+            ['Все фото.', 'Коллекции.'],
             [cfg.config['PHOTO_DIR'], cfg.config['COLL_FOLDER']],
             ['PHOTODIR_LBL', 'COLLFOLDERS_LBL']):
 
             gallery_descr = MyLabel(
-                master, text=descr, justify=tkinter.LEFT,
-                wraplength=vars['text_length'])
-            gallery_descr.pack(anchor=tkinter.W)
+                master, text=title, justify=tkinter.LEFT,
+                wraplength=vars['text_length'],
+                font=('Arial', 22, 'bold'))
+            gallery_descr.pack()
 
             vars[widget] = MyLabel(
                 master, text=value, justify=tkinter.LEFT,
@@ -189,7 +188,7 @@ class Expert(tkmacosx.SFrame):
             btn_paste.configure(height=1, width=9)
             btn_paste.cmd(
                 lambda e, x=widget, y=btn_paste: self.paste_input(x))
-            btn_paste.pack(side=tkinter.RIGHT, padx=(0, 10))
+            btn_paste.pack(side=tkinter.RIGHT)
 
             sep = Separator(master, orient='horizontal')
             sep.pack(padx=40, pady=20, fill=tkinter.X)
@@ -200,12 +199,23 @@ class Expert(tkmacosx.SFrame):
         restore_btn = MyButton(rest_frame, text='По умолчанию')
         restore_btn.configure(height=1, width=12)
         restore_btn.cmd(lambda e, x=restore_btn: self.restore(x))
-        restore_btn.pack(side=tkinter.LEFT, padx=(0, 15))
+        restore_btn.pack(side=tkinter.LEFT, padx=(0, 10))
 
         reset_button = MyButton(rest_frame, text='Полный сброс')
         reset_button.configure(height=1, width=12)
         reset_button.cmd(lambda e: self.full_reset())
-        reset_button.pack(side=tkinter.LEFT)
+        reset_button.pack(side=tkinter.RIGHT)
+
+        below_frame = MyFrame(master)
+        below_frame.pack(pady=(15, 15))
+
+        save_btn = MyButton(below_frame, text='Сохранить')
+        save_btn.cmd(lambda e: self.save_settings())
+        save_btn.pack(side=tkinter.LEFT, padx=(0, 10))
+
+        cancel_btn = MyButton(below_frame, text='Отмена')
+        cancel_btn.cmd(lambda e: self.cancel())
+        cancel_btn.pack(side=tkinter.RIGHT)
 
     def full_reset(self):
         shutil.rmtree(cfg.CFG_DIR)
@@ -262,23 +272,6 @@ class Expert(tkmacosx.SFrame):
         btn.press()
         ins.delete(0, 'end')
         ins.insert(0, my_paste())
-
-
-class BelowMenu(MyFrame):
-    """
-    Creates tkinter frame with save settings button and close button.
-    * param `master`: tkinter frame
-    """
-    def __init__(self, master):
-        MyFrame.__init__(self, master)
-
-        save_btn = MyButton(self, text='Сохранить')
-        save_btn.cmd(lambda e: self.save_settings())
-        save_btn.pack(side=tkinter.LEFT, padx=10)
-
-        cancel_btn = MyButton(self, text='Отмена')
-        cancel_btn.cmd(lambda e: self.cancel())
-        cancel_btn.pack(side=tkinter.LEFT)
 
     def cancel(self):
         """
