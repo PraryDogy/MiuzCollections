@@ -82,7 +82,7 @@ class ImageFrame(MyLabel):
         self['bg']='black'
         self.bind("<Configure>", lambda e: self.resize(e))
 
-    def resize(self, e):
+    def resize(self, e=tkinter.Event):
         """
         Fits image to label size.
         * param `img`: current image.
@@ -147,7 +147,7 @@ class ImgButtons(MyFrame):
             open_btn.cmd(lambda e: self.open_folder(open_btn))
             open_btn.pack(side=tkinter.LEFT, padx=(0, 15))
 
-    def compare(self, btn):
+    def compare(self, btn: MyButton):
         """
         Compares two images and open gui with result.
         * param `btn`: current tkinter button.
@@ -169,7 +169,7 @@ class ImgButtons(MyFrame):
 
         ImagesCompare()
 
-    def copy_name(self, btn):
+    def copy_name(self, btn: MyButton):
         """
         Copies path to folder with image.
         Simulates button press with color.
@@ -178,7 +178,7 @@ class ImgButtons(MyFrame):
         btn.press()
         my_copy(vars['img_src'].split('/')[-1].split('.')[0])
 
-    def open_folder(self, btn):
+    def open_folder(self, btn: MyButton):
         """
         Opens folder with image.
         Simulates button press with color.

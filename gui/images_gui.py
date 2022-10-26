@@ -94,7 +94,7 @@ class MenuButtons(tkmacosx.SFrame):
         if cfg.config['CURR_COLL'] == 'last':
             last_imgs.configure(bg=cfg.BGPRESSED)
 
-    def __open_coll(self, coll, btn, btns):
+    def __open_coll(self, coll: str, btn: MyButton, btns: list):
         """
         Changes all buttons color to default and change color for
         pressed button.
@@ -179,7 +179,7 @@ class ImagesThumbs(tkmacosx.SFrame):
         ImagesThumbs(self.master).pack(
             expand=True, fill=tkinter.BOTH, side=tkinter.RIGHT)
 
-    def load_thumbs(self, all_images):
+    def load_thumbs(self, all_images: list):
         """
         Loads thumbnails from database > thumbnails based on size from
         database > config > size > value.
@@ -206,7 +206,7 @@ class ImagesThumbs(tkmacosx.SFrame):
 
         return thumbs
 
-    def split_years(self, thumbs):
+    def split_years(self, thumbs: list):
         """
         Splits a list into lists by year.
         * returns: list of lists
@@ -221,7 +221,7 @@ class ImagesThumbs(tkmacosx.SFrame):
         list_years.reverse()
         return list_years
 
-    def pack_rows(self, thumbs, clmns, master):
+    def pack_rows(self, thumbs: list, clmns: int, master: tkinter.Frame):
         """
         Splits list of tuples by the number of lists.
         Each list is row with number of columns based on 'clmns'.

@@ -48,7 +48,7 @@ def defaults():
         }
 
 
-def read_cfg(what_read):
+def read_cfg(what_read: str):
     """
     Decrypts `cfg.json` from `cfg.CFG_DIR` and returns dict.
     """

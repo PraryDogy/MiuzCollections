@@ -45,7 +45,7 @@ class SettingsSection(MyLabel, MyButton):
         self.cmd(lambda e: self.open_settings(self))
         self.pack(side=tkinter.LEFT, padx=(0, 0))
 
-    def open_settings(self, btn):
+    def open_settings(self, btn: MyButton):
         """
         Opens settings gui.
         * param `btn`: tkinter button
@@ -64,7 +64,7 @@ class UpdateSection(MyLabel, MyButton):
         self.cmd(lambda e: self.updater(self))
         self.pack(side=tkinter.LEFT, padx=(0, 15))
 
-    def updater(self, btn=MyButton):
+    def updater(self, btn: MyButton):
         """
         Run Updater from utils with Splashscreen gui from 
         * param `btn`: tkinter button

@@ -13,7 +13,7 @@ vars = {
     }
 
 
-def on_closing(obj):
+def on_closing(obj: tkinter.Toplevel):
     """
     Destroys current tkinter toplevel.
     Clears `cfg.IMAGES_COMPARE` list.
@@ -116,7 +116,7 @@ class ImgButtons(MyFrame):
         toogle.cmd(lambda e: self.switch_image(toogle))
         toogle.pack(side=tkinter.LEFT, padx=(0, 0))
 
-    def copy_name(self, btn):
+    def copy_name(self, btn: MyButton):
         """
         Copies path to folder with image.
         Simulates button press with color.
@@ -126,7 +126,7 @@ class ImgButtons(MyFrame):
         get_name = vars['curr_img'][2].split('/')[-1].split('.')[0]
         my_copy(get_name)
 
-    def open_folder(self, btn):
+    def open_folder(self, btn: MyButton):
         """
         Opens folder with image.
         Simulates button press with color.
@@ -136,7 +136,7 @@ class ImgButtons(MyFrame):
         path = '/'.join(vars['curr_img'][2].split('/')[:-1])
         subprocess.check_output(["/usr/bin/open", path])
 
-    def switch_image(self, btn):
+    def switch_image(self, btn: MyButton):
         """
         Switches between two images from cfg.IMAGES_COMPARE set.
         """

@@ -64,7 +64,7 @@ class SearchDirs(list):
                 years_dirs.append(os.path.join(b_dir, dirs))
         return years_dirs
 
-    def aged_years(self, list_dirs):
+    def aged_years(self, list_dirs: list):
         """
         Returns list of dirs.
         Looking for all dirs created later than `cfg.FILE_AGE` days ago
@@ -97,7 +97,7 @@ class SearchDirs(list):
 
         return colls
 
-    def retouched(self, list_dirs):
+    def retouched(self, list_dirs: list):
         """
         Returns list of dirs.
         Looking for folders with `cfg.RT_FOLDER` name in list of dirs
@@ -125,7 +125,7 @@ class SearchImages(list):
     Creates list of tuples with
     `src`, int `size`, int `created`, int `modified`
     """
-    def __init__(self, list_dirs):
+    def __init__(self, list_dirs: list):
         all_files = []
 
         for path in list_dirs:
@@ -222,7 +222,7 @@ class DbUpdate(list):
                 insert_row(src=src, size=n_size, birth=n_birth,
                                 mod=n_mod, coll=coll)
 
-    def added(self, list_dirs):
+    def added(self, list_dirs: list):
         """
         Adds new line with thumnails to database if list item
         not in `load_db` list and exists in `SearchImages` list
@@ -246,7 +246,7 @@ class DbUpdate(list):
                 insert_row(src=src, size=size, birth=created,
                                 mod=mod, coll=coll)
 
-    def moved(self, list_dirs):
+    def moved(self, list_dirs: list):
         """
         Updates database line if list item is in both lists (`db_load`,
         `SearchImages`).
@@ -321,7 +321,7 @@ class UpdateRetouched():
     * param `aged`: true = updates dirs created later
     than `cfg.FILE_AGE` value
     """
-    def __init__(self, aged):
+    def __init__(self, aged: bool):
         cfg.LIVE_LBL['text'] = 'Обновление 60%'
 
         if aged:

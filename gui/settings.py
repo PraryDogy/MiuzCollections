@@ -214,7 +214,7 @@ class Expert(tkmacosx.SFrame):
         save_btn.pack(side=tkinter.LEFT, padx=(0, 10))
 
         cancel_btn = MyButton(below_frame, text='Отмена')
-        cancel_btn.cmd(lambda e: self.cancel())
+        cancel_btn.cmd(lambda e: self.cancel(master))
         cancel_btn.pack(side=tkinter.RIGHT)
 
     def full_reset(self):
@@ -229,7 +229,7 @@ class Expert(tkmacosx.SFrame):
 
         widget['text'] = path
 
-    def restore(self, btn):
+    def restore(self, btn: MyButton):
         """
         Gets advanced settings values from cfg and write to cfg.json
         Sets default text in all text input fields in advanced settings.
@@ -254,7 +254,7 @@ class Expert(tkmacosx.SFrame):
             widget.insert(0, default)
             cfg.config[value] = default
 
-    def copy_input(self, ins, btn):
+    def copy_input(self, ins: tkinter.Entry, btn: MyButton):
         """
         Gets text from current text input field and copy to clipboard.
         * param `ins`: tkinter entry current text input
@@ -263,7 +263,7 @@ class Expert(tkmacosx.SFrame):
         btn.press()
         my_copy(ins.get())
 
-    def paste_input(self, ins, btn):
+    def paste_input(self, ins: tkinter.Entry, btn: MyButton):
         """
         Gets text from clipboard and paste in text input field.
         * param `ins`: tkinter entry current text input
@@ -273,11 +273,11 @@ class Expert(tkmacosx.SFrame):
         ins.delete(0, 'end')
         ins.insert(0, my_paste())
 
-    def cancel(self):
+    def cancel(self, master: tkinter.Toplevel):
         """
         Cancel button command.
         """
-        self.winfo_toplevel().destroy()
+        master.winfo_toplevel().destroy()
 
     def save_settings(self):
         """
