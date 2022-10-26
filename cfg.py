@@ -58,6 +58,8 @@ def read_cfg(what_read):
     try:
         return json.loads(key.decrypt(data).decode("utf-8"))
     except InvalidToken:
+        # if config file is older than 3.0.8 version
+        # that means indeed replace database file & config file
         config = defaults()
         encrypt_cfg(config)
 

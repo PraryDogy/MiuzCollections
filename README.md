@@ -1,16 +1,11 @@
 # Miuz-Gallery
 Image gallery for Miuz-Diamons.
-Gallery designed for specific folders in network server.
+Gallery designed for MIUZ server.
 
 Download sample gallery:
 https://disk.yandex.ru/d/Vffr_r9q6CybyQ
 
 - Run gallery from "Start.py"
-- Go to /Users/USER_NAME/Library/Application Support/Miuz Gallery/cfg.json
-- Change PHOTO_DIR to "/path/to/sample/gallery"
-
-or
-
-- Run gallery from "Start.py"
-- Go to settings > advanved
-- Change first field to /path/to/sample/gallery
+- Go to settings
+- Choose sample photos root folder as photo dir (1st settings point)
+- Choose sample photos/_collections as collections dir (2st settings point)
