@@ -4,6 +4,7 @@ Gui for view image.
 
 import os
 import subprocess
+import threading
 import tkinter
 from datetime import datetime
 
@@ -106,15 +107,17 @@ class ImgInfo(MyLabel):
         MyLabel.__init__(self, master)
         vars['img_info'] = self
 
+        name = vars['img_src'].split(os.sep)[-1]
+        path = vars["img_src"].replace(cfg.config["COLL_FOLDER"], "Коллекции")
+        path = path.replace(cfg.config["PHOTO_DIR"], "Фото")
+        img_w, img_h = vars['curr_img'].width, vars['curr_img'].height
         filesize = round(os.path.getsize(vars['img_src'])/(1024*1024), 2)
         filemod = datetime.fromtimestamp(os.path.getmtime(vars['img_src']))
         filemod = filemod.strftime("%d-%m-%Y, %H:%M:%S")
-        img_w, img_h = vars['curr_img'].width, vars['curr_img'].height
-        name = vars['img_src'].split(os.sep)[-1]
 
         txt = (f'Коллекция: {get_coll_name(vars["img_src"])}'
                 f'\nИмя: {name}'
-                f'\nПуть: {vars["img_src"]}'
+                f'\nПуть: {path}'
                 f'\nРазрешение: {img_w} x {img_h}'
                 f'\nРазмер: {filesize} мб'
                 f'\nДата изменения: {filemod}')
@@ -142,7 +145,7 @@ class ImgButtons(MyFrame):
         comp_btn.pack(side=tkinter.RIGHT)
 
         if os.path.exists(vars['img_src']):
-            open_btn = MyButton(self, text='Папка с фото')
+            open_btn = MyButton(self, text='Открыть папку')
             open_btn.configure(height=1, width=b_wight)
             open_btn.cmd(lambda e: self.open_folder(open_btn))
             open_btn.pack(side=tkinter.LEFT, padx=(0, 15))
@@ -186,7 +189,11 @@ class ImgButtons(MyFrame):
         """
         btn.press()
         path = '/'.join(vars['img_src'].split('/')[:-1])
-        subprocess.check_output(["/usr/bin/open", path])
+
+        def open():
+            subprocess.check_output(["/usr/bin/open", path])
+
+        threading.Thread(target=open).start()
 
 
 class CloseButton(MyButton):
