@@ -21,6 +21,13 @@ from utils import MyButton, MyFrame, MyLabel
 from .image_viewer import ImagePreview
 
 
+class Test:
+    def __init__(self):
+        gallery = cfg.ROOT.winfo_children()[1]
+        canv = gallery.winfo_children()[1]
+        thumbs = canv.winfo_children()[-1]
+        print(thumbs.winfo_children())
+
 class Gallery(MyFrame):
     """
     Creates tkinter frame with menu and grid of images.
@@ -167,7 +174,7 @@ class ImagesThumbs(tkmacosx.SFrame):
                 self, text=y[-1][-1], font=('Arial', 35, 'bold'))
             year_label.pack(pady=(15, 15))
 
-            self.pack_rows(y, self.clmns, self)
+            self.pack_rows(y, self.clmns, self, [i[1] for i in res])
 
     def reset(self):
         """
@@ -221,7 +228,8 @@ class ImagesThumbs(tkmacosx.SFrame):
         list_years.reverse()
         return list_years
 
-    def pack_rows(self, thumbs: list, clmns: int, master: tkinter.Frame):
+    def pack_rows(
+        self, thumbs: list, clmns: int, master: tkinter.Frame, all_src: list):
         """
         Splits list of tuples by the number of lists.
         Each list is row with number of columns based on 'clmns'.
@@ -248,5 +256,5 @@ class ImagesThumbs(tkmacosx.SFrame):
                 thumb = MyButton(row_frame, image=image, highlightthickness=1)
                 thumb.configure(width=0, height=0, bg=cfg.BGCOLOR)
                 thumb.image_names = image
-                thumb.cmd(lambda e, src=src: ImagePreview(src))
+                thumb.cmd(lambda e, src=src: ImagePreview(src, all_src))
                 thumb.pack(side=tkinter.LEFT)

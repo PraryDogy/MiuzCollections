@@ -11,17 +11,37 @@ from datetime import datetime
 import cfg
 from PIL import Image, ImageTk
 from utils import (MyButton, MyFrame, MyLabel, get_coll_name, my_copy,
-                         smb_check, place_center)
+                   place_center, smb_check)
 
 from .images_compare import ImagesCompare
 from .smb_checker import SmbChecker
 
 vars = {
-    'img_src': 'tkinter label', 
-    'img_info': 'tkinter label',
-    'img_frame': 'tkinter label',
-    'curr_img': 'pillow image',
+    'img_src': str,
+    'all_src': list,
+    'img_info': tkinter.Label,
+    'img_frame': tkinter.Label,
+    'curr_img': Image,
     }
+
+
+def pack_widgets(master):
+    ImgSrc(master)
+    ImageFrame(master).pack(fill=tkinter.BOTH, expand=True)
+
+    left_frame = MyFrame(master)
+    left_frame.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=True)
+    PrevItem(left_frame).pack(expand=True, fill=tkinter.BOTH)
+
+    center_frame = MyFrame(master)
+    center_frame.pack(side=tkinter.LEFT)
+    ImgButtons(center_frame).pack(pady=(15, 15))
+    ImgInfo(center_frame).pack(pady=(0, 15), padx=15)
+    CloseButton(center_frame).pack()
+
+    right_frame = MyFrame(master)
+    right_frame.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=True)
+    NextItem(right_frame).pack(expand=True, fill=tkinter.BOTH)
 
 
 class ImagePreview(tkinter.Toplevel):
@@ -29,7 +49,7 @@ class ImagePreview(tkinter.Toplevel):
     Creates new window (tkinter Top Level) with image & buttons.
     * param `src`: source path of image.
     """
-    def __init__(self, src):
+    def __init__(self, src, all_src):
         tkinter.Toplevel.__init__(self, bg=cfg.BGCOLOR, padx=15, pady=15)
         cfg.ROOT.eval(f'tk::PlaceWindow {self} center')
         self.withdraw()
@@ -50,13 +70,9 @@ class ImagePreview(tkinter.Toplevel):
         self.geometry(f'{side}x{side}')
 
         vars['img_src'] = src
+        vars['all_src'] = all_src
 
-        ImgSrc(self)
-        ImageFrame(self).pack(fill=tkinter.BOTH, expand=True)
-        ImgButtons(self).pack(pady=(15, 15))
-        ImgInfo(self).pack(pady=(0, 15), padx=15)
-        CloseButton(self).pack()
-
+        pack_widgets(self)
         cfg.ROOT.update_idletasks()
 
         place_center(self)
@@ -205,3 +221,39 @@ class CloseButton(MyButton):
         MyButton.__init__(self, master, text='Закрыть')
         self.configure(height=2)
         self.cmd(lambda e: self.winfo_toplevel().destroy())
+
+
+def switch_image(master: tkinter.Toplevel, index: int):
+    try:
+        vars['img_src'] = vars['all_src'][index]
+    except IndexError:
+        vars['img_src'] = vars['all_src'][0]
+    master = master.winfo_toplevel()
+    for i in master.winfo_children():
+        i.destroy()
+    pack_widgets(master)
+
+
+class NextItem(MyButton):
+    def __init__(self, master):
+
+        MyButton.__init__(self, master, text='Вперед')
+        self.configure(bg=cfg.BGCOLOR)
+        self.cmd(lambda e: self.next_img())
+
+    def next_img(self):
+        index = vars['all_src'].index(vars['img_src']) + 1
+        switch_image(self, index)
+
+
+class PrevItem(MyButton):
+    def __init__(self, master):
+
+        MyButton.__init__(self, master, text='Назад')
+        self.configure(bg=cfg.BGCOLOR)
+        self.cmd(lambda e: self.prev_img())
+
+
+    def prev_img(self):
+        index = vars['all_src'].index(vars['img_src']) - 1
+        switch_image(self, index)
