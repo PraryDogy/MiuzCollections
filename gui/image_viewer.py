@@ -236,9 +236,9 @@ def switch_image(master: tkinter.Toplevel, index: int):
 
 class NextItem(MyButton):
     def __init__(self, master):
-
         MyButton.__init__(self, master, text='Вперед')
         self.configure(bg=cfg.BGCOLOR)
+        self.winfo_toplevel().bind('<Right>', lambda e: self.next_img())
         self.cmd(lambda e: self.next_img())
 
     def next_img(self):
@@ -248,11 +248,10 @@ class NextItem(MyButton):
 
 class PrevItem(MyButton):
     def __init__(self, master):
-
         MyButton.__init__(self, master, text='Назад')
         self.configure(bg=cfg.BGCOLOR)
+        self.winfo_toplevel().bind('<Left>', lambda e: self.prev_img())
         self.cmd(lambda e: self.prev_img())
-
 
     def prev_img(self):
         index = vars['all_src'].index(vars['img_src']) - 1
