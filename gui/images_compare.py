@@ -50,16 +50,19 @@ class ImagesCompare(tkinter.Toplevel):
         prevs = [v for k, v in cfg.ROOT.children.items() if "preview" in k]
         [i.withdraw() for i in prevs]
 
+        img1_info = list(prevs[0].children.values())
+        img2_info = list(prevs[1].children.values())
+
         vars['img1'] = [
-            prevs[0].children['!imageframe']['image'],
-            prevs[0].children['!imginfo']['text'],
-            prevs[0].children['!imgsrc']['text']
+            img1_info[1]['image'],
+            img1_info[3].children['!imginfo']['text'],
+            img1_info[0]['text']
             ]
 
         vars['img2'] = [
-            prevs[1].children['!imageframe']['image'],
-            prevs[1].children['!imginfo']['text'],
-            prevs[1].children['!imgsrc']['text']
+            img2_info[1]['image'],
+            img2_info[3].children['!imginfo']['text'],
+            img2_info[0]['text']
             ]
 
         vars['curr_img'] = vars['img1']

@@ -231,6 +231,8 @@ def switch_image(master: tkinter.Toplevel, index: int):
     master = master.winfo_toplevel()
     for i in master.winfo_children():
         i.destroy()
+
+
     pack_widgets(master)
 
 
