@@ -13,7 +13,7 @@ from utils import encrypt_cfg
 
 # app info
 APP_NAME = 'MiuzGallery'
-APP_VER = '3.1.1'
+APP_VER = '3.1.2'
 
 KEY = 'QaovKbF1YpKCM9e-HE2wvn30lIqCbeYTUcONcdLpV18='
 
@@ -32,7 +32,7 @@ ROOT.withdraw()
 LIVE_LBL = tkinter.Label
 FLAG = True
 IMAGES_RESET = object
-
+COMPARE = False
 
 def defaults():
     return {

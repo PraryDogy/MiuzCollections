@@ -27,7 +27,8 @@ vars = {
 
 def pack_widgets(master):
     ImgSrc(master)
-    ImageFrame(master).pack(fill=tkinter.BOTH, expand=True)
+    image_frame = ImageFrame(master)
+    image_frame.pack()
 
     left_frame = MyFrame(master)
     left_frame.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=True)
@@ -43,6 +44,8 @@ def pack_widgets(master):
     right_frame.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=True)
     NextItem(right_frame).pack(expand=True, fill=tkinter.BOTH)
 
+    image_frame.place_image()
+
 
 class ImagePreview(tkinter.Toplevel):
     """
@@ -52,6 +55,7 @@ class ImagePreview(tkinter.Toplevel):
     def __init__(self, src, all_src):
         tkinter.Toplevel.__init__(self, bg=cfg.BGCOLOR, padx=15, pady=15)
         cfg.ROOT.eval(f'tk::PlaceWindow {self} center')
+        self.title('Просмотр')
         self.withdraw()
 
         if not smb_check():
@@ -64,6 +68,7 @@ class ImagePreview(tkinter.Toplevel):
         self.protocol("WM_DELETE_WINDOW", self.destroy)
         self.bind('<Command-w>', lambda e: self.destroy())
         self.bind('<Escape>', lambda e: self.destroy())
+        self.bind('<Command-q>', quit)
 
         self.resizable(0,0)
         side = int(cfg.ROOT.winfo_screenheight()*0.8)
@@ -75,9 +80,13 @@ class ImagePreview(tkinter.Toplevel):
         pack_widgets(self)
         cfg.ROOT.update_idletasks()
 
+        if cfg.COMPARE:
+            ImagesCompare()
+            return
+
         place_center(self)
         self.deiconify()
-
+        self.grab_set()
 
 
 class ImgSrc(MyLabel):
@@ -95,23 +104,27 @@ class ImageFrame(MyLabel):
         vars['img_frame'] = self
         img = Image.open(vars['img_src'])
         vars['curr_img'] = img.copy()
-
         self['bg']='black'
-        self.bind("<Configure>", lambda e: self.resize(e))
 
-    def resize(self, e=tkinter.Event):
-        """
-        Fits image to label size.
-        * param `img`: current image.
-        """
-        self.unbind("<Configure>")
+    def place_image(self):
+        cfg.ROOT.update_idletasks()
+        widgets = list(self.winfo_toplevel().children.values())[2:]
 
-        size = (e.width, e.height)
+        win_h = self.winfo_toplevel().winfo_height()
+        win_w = self.winfo_toplevel().winfo_reqwidth()
+        widgets_h = sum(i.winfo_reqheight() for i in widgets)
+                
+        if vars['curr_img'].width > vars['curr_img'].height:
+            size = (win_w, win_w)
+        else:
+            size = (win_h-widgets_h, win_h-widgets_h)
+
         vars['curr_img'].thumbnail(size)
         img_tk = ImageTk.PhotoImage(vars['curr_img'])
-
         self.configure(image=img_tk)
         self.image = img_tk
+
+        self.configure(height=win_h-widgets_h, width=win_w)
 
 
 class ImgInfo(MyLabel):
@@ -139,7 +152,7 @@ class ImgInfo(MyLabel):
                 f'\nДата изменения: {filemod}')
 
         self.configure(
-            text=txt, justify=tkinter.LEFT, anchor=tkinter.W, width=50)
+            text=txt, justify=tkinter.LEFT, anchor=tkinter.W, width=43)
 
 
 class ImgButtons(MyFrame):
@@ -173,20 +186,12 @@ class ImgButtons(MyFrame):
         """
         btn.press()
 
-        prevs = [i for i in cfg.ROOT.children if 'preview' in i]
-        if len(prevs) != 2:
-
-            old_txt = vars['img_info']['text']
-            txt = '\n\n\nДолжно быть открыто два изображения.\n\n'
-            vars['img_info']['text'] = txt
-            vars['img_info']['anchor'] = tkinter.CENTER
-            cfg.ROOT.after(
-                1500, lambda: vars['img_info'].configure(text=old_txt))
-            cfg.ROOT.after(
-                1500, lambda: vars['img_info'].configure(anchor=tkinter.W))
+        if not cfg.COMPARE:
+            win = self.winfo_toplevel()
+            win.withdraw()
+            win.grab_release()
+            cfg.COMPARE = True
             return
-
-        ImagesCompare()
 
     def copy_name(self, btn: MyButton):
         """
@@ -231,8 +236,6 @@ def switch_image(master: tkinter.Toplevel, index: int):
     master = master.winfo_toplevel()
     for i in master.winfo_children():
         i.destroy()
-
-
     pack_widgets(master)
 
 

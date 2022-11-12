@@ -23,6 +23,7 @@ def on_closing(obj: tkinter.Toplevel):
     prevs = [v for k, v in cfg.ROOT.children.items() if "preview" in k]
     [i.destroy() for i in prevs]
     obj.destroy()
+    cfg.COMPARE = False
 
 
 class ImagesCompare(tkinter.Toplevel):
@@ -35,6 +36,7 @@ class ImagesCompare(tkinter.Toplevel):
     def __init__(self):
         tkinter.Toplevel.__init__(self, bg=cfg.BGCOLOR, padx=15, pady=15)
         cfg.ROOT.eval(f'tk::PlaceWindow {self} center')
+        self.title('Сравнение')
         self.withdraw()
 
         self.protocol("WM_DELETE_WINDOW", lambda: on_closing(self))
@@ -48,7 +50,6 @@ class ImagesCompare(tkinter.Toplevel):
         cfg.ROOT.update_idletasks()
 
         prevs = [v for k, v in cfg.ROOT.children.items() if "preview" in k]
-        [i.withdraw() for i in prevs]
 
         img1_info = list(prevs[0].children.values())
         img2_info = list(prevs[1].children.values())
@@ -162,7 +163,7 @@ class ImgInfo(MyLabel):
     def __init__(self, master):
         MyLabel.__init__(
             self, master, anchor=tkinter.W, justify=tkinter.LEFT,
-            text=vars['curr_img'][1], width=40)
+            text=vars['curr_img'][1], width=43)
         vars['img_info'] = self
 
 
