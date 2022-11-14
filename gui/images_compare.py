@@ -24,6 +24,13 @@ def on_closing(obj: tkinter.Toplevel):
     [i.destroy() for i in prevs]
     obj.destroy()
     cfg.COMPARE = False
+    obj.grab_release()
+
+
+class FakeBtn(MyButton):
+    def __init__(self, master):
+        MyButton.__init__(self, master)
+        self.configure(bg=cfg.BGCOLOR)
 
 
 class ImagesCompare(tkinter.Toplevel):
@@ -68,14 +75,29 @@ class ImagesCompare(tkinter.Toplevel):
 
         vars['curr_img'] = vars['img1']
 
-        ImageFrame(self).pack(fill=tkinter.BOTH, expand=True, pady=(0, 15))
-        ImgButtons(self).pack(pady=(0, 15))
-        ImgInfo(self).pack(pady=(0, 15), anchor=tkinter.CENTER)
-        CloseBtn(self).pack()
+        image_frame = ImageFrame(self)
+        image_frame.pack()
 
+        left_frame = MyFrame(self)
+        left_frame.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=True)
+        FakeBtn(left_frame).pack(expand=True, fill=tkinter.BOTH)
+
+        center_frame = MyFrame(self)
+        center_frame.pack(side=tkinter.LEFT)
+
+        ImgButtons(center_frame).pack(pady=(15, 15))
+        ImgInfo(center_frame).pack(pady=(0, 15), padx=15)
+        CloseBtn(center_frame).pack()
+
+        right_frame = MyFrame(self)
+        right_frame.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=True)
+        FakeBtn(right_frame).pack(expand=True, fill=tkinter.BOTH)
+
+        image_frame.set_size()
         cfg.ROOT.update_idletasks()
         place_center(self)
         self.deiconify()
+        self.grab_set()
 
 
 class ImageFrame(MyLabel):
@@ -89,9 +111,13 @@ class ImageFrame(MyLabel):
         self['image'] = vars['curr_img'][0]
         vars['img_frame'] = self
 
-        self.update_idletasks()
-        w = self.winfo_width()
-        self.configure(width=w, height=w)
+    def set_size(self):
+        cfg.ROOT.update_idletasks()
+        prevs = [v for k, v in cfg.ROOT.children.items() if "preview" in k]
+        img1_info = list(prevs[0].children.values())
+        self.configure(
+            height=img1_info[1]['height'],
+            width=img1_info[1]['width'])
 
 
 class ImgButtons(MyFrame):

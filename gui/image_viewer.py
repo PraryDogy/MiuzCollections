@@ -111,7 +111,7 @@ class ImageFrame(MyLabel):
         widgets = list(self.winfo_toplevel().children.values())[2:]
 
         win_h = self.winfo_toplevel().winfo_height()
-        win_w = self.winfo_toplevel().winfo_reqwidth()
+        win_w = self.winfo_toplevel().winfo_width()
         widgets_h = sum(i.winfo_reqheight() for i in widgets)
                 
         if vars['curr_img'].width > vars['curr_img'].height:
