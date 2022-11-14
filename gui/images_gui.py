@@ -10,16 +10,15 @@ import traceback
 from datetime import datetime
 
 import cfg
-import cv2
-import numpy
 import sqlalchemy
 import tkmacosx
 from database import Dbase, Thumbs
 from PIL import Image, ImageTk
-from utils import MyButton, MyFrame, MyLabel
+from utils import MyButton, MyFrame, MyLabel, decode_image
 
 from .image_viewer import ImagePreview
-
+import cv2
+import numpy
 
 class Test:
     def __init__(self):
@@ -196,15 +195,8 @@ class ImagesThumbs(tkmacosx.SFrame):
         thumbs = []
         for blob, src, mod in all_images:
             try:
-                nparr = numpy.frombuffer(blob, numpy.byte)
-                image1 = cv2.imdecode(nparr, cv2.IMREAD_ANYCOLOR)
-
-                # convert cv2 color to rgb
-                image_rgb = cv2.cvtColor(image1, cv2.COLOR_BGR2RGB)
-
-                # load numpy array image
-                image = Image.fromarray(image_rgb)
-                photo = ImageTk.PhotoImage(image)
+                decoded_image = decode_image(blob)
+                photo = ImageTk.PhotoImage(decoded_image)
                 year = datetime.fromtimestamp(mod).year
                 thumbs.append((photo, src, year))
 

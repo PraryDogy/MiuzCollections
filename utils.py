@@ -13,10 +13,26 @@ import os
 import subprocess
 import tkinter
 
-import cv2
-from cryptography.fernet import Fernet
-
 import cfg
+import cv2
+import numpy
+from cryptography.fernet import Fernet
+from PIL import Image
+
+
+def decode_image(image):
+    """
+    Returns decoded image (use ImageTk.Photo image)
+    """
+    nparr = numpy.frombuffer(image, numpy.byte)
+    image1 = cv2.imdecode(nparr, cv2.IMREAD_ANYCOLOR)
+
+    # convert cv2 color to rgb
+    image_rgb = cv2.cvtColor(image1, cv2.COLOR_BGR2RGB)
+
+    # load numpy array image
+    img = Image.fromarray(image_rgb)
+    return img
 
 
 def encrypt_cfg(data: dict):

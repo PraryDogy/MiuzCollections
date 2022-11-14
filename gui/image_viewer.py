@@ -9,9 +9,11 @@ import tkinter
 from datetime import datetime
 
 import cfg
+import sqlalchemy
+from database import Dbase, Thumbs
 from PIL import Image, ImageTk
-from utils import (MyButton, MyFrame, MyLabel, get_coll_name, my_copy,
-                   place_center, smb_check)
+from utils import (MyButton, MyFrame, MyLabel, decode_image, get_coll_name,
+                   my_copy, place_center, smb_check)
 
 from .images_compare import ImagesCompare
 from .smb_checker import SmbChecker
@@ -44,7 +46,8 @@ def pack_widgets(master: tkinter.Toplevel):
     right_frame.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=True)
     NextItem(right_frame).pack(expand=True, fill=tkinter.BOTH)
 
-    image_frame.place_image()
+    image_frame.place_thumbnail()
+    return image_frame
 
 
 def on_closing(window: tkinter.Toplevel):
@@ -55,6 +58,13 @@ def on_closing(window: tkinter.Toplevel):
     """
     window.destroy()
     window.grab_release()
+
+
+def load_image(image_frame):
+    t1 = threading.Thread(target=image_frame.place_image)
+    t1.start()
+    while t1.is_alive():
+        cfg.ROOT.update()
 
 
 class ImagePreview(tkinter.Toplevel):
@@ -97,17 +107,18 @@ class ImagePreview(tkinter.Toplevel):
         vars['img_src'] = src
         vars['all_src'] = all_src
 
-        pack_widgets(self)
+        widgets = pack_widgets(self)
         cfg.ROOT.update_idletasks()
 
         if cfg.COMPARE:
+            load_image(widgets)
             ImagesCompare()
             return
 
         place_center(self)
         self.deiconify()
         self.grab_set()
-
+        load_image(widgets)
 
 class ImgSrc(MyLabel):
     def __init__(self, master):
@@ -122,11 +133,33 @@ class ImageFrame(MyLabel):
     def __init__(self, master):
         MyLabel.__init__(self, master, borderwidth=0)
         vars['img_frame'] = self
-        img = Image.open(vars['img_src'])
-        vars['curr_img'] = img.copy()
         self['bg']='black'
 
+    def place_thumbnail(self):
+        cfg.ROOT.update_idletasks()
+
+        thumb = Dbase.conn.execute(sqlalchemy.select(Thumbs.img150).where(
+            Thumbs.src == vars['img_src'])).first()[0]
+
+        image = decode_image(thumb)
+
+        widgets = list(self.winfo_toplevel().children.values())[2:]
+        win_h = self.winfo_toplevel().winfo_height()
+        win_w = self.winfo_toplevel().winfo_width()
+        widgets_h = sum(i.winfo_reqheight() for i in widgets)
+        size = (win_h-widgets_h, win_h-widgets_h)
+        image = image.resize(size)
+
+        img_tk = ImageTk.PhotoImage(image)
+        self.configure(image=img_tk)
+        self.image = img_tk
+        self.configure(height=win_h-widgets_h, width=win_w)
+
+
     def place_image(self):
+        img = Image.open(vars['img_src'])
+        vars['curr_img'] = img.copy()
+
         cfg.ROOT.update_idletasks()
         widgets = list(self.winfo_toplevel().children.values())[2:]
 
@@ -143,9 +176,9 @@ class ImageFrame(MyLabel):
         img_tk = ImageTk.PhotoImage(vars['curr_img'])
         self.configure(image=img_tk)
         self.image = img_tk
-
-        self.configure(height=win_h-widgets_h, width=win_w)
-
+        
+        img_w, img_h = img.width, img.height
+        vars['img_info']['text'] = vars['img_info']['text'].replace('Загрузка', f'{img_w} x {img_h}')
 
 class ImgInfo(MyLabel):
     """
@@ -159,7 +192,6 @@ class ImgInfo(MyLabel):
         name = vars['img_src'].split(os.sep)[-1]
         path = vars["img_src"].replace(cfg.config["COLL_FOLDER"], "Коллекции")
         path = path.replace(cfg.config["PHOTO_DIR"], "Фото")
-        img_w, img_h = vars['curr_img'].width, vars['curr_img'].height
         filesize = round(os.path.getsize(vars['img_src'])/(1024*1024), 2)
         filemod = datetime.fromtimestamp(os.path.getmtime(vars['img_src']))
         filemod = filemod.strftime("%d-%m-%Y, %H:%M:%S")
@@ -167,7 +199,7 @@ class ImgInfo(MyLabel):
         txt = (f'Коллекция: {get_coll_name(vars["img_src"])}'
                 f'\nИмя: {name}'
                 f'\nПуть: {path}'
-                f'\nРазрешение: {img_w} x {img_h}'
+                f'\nРазрешение: Загрузка'
                 f'\nРазмер: {filesize} мб'
                 f'\nДата изменения: {filemod}')
 
@@ -256,7 +288,8 @@ def switch_image(master: tkinter.Toplevel, index: int):
     master = master.winfo_toplevel()
     for i in master.winfo_children():
         i.destroy()
-    pack_widgets(master)
+    widgets = pack_widgets(master)
+    load_image(widgets)
 
 
 class NextItem(MyButton):
