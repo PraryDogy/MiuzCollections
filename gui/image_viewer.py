@@ -25,7 +25,7 @@ vars = {
     }
 
 
-def pack_widgets(master):
+def pack_widgets(master: tkinter.Toplevel):
     ImgSrc(master)
     image_frame = ImageFrame(master)
     image_frame.pack()
@@ -47,6 +47,16 @@ def pack_widgets(master):
     image_frame.place_image()
 
 
+def on_closing(window: tkinter.Toplevel):
+    """
+    Destroys current tkinter toplevel.
+    Clears `cfg.IMAGES_COMPARE` list.
+    * param `obj`: tkinter toplevel
+    """
+    window.destroy()
+    window.grab_release()
+
+
 class ImagePreview(tkinter.Toplevel):
     """
     Creates new window (tkinter Top Level) with image & buttons.
@@ -59,16 +69,26 @@ class ImagePreview(tkinter.Toplevel):
         self.withdraw()
 
         if not smb_check():
+            on_closing(self)
             SmbChecker()
             return
 
         if src is None:
+            on_closing(self)
             return
 
-        self.protocol("WM_DELETE_WINDOW", self.destroy)
-        self.bind('<Command-w>', lambda e: self.destroy())
-        self.bind('<Escape>', lambda e: self.destroy())
-        self.bind('<Command-q>', quit)
+        prevs = [v for k, v in cfg.ROOT.children.items() if "preview" in k]
+        if len(prevs) > 1:
+            img_info = list(prevs[0].children.values())
+            old_src = img_info[0]['text']
+            if old_src == src:
+                on_closing(self)
+                return
+
+        self.protocol("WM_DELETE_WINDOW", lambda: on_closing(self))
+        self.bind('<Command-w>', lambda e: on_closing(self))
+        self.bind('<Command-q>', lambda e: quit())
+        self.bind('<Escape>', lambda e: on_closing(self))
 
         self.resizable(0,0)
         side = int(cfg.ROOT.winfo_screenheight()*0.8)
@@ -118,7 +138,7 @@ class ImageFrame(MyLabel):
             size = (win_w, win_w)
         else:
             size = (win_h-widgets_h, win_h-widgets_h)
-
+        
         vars['curr_img'].thumbnail(size)
         img_tk = ImageTk.PhotoImage(vars['curr_img'])
         self.configure(image=img_tk)

@@ -13,15 +13,17 @@ vars = {
     }
 
 
+def get_all_windows():
+    return [v for k, v in cfg.ROOT.children.items() if "preview" in k]
+
+
 def on_closing(obj: tkinter.Toplevel):
     """
     Destroys current tkinter toplevel.
     Clears `cfg.IMAGES_COMPARE` list.
     * param `obj`: tkinter toplevel
     """
-
-    prevs = [v for k, v in cfg.ROOT.children.items() if "preview" in k]
-    [i.destroy() for i in prevs]
+    [i.destroy() for i in get_all_windows()]
     obj.destroy()
     cfg.COMPARE = False
     obj.grab_release()
@@ -56,11 +58,16 @@ class ImagesCompare(tkinter.Toplevel):
         self.geometry(f'{side}x{side}')
         cfg.ROOT.update_idletasks()
 
-        prevs = [v for k, v in cfg.ROOT.children.items() if "preview" in k]
-
+        prevs = get_all_windows()
         img1_info = list(prevs[0].children.values())
         img2_info = list(prevs[1].children.values())
-
+        
+        # prev item is toplevel window with image preview
+        # prev item 0 = image source text
+        # prev item 1 = tkinter label with image
+        # prev item 3 = tkinter frame with labels, img info is label with
+        # image info
+        
         vars['img1'] = [
             img1_info[1]['image'],
             img1_info[3].children['!imginfo']['text'],
@@ -113,7 +120,7 @@ class ImageFrame(MyLabel):
 
     def set_size(self):
         cfg.ROOT.update_idletasks()
-        prevs = [v for k, v in cfg.ROOT.children.items() if "preview" in k]
+        prevs = get_all_windows()
         img1_info = list(prevs[0].children.values())
         self.configure(
             height=img1_info[1]['height'],
