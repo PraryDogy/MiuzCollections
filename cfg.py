@@ -33,6 +33,7 @@ LIVE_LBL = tkinter.Label
 FLAG = True
 IMAGES_RESET = object
 COMPARE = False
+THUMBS = []
 
 def defaults():
     return {

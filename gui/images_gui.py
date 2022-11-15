@@ -136,6 +136,7 @@ class ImagesThumbs(tkmacosx.SFrame):
     def __init__(self, master):
         self.master = master
         cfg.IMAGES_RESET = self.reset
+        cfg.THUMBS.clear()
 
         tkmacosx.SFrame.__init__(
             self, master, bg=cfg.BGCOLOR, scrollbarwidth=7)
@@ -247,8 +248,16 @@ class ImagesThumbs(tkmacosx.SFrame):
             row_frame.pack(fill=tkinter.Y, expand=True, anchor=tkinter.W)
 
             for image, src, _ in row:
-                thumb = MyButton(row_frame, image=image, highlightthickness=1)
+                thumb = MyButton(
+                    row_frame, image=image, highlightthickness=1, text=src)
                 thumb.configure(width=0, height=0, bg=cfg.BGCOLOR)
                 thumb.image_names = image
-                thumb.cmd(lambda e, src=src: ImagePreview(src, all_src))
+                thumb.cmd(
+                    lambda e,
+                    a=src, b=all_src, c=thumb: self.thumb_cmd(a, b, c))
+                cfg.THUMBS.append(thumb)
                 thumb.pack(side=tkinter.LEFT)
+
+    def thumb_cmd(self, src: str, all_src: list, btn: MyButton):
+        btn.configure(bg=cfg.BGPRESSED)
+        ImagePreview(src, all_src)

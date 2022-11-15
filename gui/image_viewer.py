@@ -65,6 +65,10 @@ def on_closing(window: tkinter.Toplevel):
     Clears `cfg.IMAGES_COMPARE` list.
     * param `obj`: tkinter toplevel
     """
+    for i in cfg.THUMBS:
+        if i['text'] == vars['img_src']:
+            i.configure(bg=cfg.BGCOLOR)
+
     window.destroy()
     cfg.ROOT.focus_force()
 

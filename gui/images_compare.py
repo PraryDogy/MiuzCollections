@@ -25,6 +25,12 @@ def on_closing(obj: tkinter.Toplevel):
     Clears `cfg.IMAGES_COMPARE` list.
     * param `obj`: tkinter toplevel
     """
+    for i in cfg.THUMBS:
+        if (
+            i['text'] == vars['img1']['src'] or 
+            i['text'] == vars['img2']['src']):
+            i.configure(bg=cfg.BGCOLOR)
+
     [i.destroy() for i in get_all_windows()]
     obj.destroy()
     cfg.COMPARE = False
@@ -75,17 +81,17 @@ class ImagesCompare(tkinter.Toplevel):
         # prev item 3 = tkinter frame with labels, img info is label with
         # image info
         
-        vars['img1'] = [
-            img1_info[1]['image'],
-            img1_info[3].children['!imginfo']['text'],
-            img1_info[0]['text']
-            ]
+        vars['img1'] = {
+            'image': img1_info[1]['image'],
+            'info': img1_info[3].children['!imginfo']['text'],
+            'src': img1_info[0]['text']
+            }
 
-        vars['img2'] = [
-            img2_info[1]['image'],
-            img2_info[3].children['!imginfo']['text'],
-            img2_info[0]['text']
-            ]
+        vars['img2'] = {
+            'image': img2_info[1]['image'],
+            'info': img2_info[3].children['!imginfo']['text'],
+            'src': img2_info[0]['text']
+            }
 
         vars['curr_img'] = vars['img1']
 
@@ -122,7 +128,7 @@ class ImageFrame(MyLabel):
     def __init__(self, master):
         MyLabel.__init__(self, master, borderwidth=0)
         self['bg']='black'
-        self['image'] = vars['curr_img'][0]
+        self['image'] = vars['curr_img']['image']
         vars['img_frame'] = self
 
     def set_size(self):
@@ -167,7 +173,7 @@ class ImgButtons(MyFrame):
         * param `btn`: current tkinter button.
         """
         btn.press()
-        get_name = vars['curr_img'][2].split('/')[-1].split('.')[0]
+        get_name = vars['curr_img']['src'].split('/')[-1].split('.')[0]
         my_copy(get_name)
 
     def open_folder(self, btn: MyButton):
@@ -177,7 +183,7 @@ class ImgButtons(MyFrame):
         * param `btn`: current tkinter button.
         """
         btn.press()
-        path = '/'.join(vars['curr_img'][2].split('/')[:-1])
+        path = '/'.join(vars['curr_img']['src'].split('/')[:-1])
         subprocess.check_output(["/usr/bin/open", path])
 
     def switch_image(self, btn: MyButton):
@@ -190,8 +196,8 @@ class ImgButtons(MyFrame):
             if vars['curr_img'] != i:
                 vars['curr_img'] = i
 
-                vars['img_frame']['image'] = vars['curr_img'][0]
-                vars['img_info']['text'] = vars['curr_img'][1]
+                vars['img_frame']['image'] = vars['curr_img']['image']
+                vars['img_info']['text'] = vars['curr_img']['info']
 
                 return
 
@@ -203,7 +209,7 @@ class ImgInfo(MyLabel):
     def __init__(self, master):
         MyLabel.__init__(
             self, master, anchor=tkinter.W, justify=tkinter.LEFT,
-            text=vars['curr_img'][1], width=43)
+            text=vars['curr_img']['info'], width=43)
         vars['img_info'] = self
 
 
