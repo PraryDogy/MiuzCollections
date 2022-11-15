@@ -60,7 +60,7 @@ class Settings(tkinter.Toplevel):
         self.grab_set()
 
     def on_exit(self):
-        self.on_exit()
+        self.destroy()
         cfg.ROOT.focus_force()
 
 

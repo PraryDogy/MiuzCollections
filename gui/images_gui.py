@@ -236,6 +236,7 @@ class ImagesThumbs(tkmacosx.SFrame):
         * param `thumbs`: list tuples(imageTk, image src, image year)
         * param `clmns`: int from database > config > clmns > value
         * param `master`: tkinter frame
+        * param `all_src`: list of paths of all images
         """
 
         img_rows = [thumbs[x:x+clmns] for x in range(0, len(thumbs), clmns)]
