@@ -2,14 +2,12 @@
 This is general gui with all elements.
 """
 
-import json
-import os
 import tkinter
 from tkinter.ttk import Separator
 
 import cfg
-from utils import encrypt_cfg
 
+from .ask_exit import AskExit
 from .bar_menu import BarMenu
 from .images_gui import Gallery
 from .status_bar import StatusBar
@@ -26,14 +24,18 @@ class MainGui:
 
         cfg.ROOT.createcommand(
             'tk::mac::ReopenApplication', lambda: cfg.ROOT.deiconify())
-        cfg.ROOT.createcommand("tk::mac::Quit" , self.on_exit)
         cfg.ROOT.bind('<Command-w>', lambda e: cfg.ROOT.iconify())
+        
+        cfg.ROOT.createcommand("tk::mac::Quit" , self.on_exit)
         cfg.ROOT.protocol("WM_DELETE_WINDOW", self.on_exit)
 
         Separator(cfg.ROOT, orient='horizontal').pack(
             fill=tkinter.X, pady=(30, 20))
-        Gallery(cfg.ROOT).pack(fill=tkinter.BOTH, expand=True,)
+
+        Gallery(cfg.ROOT).pack(fill=tkinter.BOTH, expand=True)
+
         Separator(cfg.ROOT, orient='horizontal').pack(fill=tkinter.X, pady=10)
+        
         StatusBar(cfg.ROOT).pack(pady=(0, 10))
 
         BarMenu()
@@ -44,15 +46,4 @@ class MainGui:
         cfg.ROOT.geometry(f'{cfg.config["ROOT_SIZE"]}{cfg.config["ROOT_POS"]}')
 
     def on_exit(self):
-        cfg.FLAG = False
-
-        cfg.ROOT.update_idletasks()
-        w, h = cfg.ROOT.winfo_width(), cfg.ROOT.winfo_height()
-        x, y = cfg.ROOT.winfo_x(), cfg.ROOT.winfo_y()
-
-        cfg.config['ROOT_SIZE'] = f'{w}x{h}'
-        cfg.config['ROOT_POS'] = f'+{x}+{y}'
-
-        encrypt_cfg(cfg.config)
-        
-        quit()
+        AskExit(cfg.ROOT)

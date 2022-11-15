@@ -8,7 +8,6 @@ import sys
 import tkinter
 from tkinter import filedialog
 from tkinter.ttk import Separator
-from turtle import width
 
 import cfg
 import tkmacosx
@@ -50,39 +49,30 @@ class Settings(tkinter.Toplevel):
 
         scrollable = tkmacosx.SFrame(
             self, bg=cfg.BGCOLOR, scrollbarwidth=7)
-
         scrollable.pack(fill=tkinter.BOTH, expand=True)
 
-        General(scrollable)
-        Expert(scrollable)
+        bottom_frame = MyFrame(self)
+        bottom_frame.pack(padx=(0, 7))
+
+        Widgets(scrollable, bottom_frame)
 
         place_center(self)
         self.deiconify()
         self.grab_set()
 
 
-class General(MyFrame):
+class Widgets(MyFrame):
     """
     Tkinter frame with general app settings.
     * param `master`: tkinter frame
     """
-    def __init__(self, master):
-        title = MyLabel(master, text='Основные', font=('Arial', 22, 'bold'))
+    def __init__(self, master: tkmacosx.SFrame, bottom_frame: tkinter.Frame):
+        title = MyLabel(master, text='Настройки', font=('Arial', 22, 'bold'))
         title.pack(pady=10)
 
-        txt1 = (
-            'При запуске программа сканирует и обновляет фото всех коллекций '
-            f'за последние {cfg.config["FILE_AGE"]} дней. Нажмите "Обновить" '
-            'в правом нижнем углу, чтобы повторно запустить сканирование.'
-            )
-
-        descr_updater = MyLabel(master)
-        descr_updater.configure(
-            text=txt1, justify=tkinter.LEFT,
-            wraplength=vars['text_length'])
-        descr_updater.pack(pady=(0, 10), anchor=tkinter.W)
-
         txt2 = (
+            'При запуске программа сканирует и обновляет фото всех коллекций '
+            f'за последние {cfg.config["FILE_AGE"]} дней'
             'Нажмите "Полное сканирование", чтобы обновить фотографии всех '
             'коллекций за все время c 2018 года.'
             )
@@ -98,22 +88,7 @@ class General(MyFrame):
         scan_btn.pack()
 
         sep = Separator(master, orient='horizontal')
-        sep.pack(padx=40, pady=(25, 20), fill=tkinter.X)
-
-    def full_scan(self):
-        """
-        Reload app and run Utils Scaner with full scan method.
-        """
-        cfg.config['TYPE_SCAN'] = 'full'
-        encrypt_cfg(cfg.config)
-        os.execv(sys.executable, ['python'] + sys.argv)
-
-
-class Expert(tkmacosx.SFrame):
-    """
-    Tkinter frame with advanced app settings.
-    """
-    def __init__(self, master):
+        sep.pack(padx=40, pady=(40, 20), fill=tkinter.X)
 
         for title, value, widget in zip(
             ['Все фото.', 'Коллекции.'],
@@ -151,9 +126,7 @@ class Expert(tkmacosx.SFrame):
         txt4 = (
             'По умолчанию программа ищет отретушированные фотографии за '
             f'последние {cfg.config["FILE_AGE"]} дней. Можно указать другое '
-            'количество дней. Чем больше дней, тем дольше сканирование. Можно '
-            'так же воспользоваться полным сканированием за все время в '
-            'основных настройках.'
+            'количество дней. Чем больше цифра, тем дольше сканирование.'
             )
 
         for descr, value, widget in zip(
@@ -206,16 +179,26 @@ class Expert(tkmacosx.SFrame):
         reset_button.cmd(lambda e: self.full_reset())
         reset_button.pack(side=tkinter.RIGHT)
 
-        below_frame = MyFrame(master)
+        below_frame = MyFrame(bottom_frame)
         below_frame.pack(pady=(15, 15))
 
         save_btn = MyButton(below_frame, text='Сохранить')
         save_btn.cmd(lambda e: self.save_settings(master))
+        save_btn.configure(height=1, width=12)
         save_btn.pack(side=tkinter.LEFT, padx=(0, 10))
 
         cancel_btn = MyButton(below_frame, text='Отмена')
         cancel_btn.cmd(lambda e: self.cancel(master))
+        cancel_btn.configure(height=1, width=12)
         cancel_btn.pack(side=tkinter.RIGHT)
+
+    def full_scan(self):
+        """
+        Reload app and run Utils Scaner with full scan method.
+        """
+        cfg.config['TYPE_SCAN'] = 'full'
+        encrypt_cfg(cfg.config)
+        os.execv(sys.executable, ['python'] + sys.argv)
 
     def full_reset(self):
         shutil.rmtree(cfg.CFG_DIR)

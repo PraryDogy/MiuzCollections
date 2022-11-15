@@ -1,4 +1,9 @@
-trate = {'1':'111', '2':'222'}
+def test():
+    a = 1
+    b = 2
+
+    for i in test.__dict__:
+        print(i)
 
 
-print(list(trate.values())[0])
+test().__dict__

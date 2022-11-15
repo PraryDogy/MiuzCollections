@@ -15,6 +15,7 @@ from PIL import Image, ImageTk
 from utils import (MyButton, MyFrame, MyLabel, decode_image, get_coll_name,
                    my_copy, place_center, smb_check)
 
+from .ask_exit import AskExit
 from .images_compare import ImagesCompare
 from .smb_checker import SmbChecker
 
@@ -28,26 +29,34 @@ vars = {
 
 
 def pack_widgets(master: tkinter.Toplevel):
-    ImgSrc(master)
+    img_src = ImgSrc(master)
+    
     image_frame = ImageFrame(master)
     image_frame.pack()
 
     left_frame = MyFrame(master)
     left_frame.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=True)
-    PrevItem(left_frame).pack(expand=True, fill=tkinter.BOTH)
+    prev_img = PrevItem(left_frame)
+    prev_img.pack(expand=True, fill=tkinter.BOTH)
 
     center_frame = MyFrame(master)
     center_frame.pack(side=tkinter.LEFT)
-    ImgButtons(center_frame).pack(pady=(15, 15))
-    ImgInfo(center_frame).pack(pady=(0, 15), padx=15)
-    CloseButton(center_frame).pack()
+    img_btns = ImgButtons(center_frame)
+    img_btns.pack(pady=(15, 15))
+    img_info = ImgInfo(center_frame)
+    img_info.pack(pady=(0, 15), padx=15)
+    close = CloseButton(center_frame)
+    close.pack()
 
     right_frame = MyFrame(master)
     right_frame.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=True)
-    NextItem(right_frame).pack(expand=True, fill=tkinter.BOTH)
+    next_img = NextItem(right_frame)
+    next_img.pack(expand=True, fill=tkinter.BOTH)
 
     image_frame.place_thumbnail()
-    return image_frame
+
+    return [img_src, image_frame, left_frame, prev_img, center_frame,
+        img_btns, img_info, close, right_frame, next_img]
 
 
 def on_closing(window: tkinter.Toplevel):
@@ -57,14 +66,18 @@ def on_closing(window: tkinter.Toplevel):
     * param `obj`: tkinter toplevel
     """
     window.destroy()
-    window.grab_release()
+    cfg.ROOT.focus_force()
 
 
-def load_image(image_frame):
+def load_image(image_frame: tkinter.Label):
     t1 = threading.Thread(target=image_frame.place_image)
     t1.start()
     while t1.is_alive():
         cfg.ROOT.update()
+
+
+def ask_exit():
+    AskExit(cfg.ROOT)
 
 
 class ImagePreview(tkinter.Toplevel):
@@ -75,7 +88,6 @@ class ImagePreview(tkinter.Toplevel):
     def __init__(self, src, all_src):
         tkinter.Toplevel.__init__(self, bg=cfg.BGCOLOR, padx=15, pady=15)
         cfg.ROOT.eval(f'tk::PlaceWindow {self} center')
-        self.title('Просмотр')
         self.withdraw()
 
         if not smb_check():
@@ -94,11 +106,13 @@ class ImagePreview(tkinter.Toplevel):
             if old_src == src:
                 on_closing(self)
                 return
+        
+        self.title('Просмотр')
 
         self.protocol("WM_DELETE_WINDOW", lambda: on_closing(self))
         self.bind('<Command-w>', lambda e: on_closing(self))
-        self.bind('<Command-q>', lambda e: quit())
         self.bind('<Escape>', lambda e: on_closing(self))
+        self.bind('<Command-q>', lambda e: ask_exit())
 
         self.resizable(0,0)
         side = int(cfg.ROOT.winfo_screenheight()*0.8)
@@ -111,14 +125,15 @@ class ImagePreview(tkinter.Toplevel):
         cfg.ROOT.update_idletasks()
 
         if cfg.COMPARE:
-            load_image(widgets)
+            load_image(widgets[1])
             ImagesCompare()
             return
 
         place_center(self)
         self.deiconify()
         self.grab_set()
-        load_image(widgets)
+        load_image(widgets[1])
+
 
 class ImgSrc(MyLabel):
     def __init__(self, master):
@@ -289,12 +304,12 @@ def switch_image(master: tkinter.Toplevel, index: int):
     for i in master.winfo_children():
         i.destroy()
     widgets = pack_widgets(master)
-    load_image(widgets)
+    load_image(widgets[1])
 
 
 class NextItem(MyButton):
     def __init__(self, master):
-        MyButton.__init__(self, master, text='Вперед')
+        MyButton.__init__(self, master, text='>')
         self.configure(bg=cfg.BGCOLOR)
         self.winfo_toplevel().bind('<Right>', lambda e: self.next_img())
         self.cmd(lambda e: self.next_img())
@@ -306,7 +321,7 @@ class NextItem(MyButton):
 
 class PrevItem(MyButton):
     def __init__(self, master):
-        MyButton.__init__(self, master, text='Назад')
+        MyButton.__init__(self, master, text='<')
         self.configure(bg=cfg.BGCOLOR)
         self.winfo_toplevel().bind('<Left>', lambda e: self.prev_img())
         self.cmd(lambda e: self.prev_img())

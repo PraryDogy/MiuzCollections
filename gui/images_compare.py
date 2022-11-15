@@ -3,6 +3,8 @@ import tkinter
 
 import cfg
 from utils import MyButton, MyFrame, MyLabel, my_copy, place_center
+from .ask_exit import AskExit
+
 
 vars = {
     'img1': 'from tkinter top level: image, text, image src',
@@ -26,7 +28,11 @@ def on_closing(obj: tkinter.Toplevel):
     [i.destroy() for i in get_all_windows()]
     obj.destroy()
     cfg.COMPARE = False
-    obj.grab_release()
+    cfg.ROOT.focus_force()
+
+
+def ask_exit():
+    AskExit(cfg.ROOT)
 
 
 class FakeBtn(MyButton):
@@ -45,13 +51,14 @@ class ImagesCompare(tkinter.Toplevel):
     def __init__(self):
         tkinter.Toplevel.__init__(self, bg=cfg.BGCOLOR, padx=15, pady=15)
         cfg.ROOT.eval(f'tk::PlaceWindow {self} center')
-        self.title('Сравнение')
         self.withdraw()
+
+        self.title('Сравнение')
 
         self.protocol("WM_DELETE_WINDOW", lambda: on_closing(self))
         self.bind('<Command-w>', lambda e: on_closing(self))
-        self.bind('<Command-q>', lambda e: quit())
         self.bind('<Escape>', lambda e: on_closing(self))
+        self.bind('<Command-q>', lambda e: ask_exit())
 
         self.resizable(0,0)
         side = int(cfg.ROOT.winfo_screenheight()*0.8)
