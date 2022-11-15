@@ -32,10 +32,9 @@ class Settings(tkinter.Toplevel):
         tkinter.Toplevel.__init__(self, cfg.ROOT, bg=cfg.BGCOLOR)
         cfg.ROOT.eval(f'tk::PlaceWindow {self} center')
 
-        self.protocol("WM_DELETE_WINDOW", self.destroy)
-        self.bind('<Command-w>', lambda e: self.destroy())
-        self.bind('<Escape>', lambda e: self.destroy())
-        self.bind('<Command-q>', lambda e: quit())
+        self.protocol("WM_DELETE_WINDOW", self.on_exit)
+        self.bind('<Command-w>', lambda e: self.on_exit())
+        self.bind('<Escape>', lambda e: self.on_exit())
 
         self.withdraw()
         self.title('Настройки')
@@ -59,6 +58,10 @@ class Settings(tkinter.Toplevel):
         place_center(self)
         self.deiconify()
         self.grab_set()
+
+    def on_exit(self):
+        self.on_exit()
+        cfg.ROOT.focus_force()
 
 
 class Widgets(MyFrame):

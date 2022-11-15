@@ -43,8 +43,8 @@ class BarMenu(tkinter.Menu):
         new_win.title('О программе')
 
         new_win.protocol("WM_DELETE_WINDOW", new_win.destroy)
-        new_win.bind('<Command-w>', lambda e: new_win.destroy())
-        new_win.bind('<Escape>', lambda e: new_win.destroy())
+        new_win.bind('<Command-w>', lambda e: self.on_exit(new_win))
+        new_win.bind('<Escape>', lambda e: self.on_exit(new_win))
 
         name = (
             f'{cfg.APP_NAME} {cfg.APP_VER}'
@@ -71,9 +71,14 @@ class BarMenu(tkinter.Menu):
 
         close_btn = MyButton(new_win)
         close_btn.configure(height=2, width=17, text='Закрыть')
-        close_btn.cmd(lambda e: new_win.destroy())
+        close_btn.cmd(lambda e: self.on_exit(new_win))
         close_btn.pack()
 
         place_center(new_win)
         new_win.deiconify()
         new_win.grab_set()
+
+    def on_exit(self, window: tkinter.Toplevel):
+        window.destroy()
+        cfg.ROOT.focus_force()
+

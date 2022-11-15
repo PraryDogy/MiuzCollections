@@ -14,9 +14,9 @@ class SmbChecker(tkinter.Toplevel):
         cfg.ROOT.eval(f'tk::PlaceWindow {self} center')
         self.withdraw()
 
-        self.protocol("WM_DELETE_WINDOW", self.destroy)
-        self.bind('<Command-w>', lambda e: self.destroy())
-        self.bind('<Escape>', lambda e: self.destroy())
+        self.protocol("WM_DELETE_WINDOW", self.on_exit)
+        self.bind('<Command-w>', lambda e: self.on_exit())
+        self.bind('<Escape>', lambda e: self.on_exit())
 
         self.focus_force()
         self.title('Нет подключения')
@@ -41,9 +41,13 @@ class SmbChecker(tkinter.Toplevel):
         descr_lbl.pack(padx=15, pady=(0, 15))
 
         cls_btn = MyButton(self, text='Закрыть')
-        cls_btn.cmd(lambda e: self.destroy())
+        cls_btn.cmd(lambda e: self.on_exit())
         cls_btn.pack()
 
         place_center(self)
         self.deiconify()
         self.grab_set()
+
+    def on_exit(self):
+        self.on_exit()
+        cfg.ROOT.focus_force()
