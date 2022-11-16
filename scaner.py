@@ -93,6 +93,10 @@ class SearchDirs(list):
         colls = []
 
         for sub_coll in os.listdir(cfg.config['COLL_FOLDER']):
+            
+            if not cfg.FLAG:
+                return
+
             colls.append(os.path.join(cfg.config['COLL_FOLDER'], sub_coll))
 
         return colls
@@ -207,6 +211,10 @@ class DbUpdate(list):
         """
         self.load_db()
         for src, _, _, mod, coll in self:
+
+            if not cfg.FLAG:
+                return
+
             atr = os.stat(src)
             if int(atr.st_mtime) > mod:
                 print('modified', src)
