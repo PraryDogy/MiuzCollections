@@ -34,6 +34,14 @@ class Gallery(MyFrame):
             pady=(0, 0), padx=(0, 15), side=tkinter.LEFT, fill=tkinter.Y)
         ImagesThumbs(self).pack(
             expand=True, fill=tkinter.BOTH, side=tkinter.RIGHT)
+        cfg.ROOT.bind('<ButtonRelease-1>', lambda e: self.update_gui(e))
+
+    def update_gui(self, e):
+        root_w, root_h = cfg.config['ROOT_SIZE'].split('x')
+        new_w, new_h = cfg.ROOT.winfo_width(), cfg.ROOT.winfo_height()
+        if new_w != int(root_w):
+            cfg.config['ROOT_SIZE'] = f'{new_w}x{new_h}'
+            cfg.IMAGES_RESET()
 
 
 class MenuButtons(tkmacosx.SFrame):

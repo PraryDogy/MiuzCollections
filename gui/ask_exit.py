@@ -14,7 +14,7 @@ class AskExit(tkinter.Toplevel):
         self.protocol("WM_DELETE_WINDOW", lambda: self.on_cancel())
         self.bind('<Command-w>', lambda e: self.on_cancel())
         self.bind('<Escape>', lambda e: self.on_cancel())
-
+        self.bind('<Return>', lambda e: self.on_exit())
         lbl = MyLabel(self, text='Выйти?')
 
         btns_frame = MyFrame(self)
