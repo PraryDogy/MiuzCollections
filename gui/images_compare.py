@@ -229,5 +229,5 @@ class CloseBtn(MyButton):
     """
     def __init__(self, master):
         MyButton.__init__(self, master, text='Закрыть')
-        self.configure(height=2)
+        self.configure(height=1, width=13)
         self.cmd(lambda e: on_closing(self.winfo_toplevel()))

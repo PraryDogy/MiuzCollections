@@ -213,11 +213,12 @@ class ImageFrame(MyLabel):
     def place_image(self):
         cfg.ROOT.update_idletasks()
 
+        win_w = self.winfo_toplevel().winfo_width()
+        new_h = self.winfo_height()
+
         img = Image.open(vars['img_src'])
         vars['curr_img'] = img.copy()
 
-        win_w = self.winfo_toplevel().winfo_width()
-        new_h = self.winfo_height()
 
         if vars['curr_img'].width > vars['curr_img'].height:
             size = (win_w, win_w)
@@ -233,12 +234,6 @@ class ImageFrame(MyLabel):
         t = vars['img_info']['text']
         vars['img_info']['text'] = t.replace('Загрузка', f'{img_w} x {img_h}')
 
-        
-        
-        
-        
-        
-        print(new_h)
 
 class ImgInfo(MyLabel):
     """
@@ -336,8 +331,8 @@ class CloseButton(MyButton):
     """
     def __init__(self, master):
         MyButton.__init__(self, master, text='Закрыть')
-        self.configure(height=2)
-        self.cmd(lambda e: self.winfo_toplevel().destroy())
+        self.configure(height=1, width=13)
+        self.cmd(lambda e: on_closing(self.winfo_toplevel()))
 
 
 class NextItem(MyButton):
