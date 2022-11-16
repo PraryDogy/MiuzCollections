@@ -32,26 +32,26 @@ def pack_widgets(master: tkinter.Toplevel):
     img_src = ImgSrc(master)
     
     image_frame = ImageFrame(master)
-    image_frame.pack()
+    image_frame.pack(expand=True, fill=tkinter.BOTH)
 
     left_frame = MyFrame(master)
-    left_frame.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=True)
+    left_frame.pack(side=tkinter.LEFT, expand=True, fill=tkinter.X)
     prev_img = PrevItem(left_frame)
-    prev_img.pack(expand=True, fill=tkinter.BOTH)
+    prev_img.pack(expand=True, fill=tkinter.X)
 
     center_frame = MyFrame(master)
-    center_frame.pack(side=tkinter.LEFT, fill=tkinter.Y, expand=True)
+    center_frame.pack(side=tkinter.LEFT, fill=tkinter.X)
     img_btns = ImgButtons(center_frame)
     img_btns.pack(pady=(15, 15))
     img_info = ImgInfo(center_frame)
-    img_info.pack(pady=(0, 15), padx=15, fill=tkinter.Y, expand=True)
+    img_info.pack(pady=(0, 15), padx=15, expand=True, fill=tkinter.X)
     close = CloseButton(center_frame)
     close.pack()
 
     right_frame = MyFrame(master, bg='red')
-    right_frame.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=True)
+    right_frame.pack(side=tkinter.LEFT, expand=True, fill=tkinter.X)
     next_img = NextItem(right_frame)
-    next_img.pack(expand=True, fill=tkinter.BOTH)
+    next_img.pack(expand=True, fill=tkinter.X)
 
     image_frame.place_thumbnail()
 
@@ -64,7 +64,7 @@ def on_closing(window: tkinter.Toplevel):
     * param `obj`: tkinter toplevel
     """
     for i in cfg.THUMBS:
-        if i['text'] == vars['img_src']:
+        if i['bg'] == cfg.BGPRESSED:
             i.configure(bg=cfg.BGCOLOR)
 
     window.destroy()
@@ -188,39 +188,41 @@ class ImageFrame(MyLabel):
     def place_thumbnail(self):
         cfg.ROOT.update_idletasks()
 
+        win_h = self.winfo_toplevel().winfo_height()
+        win_w = self.winfo_toplevel().winfo_width()
+
+        widgets = list(self.winfo_toplevel().children.values())[2:]
+        widgets_h = sum(i.winfo_reqheight() for i in widgets)
+        
+        new_h = win_h-widgets_h
+        self.configure(height=new_h, width=win_w)
+        
         thumb = Dbase.conn.execute(sqlalchemy.select(Thumbs.img150).where(
             Thumbs.src == vars['img_src'])).first()[0]
 
         image = decode_image(thumb)
-
-        widgets = list(self.winfo_toplevel().children.values())[2:]
-        win_h = self.winfo_toplevel().winfo_height()
-        win_w = self.winfo_toplevel().winfo_width()
-        widgets_h = sum(i.winfo_reqheight() for i in widgets)
-        size = (win_h-widgets_h, win_h-widgets_h)
+        new_h = self.winfo_height()
+        size = (new_h, new_h)
         image = image.resize(size)
-
         img_tk = ImageTk.PhotoImage(image)
+
         self.configure(image=img_tk)
         self.image = img_tk
-        self.configure(height=win_h-widgets_h, width=win_w)
         self.w = win_w
 
     def place_image(self):
+        cfg.ROOT.update_idletasks()
+
         img = Image.open(vars['img_src'])
         vars['curr_img'] = img.copy()
 
-        cfg.ROOT.update_idletasks()
-        widgets = list(self.winfo_toplevel().children.values())[2:]
-
-        win_h = self.winfo_toplevel().winfo_height()
         win_w = self.winfo_toplevel().winfo_width()
-        widgets_h = sum(i.winfo_reqheight() for i in widgets)
-                
+        new_h = self.winfo_height()
+
         if vars['curr_img'].width > vars['curr_img'].height:
             size = (win_w, win_w)
         else:
-            size = (win_h-widgets_h, win_h-widgets_h)
+            size = (new_h, new_h)
         
         vars['curr_img'].thumbnail(size)
         img_tk = ImageTk.PhotoImage(vars['curr_img'])
@@ -231,6 +233,12 @@ class ImageFrame(MyLabel):
         t = vars['img_info']['text']
         vars['img_info']['text'] = t.replace('Загрузка', f'{img_w} x {img_h}')
 
+        
+        
+        
+        
+        
+        print(new_h)
 
 class ImgInfo(MyLabel):
     """

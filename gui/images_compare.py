@@ -90,14 +90,14 @@ class ImagesCompare(tkinter.Toplevel):
         vars['curr_img'] = vars['img1']
 
         image_frame = ImageFrame(self)
-        image_frame.pack()
+        image_frame.pack(expand=True, fill=tkinter.BOTH)
 
         left_frame = MyFrame(self)
-        left_frame.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=True)
-        FakeBtn(left_frame).pack(expand=True, fill=tkinter.BOTH)
+        left_frame.pack(side=tkinter.LEFT, expand=True, fill=tkinter.X)
+        FakeBtn(left_frame).pack(expand=True, fill=tkinter.X)
 
         center_frame = MyFrame(self)
-        center_frame.pack(side=tkinter.LEFT, fill=tkinter.Y, expand=True)
+        center_frame.pack(side=tkinter.LEFT, fill=tkinter.X)
 
         ImgButtons(center_frame).pack(pady=(15, 15))
         ImgInfo(center_frame).pack(
@@ -105,8 +105,8 @@ class ImagesCompare(tkinter.Toplevel):
         CloseBtn(center_frame).pack()
 
         right_frame = MyFrame(self)
-        right_frame.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=True)
-        FakeBtn(right_frame).pack(expand=True, fill=tkinter.BOTH)
+        right_frame.pack(side=tkinter.LEFT, expand=True, fill=tkinter.X)
+        FakeBtn(right_frame).pack(expand=True, fill=tkinter.X)
 
         image_frame.set_size()
         cfg.ROOT.update_idletasks()
@@ -145,11 +145,15 @@ class ImageFrame(MyLabel):
 
     def set_size(self):
         cfg.ROOT.update_idletasks()
-        prevs = get_all_windows()
-        img1_info = list(prevs[0].children.values())
-        self.configure(
-            height=img1_info[1]['height'],
-            width=img1_info[1]['width'])
+
+        win_h = self.winfo_toplevel().winfo_height()
+        win_w = self.winfo_toplevel().winfo_width()
+
+        widgets = list(self.winfo_toplevel().children.values())[2:]
+        widgets_h = sum(i.winfo_reqheight() for i in widgets)
+        
+        new_h = win_h-widgets_h
+        self.configure(height=new_h, width=win_w)
 
 
 class FakeBtn(MyButton):
