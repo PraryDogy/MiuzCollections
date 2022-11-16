@@ -75,7 +75,13 @@ class UpdateSection(MyLabel, MyButton):
 
         btn.press()
         btn.unbind('<Button-1>')
-        Scaner()
+        root_w, root_h = cfg.config['ROOT_SIZE'].split('x')
+        new_w, new_h = cfg.ROOT.winfo_width(), cfg.ROOT.winfo_height()
+        if new_w != int(root_w):
+            cfg.config['ROOT_SIZE'] = f'{new_w}x{new_h}'
+            cfg.IMAGES_RESET()
+        else:
+            Scaner()
         btn.cmd(lambda e: self.updater(self))
 
 
