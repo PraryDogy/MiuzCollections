@@ -13,7 +13,7 @@ from utils import encrypt_cfg
 
 # app info
 APP_NAME = 'MiuzGallery'
-APP_VER = '3.1.5'
+APP_VER = '3.1.6'
 
 KEY = 'QaovKbF1YpKCM9e-HE2wvn30lIqCbeYTUcONcdLpV18='
 

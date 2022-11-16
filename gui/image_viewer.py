@@ -135,7 +135,6 @@ class ImagePreview(tkinter.Toplevel):
 
         place_center(self)
         self.deiconify()
-        self.transient(0)
         self.grab_set()
         load_image(widgets[1])
 
