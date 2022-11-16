@@ -383,4 +383,8 @@ class Scaner(threading.Thread):
 
         UpdateRetouched(aged=True)
         Dbase.conn.execute('VACUUM')
-        cfg.IMAGES_RESET()
+        try:
+            cfg.IMAGES_RESET()
+        except Exception:
+            print('error')
+            cfg.IMAGES_RESET()

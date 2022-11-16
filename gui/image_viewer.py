@@ -162,7 +162,7 @@ def select_thumb(index):
             if i['text'] == vars['all_src'][index]:
                 i.configure(bg=cfg.BGPRESSED)
         except IndexError:
-            print('idex error')
+            print('index error')
 
 
 class ImageFrame(MyLabel):
@@ -341,6 +341,8 @@ class NextItem(MyButton):
         self.configure(bg=cfg.BGCOLOR)
         self.winfo_toplevel().bind('<Right>', lambda e: self.next_img())
         self.cmd(lambda e: self.next_img())
+        self.unbind('<Enter>')
+        self.unbind('<Leave>')
 
     def next_img(self):
         index = vars['all_src'].index(vars['img_src']) + 1
@@ -354,6 +356,8 @@ class PrevItem(MyButton):
         self.configure(bg=cfg.BGCOLOR)
         self.winfo_toplevel().bind('<Left>', lambda e: self.prev_img())
         self.cmd(lambda e: self.prev_img())
+        self.unbind('<Enter>')
+        self.unbind('<Leave>')
 
     def prev_img(self):
         index = vars['all_src'].index(vars['img_src']) - 1

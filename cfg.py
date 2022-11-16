@@ -25,6 +25,7 @@ FONTCOLOR = "#E2E2E2"
 BGCOLOR = "#222222"
 BGBUTTON = "#434343"
 BGPRESSED = '#395432'
+SELECTED = '#4E4769'
 
 # tkinter global variables for avaibility from any place
 ROOT = tkinter.Tk()
@@ -76,6 +77,8 @@ if not os.path.exists(CFG_DIR):
 
 if os.path.exists(os.path.join(CFG_DIR, 'cfg')):
     config = read_cfg(os.path.join(CFG_DIR, 'cfg'))
+    if config['ROOT_SIZE'] == '1x1':
+        config['ROOT_SIZE'] = defaults()['ROOT_SIZE']
 else:
     config = defaults()
     encrypt_cfg(config)

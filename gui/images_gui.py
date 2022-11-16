@@ -105,6 +105,7 @@ class MenuButtons(tkmacosx.SFrame):
         if cfg.config['CURR_COLL'] == 'last':
             last_imgs.configure(bg=cfg.BGPRESSED)
 
+
     def __open_coll(self, coll: str, btn: MyButton, btns: list):
         """
         Changes all buttons color to default and change color for
@@ -270,7 +271,12 @@ class ImagesThumbs(tkmacosx.SFrame):
                     a=src, b=all_src, c=thumb: self.thumb_cmd(a, b, c))
                 cfg.THUMBS.append(thumb)
                 thumb.pack(side=tkinter.LEFT)
+                thumb.bind('<Leave>', lambda e, a=thumb: self.leave(a))
+
+    def leave(self, thumb: MyButton):
+        if thumb['bg'] != cfg.BGPRESSED:
+            thumb['bg'] = cfg.BGCOLOR
 
     def thumb_cmd(self, src: str, all_src: list, btn: MyButton):
-        btn.configure(bg=cfg.BGPRESSED)
+        btn['bg'] = cfg.BGPRESSED
         ImagePreview(src, all_src)

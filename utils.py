@@ -156,6 +156,9 @@ class MyButton(tkinter.Label):
             bg=cfg.BGBUTTON, fg=cfg.FONTCOLOR,
             width=17, height=2)
 
+        self.bind('<Enter>', lambda e: self.enter())
+        self.bind('<Leave>', lambda e: self.leave())
+
     def cmd(self, cmd):
         """
         Binds tkinter label to mouse left click.
@@ -170,6 +173,13 @@ class MyButton(tkinter.Label):
         self.configure(bg=cfg.BGPRESSED)
         cfg.ROOT.after(100, lambda: self.configure(bg=cfg.BGBUTTON))
 
+    def enter(self):
+        if self['bg'] != cfg.BGPRESSED:
+            self['bg'] = cfg.SELECTED
+
+    def leave(self):
+        if self['bg'] != cfg.BGPRESSED:
+            self['bg'] = cfg.BGBUTTON
 
 class MyFrame(tkinter.Frame):
     """
