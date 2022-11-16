@@ -271,7 +271,12 @@ class ImagesThumbs(tkmacosx.SFrame):
                     a=src, b=all_src, c=thumb: self.thumb_cmd(a, b, c))
                 cfg.THUMBS.append(thumb)
                 thumb.pack(side=tkinter.LEFT)
+                thumb.bind('<Enter>', lambda e, a=thumb: self.enter(a))
                 thumb.bind('<Leave>', lambda e, a=thumb: self.leave(a))
+
+    def enter(self, thumb: MyButton):
+        if thumb['bg'] != cfg.BGPRESSED:
+            thumb['bg'] = cfg.SELECTED_THUMB
 
     def leave(self, thumb: MyButton):
         if thumb['bg'] != cfg.BGPRESSED:

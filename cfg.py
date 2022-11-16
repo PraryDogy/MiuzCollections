@@ -13,7 +13,7 @@ from utils import encrypt_cfg
 
 # app info
 APP_NAME = 'MiuzGallery'
-APP_VER = '3.1.6'
+APP_VER = '3.1.7'
 
 KEY = 'QaovKbF1YpKCM9e-HE2wvn30lIqCbeYTUcONcdLpV18='
 
@@ -26,6 +26,7 @@ BGCOLOR = "#222222"
 BGBUTTON = "#434343"
 BGPRESSED = '#395432'
 SELECTED = '#4E4769'
+SELECTED_THUMB = '#6B6484'
 
 # tkinter global variables for avaibility from any place
 ROOT = tkinter.Tk()
