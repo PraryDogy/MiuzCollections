@@ -17,15 +17,11 @@ from PIL import Image, ImageTk
 from utils import MyButton, MyFrame, MyLabel, decode_image
 
 from .image_viewer import ImagePreview
-import cv2
-import numpy
 
-class Test:
-    def __init__(self):
-        gallery = cfg.ROOT.winfo_children()[1]
-        canv = gallery.winfo_children()[1]
-        thumbs = canv.winfo_children()[-1]
-        print(thumbs.winfo_children())
+vars = {
+    'selected_thumbs': []
+    }
+
 
 class Gallery(MyFrame):
     """
@@ -136,7 +132,6 @@ class ImagesThumbs(tkmacosx.SFrame):
     def __init__(self, master):
         self.master = master
         cfg.IMAGES_RESET = self.reset
-        cfg.THUMBS.clear()
 
         tkmacosx.SFrame.__init__(
             self, master, bg=cfg.BGCOLOR, scrollbarwidth=7)
@@ -181,11 +176,21 @@ class ImagesThumbs(tkmacosx.SFrame):
         """
         Destroys self.Run init again
         """
+        for i in cfg.THUMBS:
+            if i['bg'] == cfg.BGPRESSED:
+                vars['selected_thumbs'].append(i['text'])
+        
+        cfg.THUMBS.clear()
+            
         w, h = cfg.ROOT.winfo_width(), cfg.ROOT.winfo_height()
         cfg.config['ROOT_SIZE'] = f'{w}x{h}'
         self.destroy()
         ImagesThumbs(self.master).pack(
             expand=True, fill=tkinter.BOTH, side=tkinter.RIGHT)
+
+        for i in cfg.THUMBS:
+            if i['text'] in vars['selected_thumbs']:
+                i.configure(bg=cfg.BGPRESSED)
 
     def load_thumbs(self, all_images: list):
         """

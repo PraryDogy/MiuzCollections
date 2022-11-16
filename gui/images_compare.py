@@ -41,12 +41,6 @@ def ask_exit():
     AskExit(cfg.ROOT)
 
 
-class FakeBtn(MyButton):
-    def __init__(self, master):
-        MyButton.__init__(self, master)
-        self.configure(bg=cfg.BGCOLOR)
-
-
 class ImagesCompare(tkinter.Toplevel):
     """
     A new tkinter window containing two images and
@@ -82,15 +76,15 @@ class ImagesCompare(tkinter.Toplevel):
         # image info
         
         vars['img1'] = {
+            'src': img1_info[0]['text'],
             'image': img1_info[1]['image'],
             'info': img1_info[3].children['!imginfo']['text'],
-            'src': img1_info[0]['text']
             }
 
         vars['img2'] = {
+            'src': img2_info[0]['text'],
             'image': img2_info[1]['image'],
             'info': img2_info[3].children['!imginfo']['text'],
-            'src': img2_info[0]['text']
             }
 
         vars['curr_img'] = vars['img1']
@@ -120,6 +114,22 @@ class ImagesCompare(tkinter.Toplevel):
         self.grab_set()
 
 
+def switch_image(btn: MyButton):
+    """
+    Switches between two images from cfg.IMAGES_COMPARE set.
+    """
+    [btn.press() if btn != '' else False]
+
+    for i in [vars['img1'], vars['img2']]:
+        if vars['curr_img'] != i:
+            vars['curr_img'] = i
+
+            vars['img_frame']['image'] = vars['curr_img']['image']
+            vars['img_info']['text'] = vars['curr_img']['info']
+
+            return
+
+
 class ImageFrame(MyLabel):
     """
     Creates tkinter label with image.
@@ -130,6 +140,7 @@ class ImageFrame(MyLabel):
         self['bg']='black'
         self['image'] = vars['curr_img']['image']
         vars['img_frame'] = self
+        self.bind('<Button-1>', lambda e: switch_image(''))
 
     def set_size(self):
         cfg.ROOT.update_idletasks()
@@ -138,6 +149,13 @@ class ImageFrame(MyLabel):
         self.configure(
             height=img1_info[1]['height'],
             width=img1_info[1]['width'])
+
+
+class FakeBtn(MyButton):
+    def __init__(self, master):
+        MyButton.__init__(self, master)
+        self.configure(bg=cfg.BGCOLOR, text='•', font=('Arial', 22, 'bold'))
+        self.cmd(lambda e: switch_image(''))
 
 
 class ImgButtons(MyFrame):
@@ -161,10 +179,10 @@ class ImgButtons(MyFrame):
         open_btn.cmd(lambda e: self.open_folder(open_btn))
         open_btn.pack(side=tkinter.LEFT, padx=(0, 15))
 
-        toogle = MyButton(self, text='Переключить')
-        toogle.configure(height=1, width=b_wight)
-        toogle.cmd(lambda e: self.switch_image(toogle))
-        toogle.pack(side=tkinter.LEFT, padx=(0, 0))
+        # toogle = MyButton(self, text='Переключить')
+        # toogle.configure(height=1, width=b_wight)
+        # toogle.cmd(lambda e: switch_image(toogle))
+        # toogle.pack(side=tkinter.LEFT, padx=(0, 0))
 
     def copy_name(self, btn: MyButton):
         """
@@ -186,20 +204,6 @@ class ImgButtons(MyFrame):
         path = '/'.join(vars['curr_img']['src'].split('/')[:-1])
         subprocess.check_output(["/usr/bin/open", path])
 
-    def switch_image(self, btn: MyButton):
-        """
-        Switches between two images from cfg.IMAGES_COMPARE set.
-        """
-        btn.press()
-
-        for i in [vars['img1'], vars['img2']]:
-            if vars['curr_img'] != i:
-                vars['curr_img'] = i
-
-                vars['img_frame']['image'] = vars['curr_img']['image']
-                vars['img_info']['text'] = vars['curr_img']['info']
-
-                return
 
 class ImgInfo(MyLabel):
     """

@@ -135,6 +135,7 @@ class ImagePreview(tkinter.Toplevel):
 
         place_center(self)
         self.deiconify()
+        self.transient(0)
         self.grab_set()
         load_image(widgets[1])
 
@@ -142,6 +143,29 @@ class ImagePreview(tkinter.Toplevel):
 class ImgSrc(MyLabel):
     def __init__(self, master):
         MyLabel.__init__(self, master, text=vars['img_src'])
+
+
+def switch_image(master: tkinter.Toplevel, index: int):
+    try:
+        vars['img_src'] = vars['all_src'][index]
+    except IndexError:
+        vars['img_src'] = vars['all_src'][0]
+    master = master.winfo_toplevel()
+    for i in master.winfo_children():
+        i.destroy()
+    widgets = pack_widgets(master)
+    load_image(widgets[1])
+
+
+def select_thumb(index):
+    for i in cfg.THUMBS:
+        if i['bg'] == cfg.BGPRESSED:
+            i.configure(bg=cfg.BGCOLOR)
+        try:
+            if i['text'] == vars['all_src'][index]:
+                i.configure(bg=cfg.BGPRESSED)
+        except IndexError:
+            print('idex error')
 
 
 class ImageFrame(MyLabel):
@@ -153,6 +177,16 @@ class ImageFrame(MyLabel):
         MyLabel.__init__(self, master, borderwidth=0)
         vars['img_frame'] = self
         self['bg']='black'
+        self.w = 0
+        self.bind('<Button-1>', lambda e: self.next_image(e))
+
+    def next_image(self, e):
+        if e.x <= self.w//2:
+            index = vars['all_src'].index(vars['img_src']) - 1
+        else:
+            index = vars['all_src'].index(vars['img_src']) + 1
+        select_thumb(index)
+        switch_image(self, index)
 
     def place_thumbnail(self):
         cfg.ROOT.update_idletasks()
@@ -173,7 +207,7 @@ class ImageFrame(MyLabel):
         self.configure(image=img_tk)
         self.image = img_tk
         self.configure(height=win_h-widgets_h, width=win_w)
-
+        self.w = win_w
 
     def place_image(self):
         img = Image.open(vars['img_src'])
@@ -197,7 +231,9 @@ class ImageFrame(MyLabel):
         self.image = img_tk
         
         img_w, img_h = img.width, img.height
-        vars['img_info']['text'] = vars['img_info']['text'].replace('Загрузка', f'{img_w} x {img_h}')
+        t = vars['img_info']['text']
+        vars['img_info']['text'] = t.replace('Загрузка', f'{img_w} x {img_h}')
+
 
 class ImgInfo(MyLabel):
     """
@@ -299,37 +335,27 @@ class CloseButton(MyButton):
         self.cmd(lambda e: self.winfo_toplevel().destroy())
 
 
-def switch_image(master: tkinter.Toplevel, index: int):
-    try:
-        vars['img_src'] = vars['all_src'][index]
-    except IndexError:
-        vars['img_src'] = vars['all_src'][0]
-    master = master.winfo_toplevel()
-    for i in master.winfo_children():
-        i.destroy()
-    widgets = pack_widgets(master)
-    load_image(widgets[1])
-
-
 class NextItem(MyButton):
     def __init__(self, master):
-        MyButton.__init__(self, master, text='>')
+        MyButton.__init__(self, master, text='•', font=('Arial', 22, 'bold'))
         self.configure(bg=cfg.BGCOLOR)
         self.winfo_toplevel().bind('<Right>', lambda e: self.next_img())
         self.cmd(lambda e: self.next_img())
 
     def next_img(self):
         index = vars['all_src'].index(vars['img_src']) + 1
+        select_thumb(index)
         switch_image(self, index)
 
 
 class PrevItem(MyButton):
     def __init__(self, master):
-        MyButton.__init__(self, master, text='<')
+        MyButton.__init__(self, master, text='•', font=('Arial', 22, 'bold'))
         self.configure(bg=cfg.BGCOLOR)
         self.winfo_toplevel().bind('<Left>', lambda e: self.prev_img())
         self.cmd(lambda e: self.prev_img())
 
     def prev_img(self):
         index = vars['all_src'].index(vars['img_src']) - 1
+        select_thumb(index)
         switch_image(self, index)

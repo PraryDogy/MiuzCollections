@@ -24,8 +24,7 @@ class MainGui:
 
         cfg.ROOT.createcommand(
             'tk::mac::ReopenApplication', lambda: cfg.ROOT.deiconify())
-        cfg.ROOT.bind('<Command-w>', lambda e: cfg.ROOT.iconify())
-        
+        cfg.ROOT.bind('<Command-w>', lambda e: cfg.ROOT.withdraw())
         cfg.ROOT.createcommand("tk::mac::Quit" , self.on_exit)
         cfg.ROOT.protocol("WM_DELETE_WINDOW", self.on_exit)
 
