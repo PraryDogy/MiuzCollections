@@ -40,24 +40,22 @@ def pack_widgets(master: tkinter.Toplevel):
     prev_img.pack(expand=True, fill=tkinter.BOTH)
 
     center_frame = MyFrame(master)
-    center_frame.pack(side=tkinter.LEFT)
+    center_frame.pack(side=tkinter.LEFT, fill=tkinter.Y, expand=True)
     img_btns = ImgButtons(center_frame)
     img_btns.pack(pady=(15, 15))
     img_info = ImgInfo(center_frame)
-    img_info.pack(pady=(0, 15), padx=15)
+    img_info.pack(pady=(0, 15), padx=15, fill=tkinter.Y, expand=True)
     close = CloseButton(center_frame)
     close.pack()
 
-    right_frame = MyFrame(master)
+    right_frame = MyFrame(master, bg='red')
     right_frame.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=True)
     next_img = NextItem(right_frame)
     next_img.pack(expand=True, fill=tkinter.BOTH)
 
     image_frame.place_thumbnail()
 
-    return [img_src, image_frame, left_frame, prev_img, center_frame,
-        img_btns, img_info, close, right_frame, next_img]
-
+    return {'image_frame': image_frame}
 
 def on_closing(window: tkinter.Toplevel):
     """
@@ -129,14 +127,14 @@ class ImagePreview(tkinter.Toplevel):
         cfg.ROOT.update_idletasks()
 
         if cfg.COMPARE:
-            load_image(widgets[1])
+            load_image(widgets['image_frame'])
             ImagesCompare()
             return
 
         place_center(self)
         self.deiconify()
         self.grab_set()
-        load_image(widgets[1])
+        load_image(widgets['image_frame'])
 
 
 class ImgSrc(MyLabel):
@@ -153,7 +151,7 @@ def switch_image(master: tkinter.Toplevel, index: int):
     for i in master.winfo_children():
         i.destroy()
     widgets = pack_widgets(master)
-    load_image(widgets[1])
+    load_image(widgets['image_frame'])
 
 
 def select_thumb(index):

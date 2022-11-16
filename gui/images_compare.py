@@ -97,10 +97,11 @@ class ImagesCompare(tkinter.Toplevel):
         FakeBtn(left_frame).pack(expand=True, fill=tkinter.BOTH)
 
         center_frame = MyFrame(self)
-        center_frame.pack(side=tkinter.LEFT)
+        center_frame.pack(side=tkinter.LEFT, fill=tkinter.Y, expand=True)
 
         ImgButtons(center_frame).pack(pady=(15, 15))
-        ImgInfo(center_frame).pack(pady=(0, 15), padx=15)
+        ImgInfo(center_frame).pack(
+            pady=(0, 15), padx=15, fill=tkinter.Y, expand=True)
         CloseBtn(center_frame).pack()
 
         right_frame = MyFrame(self)
