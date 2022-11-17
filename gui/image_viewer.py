@@ -63,10 +63,9 @@ def on_closing(window: tkinter.Toplevel):
     Clears `cfg.IMAGES_COMPARE` list.
     * param `obj`: tkinter toplevel
     """
-    for i in cfg.THUMBS:
-        if i['bg'] == cfg.BGPRESSED:
-            i.configure(bg=cfg.BGCOLOR)
-
+    # for i in cfg.THUMBS:
+    #     if i['bg'] == cfg.BGPRESSED:
+    #         i.configure(bg=cfg.BGCOLOR)
     window.destroy()
     cfg.ROOT.focus_force()
 
@@ -292,8 +291,12 @@ class ImgButtons(MyFrame):
         * param `btn`: current tkinter button.
         """
         btn.press()
-
         if not cfg.COMPARE:
+            cfg.DISABLE_STATUSBAR()
+            for i in cfg.THUMBS:
+                if i['text'] == vars['img_src']:
+                    i['bg'] = cfg.BGPRESSED
+
             win = self.winfo_toplevel()
             win.withdraw()
             win.grab_release()

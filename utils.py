@@ -50,7 +50,7 @@ def encrypt_cfg(data: dict):
 def get_coll_name(src: str):
     """
     Returns collection name.
-    Returns `noCollection` if name not found.
+    Returns `Без коллекций` if name not found.
 
     Looking for collection name in path like object.
     Name of collection must be follow next to `cfg.COLL_FOLDER`
@@ -65,10 +65,10 @@ def get_coll_name(src: str):
     cfg.COLL_FOLDER = "collection"
     collection_path = /some/path/without/coll_folder
     print(get_coll_name(collection_path))
-    > noCollection
+    > Без коллекций
     ```
     """
-    coll_name = 'noCollection'
+    coll_name = 'Без коллекций'
     if cfg.config['COLL_FOLDER'] in src:
         coll_name = src.split(cfg.config['COLL_FOLDER'])[-1].split(os.sep)[1]
     return coll_name

@@ -7,14 +7,13 @@ import os
 import sys
 import threading
 
-import sqlalchemy
-
 import cfg
+import sqlalchemy
 from admin import print_alive
 from database import Dbase, Thumbs
 from gui.smb_checker import SmbChecker
 from utils import create_thumb, encrypt_cfg, get_coll_name, smb_check
-
+import tkinter
 
 def insert_row(**kw):
     """
@@ -143,10 +142,8 @@ def removed_images():
     files = db_images()
     for src, _, _, _, _ in files:
         print_alive(sys._getframe().f_code.co_name, src)
-
         if not os.path.exists(src):
             print('removed file', src)
-
             Dbase.conn.execute(
                 sqlalchemy.delete(Thumbs).where(Thumbs.src==src))
 
@@ -158,7 +155,6 @@ def modified_images():
     """
     files = db_images()
     for src, _, _, mod, coll in files:
-
         atr = os.stat(src)
         if int(atr.st_mtime) > mod:
             print('modified', src)
@@ -169,7 +165,7 @@ def modified_images():
                 sqlalchemy.delete(Thumbs).where(Thumbs.src==src))
             coll = get_coll_name(src)
             insert_row(src=src, size=n_size, birth=n_birth,
-                            mod=n_mod, coll=coll)
+                        mod=n_mod, coll=coll)
 
 
 def new_images(list_dirs: list):
@@ -209,7 +205,7 @@ def moved_images(list_dirs: list):
     files = db_images()
     no_colls = []
     for src, size, created, mod, coll in files:
-        if coll=='noCollection':
+        if coll=='Без коллекций':
             no_colls.append((size, created, mod))
     for src, size, created, mod in list_dirs:
         print_alive(sys._getframe().f_code.co_name, src)
@@ -224,30 +220,35 @@ def moved_images(list_dirs: list):
                             mod=mod, coll=coll)
 
 
+def update_livelabel(percent: str):
+    try:
+        cfg.LIVE_LBL['text'] = f'Обновление {percent}%'
+    except tkinter.TclError:
+        print('livelabel was destroyed')
+
+
 def update_collections():
     """
-    Public method.
     Collection dirs analysis.
     Searchs images.
     Updates the database thumbnails.
     """
     cfg.LIVE_LBL['fg'] = cfg.FONTCOLOR
-    cfg.LIVE_LBL['text'] = 'Обновление 10%'
+    update_livelabel('10')
     collections = search_collections()
     images = search_images(collections)
-    cfg.LIVE_LBL['text'] = 'Обновление 20%'
+    update_livelabel('20')
     removed_images()
-    cfg.LIVE_LBL['text'] = 'Обновление 30%'
+    update_livelabel('30')
     modified_images()
-    cfg.LIVE_LBL['text'] = 'Обновление 40%'
+    update_livelabel('40')
     new_images(images)
-    cfg.LIVE_LBL['text'] = 'Обновление 50%'
+    update_livelabel('50')
     moved_images(images)
 
 
 def update_nocollection(aged: bool):
     """
-    Public method.
     Collection dirs analysis.
     Searchs images.
     Updates database thumbnails.
@@ -255,43 +256,46 @@ def update_nocollection(aged: bool):
     * param `aged`: true = updates dirs created later
     than `cfg.FILE_AGE` value
     """
-    cfg.LIVE_LBL['text'] = 'Обновление 60%'
+    update_livelabel('60')
     if aged:
         aged_years = search_aged_years(search_years())
         aged_dirs = search_retouched(aged_years)
     else:
         aged_dirs = search_retouched(search_years())
     images = search_images(aged_dirs)
-    cfg.LIVE_LBL['text'] = 'Обновление 70%'
+    update_livelabel('70')
     removed_images()
-    cfg.LIVE_LBL['text'] = 'Обновление 80%'
+    update_livelabel('80')
     modified_images()
-    cfg.LIVE_LBL['text'] = 'Обновление 90%'
+    update_livelabel('90')
     new_images(images)
-    cfg.LIVE_LBL['fg'] = cfg.BGCOLOR
-
-
-def __scan():
-    """Run Files Scaner & Database Updater from utils"""
-    update_collections()
-    if cfg.config['TYPE_SCAN'] == 'full':
-        cfg.config['TYPE_SCAN'] = ''
-        encrypt_cfg(cfg.config)
-        update_nocollection(aged=False)
-    else:
-        update_nocollection(aged=True)
-    Dbase.conn.execute('VACUUM')
     try:
-        cfg.IMAGES_RESET()
-    except Exception:
-        print('images_reset error')
-        cfg.IMAGES_RESET()
+        cfg.LIVE_LBL['fg'] = cfg.BGCOLOR
+    except tkinter.TclError:
+        print('livelabel was destroyed')
 
 
 def scaner():
     if not smb_check():
         SmbChecker()
         return
+
+    def __scan():
+        """Run Files Scaner & Database Updater from utils"""
+        update_collections()
+        if cfg.config['TYPE_SCAN'] == 'full':
+            cfg.config['TYPE_SCAN'] = ''
+            encrypt_cfg(cfg.config)
+            update_nocollection(aged=False)
+        else:
+            update_nocollection(aged=True)
+        Dbase.conn.execute('VACUUM')
+        try:
+            cfg.IMAGES_RESET()
+        except Exception:
+            print('images_reset error')
+            cfg.IMAGES_RESET()
+
     t1 = threading.Thread(target=__scan, daemon=True)
     t1.start()
 

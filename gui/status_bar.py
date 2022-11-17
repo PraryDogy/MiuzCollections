@@ -19,21 +19,32 @@ class StatusBar(MyFrame):
     """
     def __init__(self, master):
         MyFrame.__init__(self, master)
+        cfg.ENABLE_STATUSBAR = self.pack_widgets
+        cfg.DISABLE_STATUSBAR = self.pack_compare
+        self.pack_widgets()
 
-        FakeLabel(self)
-        SettingsSection(self)
+    def pack_widgets(self):
+        widgets = [v for k, v in self.children.items()]
+        [i.destroy() for i in widgets]
+        FakeLabel(self).pack(side=tkinter.LEFT, padx=(0, 15))
+        SettingsSection(self).pack(side=tkinter.LEFT)
         Separator(self, orient='vertical').pack(
             fill=tkinter.Y, side=tkinter.LEFT, padx=(15, 15))
-        UpdateSection(self)
-        DynamicSection(self)
+        UpdateSection(self).pack(side=tkinter.LEFT, padx=(0, 15))
+        DynamicSection(self).pack(side=tkinter.LEFT, padx=(0, 15))
+
+    def pack_compare(self):
+        widgets = [v for k, v in self.children.items()]
+        [i.destroy() for i in widgets]
+        CompareTitle(self)
 
 
 class FakeLabel(MyLabel):
     def __init__(self, master):
         MyLabel.__init__(self, master, text='Обновление 00%')
         self['fg'] = cfg.BGCOLOR
-        self.pack(side=tkinter.LEFT, padx=(0, 15))
         cfg.LIVE_LBL = self
+
 
 class SettingsSection(MyLabel, MyButton):
     """
@@ -43,7 +54,6 @@ class SettingsSection(MyLabel, MyButton):
         MyButton.__init__(self, master, text='⚙', padx=5)
         self.configure(width=5, height=1)
         self.cmd(lambda e: self.open_settings(self))
-        self.pack(side=tkinter.LEFT, padx=(0, 0))
 
     def open_settings(self, btn: MyButton):
         """
@@ -62,7 +72,6 @@ class UpdateSection(MyLabel, MyButton):
         MyButton.__init__(self, master, text='⟲', padx=5)
         self.configure(width=5, height=1, )
         self.cmd(lambda e: self.updater(self))
-        self.pack(side=tkinter.LEFT, padx=(0, 15))
 
     def updater(self, btn: MyButton):
         """
@@ -83,5 +92,29 @@ class DynamicSection(MyLabel):
     def __init__(self, master):
         MyLabel.__init__(self, master, text='Обновление 00%')
         self['fg'] = cfg.BGCOLOR
-        self.pack(side=tkinter.LEFT, padx=(0, 15))
         cfg.LIVE_LBL = self
+
+
+class CompareTitle(MyFrame):
+    def __init__(self, master: tkinter.Frame):
+        subtitle = MyLabel(
+            master, 
+            fg=cfg.FONTCOLOR,
+            text='Выберите фото для сравнения')
+        subtitle.pack(side=tkinter.LEFT)
+
+        cancel = MyButton(master, text='Отмена')
+        cancel.configure(height=1, width=10)
+        cancel.cmd(lambda e: self.cancel())
+        cancel.pack(side=tkinter.LEFT, padx=(15, 0))
+        cfg.ROOT.bind('<Escape>', lambda e: self.cancel())
+
+    def cancel(self):
+        cfg.ROOT.unbind('<Escape>')
+        cfg.ENABLE_STATUSBAR()
+
+        for i in cfg.THUMBS:
+            if i['bg'] == cfg.BGPRESSED:
+                i['bg'] = cfg.BGCOLOR
+
+        cfg.COMPARE = False

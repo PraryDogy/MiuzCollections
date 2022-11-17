@@ -15,11 +15,10 @@ import tkmacosx
 from database import Dbase, Thumbs
 from PIL import Image, ImageTk
 from utils import MyButton, MyFrame, MyLabel, decode_image
-
 from .image_viewer import ImagePreview
 
 vars = {
-    'selected_thumbs': []
+    'selected_thumbs': [],
     }
 
 
@@ -83,7 +82,7 @@ class MenuButtons(tkmacosx.SFrame):
         last_imgs = MyButton(self, text='Последние')
         last_imgs.configure(height=1, width=13)
         last_imgs.cmd(lambda e: self.__open_coll('last', last_imgs, btns))
-        last_imgs.pack(pady=(0, 10))
+        last_imgs.pack(pady=(0, 20))
         btns.append(last_imgs)
 
         # scaner = MyButton(self, text='Сканер')
@@ -147,7 +146,8 @@ class ImagesThumbs(tkmacosx.SFrame):
         self.clmns = ((w)//158)-1
 
         title = MyLabel(
-            self, text=cfg.config['CURR_COLL'], font=('Arial', 45, 'bold'))
+            self, text=cfg.config['CURR_COLL'], 
+            font=('Arial', 45, 'bold'))
         title.pack(pady=(0, 15))
 
         if cfg.config['CURR_COLL'] == 'last':
@@ -195,9 +195,10 @@ class ImagesThumbs(tkmacosx.SFrame):
         ImagesThumbs(self.master).pack(
             expand=True, fill=tkinter.BOTH, side=tkinter.RIGHT)
 
-        for i in cfg.THUMBS:
-            if i['text'] in vars['selected_thumbs']:
-                i.configure(bg=cfg.BGPRESSED)
+        if cfg.COMPARE:
+            for i in cfg.THUMBS:
+                if i['text'] in vars['selected_thumbs']:
+                    i.configure(bg=cfg.BGPRESSED)
 
     def load_thumbs(self, all_images: list):
         """
@@ -281,5 +282,4 @@ class ImagesThumbs(tkmacosx.SFrame):
             thumb['bg'] = cfg.BGCOLOR
 
     def thumb_cmd(self, src: str, all_src: list, btn: MyButton):
-        btn['bg'] = cfg.BGPRESSED
         ImagePreview(src, all_src)
