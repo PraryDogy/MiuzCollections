@@ -118,3 +118,6 @@ class CompareTitle(MyFrame):
                 i['bg'] = cfg.BGCOLOR
 
         cfg.COMPARE = False
+
+        windows = [v for k, v in cfg.ROOT.children.items() if "preview" in k]
+        [w.destroy() for w in windows]
