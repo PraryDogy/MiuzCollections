@@ -1,3 +1,4 @@
+import sys
 import tkinter
 
 import cfg
@@ -41,14 +42,10 @@ class AskExit(tkinter.Toplevel):
         cfg.ROOT.focus_force()
 
     def on_exit(self):
-        cfg.FLAG = False
-
         cfg.ROOT.update_idletasks()
         w, h = cfg.ROOT.winfo_width(), cfg.ROOT.winfo_height()
         x, y = cfg.ROOT.winfo_x(), cfg.ROOT.winfo_y()
-
         cfg.config['ROOT_SIZE'] = f'{w}x{h}'
         cfg.config['ROOT_POS'] = f'+{x}+{y}'
-
         encrypt_cfg(cfg.config)
-        quit()
+        raise SystemExit

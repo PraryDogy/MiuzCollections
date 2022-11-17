@@ -6,7 +6,7 @@ import tkinter
 from tkinter.ttk import Separator
 
 import cfg
-from scaner import Scaner
+from scaner import scaner
 from utils import MyButton, MyFrame, MyLabel, smb_check
 
 from .settings import Settings
@@ -75,7 +75,7 @@ class UpdateSection(MyLabel, MyButton):
 
         btn.press()
         btn.unbind('<Button-1>')
-        Scaner()
+        scaner()
         btn.cmd(lambda e: self.updater(self))
 
 

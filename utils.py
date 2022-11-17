@@ -43,9 +43,9 @@ def encrypt_cfg(data: dict):
     """
     key = Fernet(cfg.KEY)
     encrypted = key.encrypt(json.dumps(data).encode("utf-8"))
-
     with open(os.path.join(cfg.CFG_DIR, 'cfg'), 'wb') as file:
         file.write(encrypted)
+
 
 def get_coll_name(src: str):
     """
@@ -93,23 +93,18 @@ def create_thumb(src: str):
     """
     img = cv2.imread(src)
     width, height = img.shape[1], img.shape[0]
-
     if height >= width:
         delta = (height-width)//2
         new_img = img[delta:height-delta, 0:width]
-
     else:
         delta = (width-height)//2
         new_img = img[0:height, delta:width-delta]
-
     resized = []
-
     for size in [(150, 150)]:
         newsize = cv2.resize(
             new_img, size, interpolation = cv2.INTER_AREA)
         encoded = cv2.imencode('.jpg', newsize)[1].tobytes()
         resized.append(encoded)
-
     return resized
 
 
@@ -117,7 +112,6 @@ def my_copy(output: str):
     """
     Custom copy to clipboard with subprocess
     """
-
     process = subprocess.Popen(
         'pbcopy', env={'LANG': 'en_US.UTF-8'}, stdin=subprocess.PIPE)
     process.communicate(output.encode('utf-8'))
@@ -127,7 +121,6 @@ def my_paste():
     """
     Custom paste from clipboard with subprocess
     """
-
     return subprocess.check_output(
         'pbpaste', env={'LANG': 'en_US.UTF-8'}).decode('utf-8')
 
@@ -137,7 +130,6 @@ def smb_check():
     Check smb disk avability with os path exists.
     Return bool.
     """
-
     if not os.path.exists(cfg.config['PHOTO_DIR']):
         return False
     return True
@@ -149,13 +141,11 @@ class MyButton(tkinter.Label):
     * method `cmd`: bind function to mouse left click
     * method `press`: simulate button press with button's bg color
     """
-
     def __init__(self, master: tkinter, **kwargs):
         tkinter.Label.__init__(self, master, **kwargs)
         self.configure(
             bg=cfg.BGBUTTON, fg=cfg.FONTCOLOR,
             width=17, height=2)
-
         self.bind('<Enter>', lambda e: self.enter())
         self.bind('<Leave>', lambda e: self.leave())
 

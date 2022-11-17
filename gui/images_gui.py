@@ -54,12 +54,9 @@ class MenuButtons(tkmacosx.SFrame):
     def __init__(self, master):
         tkmacosx.SFrame.__init__(
             self, master, bg=cfg.BGCOLOR, scrollbarwidth=7, width=170)
-
         img_src = Image.open(
             os.path.join(os.path.dirname(__file__), 'logo.png'))
-
         img_tk= ImageTk.PhotoImage(img_src)
-
         img_lbl = MyLabel(self)
         img_lbl.configure(image=img_tk)
         img_lbl.pack(pady=(0, 0))
@@ -86,25 +83,26 @@ class MenuButtons(tkmacosx.SFrame):
         last_imgs = MyButton(self, text='Последние')
         last_imgs.configure(height=1, width=13)
         last_imgs.cmd(lambda e: self.__open_coll('last', last_imgs, btns))
-        last_imgs.pack(pady=(0, 20))
+        last_imgs.pack(pady=(0, 10))
         btns.append(last_imgs)
 
-        for name_btn, name_coll in for_btns:
+        # scaner = MyButton(self, text='Сканер')
+        # scaner.configure(height=1, width=13)
+        # scaner.cmd(lambda e: self.test())
+        # scaner.pack(pady=(0, 20))
+        # btns.append(scaner)
 
+        for name_btn, name_coll in for_btns:
             btn = MyButton(self, text=name_btn)
             btn.configure(height=1, width=13 ,pady=1)
             btn.pack(pady=(0, 10))
             btns.append(btn)
-
             if name_coll == cfg.config['CURR_COLL']:
                 btn.configure(bg=cfg.BGPRESSED)
-
             btn.cmd(lambda e, coll=name_coll, btn=btn, btns=btns:
                     self.__open_coll(coll, btn, btns))
-
         if cfg.config['CURR_COLL'] == 'last':
             last_imgs.configure(bg=cfg.BGPRESSED)
-
 
     def __open_coll(self, coll: str, btn: MyButton, btns: list):
         """

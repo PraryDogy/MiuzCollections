@@ -4,7 +4,7 @@ Run file
 
 import cfg
 from gui import main_gui
-from scaner import Scaner
+from scaner import scaner
 
 
 def load_all():
@@ -14,7 +14,7 @@ def load_all():
     """
     main_gui.MainGui()
     cfg.ROOT.deiconify()
-    Scaner()
+    scaner()
 
 cfg.ROOT.after(1, load_all)
 
