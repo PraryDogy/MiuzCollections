@@ -153,17 +153,6 @@ def switch_image(master: tkinter.Toplevel, index: int):
     load_image(widgets['image_frame'])
 
 
-def select_thumb(index):
-    for i in cfg.THUMBS:
-        if i['bg'] == cfg.BGPRESSED:
-            i.configure(bg=cfg.BGCOLOR)
-        try:
-            if i['text'] == vars['all_src'][index]:
-                i.configure(bg=cfg.BGPRESSED)
-        except IndexError:
-            print('index error')
-
-
 class ImageFrame(MyLabel):
     """
     Creates tkinter label with image 0.8 wight, height of screen.
@@ -181,7 +170,6 @@ class ImageFrame(MyLabel):
             index = vars['all_src'].index(vars['img_src']) - 1
         else:
             index = vars['all_src'].index(vars['img_src']) + 1
-        select_thumb(index)
         switch_image(self, index)
 
     def place_thumbnail(self):
@@ -349,7 +337,6 @@ class NextItem(MyButton):
 
     def next_img(self):
         index = vars['all_src'].index(vars['img_src']) + 1
-        select_thumb(index)
         switch_image(self, index)
 
 
@@ -364,5 +351,4 @@ class PrevItem(MyButton):
 
     def prev_img(self):
         index = vars['all_src'].index(vars['img_src']) - 1
-        select_thumb(index)
         switch_image(self, index)
