@@ -20,6 +20,7 @@ from .image_viewer import ImagePreview
 
 vars = {
     'selected_thumbs': [],
+    'thumb_size': 0
     }
 
 
@@ -185,6 +186,10 @@ class ImagesThumbs(tkmacosx.SFrame):
         for blob, src, mod in all_images:
             try:
                 decoded_image = decode_image(blob)
+                if decoded_image.width > decoded_image.height:
+                    vars['thumb_size'] = decoded_image.height
+                else:
+                    vars['thumb_size'] = decoded_image.width
                 photo = ImageTk.PhotoImage(decoded_image)
                 year = datetime.fromtimestamp(mod).year
                 thumbs.append((photo, src, year))
@@ -228,15 +233,14 @@ class ImagesThumbs(tkmacosx.SFrame):
             row_frame = MyFrame(master)
             row_frame.pack(fill=tkinter.Y, expand=True, anchor=tkinter.W)
             for image, src, _ in row:
-                thumb = MyButton(
-                    row_frame, image=image, highlightthickness=1, text=src)
-                thumb.configure(width=0, height=0, bg=cfg.BGCOLOR)
+                thumb = MyButton(row_frame)
+                thumb.configure(width=140, height=140, image=image)
                 thumb.image = image
                 thumb.cmd(
                     lambda e,
                     a=src, b=all_src: self.thumb_cmd(a, b))
                 cfg.THUMBS.append(thumb)
-                thumb.pack(side=tkinter.LEFT)
+                thumb.pack(side=tkinter.LEFT, padx=2, pady=2)
                 thumb.bind('<Enter>', lambda e, a=thumb: self.enter(a))
                 thumb.bind('<Leave>', lambda e, a=thumb: self.leave(a))
 

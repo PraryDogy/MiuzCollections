@@ -11,7 +11,7 @@ from datetime import datetime
 import cfg
 import sqlalchemy
 from database import Dbase, Thumbs
-from PIL import Image, ImageTk
+from PIL import Image, ImageTk, ImageOps
 from utils import (MyButton, MyFrame, MyLabel, decode_image, get_coll_name,
                    my_copy, place_center, smb_check)
 
@@ -188,9 +188,10 @@ class ImageFrame(MyLabel):
             Thumbs.src == vars['img_src'])).first()[0]
 
         image = decode_image(thumb)
+
         new_h = self.winfo_height()
-        size = (new_h, new_h)
-        image = image.resize(size)
+        size = (win_w, new_h)
+        image = ImageOps.contain(image, size)
         img_tk = ImageTk.PhotoImage(image)
 
         self.configure(image=img_tk)

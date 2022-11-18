@@ -25,7 +25,7 @@ def insert_row(**kw):
     * param `mod`: Date last modified of image `int`
     * param `coll`: name of collection created with `get_coll_name`
     """
-    img150 = create_thumb(kw['src'])[0]
+    img150 = create_thumb(kw['src'])
     values = {
         'img150': img150, 
         'src':kw['src'], 'size':kw['size'],

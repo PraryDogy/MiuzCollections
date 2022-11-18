@@ -91,21 +91,31 @@ def create_thumb(src: str):
     """
     Returns list of img objects with sizes: 150
     """
+    # if height >= width:
+    #     delta = (height-width)//2
+    #     new_img = img[delta:height-delta, 0:width]
+    # else:
+    #     delta = (width-height)//2
+    #     new_img = img[0:height, delta:width-delta]
+    # resized = []
+    # for size in [(150, 150)]:
+    #     newsize = cv2.resize(
+    #         new_img, size, interpolation = cv2.INTER_AREA)
+    #     encoded = cv2.imencode('.jpg', newsize)[1].tobytes()
+    #     resized.append(encoded)
+    # return resized
+
     img = cv2.imread(src)
     width, height = img.shape[1], img.shape[0]
-    if height >= width:
-        delta = (height-width)//2
-        new_img = img[delta:height-delta, 0:width]
+    if width > height:
+        diff = float(width/height)
+        hh, ww = 150, int(150*diff)
     else:
-        delta = (width-height)//2
-        new_img = img[0:height, delta:width-delta]
-    resized = []
-    for size in [(150, 150)]:
-        newsize = cv2.resize(
-            new_img, size, interpolation = cv2.INTER_AREA)
-        encoded = cv2.imencode('.jpg', newsize)[1].tobytes()
-        resized.append(encoded)
-    return resized
+        diff = float(height/width)
+        hh, ww = int(150*diff), 150
+
+    new_img = cv2.resize(img, (ww, hh), interpolation=cv2.INTER_AREA)
+    return cv2.imencode('.jpg', new_img)[1].tobytes()
 
 
 def my_copy(output: str):
