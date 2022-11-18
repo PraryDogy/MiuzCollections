@@ -114,20 +114,15 @@ class ImagesCompare(tkinter.Toplevel):
         self.deiconify()
         self.grab_set()
 
-
-def switch_image(btn: MyButton):
+def switch_image():
     """
     Switches between two images from cfg.IMAGES_COMPARE set.
     """
-    [btn.press() if btn != '' else False]
-
     for i in [vars['img1'], vars['img2']]:
         if vars['curr_img'] != i:
             vars['curr_img'] = i
-
             vars['img_frame']['image'] = vars['curr_img']['image']
             vars['img_info']['text'] = vars['curr_img']['info']
-
             return
 
 
@@ -141,7 +136,7 @@ class ImageFrame(MyLabel):
         self['bg']='black'
         self['image'] = vars['curr_img']['image']
         vars['img_frame'] = self
-        self.bind('<ButtonRelease-1>', lambda e: switch_image(''))
+        self.bind('<ButtonRelease-1>', lambda e: switch_image())
 
     def set_size(self):
         cfg.ROOT.update_idletasks()
@@ -160,7 +155,7 @@ class FakeBtn(MyButton):
     def __init__(self, master):
         MyButton.__init__(self, master)
         self.configure(bg=cfg.BGCOLOR, text='•', font=('Arial', 22, 'bold'))
-        self.cmd(lambda e: switch_image(''))
+        self.cmd(lambda e: switch_image())
         self.unbind('<Enter>')
         self.unbind('<Leave>')
 
@@ -185,11 +180,6 @@ class ImgButtons(MyFrame):
         open_btn.configure(height=1, width=b_wight)
         open_btn.cmd(lambda e: self.open_folder(open_btn))
         open_btn.pack(side=tkinter.LEFT, padx=(0, 15))
-
-        # toogle = MyButton(self, text='Переключить')
-        # toogle.configure(height=1, width=b_wight)
-        # toogle.cmd(lambda e: switch_image(toogle))
-        # toogle.pack(side=tkinter.LEFT, padx=(0, 0))
 
     def copy_name(self, btn: MyButton):
         """

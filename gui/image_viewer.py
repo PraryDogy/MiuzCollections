@@ -13,7 +13,7 @@ import sqlalchemy
 from database import Dbase, Thumbs
 from PIL import Image, ImageTk, ImageOps
 from utils import (MyButton, MyFrame, MyLabel, decode_image, get_coll_name,
-                   my_copy, place_center, smb_check)
+                   my_copy, place_center, smb_check, convert_to_rgb)
 
 from .ask_exit import AskExit
 from .images_compare import ImagesCompare
@@ -187,7 +187,8 @@ class ImageFrame(MyLabel):
         thumb = Dbase.conn.execute(sqlalchemy.select(Thumbs.img150).where(
             Thumbs.src == vars['img_src'])).first()[0]
 
-        image = decode_image(thumb)
+        decoded = decode_image(thumb)
+        image = convert_to_rgb(decoded)
 
         new_h = self.winfo_height()
         size = (win_w, new_h)

@@ -27,6 +27,7 @@ BGBUTTON = "#434343"
 BGPRESSED = '#395432'
 SELECTED = '#4E4769'
 SELECTED_THUMB = '#6B6484'
+THUMB_SIZE = 150
 
 # tkinter global variables for avaibility from any place
 ROOT = tkinter.Tk()

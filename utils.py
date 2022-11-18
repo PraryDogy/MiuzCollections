@@ -20,21 +20,6 @@ from cryptography.fernet import Fernet
 from PIL import Image
 
 
-def decode_image(image):
-    """
-    Returns decoded image (use ImageTk.Photo image)
-    """
-    nparr = numpy.frombuffer(image, numpy.byte)
-    image1 = cv2.imdecode(nparr, cv2.IMREAD_ANYCOLOR)
-
-    # convert cv2 color to rgb
-    image_rgb = cv2.cvtColor(image1, cv2.COLOR_BGR2RGB)
-
-    # load numpy array image
-    img = Image.fromarray(image_rgb)
-    return img
-
-
 def encrypt_cfg(data: dict):
     """
     Converts dict with json dumps and enctypt converted with fernet module.
@@ -87,33 +72,46 @@ def place_center(top_level: tkinter.Toplevel):
     top_level.geometry(f'+{xx}+{yy}')
 
 
+def decode_image(image):
+    """
+    Returns decoded image (use ImageTk.Photo image)
+    """
+    nparr = numpy.frombuffer(image, numpy.byte)
+    return cv2.imdecode(nparr, cv2.IMREAD_ANYCOLOR)
+
+
+def convert_to_rgb(image):
+    # convert cv2 color to rgb
+    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    # load numpy array image
+    img = Image.fromarray(image_rgb)
+    return img
+
+
+def crop_image(img: Image):
+    width, height = img.shape[1], img.shape[0]
+    if height >= width:
+        delta = (height-width)//2
+        cropped = img[delta:height-delta, 0:width]
+    else:
+        delta = (width-height)//2
+        cropped = img[0:height, delta:width-delta]
+    return cropped[0:cfg.THUMB_SIZE, 0:cfg.THUMB_SIZE]
+
+
 def create_thumb(src: str):
     """
-    Returns list of img objects with sizes: 150
+    Returns encoded img with `cfg.THUMB_SIZE`
     """
-    # if height >= width:
-    #     delta = (height-width)//2
-    #     new_img = img[delta:height-delta, 0:width]
-    # else:
-    #     delta = (width-height)//2
-    #     new_img = img[0:height, delta:width-delta]
-    # resized = []
-    # for size in [(150, 150)]:
-    #     newsize = cv2.resize(
-    #         new_img, size, interpolation = cv2.INTER_AREA)
-    #     encoded = cv2.imencode('.jpg', newsize)[1].tobytes()
-    #     resized.append(encoded)
-    # return resized
-
     img = cv2.imread(src)
-    width, height = img.shape[1], img.shape[0]
-    if width > height:
-        diff = float(width/height)
-        hh, ww = 150, int(150*diff)
-    else:
-        diff = float(height/width)
-        hh, ww = int(150*diff), 150
-
+    height, width = img.shape[:2]
+    aspect = width/height
+    if aspect > 1:
+        hh, ww = cfg.THUMB_SIZE, round(cfg.THUMB_SIZE*aspect)
+    if aspect < 1:
+        hh, ww = round(cfg.THUMB_SIZE/aspect), cfg.THUMB_SIZE
+    if aspect == 1:
+        hh, ww = cfg.THUMB_SIZE, cfg.THUMB_SIZE
     new_img = cv2.resize(img, (ww, hh), interpolation=cv2.INTER_AREA)
     return cv2.imencode('.jpg', new_img)[1].tobytes()
 

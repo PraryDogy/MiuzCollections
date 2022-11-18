@@ -14,7 +14,8 @@ import sqlalchemy
 import tkmacosx
 from database import Dbase, Thumbs
 from PIL import Image, ImageTk
-from utils import MyButton, MyFrame, MyLabel, decode_image
+from utils import (MyButton, MyFrame, MyLabel, convert_to_rgb, crop_image,
+                   decode_image)
 
 from .image_viewer import ImagePreview
 
@@ -185,11 +186,10 @@ class ImagesThumbs(tkmacosx.SFrame):
         thumbs = []
         for blob, src, mod in all_images:
             try:
-                decoded_image = decode_image(blob)
-
-                decoded_image = decoded_image.resize((150, 150))
-
-                photo = ImageTk.PhotoImage(decoded_image)
+                decoded = decode_image(blob)
+                cropped = crop_image(decoded)
+                rgb = convert_to_rgb(cropped)
+                photo = ImageTk.PhotoImage(rgb)
                 year = datetime.fromtimestamp(mod).year
                 thumbs.append((photo, src, year))
             except Exception:
@@ -233,15 +233,16 @@ class ImagesThumbs(tkmacosx.SFrame):
             row_frame.pack(fill=tkinter.Y, expand=True, anchor=tkinter.W)
             for image, src, _ in row:
                 thumb = MyButton(row_frame)
-                thumb.configure(width=140, height=140, image=image)
+                thumb['width'] = cfg.THUMB_SIZE
+                thumb['height'] = cfg.THUMB_SIZE
+                thumb['image'] = image
+                thumb['bg'] = cfg.BGCOLOR
                 thumb.image = image
-                thumb.cmd(
-                    lambda e,
-                    a=src, b=all_src: self.thumb_cmd(a, b))
-                cfg.THUMBS.append(thumb)
-                thumb.pack(side=tkinter.LEFT, padx=2, pady=2)
+                thumb.cmd(lambda e, a=src, b=all_src: self.thumb_cmd(a, b))
                 thumb.bind('<Enter>', lambda e, a=thumb: self.enter(a))
                 thumb.bind('<Leave>', lambda e, a=thumb: self.leave(a))
+                thumb.pack(side=tkinter.LEFT)
+                cfg.THUMBS.append(thumb)
 
     def enter(self, thumb: MyButton):
         if thumb['bg'] != cfg.BGPRESSED:
