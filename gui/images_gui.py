@@ -236,6 +236,7 @@ class ImagesThumbs(tkmacosx.SFrame):
                 thumb['width'] = cfg.THUMB_SIZE
                 thumb['height'] = cfg.THUMB_SIZE
                 thumb['image'] = image
+                thumb['text'] = src
                 thumb['bg'] = cfg.BGCOLOR
                 thumb.image = image
                 thumb.cmd(lambda e, a=src, b=all_src: self.thumb_cmd(a, b))
