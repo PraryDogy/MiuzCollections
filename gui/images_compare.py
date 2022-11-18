@@ -161,6 +161,8 @@ class FakeBtn(MyButton):
         MyButton.__init__(self, master)
         self.configure(bg=cfg.BGCOLOR, text='•', font=('Arial', 22, 'bold'))
         self.cmd(lambda e: switch_image(''))
+        self.unbind('<Enter>')
+        self.unbind('<Leave>')
 
 
 class ImgButtons(MyFrame):
