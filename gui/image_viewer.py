@@ -163,7 +163,7 @@ class ImageFrame(MyLabel):
         vars['img_frame'] = self
         self['bg']='black'
         self.w = 0
-        self.bind('<Button-1>', lambda e: self.next_image(e))
+        self.bind('<ButtonRelease-1>', lambda e: self.next_image(e))
 
     def next_image(self, e):
         if e.x <= self.w//2:
@@ -280,7 +280,7 @@ class ImgButtons(MyFrame):
         """
         btn.press()
         if not cfg.COMPARE:
-            cfg.DISABLE_STATUSBAR()
+            cfg.STATUSBAR_COMPARE()
             for i in cfg.THUMBS:
                 if i['text'] == vars['img_src']:
                     i['bg'] = cfg.BGPRESSED

@@ -19,8 +19,8 @@ class StatusBar(MyFrame):
     """
     def __init__(self, master):
         MyFrame.__init__(self, master)
-        cfg.ENABLE_STATUSBAR = self.pack_widgets
-        cfg.DISABLE_STATUSBAR = self.pack_compare
+        cfg.STATUSBAR_NORMAL = self.pack_widgets
+        cfg.STATUSBAR_COMPARE = self.pack_compare
         self.pack_widgets()
 
     def pack_widgets(self):
@@ -83,7 +83,7 @@ class UpdateSection(MyLabel, MyButton):
             return
 
         btn.press()
-        btn.unbind('<Button-1>')
+        btn.unbind('<ButtonRelease-1>')
         scaner()
         btn.cmd(lambda e: self.updater(self))
 
@@ -111,7 +111,7 @@ class CompareTitle(MyFrame):
 
     def cancel(self):
         cfg.ROOT.unbind('<Escape>')
-        cfg.ENABLE_STATUSBAR()
+        cfg.STATUSBAR_NORMAL()
 
         for i in cfg.THUMBS:
             if i['bg'] == cfg.BGPRESSED:

@@ -154,7 +154,7 @@ class MyButton(tkinter.Label):
         Binds tkinter label to mouse left click.
         * param `cmd`: lambda e: some_function()
         """
-        self.bind('<Button-1>', cmd)
+        self.bind('<ButtonRelease-1>', cmd)
 
     def press(self):
         """

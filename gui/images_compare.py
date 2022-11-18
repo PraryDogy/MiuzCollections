@@ -25,7 +25,7 @@ def on_closing(obj: tkinter.Toplevel):
     Clears `cfg.IMAGES_COMPARE` list.
     * param `obj`: tkinter toplevel
     """
-    cfg.ENABLE_STATUSBAR()
+    cfg.STATUSBAR_NORMAL()
     for i in cfg.THUMBS:
         if (
             i['text'] == vars['img1']['src'] or 
@@ -141,7 +141,7 @@ class ImageFrame(MyLabel):
         self['bg']='black'
         self['image'] = vars['curr_img']['image']
         vars['img_frame'] = self
-        self.bind('<Button-1>', lambda e: switch_image(''))
+        self.bind('<ButtonRelease-1>', lambda e: switch_image(''))
 
     def set_size(self):
         cfg.ROOT.update_idletasks()

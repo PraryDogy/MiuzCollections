@@ -15,6 +15,7 @@ import tkmacosx
 from database import Dbase, Thumbs
 from PIL import Image, ImageTk
 from utils import MyButton, MyFrame, MyLabel, decode_image
+
 from .image_viewer import ImagePreview
 
 vars = {
@@ -40,7 +41,7 @@ class Gallery(MyFrame):
         new_w, new_h = cfg.ROOT.winfo_width(), cfg.ROOT.winfo_height()
         if new_w != int(root_w):
             cfg.config['ROOT_SIZE'] = f'{new_w}x{new_h}'
-            cfg.IMAGES_RESET()
+            cfg.THUMBNAILS_RELOAD()
 
 
 class MenuButtons(tkmacosx.SFrame):
@@ -59,29 +60,23 @@ class MenuButtons(tkmacosx.SFrame):
         img_lbl = MyLabel(self)
         img_lbl.configure(image=img_tk)
         img_lbl.pack(pady=(0, 0))
-        img_lbl.image_names = img_tk
-
+        img_lbl.image = img_tk
         company_name = MyLabel(
             self, text='Коллекции', font=('Arial', 18, 'bold'))
         company_name.pack(pady=(15, 20))
-
         __res = Dbase.conn.execute(
             sqlalchemy.select(Thumbs.collection)).fetchall()
         __colls_list = set(i[0] for i in __res)
-
         for_btns = []
         for coll_item in __colls_list:
             name_btn = coll_item.replace(
-                re.search(r'(\d{0,30}\s){,1}', coll_item).group(),
-                '')
+                re.search(r'(\d{0,30}\s){,1}', coll_item).group(), '')
             for_btns.append((name_btn[:13], coll_item))
         for_btns.sort()
-
         btns = []
-
         last_imgs = MyButton(self, text='Последние')
         last_imgs.configure(height=1, width=13)
-        last_imgs.cmd(lambda e: self.__open_coll('last', last_imgs, btns))
+        last_imgs.cmd(lambda e: self.collection_folder('last', last_imgs, btns))
         last_imgs.pack(pady=(0, 20))
         btns.append(last_imgs)
 
@@ -99,11 +94,11 @@ class MenuButtons(tkmacosx.SFrame):
             if name_coll == cfg.config['CURR_COLL']:
                 btn.configure(bg=cfg.BGPRESSED)
             btn.cmd(lambda e, coll=name_coll, btn=btn, btns=btns:
-                    self.__open_coll(coll, btn, btns))
+                    self.collection_folder(coll, btn, btns))
         if cfg.config['CURR_COLL'] == 'last':
             last_imgs.configure(bg=cfg.BGPRESSED)
 
-    def __open_coll(self, coll: str, btn: MyButton, btns: list):
+    def collection_folder(self, coll: str, btn: MyButton, btns: list):
         """
         Changes all buttons color to default and change color for
         pressed button.
@@ -114,18 +109,15 @@ class MenuButtons(tkmacosx.SFrame):
         * param `btn`: tkinter curren button object
         * param `btns`: list of created tkinter buttons
         """
-
         if btn['bg'] == cfg.BGPRESSED:
             coll_path = os.path.join(os.sep, cfg.config['COLL_FOLDER'], coll)
             subprocess.check_output(["/usr/bin/open", coll_path])
             return
-
         for btn_item in btns:
             btn_item['bg'] = cfg.BGBUTTON
         btn['bg'] = cfg.BGPRESSED
-
         cfg.config['CURR_COLL'] = coll
-        cfg.IMAGES_RESET()
+        cfg.THUMBNAILS_RELOAD()
 
 
 class ImagesThumbs(tkmacosx.SFrame):
@@ -137,64 +129,47 @@ class ImagesThumbs(tkmacosx.SFrame):
     """
     def __init__(self, master):
         self.master = master
-        cfg.IMAGES_RESET = self.reset
-
+        cfg.THUMBNAILS_RELOAD = self.thumbnails_reload
         tkmacosx.SFrame.__init__(
             self, master, bg=cfg.BGCOLOR, scrollbarwidth=7)
-
         w = int(cfg.config["ROOT_SIZE"].split('x')[0])
         self.clmns = ((w)//158)-1
-
         title = MyLabel(
             self, text=cfg.config['CURR_COLL'], 
             font=('Arial', 45, 'bold'))
         title.pack(pady=(0, 15))
-
         if cfg.config['CURR_COLL'] == 'last':
             title.configure(text='Последние добавленные')
-            res = Dbase.conn.execute(
-                sqlalchemy.select(
-                    Thumbs.img150, Thumbs.src, Thumbs.modified
-                    ).order_by(
+            res = Dbase.conn.execute(sqlalchemy.select(
+                    Thumbs.img150, Thumbs.src, Thumbs.modified).order_by(
                     -Thumbs.modified).limit(120)).fetchall()
         else:
-            res = Dbase.conn.execute(
-                sqlalchemy.select(
-                    Thumbs.img150, Thumbs.src, Thumbs.modified
-                    ).where(
-                    Thumbs.collection==cfg.config['CURR_COLL']
-                    ).order_by(
-                        -Thumbs.modified)).fetchall()
-
+            res = Dbase.conn.execute(sqlalchemy.select(
+                    Thumbs.img150, Thumbs.src, Thumbs.modified).where(
+                    Thumbs.collection==cfg.config['CURR_COLL']).order_by(
+                    -Thumbs.modified)).fetchall()
         thumbs = self.load_thumbs(res)
-
         if len(thumbs) == 0:
             return
-
         for y in self.split_years(thumbs):
-
             year_label = MyLabel(
                 self, text=y[-1][-1], font=('Arial', 35, 'bold'))
             year_label.pack(pady=(15, 15))
-
             self.pack_rows(y, self.clmns, self, [i[1] for i in res])
-
-    def reset(self):
+        
+    def thumbnails_reload(self):
         """
         Destroys self.Run init again
         """
         for i in cfg.THUMBS:
             if i['bg'] == cfg.BGPRESSED:
                 vars['selected_thumbs'].append(i['text'])
-        
         cfg.THUMBS.clear()
-            
         w, h = cfg.ROOT.winfo_width(), cfg.ROOT.winfo_height()
         cfg.config['ROOT_SIZE'] = f'{w}x{h}'
         self.destroy()
-        ImagesThumbs(self.master).pack(
-            expand=True, fill=tkinter.BOTH, side=tkinter.RIGHT)
-
+        thumbs = ImagesThumbs(self.master)
+        thumbs.pack(expand=True, fill=tkinter.BOTH, side=tkinter.RIGHT)
         if cfg.COMPARE:
             for i in cfg.THUMBS:
                 if i['text'] in vars['selected_thumbs']:
@@ -206,7 +181,6 @@ class ImagesThumbs(tkmacosx.SFrame):
         database > config > size > value.
         * returns: list turples: (img, src, modified)
         """
-
         thumbs = []
         for blob, src, mod in all_images:
             try:
@@ -214,10 +188,8 @@ class ImagesThumbs(tkmacosx.SFrame):
                 photo = ImageTk.PhotoImage(decoded_image)
                 year = datetime.fromtimestamp(mod).year
                 thumbs.append((photo, src, year))
-
             except Exception:
                 print(traceback.format_exc())
-
         return thumbs
 
     def split_years(self, thumbs: list):
@@ -228,7 +200,6 @@ class ImagesThumbs(tkmacosx.SFrame):
         """
         years = set(year for _, _, year in thumbs)
         list_years = []
-
         for y in years:
             tmp = [(im, src, year) for im, src, year in thumbs if year == y]
             list_years.append(tmp)
@@ -252,22 +223,18 @@ class ImagesThumbs(tkmacosx.SFrame):
         * param `master`: tkinter frame
         * param `all_src`: list of paths of all images
         """
-
         img_rows = [thumbs[x:x+clmns] for x in range(0, len(thumbs), clmns)]
-
         for row in img_rows:
-
             row_frame = MyFrame(master)
             row_frame.pack(fill=tkinter.Y, expand=True, anchor=tkinter.W)
-
             for image, src, _ in row:
                 thumb = MyButton(
                     row_frame, image=image, highlightthickness=1, text=src)
                 thumb.configure(width=0, height=0, bg=cfg.BGCOLOR)
-                thumb.image_names = image
+                thumb.image = image
                 thumb.cmd(
                     lambda e,
-                    a=src, b=all_src, c=thumb: self.thumb_cmd(a, b, c))
+                    a=src, b=all_src: self.thumb_cmd(a, b))
                 cfg.THUMBS.append(thumb)
                 thumb.pack(side=tkinter.LEFT)
                 thumb.bind('<Enter>', lambda e, a=thumb: self.enter(a))
@@ -281,5 +248,5 @@ class ImagesThumbs(tkmacosx.SFrame):
         if thumb['bg'] != cfg.BGPRESSED:
             thumb['bg'] = cfg.BGCOLOR
 
-    def thumb_cmd(self, src: str, all_src: list, btn: MyButton):
+    def thumb_cmd(self, src: str, all_src: list):
         ImagePreview(src, all_src)

@@ -235,8 +235,7 @@ def update_collections():
     """
     cfg.LIVE_LBL['fg'] = cfg.FONTCOLOR
     update_livelabel('10')
-    collections = search_collections()
-    images = search_images(collections)
+    images = search_images(search_collections())
     update_livelabel('20')
     removed_images()
     update_livelabel('30')
@@ -291,11 +290,11 @@ def scaner():
             update_nocollection(aged=True)
         Dbase.conn.execute('VACUUM')
         try:
-            cfg.IMAGES_RESET()
+            cfg.THUMBNAILS_RELOAD()
         except Exception:
             print('images_reset error')
-            cfg.IMAGES_RESET()
-
+            cfg.THUMBNAILS_RELOAD()
     t1 = threading.Thread(target=__scan, daemon=True)
     t1.start()
-
+    while t1.is_alive():
+        cfg.ROOT.update()

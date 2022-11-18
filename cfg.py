@@ -31,13 +31,15 @@ SELECTED_THUMB = '#6B6484'
 # tkinter global variables for avaibility from any place
 ROOT = tkinter.Tk()
 ROOT.withdraw()
+
 LIVE_LBL = tkinter.Label
-FLAG = True
-IMAGES_RESET = object
 THUMBS = []
 COMPARE = False
-ENABLE_STATUSBAR = object
-DISABLE_STATUSBAR = object
+
+# gui functions 
+THUMBNAILS_RELOAD = object
+STATUSBAR_NORMAL = object
+STATUSBAR_COMPARE = object
 
 def defaults():
     return {
