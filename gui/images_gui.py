@@ -186,10 +186,9 @@ class ImagesThumbs(tkmacosx.SFrame):
         for blob, src, mod in all_images:
             try:
                 decoded_image = decode_image(blob)
-                if decoded_image.width > decoded_image.height:
-                    vars['thumb_size'] = decoded_image.height
-                else:
-                    vars['thumb_size'] = decoded_image.width
+
+                decoded_image = decoded_image.resize((150, 150))
+
                 photo = ImageTk.PhotoImage(decoded_image)
                 year = datetime.fromtimestamp(mod).year
                 thumbs.append((photo, src, year))
