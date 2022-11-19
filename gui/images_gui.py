@@ -137,7 +137,7 @@ class ImagesThumbs(tkmacosx.SFrame):
         w = int(cfg.config["ROOT_SIZE"].split('x')[0])
         self.clmns = ((w)//158)-1
         title = MyLabel(
-            self, text=cfg.config['CURR_COLL'], 
+            self, text=cfg.config['CURR_COLL'],
             font=('Arial', 45, 'bold'))
         title.pack(pady=(0, 15))
         if cfg.config['CURR_COLL'] == 'last':

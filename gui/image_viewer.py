@@ -12,7 +12,7 @@ import cfg
 import cv2
 import sqlalchemy
 from database import Dbase, Thumbs
-from PIL import ImageTk
+from PIL import ImageTk, ImageOps, Image
 from utils import (MyButton, MyFrame, MyLabel, convert_to_rgb, decode_image,
                    get_coll_name, my_copy, place_center, smb_check)
 
