@@ -10,10 +10,11 @@ import traceback
 from datetime import datetime
 
 import cfg
+import cv2
 import sqlalchemy
 import tkmacosx
 from database import Dbase, Thumbs
-from PIL import Image, ImageTk
+from PIL import ImageTk
 from utils import (MyButton, MyFrame, MyLabel, convert_to_rgb, crop_image,
                    decode_image)
 
@@ -56,9 +57,8 @@ class MenuButtons(tkmacosx.SFrame):
     def __init__(self, master):
         tkmacosx.SFrame.__init__(
             self, master, bg=cfg.BGCOLOR, scrollbarwidth=7, width=170)
-        img_src = Image.open(
-            os.path.join(os.path.dirname(__file__), 'logo.png'))
-        img_tk= ImageTk.PhotoImage(img_src)
+        img_src = os.path.join(os.path.dirname(__file__), 'logo.png')
+        img_tk= ImageTk.PhotoImage(file=img_src)
         img_lbl = MyLabel(self)
         img_lbl.configure(image=img_tk)
         img_lbl.pack(pady=(0, 0))

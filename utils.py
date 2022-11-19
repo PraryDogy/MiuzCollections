@@ -74,13 +74,19 @@ def place_center(top_level: tkinter.Toplevel):
 
 def decode_image(image):
     """
-    Returns decoded image (use ImageTk.Photo image)
+    Decodes from bytes to numpy array. Returns numpy array.
+    * param `image`: bytes image.
     """
     nparr = numpy.frombuffer(image, numpy.byte)
     return cv2.imdecode(nparr, cv2.IMREAD_ANYCOLOR)
 
 
 def convert_to_rgb(image):
+    """
+    Converts numpy array BGR to RGB, converts numpy array to img object.
+    Returns converted image.
+    * param `image`: BGR numpy array image.
+    """
     # convert cv2 color to rgb
     image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     # load numpy array image
@@ -88,7 +94,11 @@ def convert_to_rgb(image):
     return img
 
 
-def crop_image(img: Image):
+def crop_image(img):
+    """
+    Crops numpy array image to square. Returns cropped image.
+    * param `img`: numpy array image.
+    """
     width, height = img.shape[1], img.shape[0]
     if height >= width:
         delta = (height-width)//2
@@ -101,7 +111,9 @@ def crop_image(img: Image):
 
 def create_thumb(src: str):
     """
-    Returns encoded img with `cfg.THUMB_SIZE`
+    Creates image thumbnail with keep aspect ratio, where short side will be
+    `cfg.THUMB_SIZE` pixels. Returns converted to bytes image.
+    * param `src`: source path of image.
     """
     img = cv2.imread(src)
     height, width = img.shape[:2]

@@ -9,11 +9,12 @@ import tkinter
 from datetime import datetime
 
 import cfg
+import cv2
 import sqlalchemy
 from database import Dbase, Thumbs
-from PIL import Image, ImageTk, ImageOps
-from utils import (MyButton, MyFrame, MyLabel, decode_image, get_coll_name,
-                   my_copy, place_center, smb_check, convert_to_rgb)
+from PIL import ImageTk
+from utils import (MyButton, MyFrame, MyLabel, convert_to_rgb, decode_image,
+                   get_coll_name, my_copy, place_center, smb_check)
 
 from .ask_exit import AskExit
 from .images_compare import ImagesCompare
@@ -24,7 +25,7 @@ vars = {
     'all_src': list,
     'img_info': tkinter.Label,
     'img_frame': tkinter.Label,
-    'curr_img': Image,
+    'curr_img': 'image',
     }
 
 
@@ -63,9 +64,6 @@ def on_closing(window: tkinter.Toplevel):
     Clears `cfg.IMAGES_COMPARE` list.
     * param `obj`: tkinter toplevel
     """
-    # for i in cfg.THUMBS:
-    #     if i['bg'] == cfg.BGPRESSED:
-    #         i.configure(bg=cfg.BGCOLOR)
     window.destroy()
     cfg.ROOT.focus_force()
 
@@ -90,46 +88,29 @@ class ImagePreview(tkinter.Toplevel):
         tkinter.Toplevel.__init__(self, bg=cfg.BGCOLOR, padx=15, pady=15)
         cfg.ROOT.eval(f'tk::PlaceWindow {self} center')
         self.withdraw()
-
         if not smb_check():
             on_closing(self)
             SmbChecker()
             return
-
         if src is None:
             on_closing(self)
             return
-
-        prevs = [v for k, v in cfg.ROOT.children.items() if "preview" in k]
-        if len(prevs) > 1:
-            img_info = list(prevs[0].children.values())
-            old_src = img_info[0]['text']
-            if old_src == src:
-                on_closing(self)
-                return
-        
-        self.title('Просмотр')
-
         self.protocol("WM_DELETE_WINDOW", lambda: on_closing(self))
         self.bind('<Command-w>', lambda e: on_closing(self))
         self.bind('<Escape>', lambda e: on_closing(self))
         self.bind('<Command-q>', lambda e: ask_exit())
-
+        self.title('Просмотр')
         self.resizable(0,0)
         side = int(cfg.ROOT.winfo_screenheight()*0.8)
         self.geometry(f'{side}x{side}')
-
         vars['img_src'] = src
         vars['all_src'] = all_src
-
         widgets = pack_widgets(self)
         cfg.ROOT.update_idletasks()
-
         if cfg.COMPARE:
             load_image(widgets['image_frame'])
             ImagesCompare()
             return
-
         place_center(self)
         self.deiconify()
         self.grab_set()
@@ -172,56 +153,47 @@ class ImageFrame(MyLabel):
             index = vars['all_src'].index(vars['img_src']) + 1
         switch_image(self, index)
 
+    def image_resize(self, img, win_w, new_h):
+        height, width = img.shape[:2]
+        aspect = width/height
+        if aspect > 1:
+            hh, ww = round(win_w/aspect), win_w
+        if aspect < 1:
+            hh, ww = new_h, round(new_h*aspect)
+        if aspect == 1:
+            hh, ww = new_h, new_h
+        resized = cv2.resize(img, (ww, hh), interpolation=cv2.INTER_AREA)
+        return convert_to_rgb(resized)
+        
     def place_thumbnail(self):
         cfg.ROOT.update_idletasks()
-
         win_h = self.winfo_toplevel().winfo_height()
         win_w = self.winfo_toplevel().winfo_width()
-
         widgets = list(self.winfo_toplevel().children.values())[2:]
         widgets_h = sum(i.winfo_reqheight() for i in widgets)
-        
         new_h = win_h-widgets_h
         self.configure(height=new_h, width=win_w)
-        
         thumb = Dbase.conn.execute(sqlalchemy.select(Thumbs.img150).where(
             Thumbs.src == vars['img_src'])).first()[0]
-
         decoded = decode_image(thumb)
-        image = convert_to_rgb(decoded)
-
-        new_h = self.winfo_height()
-        size = (win_w, new_h)
-        image = ImageOps.contain(image, size)
+        image = self.image_resize(decoded, win_w, self.winfo_height())
         img_tk = ImageTk.PhotoImage(image)
-
         self.configure(image=img_tk)
         self.image = img_tk
         self.w = win_w
 
     def place_image(self):
         cfg.ROOT.update_idletasks()
-
         win_w = self.winfo_toplevel().winfo_width()
         new_h = self.winfo_height()
-
-        img = Image.open(vars['img_src'])
-        vars['curr_img'] = img.copy()
-
-
-        if vars['curr_img'].width > vars['curr_img'].height:
-            size = (win_w, win_w)
-        else:
-            size = (new_h, new_h)
-        
-        vars['curr_img'].thumbnail(size)
+        img_read = cv2.imread(vars['img_src'])
+        vars['curr_img'] = self.image_resize(img_read, win_w, new_h)
         img_tk = ImageTk.PhotoImage(vars['curr_img'])
         self.configure(image=img_tk)
         self.image = img_tk
-        
-        img_w, img_h = img.width, img.height
         t = vars['img_info']['text']
-        vars['img_info']['text'] = t.replace('Загрузка', f'{img_w} x {img_h}')
+        height, width = img_read.shape[:2]
+        vars['img_info']['text'] = t.replace('Загрузка', f'{width} x {height}')
 
 
 class ImgInfo(MyLabel):
