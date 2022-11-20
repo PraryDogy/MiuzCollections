@@ -41,23 +41,23 @@ def search_years():
     in `cfg.PHOTO_DIR`
     Looking for all folders in year named folders.
     """
-    photo_dir = os.path.join(os.sep, *cfg.config['PHOTO_DIR'].split('/'))
-    base_dirs = []
-    for r in range(2018, datetime.datetime.now().year + 1):
-        year_dir = os.path.join(photo_dir, str(r))
-        base_dirs.append(year_dir) if os.path.exists(year_dir) else False
-    years_dirs = []
-    for b_dir in base_dirs:
-        for dirs in os.listdir(b_dir):
-            years_dirs.append(os.path.join(b_dir, dirs))
-    return years_dirs
+    years = [str(y) for y in range(2018, datetime.datetime.now().year + 1)]
+    y_dirs = []
+    for root, dirs, _ in os.walk(cfg.config['PHOTO_DIR']):
+        for d in dirs:
+            [y_dirs.append(os.path.join(root, d)) if d in years else False]
+    in_years = []
+    for y_dir in y_dirs:
+        for subdir in os.listdir(y_dir):
+            new_dir = os.path.join(y_dir, subdir)
+            [in_years.append(new_dir) if os.path.isdir(new_dir) else False]
+    return in_years
 
 
-def search_aged_years(list_dirs: list):
+def search_aged_dirs(list_dirs: list):
     """
     Returns list of dirs.
     Looking for all dirs created later than `cfg.FILE_AGE` days ago
-
     * param `list_dirs`: list of path like objects
     """
     now = datetime.datetime.now().replace(microsecond=0)
@@ -87,7 +87,6 @@ def search_retouched(list_dirs: list):
     """
     Returns list of dirs.
     Looking for folders with `cfg.RT_FOLDER` name in list of dirs
-
     * param `list_dirs`: list of path like objects
     """
     retouched = []
@@ -257,7 +256,7 @@ def update_nocollection(aged: bool):
     """
     update_livelabel('60')
     if aged:
-        aged_years = search_aged_years(search_years())
+        aged_years = search_aged_dirs(search_years())
         aged_dirs = search_retouched(aged_years)
     else:
         aged_dirs = search_retouched(search_years())

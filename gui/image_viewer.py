@@ -12,7 +12,7 @@ import cfg
 import cv2
 import sqlalchemy
 from database import Dbase, Thumbs
-from PIL import ImageTk, ImageOps, Image
+from PIL import ImageTk
 from utils import (MyButton, MyFrame, MyLabel, convert_to_rgb, decode_image,
                    get_coll_name, my_copy, place_center, smb_check)
 
@@ -272,7 +272,7 @@ class ImgButtons(MyFrame):
         * param `btn`: current tkinter button.
         """
         btn.press()
-        my_copy(vars['img_src'].split('/')[-1].split('.')[0])
+        my_copy(vars['img_src'].split(os.sep)[-1].split('.')[0])
 
     def open_folder(self, btn: MyButton):
         """
@@ -281,7 +281,7 @@ class ImgButtons(MyFrame):
         * param `btn`: current tkinter button.
         """
         btn.press()
-        path = '/'.join(vars['img_src'].split('/')[:-1])
+        path = os.sep.join(vars['img_src'].split(os.sep)[:-1])
 
         def open():
             subprocess.check_output(["/usr/bin/open", path])

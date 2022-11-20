@@ -4,7 +4,7 @@ import tkinter
 import cfg
 from utils import MyButton, MyFrame, MyLabel, my_copy, place_center
 from .ask_exit import AskExit
-
+import os
 
 vars = {
     'img1': 'from tkinter top level: image, text, image src',
@@ -188,7 +188,7 @@ class ImgButtons(MyFrame):
         * param `btn`: current tkinter button.
         """
         btn.press()
-        get_name = vars['curr_img']['src'].split('/')[-1].split('.')[0]
+        get_name = vars['curr_img']['src'].split(os.sep)[-1].split('.')[0]
         my_copy(get_name)
 
     def open_folder(self, btn: MyButton):
@@ -198,7 +198,7 @@ class ImgButtons(MyFrame):
         * param `btn`: current tkinter button.
         """
         btn.press()
-        path = '/'.join(vars['curr_img']['src'].split('/')[:-1])
+        path = os.sep.join(vars['curr_img']['src'].split(os.sep)[:-1])
         subprocess.check_output(["/usr/bin/open", path])
 
 
