@@ -7,6 +7,7 @@ import subprocess
 import threading
 import tkinter
 from datetime import datetime
+from tkinter.ttk import Separator
 
 import cfg
 import cv2
@@ -75,10 +76,6 @@ def load_image(image_frame: tkinter.Label):
         cfg.ROOT.update()
 
 
-def ask_exit():
-    AskExit(cfg.ROOT)
-
-
 class ImagePreview(tkinter.Toplevel):
     """
     Creates new window (tkinter Top Level) with image & buttons.
@@ -98,7 +95,7 @@ class ImagePreview(tkinter.Toplevel):
         self.protocol("WM_DELETE_WINDOW", lambda: on_closing(self))
         self.bind('<Command-w>', lambda e: on_closing(self))
         self.bind('<Escape>', lambda e: on_closing(self))
-        self.bind('<Command-q>', lambda e: ask_exit())
+        self.bind('<Command-q>', lambda e: AskExit(cfg.ROOT))
         self.title('Просмотр')
         self.resizable(0,0)
         side = int(cfg.ROOT.winfo_screenheight()*0.8)
@@ -258,7 +255,7 @@ class ImgButtons(MyFrame):
             for i in cfg.THUMBS:
                 if i['text'] == vars['img_src']:
                     i['bg'] = cfg.BGPRESSED
-
+                    break
             win = self.winfo_toplevel()
             win.withdraw()
             win.grab_release()

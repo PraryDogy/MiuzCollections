@@ -28,9 +28,10 @@ def on_closing(obj: tkinter.Toplevel):
     cfg.STATUSBAR_NORMAL()
     for i in cfg.THUMBS:
         if (
-            i['text'] == vars['img1']['src'] or 
+            i['text'] == vars['img1']['src'] or
             i['text'] == vars['img2']['src']):
             i.configure(bg=cfg.BGCOLOR)
+            break
     [i.destroy() for i in get_all_windows()]
     obj.destroy()
     cfg.COMPARE = False

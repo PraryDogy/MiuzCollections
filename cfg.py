@@ -22,8 +22,10 @@ CFG_DIR = os.path.join(
     os.path.expanduser('~'), 'Library/Application Support/Miuz Gallery')
 
 FONTCOLOR = "#E2E2E2"
-BGCOLOR = "#222222"
-BGBUTTON = "#434343"
+BGCOLOR = "black"
+# BGCOLOR = "#222222"
+BGBUTTON = "#232323"
+# BGBUTTON = "#434343"
 BGPRESSED = '#395432'
 SELECTED = '#4E4769'
 SELECTED_THUMB = '#6B6484'

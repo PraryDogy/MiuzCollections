@@ -112,12 +112,10 @@ class CompareTitle(MyFrame):
     def cancel(self):
         cfg.ROOT.unbind('<Escape>')
         cfg.STATUSBAR_NORMAL()
-
         for i in cfg.THUMBS:
             if i['bg'] == cfg.BGPRESSED:
                 i['bg'] = cfg.BGCOLOR
-
+                break
         cfg.COMPARE = False
-
         windows = [v for k, v in cfg.ROOT.children.items() if "preview" in k]
         [w.destroy() for w in windows]
