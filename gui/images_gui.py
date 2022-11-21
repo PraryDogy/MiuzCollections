@@ -154,10 +154,11 @@ class ImagesThumbs(tkmacosx.SFrame):
         Destroys self.Run init again
         """
         selected = ''
-        for i in cfg.THUMBS:
-            if i['bg'] == cfg.BGPRESSED:
-                selected = i['text']
-                break
+        if cfg.COMPARE:
+            for i in cfg.THUMBS:
+                if i['bg'] == cfg.BGPRESSED:
+                    selected = i['text']
+                    break
         cfg.THUMBS.clear()
         w, h = cfg.ROOT.winfo_width(), cfg.ROOT.winfo_height()
         cfg.config['ROOT_SIZE'] = f'{w}x{h}'
