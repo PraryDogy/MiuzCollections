@@ -3,11 +3,10 @@ Gui for status bar.
 """
 
 import tkinter
-from tkinter.ttk import Separator
 
 import cfg
 from scaner import scaner
-from utils import MyButton, MyFrame, MyLabel, smb_check
+from utils import MyButton, MyFrame, MyLabel, MySep, smb_check
 
 from .settings import Settings
 from .smb_checker import SmbChecker
@@ -28,7 +27,7 @@ class StatusBar(MyFrame):
         [i.destroy() for i in widgets]
         FakeLabel(self).pack(side=tkinter.LEFT, padx=(0, 15))
         SettingsSection(self).pack(side=tkinter.LEFT)
-        Separator(self, orient='vertical').pack(
+        MySep(self, orient='vertical').pack(
             fill=tkinter.Y, side=tkinter.LEFT, padx=(15, 15))
         UpdateSection(self).pack(side=tkinter.LEFT, padx=(0, 15))
         DynamicSection(self).pack(side=tkinter.LEFT, padx=(0, 15))
@@ -78,15 +77,14 @@ class UpdateSection(MyLabel, MyButton):
         Run Updater from utils with Splashscreen gui from 
         * param `btn`: tkinter button
         """
-        if not smb_check():
-            SmbChecker()
-            return
-
-        btn.press()
-        btn.unbind('<ButtonRelease-1>')
-        scaner()
-        btn.cmd(lambda e: self.updater(self))
-
+        if not cfg.FLAG:
+            if not smb_check():
+                SmbChecker()
+                return
+            btn.press()
+            btn.unbind('<ButtonRelease-1>')
+            scaner()
+            btn.cmd(lambda e: self.updater(self))
 
 class DynamicSection(MyLabel):
     def __init__(self, master):

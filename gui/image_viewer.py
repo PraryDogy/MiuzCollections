@@ -7,15 +7,15 @@ import subprocess
 import threading
 import tkinter
 from datetime import datetime
-from tkinter.ttk import Separator
 
 import cfg
 import cv2
 import sqlalchemy
 from database import Dbase, Thumbs
 from PIL import ImageTk
-from utils import (MyButton, MyFrame, MyLabel, convert_to_rgb, decode_image,
-                   get_coll_name, my_copy, place_center, smb_check)
+from utils import (MyButton, MyFrame, MyLabel, MySep, convert_to_rgb,
+                   decode_image, get_coll_name, my_copy, place_center,
+                   smb_check)
 
 from .ask_exit import AskExit
 from .images_compare import ImagesCompare

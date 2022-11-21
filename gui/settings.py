@@ -7,12 +7,11 @@ import shutil
 import sys
 import tkinter
 from tkinter import filedialog
-from tkinter.ttk import Separator
 
 import cfg
 import tkmacosx
-from utils import (MyButton, MyFrame, MyLabel, encrypt_cfg, my_copy, my_paste,
-                   place_center)
+from utils import (MyButton, MyFrame, MyLabel, MySep, encrypt_cfg, my_copy,
+                   my_paste, place_center)
 
 vars = {
     'PHOTODIR_LBL': 'tkinter label',
@@ -90,7 +89,7 @@ class Widgets(MyFrame):
         scan_btn.cmd(lambda e: self.full_scan())
         scan_btn.pack()
 
-        sep = Separator(master, orient='horizontal')
+        sep = MySep(master)
         sep.pack(padx=40, pady=(40, 20), fill=tkinter.X)
 
         for title, value, widget in zip(
@@ -118,7 +117,7 @@ class Widgets(MyFrame):
             gallery_btn.cmd(
                 lambda e, x=vars[widget]: self.select_path(x))
 
-            sep = Separator(master, orient='horizontal')
+            sep = MySep(master)
             sep.pack(padx=40, pady=20, fill=tkinter.X)
 
         txt3 = (
@@ -166,7 +165,7 @@ class Widgets(MyFrame):
                 lambda e, x=widget, y=btn_paste: self.paste_input(x))
             btn_paste.pack(side=tkinter.RIGHT)
 
-            sep = Separator(master, orient='horizontal')
+            sep = MySep(master)
             sep.pack(padx=40, pady=20, fill=tkinter.X)
 
         rest_frame = MyFrame(master)

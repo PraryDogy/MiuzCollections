@@ -155,6 +155,11 @@ def smb_check():
     return True
 
 
+class MySep(tkinter.Frame):
+    def __init__(self, master, **kwargs):
+        tkinter.Frame.__init__(self, master, bg=cfg.BGBUTTON, height=1)
+
+
 class MyButton(tkinter.Label):
     """
     Tkinter Label with custom style.

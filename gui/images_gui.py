@@ -16,10 +16,9 @@ import tkmacosx
 from database import Dbase, Thumbs
 from PIL import ImageTk
 from utils import (MyButton, MyFrame, MyLabel, convert_to_rgb, crop_image,
-                   decode_image)
+                   decode_image, MySep)
 
 from .image_viewer import ImagePreview
-from tkinter.ttk import Separator
 
 class Gallery(MyFrame):
     """
@@ -81,12 +80,14 @@ class MenuButtons(tkmacosx.SFrame):
         for name_btn, name_coll in for_btns:
             btn = MyButton(self, text=name_btn)
             btn.configure(height=1, width=13 ,pady=5, anchor=tkinter.W, padx=10)
-            btn.pack(fill=tkinter.X, padx=(0, 15), pady=(0, 1))
+            btn.pack(fill=tkinter.X, padx=(0, 15))
             btns.append(btn)
             if name_coll == cfg.config['CURR_COLL']:
                 btn.configure(bg=cfg.BGPRESSED)
             btn.cmd(partial(self.collection_folder, name_coll, btn, btns))
-
+            sep = MySep(self)
+            sep['bg'] = '#272727'
+            sep.pack(fill=tkinter.X, padx=(0, 15))
         if cfg.config['CURR_COLL'] == 'last':
             last.configure(bg=cfg.BGPRESSED)
 
