@@ -1,8 +1,9 @@
-import os
 import cfg
-import shutil
+import os
+import datetime
 
+years = [str(y) for y in range(2018, datetime.datetime.now().year + 1)]
+y_dirs = [os.path.join('/Users/Loshkarev/Desktop/test', y) for y in years]
+y_dirs = [i for i in y_dirs if os.path.exists(i)]
 
-for file in os.listdir(cfg.CFG_DIR)[1:]:
-    if file.endswith('.db') and file != f'database {cfg.APP_VER}.db':
-        os.remove(os.path.join(cfg.CFG_DIR, file))
+print(y_dirs)

@@ -43,6 +43,7 @@ def search_years():
     """
     years = [str(y) for y in range(2018, datetime.datetime.now().year + 1)]
     y_dirs = [os.path.join(cfg.config['PHOTO_DIR'], y) for y in years]
+    y_dirs = [i for i in y_dirs if os.path.exists(i)]
     in_years = []
     for y_dir in y_dirs:
         for subdir in os.listdir(y_dir):
