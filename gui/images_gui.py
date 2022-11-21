@@ -19,7 +19,7 @@ from utils import (MyButton, MyFrame, MyLabel, convert_to_rgb, crop_image,
                    decode_image)
 
 from .image_viewer import ImagePreview
-
+from tkinter.ttk import Separator
 
 class Gallery(MyFrame):
     """
@@ -50,17 +50,12 @@ class MenuButtons(tkmacosx.SFrame):
     * param `master`: tkinter frame
     """
     def __init__(self, master):
+        self.master = master
         tkmacosx.SFrame.__init__(
             self, master, bg=cfg.BGCOLOR, scrollbarwidth=7, width=170)
-        img_src = os.path.join(os.path.dirname(__file__), 'logo.png')
-        img_tk= ImageTk.PhotoImage(file=img_src)
-        img_lbl = MyLabel(self)
-        img_lbl.configure(image=img_tk)
-        img_lbl.pack()
-        img_lbl.image = img_tk
         company_name = MyLabel(
-            self, text='Коллекции', font=('Arial', 18, 'bold'))
-        company_name.pack(pady=(15, 20))
+            self, text='Коллекции', font=('Arial', 22, 'bold'))
+        company_name.pack(pady=(20, 20), padx=(0, 15))
         __res = Dbase.conn.execute(
             sqlalchemy.select(Thumbs.collection)).fetchall()
         __colls_list = set(i[0] for i in __res)
@@ -86,11 +81,12 @@ class MenuButtons(tkmacosx.SFrame):
         for name_btn, name_coll in for_btns:
             btn = MyButton(self, text=name_btn)
             btn.configure(height=1, width=13 ,pady=5, anchor=tkinter.W, padx=10)
-            btn.pack(fill=tkinter.X, padx=(0, 15))
+            btn.pack(fill=tkinter.X, padx=(0, 15), pady=(0, 1))
             btns.append(btn)
             if name_coll == cfg.config['CURR_COLL']:
                 btn.configure(bg=cfg.BGPRESSED)
             btn.cmd(partial(self.collection_folder, name_coll, btn, btns))
+
         if cfg.config['CURR_COLL'] == 'last':
             last.configure(bg=cfg.BGPRESSED)
 

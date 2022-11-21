@@ -42,10 +42,7 @@ def search_years():
     Looking for all folders in year named folders.
     """
     years = [str(y) for y in range(2018, datetime.datetime.now().year + 1)]
-    y_dirs = []
-    for root, dirs, _ in os.walk(cfg.config['PHOTO_DIR']):
-        for d in dirs:
-            [y_dirs.append(os.path.join(root, d)) if d in years else False]
+    y_dirs = [os.path.join(cfg.config['PHOTO_DIR'], y) for y in years]
     in_years = []
     for y_dir in y_dirs:
         for subdir in os.listdir(y_dir):
@@ -280,6 +277,7 @@ def scaner():
 
     def __scan():
         """Run Files Scaner & Database Updater from utils"""
+        cfg.FLAG = True
         update_collections()
         if cfg.config['TYPE_SCAN'] == 'full':
             cfg.config['TYPE_SCAN'] = ''
@@ -293,7 +291,11 @@ def scaner():
         except Exception:
             print('images_reset error')
             cfg.THUMBNAILS_RELOAD()
+        cfg.FLAG = False
+
     t1 = threading.Thread(target=__scan, daemon=True)
     t1.start()
     while t1.is_alive():
         cfg.ROOT.update()
+        if not cfg.FLAG:
+            break

@@ -18,7 +18,7 @@ class Dbase():
     *var base: declatative_base for models and actions
     """
     __engine = sqlalchemy.create_engine(
-        'sqlite:////' + os.path.join(cfg.CFG_DIR, 'database.db'),
+        'sqlite:////' + os.path.join(cfg.CFG_DIR, cfg.DB_NAME),
         connect_args={'check_same_thread':False,},
         echo= False
         )

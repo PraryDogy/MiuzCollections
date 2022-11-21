@@ -13,7 +13,10 @@ from utils import encrypt_cfg
 
 # app info
 APP_NAME = 'MiuzGallery'
-APP_VER = '3.1.9'
+APP_VER = '3.2.0'
+
+DB_VER = '1.1'
+DB_NAME = f'db {DB_VER}.db'
 
 KEY = 'QaovKbF1YpKCM9e-HE2wvn30lIqCbeYTUcONcdLpV18='
 
@@ -22,9 +25,9 @@ CFG_DIR = os.path.join(
     os.path.expanduser('~'), 'Library/Application Support/Miuz Gallery')
 
 FONTCOLOR = "#E2E2E2"
-BGCOLOR = "black"
+BGCOLOR = "#1A1A1A"
 # BGCOLOR = "#222222"
-BGBUTTON = "#232323"
+BGBUTTON = "#2C2C2C"
 # BGBUTTON = "#434343"
 BGPRESSED = '#395432'
 SELECTED = '#4E4769'
@@ -38,6 +41,7 @@ ROOT.withdraw()
 LIVE_LBL = tkinter.Label
 THUMBS = []
 COMPARE = False
+FLAG = False
 
 # gui functions 
 THUMBNAILS_RELOAD = object
@@ -74,8 +78,8 @@ def read_cfg(what_read: str):
         encrypt_cfg(config)
 
         shutil.copyfile(
-            os.path.join(os.path.dirname(__file__), 'database.db'),
-            os.path.join(CFG_DIR, 'database.db'))
+            os.path.join(os.path.dirname(__file__), 'db.db'),
+            os.path.join(CFG_DIR, DB_NAME))
 
         return config
 
@@ -91,7 +95,11 @@ else:
     config = defaults()
     encrypt_cfg(config)
 
-if not os.path.exists(os.path.join(CFG_DIR, 'database.db')):
+if not os.path.exists(os.path.join(CFG_DIR, DB_NAME)):
     shutil.copyfile(
-        os.path.join(os.path.dirname(__file__), 'database.db'),
-        os.path.join(CFG_DIR, 'database.db'))
+        os.path.join(os.path.dirname(__file__), 'db.db'),
+        os.path.join(CFG_DIR, DB_NAME))
+
+for file in os.listdir(CFG_DIR):
+    if file.endswith('.db') and file != DB_NAME:
+        os.remove(os.path.join(CFG_DIR, file))

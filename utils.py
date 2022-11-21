@@ -212,64 +212,64 @@ class MyLabel(tkinter.Label):
 # unused
 
 
-class Scrollable(tkinter.Frame):
-    """
-    Example scrollable frame.
-    """
-    def __init__(self, master):
-        tkinter.Frame.__init__(self, master)
+# class Scrollable(tkinter.Frame):
+    # """
+    # Example scrollable frame.
+    # """
+    # def __init__(self, master):
+    #     tkinter.Frame.__init__(self, master)
 
-        canvas = tkinter.Canvas(
-            self, bg=cfg.BGCOLOR, highlightbackground=cfg.BGCOLOR)
+    #     canvas = tkinter.Canvas(
+    #         self, bg=cfg.BGCOLOR, highlightbackground=cfg.BGCOLOR)
 
-        scrollbar = tkinter.Scrollbar(
-            self, width=12, orient='vertical', command=canvas.yview)
+    #     scrollbar = tkinter.Scrollbar(
+    #         self, width=12, orient='vertical', command=canvas.yview)
 
-        scrollable = tkinter.Frame(canvas)
+    #     scrollable = tkinter.Frame(canvas)
 
-        scrollable.bind("<Configure>", lambda e: canvas.configure(
-            scrollregion=canvas.bbox("all")))
+    #     scrollable.bind("<Configure>", lambda e: canvas.configure(
+    #         scrollregion=canvas.bbox("all")))
 
-        canvas.bind_all("<MouseWheel>", lambda e: canvas.yview_scroll(
-            -1*(e.delta), "units"))
-            # lambda e: canvas.yview_scroll(-1*(e.delta/120), "units")
+    #     canvas.bind_all("<MouseWheel>", lambda e: canvas.yview_scroll(
+    #         -1*(e.delta), "units"))
+    #         # lambda e: canvas.yview_scroll(-1*(e.delta/120), "units")
 
-        canvas.create_window((0,0), window=scrollable, anchor='nw')
-        canvas.configure(yscrollcommand=scrollbar.set)
+    #     canvas.create_window((0,0), window=scrollable, anchor='nw')
+    #     canvas.configure(yscrollcommand=scrollbar.set)
 
-        self.pack(fill=tkinter.BOTH, expand=True)
-        canvas.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=True)
-        scrollbar.pack(side=tkinter.RIGHT, fill=tkinter.Y)
+    #     self.pack(fill=tkinter.BOTH, expand=True)
+    #     canvas.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=True)
+    #     scrollbar.pack(side=tkinter.RIGHT, fill=tkinter.Y)
 
 
-    def image_resize(self, image, width = None, height = None, inter = cv2.INTER_AREA):
-        # initialize the dimensions of the image to be resized and
-        # grab the image size
-        image = cv2.imread(image)
-        dim = None
-        (h, w) = image.shape[:2]
+    # def image_resize(self, image, width = None, height = None, inter = cv2.INTER_AREA):
+    #     # initialize the dimensions of the image to be resized and
+    #     # grab the image size
+    #     image = cv2.imread(image)
+    #     dim = None
+    #     (h, w) = image.shape[:2]
 
-        # if both the width and height are None, then return the
-        # original image
-        if width is None and height is None:
-            return image
+    #     # if both the width and height are None, then return the
+    #     # original image
+    #     if width is None and height is None:
+    #         return image
 
-        # check to see if the width is None
-        if width is None:
-            # calculate the ratio of the height and construct the
-            # dimensions
-            r = height / float(h)
-            dim = (int(w * r), height)
+    #     # check to see if the width is None
+    #     if width is None:
+    #         # calculate the ratio of the height and construct the
+    #         # dimensions
+    #         r = height / float(h)
+    #         dim = (int(w * r), height)
 
-        # otherwise, the height is None
-        else:
-            # calculate the ratio of the width and construct the
-            # dimensions
-            r = width / float(w)
-            dim = (width, int(h * r))
+    #     # otherwise, the height is None
+    #     else:
+    #         # calculate the ratio of the width and construct the
+    #         # dimensions
+    #         r = width / float(w)
+    #         dim = (width, int(h * r))
 
-        # resize the image
-        resized = cv2.resize(image, dim, interpolation = inter)
+    #     # resize the image
+    #     resized = cv2.resize(image, dim, interpolation = inter)
 
-        # return the resized image
-        return resized
+    #     # return the resized image
+    #     return resized

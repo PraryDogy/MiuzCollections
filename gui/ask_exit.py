@@ -48,4 +48,5 @@ class AskExit(tkinter.Toplevel):
         cfg.config['ROOT_SIZE'] = f'{w}x{h}'
         cfg.config['ROOT_POS'] = f'+{x}+{y}'
         encrypt_cfg(cfg.config)
-        raise SystemExit
+        cfg.FLAG = False
+        quit()
