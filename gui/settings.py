@@ -142,8 +142,8 @@ class Widgets(MyFrame):
             lbl.pack(anchor=tkinter.W, pady=(0, 10))
 
             vars[widget] = tkinter.Entry(
-                master, bg=cfg.BGBUTTON, fg=cfg.FONTCOLOR,
-                insertbackground=cfg.FONTCOLOR, selectbackground=cfg.BGPRESSED,
+                master, bg=cfg.BGBUTTON, fg=cfg.BGFONT,
+                insertbackground=cfg.BGFONT, selectbackground=cfg.BGPRESSED,
                 highlightthickness=5, highlightbackground=cfg.BGBUTTON,
                 highlightcolor=cfg.BGBUTTON, bd=0, justify='center', width=35)
 

@@ -103,6 +103,8 @@ class MenuButtons(tkmacosx.SFrame):
         * param `btns`: list of created tkinter buttons
         """
         if btn['bg'] == cfg.BGPRESSED:
+            btn['bg'] = cfg.BGSELECTED
+            cfg.ROOT.after(200, lambda: btn.configure(bg=cfg.BGPRESSED))
             coll_path = os.path.join(os.sep, cfg.config['COLL_FOLDER'], coll)
             subprocess.check_output(["/usr/bin/open", coll_path])
             return
@@ -242,7 +244,7 @@ class ImagesThumbs(tkmacosx.SFrame):
 
     def enter(self, thumb: MyButton):
         if thumb['bg'] != cfg.BGPRESSED:
-            thumb['bg'] = cfg.SELECTED_THUMB
+            thumb['bg'] = cfg.BGSELECTED
 
     def leave(self, thumb: MyButton):
         if thumb['bg'] != cfg.BGPRESSED:

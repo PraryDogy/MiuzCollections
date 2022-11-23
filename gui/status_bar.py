@@ -97,7 +97,7 @@ class CompareTitle(MyFrame):
     def __init__(self, master: tkinter.Frame):
         subtitle = MyLabel(
             master, 
-            fg=cfg.FONTCOLOR,
+            fg=cfg.BGFONT,
             text='Выберите фото для сравнения')
         subtitle.pack(side=tkinter.LEFT)
 

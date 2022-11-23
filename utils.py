@@ -169,7 +169,7 @@ class MyButton(tkinter.Label):
     def __init__(self, master: tkinter, **kwargs):
         tkinter.Label.__init__(self, master, **kwargs)
         self.configure(
-            bg=cfg.BGBUTTON, fg=cfg.FONTCOLOR,
+            bg=cfg.BGBUTTON, fg=cfg.BGFONT,
             width=17, height=2)
         self.bind('<Enter>', lambda e: self.enter())
         self.bind('<Leave>', lambda e: self.leave())
@@ -190,7 +190,7 @@ class MyButton(tkinter.Label):
 
     def enter(self):
         if self['bg'] != cfg.BGPRESSED:
-            self['bg'] = cfg.SELECTED
+            self['bg'] = cfg.BGSELECTED
 
     def leave(self):
         if self['bg'] != cfg.BGPRESSED:
@@ -211,7 +211,7 @@ class MyLabel(tkinter.Label):
     """
     def __init__(self, master, **kwargs):
         tkinter.Label.__init__(self, master, **kwargs)
-        self.configure(bg=cfg.BGCOLOR, fg=cfg.FONTCOLOR)
+        self.configure(bg=cfg.BGCOLOR, fg=cfg.BGFONT)
 
 
 # unused

@@ -230,7 +230,7 @@ def update_collections():
     Searchs images.
     Updates the database thumbnails.
     """
-    cfg.LIVE_LBL['fg'] = cfg.FONTCOLOR
+    cfg.LIVE_LBL['fg'] = cfg.BGFONT
     update_livelabel('10')
     images = search_images(search_collections())
     update_livelabel('20')
