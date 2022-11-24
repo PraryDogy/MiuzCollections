@@ -6,6 +6,7 @@ import os
 import shutil
 import sys
 import tkinter
+from functools import partial
 from tkinter import filedialog
 
 import cfg
@@ -155,14 +156,12 @@ class Widgets(MyFrame):
 
             btn_copy = MyButton(frame_btns, text='Копировать')
             btn_copy.configure(height=1, width=9)
-            btn_copy.cmd(
-                lambda e, x=widget, y=btn_copy: self.copy_input(x, y))
+            btn_copy.cmd(partial(self.copy_input, vars[widget], btn_copy))
             btn_copy.pack(side=tkinter.LEFT, padx=(0, 10))
 
             btn_paste = MyButton(frame_btns, text='Вставить')
             btn_paste.configure(height=1, width=9)
-            btn_paste.cmd(
-                lambda e, x=widget, y=btn_paste: self.paste_input(x))
+            btn_paste.cmd(partial(self.paste_input, vars[widget], btn_paste))
             btn_paste.pack(side=tkinter.RIGHT)
 
             sep = MySep(master)
@@ -239,7 +238,7 @@ class Widgets(MyFrame):
             widget.insert(0, default)
             cfg.config[value] = default
 
-    def copy_input(self, ins: tkinter.Entry, btn: MyButton):
+    def copy_input(self, ins: tkinter.Entry, btn: MyButton, e: tkinter.Event):
         """
         Gets text from current text input field and copy to clipboard.
         * param `ins`: tkinter entry current text input
@@ -248,7 +247,7 @@ class Widgets(MyFrame):
         btn.press()
         my_copy(ins.get())
 
-    def paste_input(self, ins: tkinter.Entry, btn: MyButton):
+    def paste_input(self, ins: tkinter.Entry, btn: MyButton, e: tkinter.Event):
         """
         Gets text from clipboard and paste in text input field.
         * param `ins`: tkinter entry current text input

@@ -7,6 +7,7 @@ import subprocess
 import threading
 import tkinter
 from datetime import datetime
+from functools import partial
 
 import cfg
 import cv2
@@ -241,7 +242,7 @@ class ImgButtons(MyFrame):
         if os.path.exists(vars['img_src']):
             open_btn = MyButton(self, text='Открыть папку')
             open_btn.configure(height=1, width=b_wight)
-            open_btn.cmd(lambda e: self.open_folder(open_btn))
+            open_btn.cmd(partial(self.open_folder, open_btn))
             open_btn.pack(side=tkinter.LEFT, padx=(0, 15))
 
     def compare(self, btn: MyButton):
@@ -271,7 +272,7 @@ class ImgButtons(MyFrame):
         btn.press()
         my_copy(vars['img_src'].split(os.sep)[-1].split('.')[0])
 
-    def open_folder(self, btn: MyButton):
+    def open_folder(self, btn: MyButton, e: tkinter.Event):
         """
         Opens folder with image.
         Simulates button press with color.

@@ -1,54 +1,60 @@
 from tkinter import *
-import tkinter as tk
 
-root = Tk()
+def rClicker(e):
+    ''' right click context menu for all Tk Entry and Text widgets
+    '''
 
-class RoundedButton(tk.Canvas):
-    def __init__(self, parent, width, height, cornerradius, padding, color, bg, command=None):
-        tk.Canvas.__init__(self, parent, borderwidth=0, 
-            relief="flat", highlightthickness=0, bg=bg)
-        self.command = command
+    try:
+        def rClick_Copy(e: Event, apnd=0):
+            e.widget.event_generate('<Command-c>')
 
-        if cornerradius > 0.5*width:
-            print("Error: cornerradius is greater than width.")
-            return None
+        def rClick_Cut(e):
+            e.widget.event_generate('<Command-x>')
 
-        if cornerradius > 0.5*height:
-            print("Error: cornerradius is greater than height.")
-            return None
+        def rClick_Paste(e):
+            e.widget.event_generate('<Command-v>')
 
-        rad = 2*cornerradius
-        def shape():
-            self.create_polygon((padding,height-cornerradius-padding,padding,cornerradius+padding,padding+cornerradius,padding,width-padding-cornerradius,padding,width-padding,cornerradius+padding,width-padding,height-cornerradius-padding,width-padding-cornerradius,height-padding,padding+cornerradius,height-padding), fill=color, outline=color)
-            self.create_arc((padding,padding+rad,padding+rad,padding), start=90, extent=90, fill=color, outline=color)
-            self.create_arc((width-padding-rad,padding,width-padding,padding+rad), start=0, extent=90, fill=color, outline=color)
-            self.create_arc((width-padding,height-rad-padding,width-padding-rad,height-padding), start=270, extent=90, fill=color, outline=color)
-            self.create_arc((padding,height-padding-rad,padding+rad,height-padding), start=180, extent=90, fill=color, outline=color)
+        e.widget.focus()
+
+        nclst=[
+               (' Cut', lambda e=e: rClick_Cut(e)),
+               (' Copy', lambda e=e: rClick_Copy(e)),
+               (' Paste', lambda e=e: rClick_Paste(e)),
+               ]
+
+        rmenu = Menu(None, tearoff=0, takefocus=0)
+
+        for (txt, cmd) in nclst:
+            rmenu.add_command(label=txt, command=cmd)
+
+        rmenu.tk_popup(e.x_root+40, e.y_root+10,entry="0")
+
+    except TclError:
+        print (' - rClick menu, something wrong')
+        pass
+
+    return "break"
 
 
-        id = shape()
-        (x0,y0,x1,y1)  = self.bbox("all")
-        width = (x1-x0)
-        height = (y1-y0)
-        self.configure(width=width, height=height)
-        self.bind("<ButtonPress-1>", self._on_press)
-        self.bind("<ButtonRelease-1>", self._on_release)
+def rClickbinder(r):
 
-    def _on_press(self, event):
-        self.configure(relief="sunken")
+    try:
+        for b in [ 'Text', 'Entry', 'Listbox', 'Label']: #
+            r.bind_class(b, sequence='<Button-3>',
+                         func=rClicker, add='')
+    except TclError:
+        print (' - rClickbinder, something wrong')
+        pass
 
-    def _on_release(self, event):
-        self.configure(relief="raised")
-        if self.command is not None:
-            self.command()
 
-def test():
-    print("Hello")
+if __name__ == '__main__':
+    master = Tk()
+    ent = Entry(master, width=50)
+    ent.pack(anchor="w")
 
-canvas = Canvas(root, height=300, width=500)
-canvas.pack()
+    #bind context menu to a specific element
+    ent.bind('<Button-2>',rClicker, add='')
+    #or bind it to any Text/Entry/Listbox/Label element
+    #rClickbinder(master)
 
-button = RoundedButton(root, 200, 100, 10, 2, 'red', 'white', command=test)
-button.place(relx=.1, rely=.1)
-
-root.mainloop()
+    master.mainloop()
