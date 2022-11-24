@@ -56,6 +56,7 @@ def defaults():
         'ROOT_POS': '+0+0',
         'CURR_COLL': 'last',
         'TYPE_SCAN': '',
+        'MINIMIZE': 1
         }
 
 
@@ -73,11 +74,9 @@ def read_cfg(what_read: str):
         # that means indeed replace database file & config file
         config = defaults()
         encrypt_cfg(config)
-
         shutil.copyfile(
             os.path.join(os.path.dirname(__file__), 'db.db'),
             os.path.join(CFG_DIR, DB_NAME))
-
         return config
 
 
@@ -86,11 +85,14 @@ if not os.path.exists(CFG_DIR):
 
 if os.path.exists(os.path.join(CFG_DIR, 'cfg')):
     config = read_cfg(os.path.join(CFG_DIR, 'cfg'))
-    if config['ROOT_SIZE'] == '1x1':
-        config['ROOT_SIZE'] = defaults()['ROOT_SIZE']
 else:
     config = defaults()
     encrypt_cfg(config)
+
+for k,v in defaults().items():
+    if k not in config:
+        config[k] = v
+        encrypt_cfg(config)
 
 if not os.path.exists(os.path.join(CFG_DIR, DB_NAME)):
     shutil.copyfile(

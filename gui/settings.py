@@ -14,11 +14,14 @@ import tkmacosx
 from utils import (MyButton, MyFrame, MyLabel, MySep, encrypt_cfg, my_copy,
                    my_paste, place_center)
 
+from .ask_exit import AskExit
+
 vars = {
-    'PHOTODIR_LBL': 'tkinter label',
-    'COLLFOLDERS_LBL': 'tkinter label',
-    'RTFOLDER_ENTRY': 'tkinter entry',
-    'FILEAGE_ENTRY':'tkinter entry',
+    'PHOTODIR_LBL': tkinter.Label,
+    'COLLFOLDERS_LBL': tkinter.Label,
+    'RTFOLDER_ENTRY': tkinter.Entry,
+    'FILEAGE_ENTRY':tkinter.Entry,
+    'MIN_CHECKBOX': tkinter.Checkbutton,
     'text_length': 1,
     }
 
@@ -153,19 +156,25 @@ class Widgets(MyFrame):
 
             frame_btns = MyFrame(master)
             frame_btns.pack()
-
-            btn_copy = MyButton(frame_btns, text='Копировать')
-            btn_copy.configure(height=1, width=9)
-            btn_copy.cmd(partial(self.copy_input, vars[widget], btn_copy))
-            btn_copy.pack(side=tkinter.LEFT, padx=(0, 10))
-
-            btn_paste = MyButton(frame_btns, text='Вставить')
-            btn_paste.configure(height=1, width=9)
-            btn_paste.cmd(partial(self.paste_input, vars[widget], btn_paste))
-            btn_paste.pack(side=tkinter.RIGHT)
+            btn_c = MyButton(frame_btns, text='Копировать')
+            btn_c.cmd(partial(self.copy_input, vars[widget], btn_c))
+            btn_v = MyButton(frame_btns, text='Вставить')
+            btn_v.cmd(partial(self.paste_input, vars[widget], btn_v))
+            [i.configure(height=1, width=9) for i in (btn_c, btn_v)]
+            [i.pack(side=tkinter.LEFT, padx=(5)) for i in (btn_c, btn_v)]
 
             sep = MySep(master)
             sep.pack(padx=40, pady=20, fill=tkinter.X)
+
+        min_frame = MyFrame(master)
+        min_frame.pack(pady = (0, 15))
+
+        vars['MIN_CHECKBOX'] = tkinter.IntVar()
+        check_box = tkinter.Checkbutton(
+            min_frame, bg=cfg.BGCOLOR,variable=vars['MIN_CHECKBOX'])
+        check_lbl = MyLabel(min_frame, text='Свернуть вместо закрыть')
+        [check_box.select() if cfg.config['MINIMIZE'] else False]
+        [i.pack(side=tkinter.LEFT) for i in [check_box, check_lbl]]
 
         rest_frame = MyFrame(master)
         rest_frame.pack(pady=(0, 15))
@@ -268,12 +277,16 @@ class Widgets(MyFrame):
         Get text from all text fields in advanced settings and save to
         cfg.json
         """
-
         cfg.config['PHOTO_DIR'] = vars['PHOTODIR_LBL']['text']
         cfg.config['COLL_FOLDER'] = vars['COLLFOLDERS_LBL']['text']
         cfg.config['RT_FOLDER'] = vars['RTFOLDER_ENTRY'].get()
         cfg.config['FILE_AGE'] = vars['FILEAGE_ENTRY'].get()
-
+        cfg.config['MINIMIZE'] = vars['MIN_CHECKBOX'].get()
         encrypt_cfg(cfg.config)
+
+        if cfg.config['MINIMIZE']:
+            cfg.ROOT.protocol("WM_DELETE_WINDOW", lambda: cfg.ROOT.withdraw())
+        else:
+            cfg.ROOT.protocol("WM_DELETE_WINDOW", partial(AskExit, cfg.ROOT))
 
         master.winfo_toplevel().destroy()

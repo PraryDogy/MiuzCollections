@@ -11,7 +11,7 @@ from .ask_exit import AskExit
 from .bar_menu import BarMenu
 from .images_gui import Gallery
 from .status_bar import StatusBar
-
+from functools import partial
 
 class MainGui:
     """
@@ -24,8 +24,11 @@ class MainGui:
         cfg.ROOT.createcommand(
             'tk::mac::ReopenApplication', lambda: cfg.ROOT.deiconify())
         cfg.ROOT.bind('<Command-w>', lambda e: cfg.ROOT.withdraw())
-        cfg.ROOT.createcommand("tk::mac::Quit" , self.on_exit)
-        cfg.ROOT.protocol("WM_DELETE_WINDOW", self.on_exit)
+        cfg.ROOT.createcommand("tk::mac::Quit" , partial(AskExit, cfg.ROOT))
+        if cfg.config['MINIMIZE']:
+            cfg.ROOT.protocol("WM_DELETE_WINDOW", lambda: cfg.ROOT.withdraw())
+        else:
+            cfg.ROOT.protocol("WM_DELETE_WINDOW", partial(AskExit, cfg.ROOT))
         MySep(cfg.ROOT).pack(fill=tkinter.X, pady=(30, 20))
         Gallery(cfg.ROOT).pack(fill=tkinter.BOTH, expand=True)
         MySep(cfg.ROOT).pack(fill=tkinter.X, pady=10)
@@ -34,6 +37,3 @@ class MainGui:
         cfg.ROOT.update_idletasks()
         cfg.ROOT.eval(f'tk::PlaceWindow {cfg.ROOT} center')
         cfg.ROOT.geometry(f'{cfg.config["ROOT_SIZE"]}{cfg.config["ROOT_POS"]}')
-
-    def on_exit(self):
-        AskExit(cfg.ROOT)

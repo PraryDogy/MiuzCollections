@@ -286,6 +286,7 @@ def scaner():
             update_nocollection(aged=False)
         else:
             update_nocollection(aged=True)
+
         Dbase.conn.execute('VACUUM')
         try:
             cfg.THUMBNAILS_RELOAD()
@@ -293,6 +294,10 @@ def scaner():
             print('images_reset error')
             cfg.THUMBNAILS_RELOAD()
         cfg.FLAG = False
+
+        for k, v in cfg.ROOT.children.items():
+            [v.focus_force() if v.winfo_class() == 'Toplevel' else False]
+            break
 
     t1 = threading.Thread(target=__scan, daemon=True)
     t1.start()
