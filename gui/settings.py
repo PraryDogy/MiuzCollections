@@ -43,8 +43,8 @@ class Settings(tkinter.Toplevel):
         self.title('Настройки')
         self.configure(padx=20, pady=10)
         self.geometry(
-            f'{int(cfg.ROOT.winfo_width()*0.4)}x'
-            f'{int(cfg.ROOT.winfo_height()*0.7)}')
+            f'{int(cfg.ROOT.winfo_width()*0.5)}x'
+            f'{int(cfg.ROOT.winfo_height()*0.8)}')
 
         cfg.ROOT.update_idletasks()
         vars['text_length'] = int(self.winfo_width()*0.9)
