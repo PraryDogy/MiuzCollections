@@ -78,7 +78,7 @@ class Widgets(MyFrame):
 
         txt2 = (
             'При запуске программа сканирует и обновляет фото всех коллекций '
-            f'за последние {cfg.config["FILE_AGE"]} дней'
+            f'за последние {cfg.config["FILE_AGE"]} дней. '
             'Нажмите "Полное сканирование", чтобы обновить фотографии всех '
             'коллекций за все время c 2018 года.'
             )
@@ -125,14 +125,13 @@ class Widgets(MyFrame):
             sep.pack(padx=40, pady=20, fill=tkinter.X)
 
         txt3 = (
-            'Имя папки с ретушью. Подразумевается, что внутри папки с этим '
-            'именем будут отретушированные фото.'
+            'Программа ищет отретушированные фото в папках с данным именем.'
             )
 
         txt4 = (
             'По умолчанию программа ищет отретушированные фотографии за '
             f'последние {cfg.config["FILE_AGE"]} дней. Можно указать другое '
-            'количество дней. Чем больше цифра, тем дольше сканирование.'
+            'количество дней. Чем больше число, тем дольше сканирование.'
             )
 
         for descr, value, widget in zip(
@@ -171,7 +170,7 @@ class Widgets(MyFrame):
 
         vars['MIN_CHECKBOX'] = tkinter.IntVar()
         check_box = tkinter.Checkbutton(
-            min_frame, bg=cfg.BGCOLOR,variable=vars['MIN_CHECKBOX'])
+            min_frame, bg=cfg.BGCOLOR, variable=vars['MIN_CHECKBOX'])
         check_lbl = MyLabel(min_frame, text='Свернуть вместо закрыть')
         [check_box.select() if cfg.config['MINIMIZE'] else False]
         [i.pack(side=tkinter.LEFT) for i in [check_box, check_lbl]]

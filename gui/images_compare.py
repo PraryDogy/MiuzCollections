@@ -7,16 +7,16 @@ from .ask_exit import AskExit
 import os
 
 vars = {
-    'img1': 'from tkinter top level: image, text, image src',
-    'img2': 'from tkinter top level: image, text, image src',
+    'img1': (tkinter.Label, tkinter.Label, tkinter.Label),
+    'img2': (tkinter.Label, tkinter.Label, tkinter.Label),
     'curr_img': 'img1 or img2',
-    'img_frame': 'tkinter label with image',
-    'img_info': 'tkinter label with text',
+    'img_frame': tkinter.Label,
+    'img_info': tkinter.Label,
     }
 
 
 def get_all_windows():
-    return [v for k, v in cfg.ROOT.children.items() if "preview" in k]
+    return tuple(v for k, v in cfg.ROOT.children.items() if "preview" in k)
 
 
 def on_closing(obj: tkinter.Toplevel):
@@ -38,10 +38,6 @@ def on_closing(obj: tkinter.Toplevel):
     cfg.ROOT.focus_force()
 
 
-def ask_exit():
-    AskExit(cfg.ROOT)
-
-
 class ImagesCompare(tkinter.Toplevel):
     """
     A new tkinter window containing two images and
@@ -59,7 +55,7 @@ class ImagesCompare(tkinter.Toplevel):
         self.protocol("WM_DELETE_WINDOW", lambda: on_closing(self))
         self.bind('<Command-w>', lambda e: on_closing(self))
         self.bind('<Escape>', lambda e: on_closing(self))
-        self.bind('<Command-q>', lambda e: ask_exit())
+        self.bind('<Command-q>', lambda e: AskExit(cfg.ROOT))
 
         self.resizable(0,0)
         side = int(cfg.ROOT.winfo_screenheight()*0.8)
@@ -67,8 +63,8 @@ class ImagesCompare(tkinter.Toplevel):
         cfg.ROOT.update_idletasks()
 
         prevs = get_all_windows()
-        img1_info = list(prevs[0].children.values())
-        img2_info = list(prevs[1].children.values())
+        img1_info = tuple(prevs[0].children.values())
+        img2_info = tuple(prevs[1].children.values())
         
         # prev item is toplevel window with image preview
         # prev item 0 = image source text
@@ -110,7 +106,6 @@ class ImagesCompare(tkinter.Toplevel):
         FakeBtn(right_frame).pack(expand=True, fill=tkinter.X)
 
         image_frame.set_size()
-        cfg.ROOT.update_idletasks()
         place_center(self)
         self.deiconify()
         self.grab_set()
@@ -145,7 +140,7 @@ class ImageFrame(MyLabel):
         win_h = self.winfo_toplevel().winfo_height()
         win_w = self.winfo_toplevel().winfo_width()
 
-        widgets = list(self.winfo_toplevel().children.values())[2:]
+        widgets = tuple(self.winfo_toplevel().children.values())[2:]
         widgets_h = sum(i.winfo_reqheight() for i in widgets)
         
         new_h = win_h-widgets_h

@@ -6,14 +6,16 @@ import datetime
 import os
 import sys
 import threading
+import tkinter
 
 import cfg
+import cv2
 import sqlalchemy
 from admin import print_alive
 from database import Dbase, Thumbs
 from gui.smb_checker import SmbChecker
-from utils import create_thumb, encrypt_cfg, get_coll_name, smb_check
-import tkinter
+from utils import encrypt_cfg, get_coll_name, resize_image, smb_check
+
 
 def insert_row(**kw):
     """
@@ -25,11 +27,15 @@ def insert_row(**kw):
     * param `mod`: Date last modified of image `int`
     * param `coll`: name of collection created with `get_coll_name`
     """
-    img150 = create_thumb(kw['src'])
+    image = cv2.imread(kw['src'])
+    resized = resize_image(image, cfg.THUMB_SIZE, cfg.THUMB_SIZE, True)
+    encoded_img = cv2.imencode('.jpg', resized)[1].tobytes()
     values = {
-        'img150': img150, 
-        'src':kw['src'], 'size':kw['size'],
-        'created':kw['birth'], 'modified':kw['mod'],
+        'img150': encoded_img, 
+        'src':kw['src'],
+        'size':kw['size'],
+        'created':kw['birth'],
+        'modified':kw['mod'],
         'collection':kw['coll']}
     Dbase.conn.execute(sqlalchemy.insert(Thumbs).values(values))
 
@@ -41,9 +47,9 @@ def search_years():
     in `cfg.PHOTO_DIR`
     Looking for all folders in year named folders.
     """
-    years = [str(y) for y in range(2018, datetime.datetime.now().year + 1)]
-    y_dirs = [os.path.join(cfg.config['PHOTO_DIR'], y) for y in years]
-    y_dirs = [i for i in y_dirs if os.path.exists(i)]
+    years = tuple([str(y) for y in range(2018, datetime.datetime.now().year + 1)])
+    y_dirs = tuple(os.path.join(cfg.config['PHOTO_DIR'], y) for y in years)
+    y_dirs = tuple(i for i in y_dirs if os.path.exists(i))
     in_years = []
     for y_dir in y_dirs:
         for subdir in os.listdir(y_dir):
@@ -292,7 +298,7 @@ def scaner():
             cfg.THUMBNAILS_RELOAD()
         except Exception:
             print('images_reset error')
-            cfg.THUMBNAILS_RELOAD()
+            os.execv(sys.executable, ['python'] + sys.argv)
         cfg.FLAG = False
 
         for k, v in cfg.ROOT.children.items():

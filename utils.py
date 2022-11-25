@@ -64,7 +64,6 @@ def place_center(top_level: tkinter.Toplevel):
     Place new tkinter window to center relavive main window.
     * param `top_level`: tkinter.TopLevel
     """
-    cfg.ROOT.update_idletasks()
     x, y = cfg.ROOT.winfo_x(), cfg.ROOT.winfo_y()
     xx = x + cfg.ROOT.winfo_width()//2 - top_level.winfo_width()//2
     yy = y + cfg.ROOT.winfo_height()//2 - top_level.winfo_height()//2
@@ -109,38 +108,35 @@ def crop_image(img):
     return cropped[0:cfg.THUMB_SIZE, 0:cfg.THUMB_SIZE]
 
 
-def create_thumb(src: str):
-    """
-    Creates image thumbnail with keep aspect ratio, where short side will be
-    `cfg.THUMB_SIZE` pixels. Returns converted to bytes image.
-    * param `src`: source path of image.
-    """
-    img = cv2.imread(src)
-    height, width = img.shape[:2]
-    aspect = width/height
-    if aspect > 1:
-        hh, ww = cfg.THUMB_SIZE, round(cfg.THUMB_SIZE*aspect)
-    if aspect < 1:
-        hh, ww = round(cfg.THUMB_SIZE/aspect), cfg.THUMB_SIZE
-    if aspect == 1:
-        hh, ww = cfg.THUMB_SIZE, cfg.THUMB_SIZE
-    new_img = cv2.resize(img, (ww, hh), interpolation=cv2.INTER_AREA)
-    return cv2.imencode('.jpg', new_img)[1].tobytes()
+def resize_image(img, ww, hh, thumbnail: bool):
+    h, w = img.shape[:2]
+    aspect = w/h
+    hh1, ww1 = round(ww/aspect), ww
+    hh2, ww2 = hh, round(hh*aspect)
+    if thumbnail:
+        if aspect > 1:
+            hh, ww = hh2, ww2
+        elif aspect < 1:
+            hh, ww = hh1, ww1
+        elif aspect == 1:
+            hh, ww = hh, hh
+    else:
+        if aspect > 1:
+            hh, ww = hh1, ww1
+        elif aspect < 1:
+            hh, ww = hh2, ww2
+        elif aspect == 1:
+            hh, ww = hh, hh
+    return cv2.resize(img, (ww, hh), interpolation=cv2.INTER_AREA)
 
 
 def my_copy(output: str):
-    """
-    Custom copy to clipboard with subprocess
-    """
     process = subprocess.Popen(
         'pbcopy', env={'LANG': 'en_US.UTF-8'}, stdin=subprocess.PIPE)
     process.communicate(output.encode('utf-8'))
 
 
 def my_paste():
-    """
-    Custom paste from clipboard with subprocess
-    """
     return subprocess.check_output(
         'pbpaste', env={'LANG': 'en_US.UTF-8'}).decode('utf-8')
 
@@ -161,30 +157,16 @@ class MySep(tkinter.Frame):
 
 
 class MyButton(tkinter.Label):
-    """
-    Tkinter Label with custom style.
-    * method `cmd`: bind function to mouse left click
-    * method `press`: simulate button press with button's bg color
-    """
     def __init__(self, master: tkinter, **kwargs):
         tkinter.Label.__init__(self, master, **kwargs)
-        self.configure(
-            bg=cfg.BGBUTTON, fg=cfg.BGFONT,
-            width=17, height=2)
+        self.configure(bg=cfg.BGBUTTON, fg=cfg.BGFONT)
         self.bind('<Enter>', lambda e: self.enter())
         self.bind('<Leave>', lambda e: self.leave())
 
     def cmd(self, cmd):
-        """
-        Binds tkinter label to mouse left click.
-        * param `cmd`: lambda e: some_function()
-        """
         self.bind('<ButtonRelease-1>', cmd)
 
     def press(self):
-        """
-        Simulates button press with button's bg color
-        """
         self.configure(bg=cfg.BGPRESSED)
         cfg.ROOT.after(100, lambda: self.configure(bg=cfg.BGBUTTON))
 
@@ -197,18 +179,12 @@ class MyButton(tkinter.Label):
             self['bg'] = cfg.BGBUTTON
 
 class MyFrame(tkinter.Frame):
-    """
-    Tkinter Frame with custom style.
-    """
     def __init__(self, master: tkinter, **kwargs):
         tkinter.Frame.__init__(self, master, **kwargs)
         self.configure(bg=cfg.BGCOLOR)
 
 
 class MyLabel(tkinter.Label):
-    """
-    Tkinter Label with custom style.
-    """
     def __init__(self, master, **kwargs):
         tkinter.Label.__init__(self, master, **kwargs)
         self.configure(bg=cfg.BGCOLOR, fg=cfg.BGFONT)

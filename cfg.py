@@ -52,8 +52,7 @@ def defaults():
         'COLL_FOLDER': '/Volumes/Shares/Marketing/Photo/_Collections',
         'RT_FOLDER': 'Retouch',
         'FILE_AGE': 60,
-        'ROOT_SIZE': '500x500',
-        'ROOT_POS': '+0+0',
+        'GEOMETRY': [700, 500, 0, 0],
         'CURR_COLL': 'last',
         'TYPE_SCAN': '',
         'MINIMIZE': 1
@@ -89,10 +88,12 @@ else:
     config = defaults()
     encrypt_cfg(config)
 
-for k,v in defaults().items():
-    if k not in config:
-        config[k] = v
-        encrypt_cfg(config)
+defs = defaults()
+part1 = {k:v for k, v in config.items() if k in defs.keys()}
+part2 = {k:v for k, v in defs.items() if k not in config.keys()}
+new_config = {**part1, **part2}
+encrypt_cfg(new_config) if new_config.keys() != config.keys() else False
+config = new_config if new_config.keys() != config.keys() else config
 
 if not os.path.exists(os.path.join(CFG_DIR, DB_NAME)):
     shutil.copyfile(

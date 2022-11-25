@@ -34,6 +34,6 @@ class MainGui:
         MySep(cfg.ROOT).pack(fill=tkinter.X, pady=10)
         StatusBar(cfg.ROOT).pack(pady=(0, 10))
         BarMenu()
-        cfg.ROOT.update_idletasks()
         cfg.ROOT.eval(f'tk::PlaceWindow {cfg.ROOT} center')
-        cfg.ROOT.geometry(f'{cfg.config["ROOT_SIZE"]}{cfg.config["ROOT_POS"]}')
+        w, h, x, y = cfg.config['GEOMETRY']
+        cfg.ROOT.geometry(f'{w}x{h}+{x}+{y}')

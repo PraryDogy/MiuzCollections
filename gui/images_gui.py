@@ -15,10 +15,11 @@ import sqlalchemy
 import tkmacosx
 from database import Dbase, Thumbs
 from PIL import ImageTk
-from utils import (MyButton, MyFrame, MyLabel, convert_to_rgb, crop_image,
-                   decode_image, MySep)
+from utils import (MyButton, MyFrame, MyLabel, MySep, convert_to_rgb,
+                   crop_image, decode_image)
 
 from .image_viewer import ImagePreview
+
 
 class Gallery(MyFrame):
     """
@@ -34,10 +35,10 @@ class Gallery(MyFrame):
         cfg.ROOT.bind('<ButtonRelease-1>', self.update_gui)
 
     def update_gui(self, e):
-        root_w, root_h = cfg.config['ROOT_SIZE'].split('x')
-        new_w, new_h = cfg.ROOT.winfo_width(), cfg.ROOT.winfo_height()
+        root_w = cfg.config['GEOMETRY'][0]
+        new_w = cfg.ROOT.winfo_width()
         if new_w != int(root_w):
-            cfg.config['ROOT_SIZE'] = f'{new_w}x{new_h}'
+            cfg.config['GEOMETRY'][0] = new_w
             cfg.THUMBNAILS_RELOAD()
 
 
@@ -52,14 +53,15 @@ class MenuButtons(tkmacosx.SFrame):
         self.master = master
         tkmacosx.SFrame.__init__(
             self, master, bg=cfg.BGCOLOR, scrollbarwidth=7, width=170)
-        company_name = MyLabel(
+        title = MyLabel(
             self, text='Коллекции', font=('Arial', 22, 'bold'))
-        company_name.pack(pady=(20, 20), padx=(0, 15))
-        __res = Dbase.conn.execute(
+        title.pack(pady=(20, 20), padx=(0, 15))
+
+        load_colls = Dbase.conn.execute(
             sqlalchemy.select(Thumbs.collection)).fetchall()
-        __colls_list = set(i[0] for i in __res)
+        colls_list = set(i[0] for i in load_colls)
         for_btns = []
-        for coll_item in __colls_list:
+        for coll_item in colls_list:
             name_btn = coll_item.replace(
                 re.search(r'(\d{0,30}\s){,1}', coll_item).group(), '')
             for_btns.append((name_btn[:13], coll_item))
@@ -127,8 +129,8 @@ class ImagesThumbs(tkmacosx.SFrame):
         cfg.THUMBNAILS_RELOAD = self.thumbnails_reload
         tkmacosx.SFrame.__init__(
             self, master, bg=cfg.BGCOLOR, scrollbarwidth=7)
-        w = int(cfg.config["ROOT_SIZE"].split('x')[0])
-        self.clmns = ((w)//158)-1
+        w = cfg.config['GEOMETRY'][0]
+        self.clmns = (w//158)-1
         title = MyLabel(
             self, text=cfg.config['CURR_COLL'],
             font=('Arial', 45, 'bold'))
@@ -164,7 +166,7 @@ class ImagesThumbs(tkmacosx.SFrame):
                     break
         cfg.THUMBS.clear()
         w, h = cfg.ROOT.winfo_width(), cfg.ROOT.winfo_height()
-        cfg.config['ROOT_SIZE'] = f'{w}x{h}'
+        cfg.config['GEOMETRY'][0], cfg.config['GEOMETRY'][1] = w, h
         self.destroy()
         thumbs = ImagesThumbs(self.master)
         thumbs.pack(expand=True, fill=tkinter.BOTH, side=tkinter.RIGHT)

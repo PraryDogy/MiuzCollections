@@ -14,8 +14,8 @@ import cv2
 import sqlalchemy
 from database import Dbase, Thumbs
 from PIL import ImageTk
-from utils import (MyButton, MyFrame, MyLabel, MySep, convert_to_rgb,
-                   decode_image, get_coll_name, my_copy, place_center,
+from utils import (MyButton, MyFrame, MyLabel, convert_to_rgb, decode_image,
+                   get_coll_name, my_copy, place_center, resize_image,
                    smb_check)
 
 from .ask_exit import AskExit
@@ -23,16 +23,16 @@ from .images_compare import ImagesCompare
 from .smb_checker import SmbChecker
 
 vars = {
-    'img_src': str,
+    'img_src': os.PathLike,
     'all_src': list,
     'img_info': tkinter.Label,
     'img_frame': tkinter.Label,
-    'curr_img': 'image',
+    'curr_img': ImageTk,
     }
 
 
 def pack_widgets(master: tkinter.Toplevel):
-    img_src = ImgSrc(master)
+    ImgSrc(master)
     
     image_frame = ImageFrame(master)
     image_frame.pack(expand=True, fill=tkinter.BOTH)
@@ -60,6 +60,7 @@ def pack_widgets(master: tkinter.Toplevel):
 
     return {'image_frame': image_frame}
 
+
 def on_closing(window: tkinter.Toplevel):
     """
     Destroys current tkinter toplevel.
@@ -75,6 +76,18 @@ def load_image(image_frame: tkinter.Label):
     t1.start()
     while t1.is_alive():
         cfg.ROOT.update()
+
+
+def switch_image(master: tkinter.Toplevel, index: int):
+    try:
+        vars['img_src'] = vars['all_src'][index]
+    except IndexError:
+        vars['img_src'] = vars['all_src'][0]
+    master = master.winfo_toplevel()
+    for i in master.winfo_children():
+        i.destroy()
+    widgets = pack_widgets(master)
+    load_image(widgets['image_frame'])
 
 
 class ImagePreview(tkinter.Toplevel):
@@ -120,18 +133,6 @@ class ImgSrc(MyLabel):
         MyLabel.__init__(self, master, text=vars['img_src'])
 
 
-def switch_image(master: tkinter.Toplevel, index: int):
-    try:
-        vars['img_src'] = vars['all_src'][index]
-    except IndexError:
-        vars['img_src'] = vars['all_src'][0]
-    master = master.winfo_toplevel()
-    for i in master.winfo_children():
-        i.destroy()
-    widgets = pack_widgets(master)
-    load_image(widgets['image_frame'])
-
-
 class ImageFrame(MyLabel):
     """
     Creates tkinter label with image 0.8 wight, height of screen.
@@ -151,41 +152,34 @@ class ImageFrame(MyLabel):
             index = vars['all_src'].index(vars['img_src']) + 1
         switch_image(self, index)
 
-    def image_resize(self, img, win_w, new_h):
-        height, width = img.shape[:2]
-        aspect = width/height
-        if aspect > 1:
-            hh, ww = round(win_w/aspect), win_w
-        if aspect < 1:
-            hh, ww = new_h, round(new_h*aspect)
-        if aspect == 1:
-            hh, ww = new_h, new_h
-        resized = cv2.resize(img, (ww, hh), interpolation=cv2.INTER_AREA)
-        return convert_to_rgb(resized)
-        
     def place_thumbnail(self):
         cfg.ROOT.update_idletasks()
         win_h = self.winfo_toplevel().winfo_height()
         win_w = self.winfo_toplevel().winfo_width()
-        widgets = list(self.winfo_toplevel().children.values())[2:]
+
+        widgets = tuple(self.winfo_toplevel().children.values())[2:]
         widgets_h = sum(i.winfo_reqheight() for i in widgets)
+
         new_h = win_h-widgets_h
         self.configure(height=new_h, width=win_w)
+
         thumb = Dbase.conn.execute(sqlalchemy.select(Thumbs.img150).where(
             Thumbs.src == vars['img_src'])).first()[0]
         decoded = decode_image(thumb)
-        image = self.image_resize(decoded, win_w, self.winfo_height())
-        img_tk = ImageTk.PhotoImage(image)
+        resized = resize_image(decoded, win_w, self.winfo_height(), False)
+        rgb_image = convert_to_rgb(resized)
+
+        img_tk = ImageTk.PhotoImage(rgb_image)
         self.configure(image=img_tk)
         self.image = img_tk
         self.w = win_w
 
     def place_image(self):
-        cfg.ROOT.update_idletasks()
         win_w = self.winfo_toplevel().winfo_width()
-        new_h = self.winfo_height()
+
         img_read = cv2.imread(vars['img_src'])
-        vars['curr_img'] = self.image_resize(img_read, win_w, new_h)
+        resized = resize_image(img_read, win_w, self.winfo_height(), False)
+        vars['curr_img'] = convert_to_rgb(resized)
         img_tk = ImageTk.PhotoImage(vars['curr_img'])
         self.configure(image=img_tk)
         self.image = img_tk
