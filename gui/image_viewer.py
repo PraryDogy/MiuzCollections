@@ -24,25 +24,27 @@ from .smb_checker import SmbChecker
 
 vars = {
     'img_src': os.PathLike,
-    'all_src': list,
+    'all_src': [],
+    'height': 0,
+    'width': 0,
     'img_info': tkinter.Label,
     'img_frame': tkinter.Label,
-    'curr_img': ImageTk,
+    'curr_img': ImageTk
     }
 
 
-def pack_widgets(master: tkinter.Toplevel):
-    ImgSrc(master)
+def pack_widgets(win: tkinter.Toplevel):
+    ImgSrc(win)
     
-    image_frame = ImageFrame(master)
+    image_frame = ImageFrame(win)
     image_frame.pack(expand=True, fill=tkinter.BOTH)
 
-    left_frame = MyFrame(master)
+    left_frame = MyFrame(win)
     left_frame.pack(side=tkinter.LEFT, expand=True, fill=tkinter.X)
     prev_img = PrevItem(left_frame)
     prev_img.pack(expand=True, fill=tkinter.X)
 
-    center_frame = MyFrame(master)
+    center_frame = MyFrame(win)
     center_frame.pack(side=tkinter.LEFT, fill=tkinter.X)
     img_btns = ImgButtons(center_frame)
     img_btns.pack(pady=(15, 15))
@@ -51,14 +53,18 @@ def pack_widgets(master: tkinter.Toplevel):
     close = CloseButton(center_frame)
     close.pack()
 
-    right_frame = MyFrame(master, bg='red')
+    right_frame = MyFrame(win, bg='red')
     right_frame.pack(side=tkinter.LEFT, expand=True, fill=tkinter.X)
     next_img = NextItem(right_frame)
     next_img.pack(expand=True, fill=tkinter.X)
 
-    image_frame.place_thumbnail()
+    if vars['height'] == 0:
+        center_frame.update_idletasks()
+        vars['height'] = image_frame.winfo_height()
+        vars['width'] = win.winfo_width()
+        image_frame.set_size()
 
-    return {'image_frame': image_frame}
+    image_frame.place_thumbnail()
 
 
 def on_closing(window: tkinter.Toplevel):
@@ -71,8 +77,8 @@ def on_closing(window: tkinter.Toplevel):
     cfg.ROOT.focus_force()
 
 
-def load_image(image_frame: tkinter.Label):
-    t1 = threading.Thread(target=image_frame.place_image)
+def load_image():
+    t1 = threading.Thread(target=vars['img_frame'].place_image)
     t1.start()
     while t1.is_alive():
         cfg.ROOT.update()
@@ -86,8 +92,8 @@ def switch_image(master: tkinter.Toplevel, index: int):
     master = master.winfo_toplevel()
     for i in master.winfo_children():
         i.destroy()
-    widgets = pack_widgets(master)
-    load_image(widgets['image_frame'])
+    pack_widgets(master)
+    load_image()
 
 
 class ImagePreview(tkinter.Toplevel):
@@ -99,13 +105,16 @@ class ImagePreview(tkinter.Toplevel):
         tkinter.Toplevel.__init__(self, bg=cfg.BGCOLOR, padx=15, pady=15)
         cfg.ROOT.eval(f'tk::PlaceWindow {self} center')
         self.withdraw()
+
         if not smb_check():
             on_closing(self)
             SmbChecker()
             return
+
         if src is None:
             on_closing(self)
             return
+
         self.protocol("WM_DELETE_WINDOW", lambda: on_closing(self))
         self.bind('<Command-w>', lambda e: on_closing(self))
         self.bind('<Escape>', lambda e: on_closing(self))
@@ -114,18 +123,22 @@ class ImagePreview(tkinter.Toplevel):
         self.resizable(0,0)
         side = int(cfg.ROOT.winfo_screenheight()*0.8)
         self.geometry(f'{side}x{side}')
+
         vars['img_src'] = src
         vars['all_src'] = all_src
-        widgets = pack_widgets(self)
+
+        pack_widgets(self)
         cfg.ROOT.update_idletasks()
+
         if cfg.COMPARE:
-            load_image(widgets['image_frame'])
+            load_image()
             ImagesCompare()
             return
+
         place_center(self)
         self.deiconify()
         self.grab_set()
-        load_image(widgets['image_frame'])
+        load_image()
 
 
 class ImgSrc(MyLabel):
@@ -142,50 +155,40 @@ class ImageFrame(MyLabel):
         MyLabel.__init__(self, master, borderwidth=0)
         vars['img_frame'] = self
         self['bg']='black'
-        self.w = 0
         self.bind('<ButtonRelease-1>', lambda e: self.next_image(e))
 
-    def next_image(self, e):
-        if e.x <= self.w//2:
+    def next_image(self, e: tkinter.Event):
+        if e.x <= vars['width']//2:
             index = vars['all_src'].index(vars['img_src']) - 1
         else:
             index = vars['all_src'].index(vars['img_src']) + 1
         switch_image(self, index)
 
+    def set_size(self):
+        self['height'] = vars['height']
+        self['width'] = vars['width']
+
     def place_thumbnail(self):
-        cfg.ROOT.update_idletasks()
-        win_h = self.winfo_toplevel().winfo_height()
-        win_w = self.winfo_toplevel().winfo_width()
-
-        widgets = tuple(self.winfo_toplevel().children.values())[2:]
-        widgets_h = sum(i.winfo_reqheight() for i in widgets)
-
-        new_h = win_h-widgets_h
-        self.configure(height=new_h, width=win_w)
-
         thumb = Dbase.conn.execute(sqlalchemy.select(Thumbs.img150).where(
             Thumbs.src == vars['img_src'])).first()[0]
         decoded = decode_image(thumb)
-        resized = resize_image(decoded, win_w, self.winfo_height(), False)
+        resized = resize_image(decoded, vars['width'], vars['height'], False)
         rgb_image = convert_to_rgb(resized)
 
         img_tk = ImageTk.PhotoImage(rgb_image)
         self.configure(image=img_tk)
         self.image = img_tk
-        self.w = win_w
 
     def place_image(self):
-        win_w = self.winfo_toplevel().winfo_width()
-
         img_read = cv2.imread(vars['img_src'])
-        resized = resize_image(img_read, win_w, self.winfo_height(), False)
+        resized = resize_image(img_read, vars['width'], vars['height'], False)
         vars['curr_img'] = convert_to_rgb(resized)
         img_tk = ImageTk.PhotoImage(vars['curr_img'])
         self.configure(image=img_tk)
         self.image = img_tk
         t = vars['img_info']['text']
-        height, width = img_read.shape[:2]
-        vars['img_info']['text'] = t.replace('Загрузка', f'{width} x {height}')
+        h, w = img_read.shape[:2]
+        vars['img_info']['text'] = t.replace('Загрузка', f'{w} x {h}')
 
 
 class ImgInfo(MyLabel):
@@ -213,7 +216,6 @@ class ImgInfo(MyLabel):
 
         self.configure(
             text=txt, justify=tkinter.LEFT, anchor=tkinter.W, width=43)
-
 
 class ImgButtons(MyFrame):
     """
