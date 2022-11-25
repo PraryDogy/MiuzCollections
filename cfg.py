@@ -13,7 +13,7 @@ from utils import encrypt_cfg
 
 # app info
 APP_NAME = 'MiuzGallery'
-APP_VER = '3.2.0'
+APP_VER = '3.2.1'
 
 DB_VER = '1.1'
 DB_NAME = f'db {DB_VER}.db'
