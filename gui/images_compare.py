@@ -26,16 +26,23 @@ def on_closing(obj: tkinter.Toplevel):
     * param `obj`: tkinter toplevel
     """
     cfg.STATUSBAR_NORMAL()
-    for i in cfg.THUMBS:
-        if (
-            i['text'] == vars['img1']['src'] or
-            i['text'] == vars['img2']['src']):
-            i.configure(bg=cfg.BGCOLOR)
-            break
+    [i.configure(bg=cfg.BGCOLOR) for i in cfg.THUMBS]
     [i.destroy() for i in get_all_windows()]
     obj.destroy()
     cfg.COMPARE = False
     cfg.ROOT.focus_force()
+
+
+def switch_image():
+    """
+    Switches between two images from cfg.IMAGES_COMPARE set.
+    """
+    for i in [vars['img1'], vars['img2']]:
+        if vars['curr_img'] != i:
+            vars['curr_img'] = i
+            vars['img_frame']['image'] = vars['curr_img']['image']
+            vars['img_info']['text'] = vars['curr_img']['info']
+            return
 
 
 class ImagesCompare(tkinter.Toplevel):
@@ -109,17 +116,6 @@ class ImagesCompare(tkinter.Toplevel):
         place_center(self)
         self.deiconify()
         self.grab_set()
-
-def switch_image():
-    """
-    Switches between two images from cfg.IMAGES_COMPARE set.
-    """
-    for i in [vars['img1'], vars['img2']]:
-        if vars['curr_img'] != i:
-            vars['curr_img'] = i
-            vars['img_frame']['image'] = vars['curr_img']['image']
-            vars['img_info']['text'] = vars['curr_img']['info']
-            return
 
 
 class ImageFrame(MyLabel):
