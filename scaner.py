@@ -39,7 +39,6 @@ def insert_row(**kw):
         'collection':kw['coll']}
     Dbase.conn.execute(sqlalchemy.insert(Thumbs).values(values))
 
-
 def search_years():
     """
     Returns list dirs.

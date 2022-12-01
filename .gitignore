@@ -7,3 +7,4 @@ dist/
 build/
 __Dist/
 database.db
+venv/
