@@ -8,13 +8,21 @@ import sys
 import threading
 import tkinter
 
-import cfg
 import cv2
 import sqlalchemy
+
+import cfg
 from admin import print_alive
 from database import Dbase, Thumbs
 from gui.smb_checker import SmbChecker
 from utils import encrypt_cfg, get_coll_name, resize_image, smb_check
+
+
+def update_livelabel(text: str):
+    try:
+        cfg.LIVE_LBL['text'] = text
+    except tkinter.TclError:
+        print('livelabel was destroyed')
 
 
 def insert_row(**kw):
@@ -160,6 +168,7 @@ def modified_images():
         atr = os.stat(src)
         if int(atr.st_mtime) > mod:
             print('modified', src)
+            # update_livelabel('Обновляю фото')
             n_size = int(os.path.getsize(src))
             n_birth = int(atr.st_birthtime)
             n_mod = int(atr.st_mtime)
@@ -185,6 +194,7 @@ def new_images(list_dirs: list):
 
         if (size, created, mod) not in db_colls:
             print('add new file', src)
+            # update_livelabel('Добавляю новые фото')
             coll = get_coll_name(src)
             insert_row(src=src, size=size, birth=created,
                             mod=mod, coll=coll)
@@ -222,13 +232,6 @@ def moved_images(list_dirs: list):
                             mod=mod, coll=coll)
 
 
-def update_livelabel(percent: str):
-    try:
-        cfg.LIVE_LBL['text'] = f'Обновление {percent}%'
-    except tkinter.TclError:
-        print('livelabel was destroyed')
-
-
 def update_collections():
     """
     Collection dirs analysis.
@@ -236,15 +239,15 @@ def update_collections():
     Updates the database thumbnails.
     """
     cfg.LIVE_LBL['fg'] = cfg.BGFONT
-    update_livelabel('10')
+    update_livelabel('Обновление 10%')
     images = search_images(search_collections())
-    update_livelabel('20')
+    update_livelabel('Обновление 20%')
     removed_images()
-    update_livelabel('30')
+    update_livelabel('Обновление 30%')
     modified_images()
-    update_livelabel('40')
+    update_livelabel('Обновление 40%')
     new_images(images)
-    update_livelabel('50')
+    update_livelabel('Обновление 50%')
     moved_images(images)
 
 
@@ -257,18 +260,18 @@ def update_nocollection(aged: bool):
     * param `aged`: true = updates dirs created later
     than `cfg.FILE_AGE` value
     """
-    update_livelabel('60')
+    update_livelabel('Обновление 60%')
     if aged:
         aged_years = search_aged_dirs(search_years())
         aged_dirs = search_retouched(aged_years)
     else:
         aged_dirs = search_retouched(search_years())
     images = search_images(aged_dirs)
-    update_livelabel('70')
+    update_livelabel('Обновление 70%')
     removed_images()
-    update_livelabel('80')
+    update_livelabel('Обновление 80%')
     modified_images()
-    update_livelabel('90')
+    update_livelabel('Обновление 90%')
     new_images(images)
     try:
         cfg.LIVE_LBL['fg'] = cfg.BGCOLOR

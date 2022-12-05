@@ -82,6 +82,15 @@ def read_cfg(what_read: str):
 if not os.path.exists(CFG_DIR):
     os.mkdir(CFG_DIR)
 
+if not os.path.exists(os.path.join(CFG_DIR, DB_NAME)):
+    shutil.copyfile(
+        os.path.join(os.path.dirname(__file__), 'db.db'),
+        os.path.join(CFG_DIR, DB_NAME))
+
+for file in os.listdir(CFG_DIR):
+    if file.endswith('.db') and file != DB_NAME:
+        os.remove(os.path.join(CFG_DIR, file))
+
 if os.path.exists(os.path.join(CFG_DIR, 'cfg')):
     config = read_cfg(os.path.join(CFG_DIR, 'cfg'))
 else:
@@ -94,12 +103,3 @@ part2 = {k:v for k, v in defs.items() if k not in config.keys()}
 new_config = {**part1, **part2}
 encrypt_cfg(new_config) if new_config.keys() != config.keys() else False
 config = new_config if new_config.keys() != config.keys() else config
-
-if not os.path.exists(os.path.join(CFG_DIR, DB_NAME)):
-    shutil.copyfile(
-        os.path.join(os.path.dirname(__file__), 'db.db'),
-        os.path.join(CFG_DIR, DB_NAME))
-
-for file in os.listdir(CFG_DIR):
-    if file.endswith('.db') and file != DB_NAME:
-        os.remove(os.path.join(CFG_DIR, file))

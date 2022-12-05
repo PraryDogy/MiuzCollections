@@ -108,26 +108,49 @@ def crop_image(img):
     return cropped[0:cfg.THUMB_SIZE, 0:cfg.THUMB_SIZE]
 
 
-def resize_image(img, ww, hh, thumbnail: bool):
+# def resize_image(img, ww, hh, thumbnail: bool):
+#     print(ww, hh)
+#     h, w = img.shape[:2]
+#     aspect = w/h
+#     hh1, ww1 = round(ww/aspect), ww
+#     hh2, ww2 = hh, round(hh*aspect)
+#     if thumbnail:
+#         if aspect > 1:
+#             hh, ww = hh2, ww2
+#         elif aspect < 1:
+#             hh, ww = hh1, ww1
+#         elif aspect == 1:
+#             hh, ww = hh, hh
+#     else:
+#         if aspect > 1:
+#             hh, ww = hh1, ww1
+#         elif aspect < 1:
+#             hh, ww = hh2, ww2
+#         elif aspect == 1:
+#             hh, ww = hh, hh
+#     return cv2.resize(img, (ww, hh), interpolation=cv2.INTER_AREA)
+
+
+def resize_image(img, widget_w, widget_h, thumbnail: bool):
     h, w = img.shape[:2]
     aspect = w/h
-    hh1, ww1 = round(ww/aspect), ww
-    hh2, ww2 = hh, round(hh*aspect)
+    hh1, ww1 = round(widget_w/aspect), widget_w
+    hh2, ww2 = widget_h, round(widget_h*aspect)
     if thumbnail:
         if aspect > 1:
-            hh, ww = hh2, ww2
-        elif aspect < 1:
-            hh, ww = hh1, ww1
+            new_h, new_w = hh2, ww2
+        if aspect < 1:
+            new_h, new_w = hh1, ww1
         elif aspect == 1:
-            hh, ww = hh, hh
+            new_h, new_w = widget_h, widget_h
     else:
         if aspect > 1:
-            hh, ww = hh1, ww1
+            new_h, new_w = hh1, ww1
         elif aspect < 1:
-            hh, ww = hh2, ww2
+            new_h, new_w = hh2, ww2
         elif aspect == 1:
-            hh, ww = hh, hh
-    return cv2.resize(img, (ww, hh), interpolation=cv2.INTER_AREA)
+            new_h, new_w = widget_h, widget_h
+    return cv2.resize(img, (new_w, new_h), interpolation=cv2.INTER_AREA)
 
 
 def my_copy(output: str):
