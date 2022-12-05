@@ -62,7 +62,6 @@ def pack_widgets(win: tkinter.Toplevel):
         center_frame.update_idletasks()
         vars['height'] = image_frame.winfo_height()
         vars['width'] = win.winfo_width()
-        image_frame.set_size()
 
     image_frame.place_thumbnail()
 
@@ -163,10 +162,6 @@ class ImageFrame(MyLabel):
         else:
             index = vars['all_src'].index(vars['img_src']) + 1
         switch_image(self, index)
-
-    def set_size(self):
-        self['height'] = vars['height']
-        self['width'] = vars['width']
 
     def place_thumbnail(self):
         thumb = Dbase.conn.execute(sqlalchemy.select(Thumbs.img150).where(
