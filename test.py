@@ -1,36 +1,22 @@
-import sqlalchemy
-import sqlalchemy.ext.declarative
 
-class Dbase:
-    """
-    Checks database exists with DbChecker.
+# img_w, img_h = 3000, 2758
+img_w, img_h = 150, 110
+widget_w, widget_h = 1152, 929
 
-    *var conn: database connection
-    *var base: declatative_base for models and actions
-    """
-    __engine = sqlalchemy.create_engine(
-        'sqlite:////' + '/Users/Loshkarev/Desktop/test.db',
-        connect_args={'check_same_thread':False,},
-        echo= False
-        )
-    conn = __engine.connect()
-    base = sqlalchemy.ext.declarative.declarative_base()
+maxwidth, maxheight = 1152, 929
 
 
-class person(Dbase.base):
-    """
-    Sqlalchemy model.
+if maxwidth > img_w or maxheight > img_h:
+    print('smalla img')
+    f1 = maxwidth / img_w
+    f2 = maxheight / img_h
+else:
+    print('big img')
+    f1 = maxwidth / img_w
+    f2 = maxheight / img_h
 
-    *columns: img150, src, size, created, modified,
-    collection
-    """
-
-    __tablename__ = 'thumbs'
-    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
-    first = sqlalchemy.Column(sqlalchemy.Integer)
-    second = sqlalchemy.Column(sqlalchemy.Integer)
+f = min(f1, f2)  # resizing factor
+dim = (int(img_w * f), int(img_h * f))
 
 
-for i in range(0, 2):
-    q = sqlalchemy.insert(person).values({'first': 4, 'second': 555})
-
+print(dim)
