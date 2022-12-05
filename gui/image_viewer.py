@@ -168,6 +168,7 @@ class ImageFrame(MyLabel):
             Thumbs.src == vars['img_src'])).first()[0]
         decoded = decode_image(thumb)
         resized = resize_image(decoded, vars['width'], vars['height'], False)
+        self.img_h, self.img_w = resized.shape[:2]
         rgb_image = convert_to_rgb(resized)
 
         img_tk = ImageTk.PhotoImage(rgb_image)
@@ -176,7 +177,7 @@ class ImageFrame(MyLabel):
 
     def place_image(self):
         img_read = cv2.imread(vars['img_src'])
-        resized = resize_image(img_read, vars['width'], vars['height'], False)
+        resized = resize_image(img_read, self.img_w, self.img_h, False)
         vars['curr_img'] = convert_to_rgb(resized)
         img_tk = ImageTk.PhotoImage(vars['curr_img'])
         self.configure(image=img_tk)
