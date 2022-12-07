@@ -22,7 +22,8 @@ def update_livelabel(text: str):
     try:
         cfg.LIVE_LBL['text'] = text
     except tkinter.TclError:
-        print('livelabel was destroyed')
+        # print('livelabel was destroyed')
+        pass
 
 
 def insert_row(**kw):

@@ -97,7 +97,7 @@ class CompareTitle(MyFrame):
         subtitle = MyLabel(
             master, 
             fg=cfg.BGFONT,
-            text='Выберите фото для сравнения')
+            text='Выберите фото для сравнения или нажмите Esc для отмены')
         subtitle.pack(side=tkinter.LEFT)
 
         cancel = MyButton(master, text='Отмена')

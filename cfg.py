@@ -13,7 +13,7 @@ from utils import encrypt_cfg
 
 # app info
 APP_NAME = 'MiuzGallery'
-APP_VER = '3.2.2'
+APP_VER = '3.2.3'
 
 DB_VER = '1.1'
 DB_NAME = f'db {DB_VER}.db'
@@ -37,8 +37,8 @@ ROOT.withdraw()
 
 LIVE_LBL = tkinter.Label
 THUMBS = []
-COMPARE = False
 FLAG = False
+COMPARE = False
 
 # gui functions 
 THUMBNAILS_RELOAD = object

@@ -18,7 +18,7 @@ from PIL import ImageTk
 from utils import (MyButton, MyFrame, MyLabel, MySep, convert_to_rgb,
                    crop_image, decode_image)
 
-from .image_viewer import ImagePreview
+from .image_viewer import PreviewWindow
 
 
 class Gallery(MyFrame):
@@ -72,12 +72,6 @@ class MenuButtons(tkmacosx.SFrame):
         last.cmd(partial(self.collection_folder, 'last', last, btns))
         last.pack(fill=tkinter.X, padx=(0, 15), pady=(0, 15))
         btns.append(last)
-
-        # scaner = MyButton(self, text='Сканер')
-        # scaner.configure(height=1, width=13)
-        # scaner.cmd(lambda e: self.test())
-        # scaner.pack(pady=(0, 20))
-        # btns.append(scaner)
 
         for name_btn, name_coll in for_btns:
             btn = MyButton(self, text=name_btn)
@@ -253,4 +247,4 @@ class ImagesThumbs(tkmacosx.SFrame):
             thumb['bg'] = cfg.BGCOLOR
 
     def open_preview(self, src, all_src, e):
-        ImagePreview(src, all_src)
+        PreviewWindow(src, all_src)
