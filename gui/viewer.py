@@ -9,11 +9,12 @@ from PIL import ImageTk
 
 import cfg
 from database import Dbase, Thumbs
-from utils import (MyButton, MyLabel, convert_to_rgb, decode_image,
-                   get_coll_name, place_center, resize_image)
+from utils import (close_windows, convert_to_rgb, decode_image, get_coll_name,
+                   place_center, resize_image, smb_check)
 
-from .base_widgets import BaseImgButtons, BaseWindow, CloseButton
-from .images_compare import CompareWindow
+from .widgets import (AskExit, CButton, CLabel, CloseBtn, CWindow,
+                           ImgBtns, SmbChecker)
+from .img_compare import CompareWindow
 
 
 class Globals:
@@ -33,7 +34,7 @@ def pack_widgets(win: tkinter.Toplevel):
 
     ImgButtons(win).pack(pady=(0, 15))
     ImgInfo(win).pack(pady=(0, 15))
-    CloseButton(win).pack()
+    CloseBtn(win, text='Закрыть').pack()
 
     if globs.height == 0:
         cfg.ROOT.update_idletasks()
@@ -55,29 +56,39 @@ def switch_image(master: tkinter.Widget, index: int):
     globs.img_frame.place_image()
 
 
-class PreviewWindow(BaseWindow):
+class PreviewWindow(CWindow):
     def __init__(self, src: str, all_src: list):
-        BaseWindow.__init__(self)
+        CWindow.__init__(self)
+
+        if not smb_check():
+            close_windows()
+            SmbChecker()
+            return
+
+        self.bind('<Command-q>', lambda e: AskExit())
+        self.title('Просмотр')
+        side = int(cfg.ROOT.winfo_screenheight()*0.8)
+        self.geometry(f'{side}x{side}')
 
         cfg.IMG_SRC, globs.all_src = src, all_src
 
         pack_widgets(self)
-        cfg.ROOT.update_idletasks()
 
         if cfg.COMPARE:
             globs.img_frame.place_image()
             CompareWindow()
             return
 
+        cfg.ROOT.update_idletasks()
         place_center(self)
         self.deiconify()
         self.grab_set()
         globs.img_frame.place_image()
 
 
-class ImgFrame(MyLabel):
+class ImgFrame(CLabel):
     def __init__(self, master: tkinter.Toplevel):
-        MyLabel.__init__(self, master, borderwidth=0)
+        CLabel.__init__(self, master, borderwidth=0)
         globs.img_frame = self
         self['bg']='black'
         self.bind('<ButtonRelease-1>', lambda e: self.click_image(e))
@@ -126,16 +137,16 @@ class ImgFrame(MyLabel):
             cfg.ROOT.update()
 
 
-class ImgButtons(BaseImgButtons):
+class ImgButtons(ImgBtns):
     def __init__(self, master):
-        BaseImgButtons.__init__(self, master)
+        ImgBtns.__init__(self, master)
 
-        comp_btn = MyButton(self, text='Сравнить')
+        comp_btn = CButton(self, text='Сравнить')
         comp_btn.configure(height=1, width=13)
         comp_btn.cmd(lambda e: self.compare(comp_btn))
         comp_btn.pack(side=tkinter.RIGHT)
 
-    def compare(self, btn: MyButton):
+    def compare(self, btn: CButton):
         btn.press()
         if not cfg.COMPARE:
             cfg.STATUSBAR_COMPARE()
@@ -150,9 +161,9 @@ class ImgButtons(BaseImgButtons):
             return
 
 
-class ImgInfo(MyLabel):
+class ImgInfo(CLabel):
     def __init__(self, master: tkinter.Widget):
-        MyLabel.__init__(self, master)
+        CLabel.__init__(self, master)
         globs.img_info = self
 
         name = cfg.IMG_SRC.split(os.sep)[-1]

@@ -13,11 +13,12 @@ import os
 import subprocess
 import tkinter
 
-import cfg
 import cv2
 import numpy
 from cryptography.fernet import Fernet
 from PIL import Image
+
+import cfg
 
 
 def encrypt_cfg(data: dict):
@@ -148,106 +149,15 @@ def smb_check():
     return True
 
 
-class MySep(tkinter.Frame):
-    def __init__(self, master, **kwargs):
-        tkinter.Frame.__init__(self, master, bg=cfg.BGBUTTON, height=1)
+def close_windows():
+    "Close all top levels"
+    if cfg.COMPARE:
+        cfg.COMPARE = False
+        cfg.STATUSBAR_NORMAL()
+        [i.configure(bg=cfg.BGCOLOR) for i in cfg.THUMBS]
 
+    all = tuple(i for i in cfg.ROOT.winfo_children())
+    windows = tuple(i for i in all if isinstance(i, tkinter.Toplevel))
+    [i.destroy() for i in windows]
 
-class MyButton(tkinter.Label):
-    def __init__(self, master: tkinter, **kwargs):
-        tkinter.Label.__init__(self, master, **kwargs)
-        self.configure(bg=cfg.BGBUTTON, fg=cfg.BGFONT)
-        self.bind('<Enter>', lambda e: self.enter())
-        self.bind('<Leave>', lambda e: self.leave())
-
-    def cmd(self, cmd):
-        self.bind('<ButtonRelease-1>', cmd)
-
-    def press(self):
-        self.configure(bg=cfg.BGPRESSED)
-        cfg.ROOT.after(100, lambda: self.configure(bg=cfg.BGBUTTON))
-
-    def enter(self):
-        if self['bg'] != cfg.BGPRESSED:
-            self['bg'] = cfg.BGSELECTED
-
-    def leave(self):
-        if self['bg'] != cfg.BGPRESSED:
-            self['bg'] = cfg.BGBUTTON
-
-class MyFrame(tkinter.Frame):
-    def __init__(self, master: tkinter, **kwargs):
-        tkinter.Frame.__init__(self, master, **kwargs)
-        self.configure(bg=cfg.BGCOLOR)
-
-
-class MyLabel(tkinter.Label):
-    def __init__(self, master, **kwargs):
-        tkinter.Label.__init__(self, master, **kwargs)
-        self.configure(bg=cfg.BGCOLOR, fg=cfg.BGFONT)
-
-
-# unused
-
-
-# class Scrollable(tkinter.Frame):
-    # """
-    # Example scrollable frame.
-    # """
-    # def __init__(self, master):
-    #     tkinter.Frame.__init__(self, master)
-
-    #     canvas = tkinter.Canvas(
-    #         self, bg=cfg.BGCOLOR, highlightbackground=cfg.BGCOLOR)
-
-    #     scrollbar = tkinter.Scrollbar(
-    #         self, width=12, orient='vertical', command=canvas.yview)
-
-    #     scrollable = tkinter.Frame(canvas)
-
-    #     scrollable.bind("<Configure>", lambda e: canvas.configure(
-    #         scrollregion=canvas.bbox("all")))
-
-    #     canvas.bind_all("<MouseWheel>", lambda e: canvas.yview_scroll(
-    #         -1*(e.delta), "units"))
-    #         # lambda e: canvas.yview_scroll(-1*(e.delta/120), "units")
-
-    #     canvas.create_window((0,0), window=scrollable, anchor='nw')
-    #     canvas.configure(yscrollcommand=scrollbar.set)
-
-    #     self.pack(fill=tkinter.BOTH, expand=True)
-    #     canvas.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=True)
-    #     scrollbar.pack(side=tkinter.RIGHT, fill=tkinter.Y)
-
-
-    # def image_resize(self, image, width = None, height = None, inter = cv2.INTER_AREA):
-    #     # initialize the dimensions of the image to be resized and
-    #     # grab the image size
-    #     image = cv2.imread(image)
-    #     dim = None
-    #     (h, w) = image.shape[:2]
-
-    #     # if both the width and height are None, then return the
-    #     # original image
-    #     if width is None and height is None:
-    #         return image
-
-    #     # check to see if the width is None
-    #     if width is None:
-    #         # calculate the ratio of the height and construct the
-    #         # dimensions
-    #         r = height / float(h)
-    #         dim = (int(w * r), height)
-
-    #     # otherwise, the height is None
-    #     else:
-    #         # calculate the ratio of the width and construct the
-    #         # dimensions
-    #         r = width / float(w)
-    #         dim = (width, int(h * r))
-
-    #     # resize the image
-    #     resized = cv2.resize(image, dim, interpolation = inter)
-
-    #     # return the resized image
-    #     return resized
+    cfg.ROOT.focus_force()

@@ -1,9 +1,10 @@
 import tkinter
 
 import cfg
-from utils import MyLabel, place_center
+from utils import place_center
 
-from .base_widgets import BaseImgButtons, BaseWindow, CloseButton
+from .macosx_menu import CLabel
+from .widgets import ImgBtns, CWindow, CloseBtn, AskExit
 
 
 class Globals:
@@ -17,7 +18,7 @@ globs = Globals()
 
 def get_windows():
     widgets = tuple(i for i in cfg.ROOT.winfo_children())
-    return tuple(i for i in widgets if isinstance(i, tkinter.Toplevel))[:-1]
+    return tuple(i for i in widgets if isinstance(i, tkinter.Toplevel))
 
 
 def get_widgets(window: tkinter.Toplevel):
@@ -44,13 +45,16 @@ def switch_image():
         cfg.IMG_SRC = globs.src1
 
 
-class CompareWindow(BaseWindow):
+class CompareWindow(CWindow):
     def __init__(self):
-        BaseWindow.__init__(self)
-        self.title('Сравнение')
-        cfg.ROOT.update_idletasks()
+        CWindow.__init__(self)
 
-        win1, win2 = get_windows()
+        self.bind('<Command-q>', lambda e: AskExit())
+        self.title('Сравнение')
+        side = int(cfg.ROOT.winfo_screenheight()*0.8)
+        self.geometry(f'{side}x{side}')
+
+        win1, win2 = get_windows()[:2]
 
         try:
             globs.img1, globs.src1, globs.info1 = get_widgets(win1)
@@ -65,30 +69,31 @@ class CompareWindow(BaseWindow):
 
         ImgButtons(self).pack(pady=(0, 15))
         ImgInfo(self).pack(pady=(0, 15))
-        CloseButton(self).pack()
+        CloseBtn(self, text='Закрыть').pack()
 
+        cfg.ROOT.update_idletasks()
         place_center(self)
         self.deiconify()
         self.grab_set()
 
 
-class ImageFrame(MyLabel):
+class ImageFrame(CLabel):
     def __init__(self, master):
-        MyLabel.__init__(self, master, borderwidth=0)
+        CLabel.__init__(self, master, borderwidth=0)
         self['bg']='black'
         self['image'] = globs.img1
         globs.img_widget = self
         self.bind('<ButtonRelease-1>', lambda e: switch_image())
 
 
-class ImgButtons(BaseImgButtons):
+class ImgButtons(ImgBtns):
     def __init__(self, master):
-        BaseImgButtons.__init__(self, master)
+        ImgBtns.__init__(self, master)
 
 
-class ImgInfo(MyLabel):
+class ImgInfo(CLabel):
     def __init__(self, master):
-        MyLabel.__init__(
+        CLabel.__init__(
             self, master, anchor=tkinter.W, justify=tkinter.LEFT,
             text=globs.info1, width=43)
         globs.info_widget = self

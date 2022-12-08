@@ -5,8 +5,9 @@ Mac osx bar menus.
 import tkinter
 
 import cfg
-from utils import MyButton, MyLabel, place_center
+from utils import place_center
 
+from .widgets import CButton, CLabel
 from .settings import Settings
 
 
@@ -50,9 +51,9 @@ class About(tkinter.Toplevel):
             '\n\nEmail: evlosh@gmail.com'
             '\nTelegram: evlosh'
             )
-        author = MyLabel(self, text=made)
+        author = CLabel(self, text=made)
         author.pack(pady=(0, 10))
-        close_btn = MyButton(self)
+        close_btn = CButton(self)
         close_btn.configure(height=1, width=12, text='Закрыть')
         close_btn.cmd(lambda e: self.on_exit(self))
         close_btn.pack()

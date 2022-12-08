@@ -10,24 +10,25 @@ import traceback
 from datetime import datetime
 from functools import partial
 
-import cfg
 import sqlalchemy
 import tkmacosx
-from database import Dbase, Thumbs
 from PIL import ImageTk
-from utils import (MyButton, MyFrame, MyLabel, MySep, convert_to_rgb,
-                   crop_image, decode_image)
 
-from .image_viewer import PreviewWindow
+import cfg
+from database import Dbase, Thumbs
+from utils import convert_to_rgb, crop_image, decode_image
+
+from .widgets import CButton, CFrame, CLabel, CSep
+from .viewer import PreviewWindow
 
 
-class Gallery(MyFrame):
+class Gallery(CFrame):
     """
     Creates tkinter frame with menu and grid of images.
     * param `master`: tkinter frame
     """
     def __init__(self, master):
-        MyFrame.__init__(self, master)
+        CFrame.__init__(self, master)
         MenuButtons(self).pack(
             pady=(0, 0), padx=(0, 15), side=tkinter.LEFT, fill=tkinter.Y)
         ImagesThumbs(self).pack(
@@ -53,7 +54,7 @@ class MenuButtons(tkmacosx.SFrame):
         self.master = master
         tkmacosx.SFrame.__init__(
             self, master, bg=cfg.BGCOLOR, scrollbarwidth=7, width=170)
-        title = MyLabel(
+        title = CLabel(
             self, text='Коллекции', font=('Arial', 22, 'bold'))
         title.pack(pady=(20, 20), padx=(0, 15))
 
@@ -67,27 +68,27 @@ class MenuButtons(tkmacosx.SFrame):
             for_btns.append((name_btn[:13], coll_item))
         for_btns.sort()
         btns = []
-        last = MyButton(self, text='Последние')
+        last = CButton(self, text='Последние')
         last.configure(height=1, width=13, pady=5, anchor=tkinter.W, padx=10)
         last.cmd(partial(self.collection_folder, 'last', last, btns))
         last.pack(fill=tkinter.X, padx=(0, 15), pady=(0, 15))
         btns.append(last)
 
         for name_btn, name_coll in for_btns:
-            btn = MyButton(self, text=name_btn)
+            btn = CButton(self, text=name_btn)
             btn.configure(height=1, width=13 ,pady=5, anchor=tkinter.W, padx=10)
             btn.pack(fill=tkinter.X, padx=(0, 15))
             btns.append(btn)
             if name_coll == cfg.config['CURR_COLL']:
                 btn.configure(bg=cfg.BGPRESSED)
             btn.cmd(partial(self.collection_folder, name_coll, btn, btns))
-            sep = MySep(self)
+            sep = CSep(self)
             sep['bg'] = '#272727'
             sep.pack(fill=tkinter.X, padx=(0, 15))
         if cfg.config['CURR_COLL'] == 'last':
             last.configure(bg=cfg.BGPRESSED)
 
-    def collection_folder(self, coll: str, btn: MyButton, btns: list, e):
+    def collection_folder(self, coll: str, btn: CButton, btns: list, e):
         """
         Changes all buttons color to default and change color for
         pressed button.
@@ -125,7 +126,7 @@ class ImagesThumbs(tkmacosx.SFrame):
             self, master, bg=cfg.BGCOLOR, scrollbarwidth=7)
         w = cfg.config['GEOMETRY'][0]
         self.clmns = (w//158)-1
-        title = MyLabel(
+        title = CLabel(
             self, text=cfg.config['CURR_COLL'],
             font=('Arial', 45, 'bold'))
         title.pack(pady=(0, 15))
@@ -143,7 +144,7 @@ class ImagesThumbs(tkmacosx.SFrame):
         if len(thumbs) == 0:
             return
         for y in self.split_years(thumbs):
-            year_label = MyLabel(
+            year_label = CLabel(
                 self, text=y[-1][-1], font=('Arial', 35, 'bold'))
             year_label.pack(pady=(15, 15))
             self.pack_rows(y, self.clmns, self, [i[1] for i in res])
@@ -222,10 +223,10 @@ class ImagesThumbs(tkmacosx.SFrame):
         """
         img_rows = [thumbs[x:x+clmns] for x in range(0, len(thumbs), clmns)]
         for row in img_rows:
-            row_frame = MyFrame(master)
+            row_frame = CFrame(master)
             row_frame.pack(fill=tkinter.Y, expand=True, anchor=tkinter.W)
             for image, src, _ in row:
-                thumb = MyButton(row_frame)
+                thumb = CButton(row_frame)
                 thumb['width'] = cfg.THUMB_SIZE
                 thumb['height'] = cfg.THUMB_SIZE
                 thumb['image'] = image
@@ -238,11 +239,11 @@ class ImagesThumbs(tkmacosx.SFrame):
                 thumb.pack(side=tkinter.LEFT)
                 cfg.THUMBS.append(thumb)
 
-    def enter(self, thumb: MyButton):
+    def enter(self, thumb: CButton):
         if thumb['bg'] != cfg.BGPRESSED:
             thumb['bg'] = cfg.BGSELECTED
 
-    def leave(self, thumb: MyButton):
+    def leave(self, thumb: CButton):
         if thumb['bg'] != cfg.BGPRESSED:
             thumb['bg'] = cfg.BGCOLOR
 

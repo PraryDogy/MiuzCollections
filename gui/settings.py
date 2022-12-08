@@ -9,12 +9,12 @@ import tkinter
 from functools import partial
 from tkinter import filedialog
 
-import cfg
 import tkmacosx
-from utils import (MyButton, MyFrame, MyLabel, MySep, encrypt_cfg, my_copy,
-                   my_paste, place_center)
 
-from .ask_exit import AskExit
+import cfg
+from utils import encrypt_cfg, my_copy, my_paste, place_center
+
+from .widgets import AskExit, CButton, CFrame, CLabel, CloseBtn, CSep, CWindow
 
 vars = {
     'PHOTODIR_LBL': tkinter.Label,
@@ -26,22 +26,15 @@ vars = {
     }
 
 
-class Settings(tkinter.Toplevel):
+class Settings(CWindow):
     """
     Tkinter toplevel with settings gui.
     """
 
     def __init__(self):
-        tkinter.Toplevel.__init__(self, cfg.ROOT, bg=cfg.BGCOLOR)
-        cfg.ROOT.eval(f'tk::PlaceWindow {self} center')
-
-        self.protocol("WM_DELETE_WINDOW", self.on_exit)
-        self.bind('<Command-w>', lambda e: self.on_exit())
-        self.bind('<Escape>', lambda e: self.on_exit())
-
-        self.withdraw()
+        CWindow.__init__(self)
         self.title('Настройки')
-        self.configure(padx=20, pady=10)
+
         self.geometry(
             f'{int(cfg.ROOT.winfo_width()*0.5)}x'
             f'{int(cfg.ROOT.winfo_height()*0.8)}')
@@ -53,11 +46,12 @@ class Settings(tkinter.Toplevel):
             self, bg=cfg.BGCOLOR, scrollbarwidth=7)
         scrollable.pack(fill=tkinter.BOTH, expand=True)
 
-        bottom_frame = MyFrame(self)
+        bottom_frame = CFrame(self)
         bottom_frame.pack(padx=(0, 7))
 
         Widgets(scrollable, bottom_frame)
 
+        cfg.ROOT.update_idletasks()
         place_center(self)
         self.deiconify()
         self.grab_set()
@@ -67,13 +61,13 @@ class Settings(tkinter.Toplevel):
         cfg.ROOT.focus_force()
 
 
-class Widgets(MyFrame):
+class Widgets(CFrame):
     """
     Tkinter frame with general app settings.
     * param `master`: tkinter frame
     """
     def __init__(self, master: tkmacosx.SFrame, bottom_frame: tkinter.Frame):
-        title = MyLabel(master, text='Настройки', font=('Arial', 22, 'bold'))
+        title = CLabel(master, text='Настройки', font=('Arial', 22, 'bold'))
         title.pack(pady=10)
 
         txt2 = (
@@ -82,18 +76,18 @@ class Widgets(MyFrame):
             'Нажмите "Полное сканирование", чтобы обновить фотографии всех '
             'коллекций за все время c 2018 года.'
             )
-        descr_scan = MyLabel(master)
+        descr_scan = CLabel(master)
         descr_scan.configure(
             text=txt2, justify=tkinter.LEFT,
             wraplength=vars['text_length'])
         descr_scan.pack(pady=(0, 5), anchor=tkinter.W)
 
-        scan_btn = MyButton(master, text='Полное сканирование')
+        scan_btn = CButton(master, text='Полное сканирование')
         scan_btn.configure(height=1, width=17)
         scan_btn.cmd(lambda e: self.full_scan())
         scan_btn.pack()
 
-        sep = MySep(master)
+        sep = CSep(master)
         sep.pack(padx=40, pady=(40, 20), fill=tkinter.X)
 
         for title, value, widget in zip(
@@ -101,19 +95,19 @@ class Widgets(MyFrame):
             [cfg.config['PHOTO_DIR'], cfg.config['COLL_FOLDER']],
             ['PHOTODIR_LBL', 'COLLFOLDERS_LBL']):
 
-            gallery_descr = MyLabel(
+            gallery_descr = CLabel(
                 master, text=title, justify=tkinter.LEFT,
                 wraplength=vars['text_length'],
                 font=('Arial', 22, 'bold'))
             gallery_descr.pack()
 
-            vars[widget] = MyLabel(
+            vars[widget] = CLabel(
                 master, text=value, justify=tkinter.LEFT,
                 wraplength=vars['text_length'])
             vars[widget].pack(
                 padx=(10, 0), pady=(5, 0))
 
-            gallery_btn = MyButton(master, text='Обзор')
+            gallery_btn = CButton(master, text='Обзор')
             gallery_btn.pack(
                 pady=(5, 0), padx=(5, 0))
             gallery_btn.configure(height=1, width=9)
@@ -121,7 +115,7 @@ class Widgets(MyFrame):
             gallery_btn.cmd(
                 lambda e, x=vars[widget]: self.select_path(x))
 
-            sep = MySep(master)
+            sep = CSep(master)
             sep.pack(padx=40, pady=20, fill=tkinter.X)
 
         txt3 = (
@@ -139,7 +133,7 @@ class Widgets(MyFrame):
             [cfg.config['RT_FOLDER'], cfg.config['FILE_AGE']],
             ['RTFOLDER_ENTRY', 'FILEAGE_ENTRY']):
 
-            lbl = MyLabel(
+            lbl = CLabel(
                 master, justify=tkinter.LEFT,
                 wraplength=vars['text_length'], text=descr)
             lbl.pack(anchor=tkinter.W, pady=(0, 10))
@@ -153,51 +147,50 @@ class Widgets(MyFrame):
             vars[widget].insert(0, value)
             vars[widget].pack(pady=(0, 10))
 
-            frame_btns = MyFrame(master)
+            frame_btns = CFrame(master)
             frame_btns.pack()
-            btn_c = MyButton(frame_btns, text='Копировать')
+            btn_c = CButton(frame_btns, text='Копировать')
             btn_c.cmd(partial(self.copy_input, vars[widget], btn_c))
-            btn_v = MyButton(frame_btns, text='Вставить')
+            btn_v = CButton(frame_btns, text='Вставить')
             btn_v.cmd(partial(self.paste_input, vars[widget], btn_v))
             [i.configure(height=1, width=9) for i in (btn_c, btn_v)]
             [i.pack(side=tkinter.LEFT, padx=(5)) for i in (btn_c, btn_v)]
 
-            sep = MySep(master)
+            sep = CSep(master)
             sep.pack(padx=40, pady=20, fill=tkinter.X)
 
-        min_frame = MyFrame(master)
+        min_frame = CFrame(master)
         min_frame.pack(pady = (0, 15))
 
         vars['MIN_CHECKBOX'] = tkinter.IntVar()
         check_box = tkinter.Checkbutton(
             min_frame, bg=cfg.BGCOLOR, variable=vars['MIN_CHECKBOX'])
-        check_lbl = MyLabel(min_frame, text='Свернуть вместо закрыть')
+        check_lbl = CLabel(min_frame, text='Свернуть вместо закрыть')
         [check_box.select() if cfg.config['MINIMIZE'] else False]
         [i.pack(side=tkinter.LEFT) for i in [check_box, check_lbl]]
 
-        rest_frame = MyFrame(master)
+        rest_frame = CFrame(master)
         rest_frame.pack(pady=(0, 15))
 
-        restore_btn = MyButton(rest_frame, text='По умолчанию')
+        restore_btn = CButton(rest_frame, text='По умолчанию')
         restore_btn.configure(height=1, width=12)
         restore_btn.cmd(lambda e, x=restore_btn: self.restore(x))
         restore_btn.pack(side=tkinter.LEFT, padx=(0, 10))
 
-        reset_button = MyButton(rest_frame, text='Полный сброс')
+        reset_button = CButton(rest_frame, text='Полный сброс')
         reset_button.configure(height=1, width=12)
         reset_button.cmd(lambda e: self.full_reset())
         reset_button.pack(side=tkinter.RIGHT)
 
-        below_frame = MyFrame(bottom_frame)
+        below_frame = CFrame(bottom_frame)
         below_frame.pack(pady=(15, 15))
 
-        save_btn = MyButton(below_frame, text='Сохранить')
+        save_btn = CButton(below_frame, text='Сохранить')
         save_btn.cmd(lambda e: self.save_settings(master))
         save_btn.configure(height=1, width=12)
         save_btn.pack(side=tkinter.LEFT, padx=(0, 10))
 
-        cancel_btn = MyButton(below_frame, text='Отмена')
-        cancel_btn.cmd(lambda e: self.cancel(master))
+        cancel_btn = CloseBtn(below_frame, text='Отмена')
         cancel_btn.configure(height=1, width=12)
         cancel_btn.pack(side=tkinter.RIGHT)
 
@@ -221,7 +214,7 @@ class Widgets(MyFrame):
 
         widget['text'] = path
 
-    def restore(self, btn: MyButton):
+    def restore(self, btn: CButton):
         """
         Gets advanced settings values from cfg and write to cfg.json
         Sets default text in all text input fields in advanced settings.
@@ -246,7 +239,7 @@ class Widgets(MyFrame):
             widget.insert(0, default)
             cfg.config[value] = default
 
-    def copy_input(self, ins: tkinter.Entry, btn: MyButton, e: tkinter.Event):
+    def copy_input(self, ins: tkinter.Entry, btn: CButton, e: tkinter.Event):
         """
         Gets text from current text input field and copy to clipboard.
         * param `ins`: tkinter entry current text input
@@ -255,7 +248,7 @@ class Widgets(MyFrame):
         btn.press()
         my_copy(ins.get())
 
-    def paste_input(self, ins: tkinter.Entry, btn: MyButton, e: tkinter.Event):
+    def paste_input(self, ins: tkinter.Entry, btn: CButton, e: tkinter.Event):
         """
         Gets text from clipboard and paste in text input field.
         * param `ins`: tkinter entry current text input
@@ -265,11 +258,11 @@ class Widgets(MyFrame):
         ins.delete(0, 'end')
         ins.insert(0, my_paste())
 
-    def cancel(self, master: tkinter.Frame):
-        """
-        Cancel button command.
-        """
-        master.winfo_toplevel().destroy()
+    # def cancel(self, master: tkinter.Frame):
+    #     """
+    #     Cancel button command.
+    #     """
+    #     master.winfo_toplevel().destroy()
 
     def save_settings(self, master: tkinter.Frame):
         """
@@ -286,6 +279,6 @@ class Widgets(MyFrame):
         if cfg.config['MINIMIZE']:
             cfg.ROOT.protocol("WM_DELETE_WINDOW", lambda: cfg.ROOT.withdraw())
         else:
-            cfg.ROOT.protocol("WM_DELETE_WINDOW", partial(AskExit, cfg.ROOT))
+            cfg.ROOT.protocol("WM_DELETE_WINDOW", AskExit)
 
         master.winfo_toplevel().destroy()

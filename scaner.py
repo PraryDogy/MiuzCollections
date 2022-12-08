@@ -14,7 +14,6 @@ import sqlalchemy
 import cfg
 from admin import print_alive
 from database import Dbase, Thumbs
-from gui.smb_checker import SmbChecker
 from utils import encrypt_cfg, get_coll_name, resize_image, smb_check
 
 
@@ -281,10 +280,6 @@ def update_nocollection(aged: bool):
 
 
 def scaner():
-    if not smb_check():
-        SmbChecker()
-        return
-
     def __scan():
         """Run Files Scaner & Database Updater from utils"""
         cfg.FLAG = True
@@ -303,10 +298,6 @@ def scaner():
             print('images_reset error')
             os.execv(sys.executable, ['python'] + sys.argv)
         cfg.FLAG = False
-
-        for k, v in cfg.ROOT.children.items():
-            [v.focus_force() if v.winfo_class() == 'Toplevel' else False]
-            break
 
     t1 = threading.Thread(target=__scan, daemon=True)
     t1.start()

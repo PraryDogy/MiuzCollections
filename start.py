@@ -1,20 +1,13 @@
-"""
-Run file
-"""
-
 import cfg
-from gui import main_gui
+from gui import main
 from scaner import scaner
-
+from utils import smb_check
 
 def load_all():
-    """
-    Loads splashscreen with thumbnails updater first.
-    Then loads main gui with thumbnails.
-    """
-    main_gui.MainGui()
+    main.MainGui()
     cfg.ROOT.deiconify()
-    scaner()
+    if smb_check():
+        scaner()
 
 cfg.ROOT.after(1, load_all)
 
