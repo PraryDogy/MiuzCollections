@@ -17,7 +17,6 @@ from .images_compare import CompareWindow
 
 
 class Globals:
-    img_src = str
     all_src = []
     width, height = 0, 0
     img_info = tkinter.Label
@@ -46,9 +45,9 @@ def pack_widgets(win: tkinter.Toplevel):
 
 def switch_image(master: tkinter.Widget, index: int):
     try:
-        globs.img_src = globs.all_src[index]
+        cfg.IMG_SRC = globs.all_src[index]
     except IndexError:
-        globs.img_src = globs.all_src[0]
+        cfg.IMG_SRC = globs.all_src[0]
     master = master.winfo_toplevel()
     for i in master.winfo_children():
         i.destroy()
@@ -60,7 +59,7 @@ class PreviewWindow(BaseWindow):
     def __init__(self, src: str, all_src: list):
         BaseWindow.__init__(self)
 
-        globs.img_src, globs.all_src = src, all_src
+        cfg.IMG_SRC, globs.all_src = src, all_src
 
         pack_widgets(self)
         cfg.ROOT.update_idletasks()
@@ -86,7 +85,7 @@ class ImgFrame(MyLabel):
         master.bind('<Right>', lambda e: switch_image(self, self.img_ind()+1))
 
     def img_ind(self) -> int: 
-        return globs.all_src.index(globs.img_src)
+        return globs.all_src.index(cfg.IMG_SRC)
 
     def set_img(self, img):
         img_tk = ImageTk.PhotoImage(img)
@@ -102,7 +101,7 @@ class ImgFrame(MyLabel):
 
     def place_thumbnail(self):
         thumb = Dbase.conn.execute(sqlalchemy.select(Thumbs.img150).where(
-            Thumbs.src == globs.img_src)).first()[0]
+            Thumbs.src == cfg.IMG_SRC)).first()[0]
         decoded = decode_image(thumb)
         resized = resize_image(decoded, globs.width, globs.height, False)
         self.img_h, self.img_w = resized.shape[:2]
@@ -110,7 +109,7 @@ class ImgFrame(MyLabel):
         self.set_img(rgb_image)
 
     def __place_image(self):
-        img_read = cv2.imread(globs.img_src)
+        img_read = cv2.imread(cfg.IMG_SRC)
         resized = cv2.resize(
             img_read, (self.img_w, self.img_h), interpolation=cv2.INTER_AREA)
         globs.curr_img = convert_to_rgb(resized)
@@ -118,7 +117,7 @@ class ImgFrame(MyLabel):
         t = globs.img_info['text']
         h, w = img_read.shape[:2]
         globs.img_info['text'] = t.replace('Загрузка', f'{w} x {h}')
-        self['text'] = globs.img_src
+        self['text'] = cfg.IMG_SRC
 
     def place_image(self):
         task = threading.Thread(target=self.__place_image)
@@ -129,7 +128,7 @@ class ImgFrame(MyLabel):
 
 class ImgButtons(BaseImgButtons):
     def __init__(self, master):
-        BaseImgButtons.__init__(self, master, globs.img_src)
+        BaseImgButtons.__init__(self, master)
 
         comp_btn = MyButton(self, text='Сравнить')
         comp_btn.configure(height=1, width=13)
@@ -141,7 +140,7 @@ class ImgButtons(BaseImgButtons):
         if not cfg.COMPARE:
             cfg.STATUSBAR_COMPARE()
             for i in cfg.THUMBS:
-                if i['text'] == globs.img_src:
+                if i['text'] == cfg.IMG_SRC:
                     i['bg'] = cfg.BGPRESSED
                     break
             win = self.winfo_toplevel()
@@ -156,14 +155,14 @@ class ImgInfo(MyLabel):
         MyLabel.__init__(self, master)
         globs.img_info = self
 
-        name = globs.img_src.split(os.sep)[-1]
-        path = globs.img_src.replace(cfg.config["COLL_FOLDER"], "Коллекции")
+        name = cfg.IMG_SRC.split(os.sep)[-1]
+        path = cfg.IMG_SRC.replace(cfg.config["COLL_FOLDER"], "Коллекции")
         path = path.replace(cfg.config["PHOTO_DIR"], "Фото")
-        filesize = round(os.path.getsize(globs.img_src)/(1024*1024), 2)
-        filemod = datetime.fromtimestamp(os.path.getmtime(globs.img_src))
+        filesize = round(os.path.getsize(cfg.IMG_SRC)/(1024*1024), 2)
+        filemod = datetime.fromtimestamp(os.path.getmtime(cfg.IMG_SRC))
         filemod = filemod.strftime("%d-%m-%Y, %H:%M:%S")
 
-        txt = (f'Коллекция: {get_coll_name(globs.img_src)}'
+        txt = (f'Коллекция: {get_coll_name(cfg.IMG_SRC)}'
                 f'\nИмя: {name}'
                 f'\nПуть: {path}'
                 f'\nРазрешение: Загрузка'

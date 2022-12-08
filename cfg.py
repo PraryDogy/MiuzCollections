@@ -39,6 +39,7 @@ LIVE_LBL = tkinter.Label
 THUMBS = []
 FLAG = False
 COMPARE = False
+IMG_SRC = str
 
 # gui functions 
 THUMBNAILS_RELOAD = object

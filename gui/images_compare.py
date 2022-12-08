@@ -7,9 +7,8 @@ from .base_widgets import BaseImgButtons, BaseWindow, CloseButton
 
 
 class Globals:
-    image1, src1, info1 = None, str, str
-    image2, src2, info2 = None, str, str
-    curr_img, curr_src, curr_info = None, str, str
+    img1, src1, info1 = None, str, str
+    img2, src2, info2 = None, str, str
     img_widget, info_widget = tkinter.Label, tkinter.Label
 
 
@@ -30,16 +29,19 @@ def get_widgets(window: tkinter.Toplevel):
     img_frame = window.children['!imgframe']['image']
     img_src = window.children['!imgframe']['text']
     img_info = window.children['!imginfo']['text']
+
     return (img_frame, img_src, img_info)
 
 
 def switch_image():
-    for i in (globs.image1, globs.image2):
-        if globs.curr_img != i:
-            globs.curr_img = i
-            globs.img_widget['image'] = globs.curr_img
-            globs.info_widget['text'] = globs.curr_info
-            return
+    if globs.src1 == cfg.IMG_SRC:
+        globs.img_widget['image'] = globs.img2
+        globs.info_widget['text'] = globs.info2
+        cfg.IMG_SRC = globs.src2
+    else:
+        globs.img_widget['image'] = globs.img1
+        globs.info_widget['text'] = globs.info1
+        cfg.IMG_SRC = globs.src1
 
 
 class CompareWindow(BaseWindow):
@@ -49,9 +51,14 @@ class CompareWindow(BaseWindow):
         cfg.ROOT.update_idletasks()
 
         win1, win2 = get_windows()
-        globs.image1, globs.src1, globs.info1 = get_widgets(win1)
-        globs.curr_img, globs.curr_src, globs.curr_info = get_widgets(win1)
-        globs.image2, globs.src2, globs.info2 = get_widgets(win2)
+
+        try:
+            globs.img1, globs.src1, globs.info1 = get_widgets(win1)
+            globs.img2, globs.src2, globs.info2 = get_widgets(win2)
+        except KeyError:
+            [i.destroy() for i in get_windows()]
+
+        cfg.IMG_SRC = globs.src1
 
         image_frame = ImageFrame(self)
         image_frame.pack(pady=(0, 15), expand=True, fill=tkinter.BOTH)
@@ -69,19 +76,19 @@ class ImageFrame(MyLabel):
     def __init__(self, master):
         MyLabel.__init__(self, master, borderwidth=0)
         self['bg']='black'
-        self['image'] = globs.curr_img
+        self['image'] = globs.img1
         globs.img_widget = self
         self.bind('<ButtonRelease-1>', lambda e: switch_image())
 
 
 class ImgButtons(BaseImgButtons):
     def __init__(self, master):
-        BaseImgButtons.__init__(self, master, globs.curr_src)
+        BaseImgButtons.__init__(self, master)
 
 
 class ImgInfo(MyLabel):
     def __init__(self, master):
         MyLabel.__init__(
             self, master, anchor=tkinter.W, justify=tkinter.LEFT,
-            text=globs.curr_info, width=43)
+            text=globs.info1, width=43)
         globs.info_widget = self

@@ -2,11 +2,10 @@ import os
 import subprocess
 import threading
 import tkinter
-from datetime import datetime
 from functools import partial
 
 import cfg
-from utils import MyButton, MyFrame, MyLabel, get_coll_name, my_copy, smb_check
+from utils import MyButton, MyFrame, my_copy, smb_check
 
 from .ask_exit import AskExit
 from .smb_checker import SmbChecker
@@ -55,9 +54,8 @@ class CloseButton(MyButton):
 
 
 class BaseImgButtons(MyFrame):
-    def __init__(self, master, img_src):
-        MyFrame.__init__(self, master)
-        self.img_src = img_src
+    def __init__(self, master: tkinter, **kwargs):
+        MyFrame.__init__(self, master, **kwargs)
 
         copy_btn = MyButton(self, text='Копировать имя')
         copy_btn.configure(height=1, width=13)
@@ -71,11 +69,11 @@ class BaseImgButtons(MyFrame):
 
     def copy_name(self, btn: MyButton):
         btn.press()
-        my_copy(self.img_src.split(os.sep)[-1].split('.')[0])
+        my_copy(cfg.IMG_SRC.split(os.sep)[-1].split('.')[0])
 
     def open_folder(self, btn: MyButton, e: tkinter.Event):
         btn.press()
-        path = os.sep.join(self.img_src.split(os.sep)[:-1])
+        path = os.sep.join(cfg.IMG_SRC.split(os.sep)[:-1])
 
         def open():
             subprocess.check_output(["/usr/bin/open", path])
