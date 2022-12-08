@@ -154,8 +154,7 @@ class SmbChecker(tkinter.Toplevel):
             'Рекомендации:'
             '\n- Проверьте подключение к интернету.'
             '\n- Откройте любую папку на сетевом диске,'
-            '\n- Укажите в настройках правильный путь'
-            '\nпуть до галерии фото и коллекций'
+            '\n- Укажите правильный путь до галерии фото и коллекций'
             '\n- Перезапустите приложение.'
 
             '\n\nПоддержка: loshkarev@miuz.ru'
@@ -167,6 +166,7 @@ class SmbChecker(tkinter.Toplevel):
         cls_btn = CloseBtn(self, text='Закрыть')
         cls_btn.pack()
 
+        cfg.ROOT.update_idletasks()
         place_center(self)
         self.deiconify()
         self.grab_set()
