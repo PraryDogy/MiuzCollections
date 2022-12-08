@@ -1,7 +1,7 @@
 import tkinter
 
 import cfg
-from utils import place_center
+from utils import place_center, close_windows
 
 from .macosx_menu import CLabel
 from .widgets import ImgBtns, CWindow, CloseBtn, AskExit
@@ -50,6 +50,10 @@ class CompareWindow(CWindow):
         CWindow.__init__(self)
 
         self.bind('<Command-q>', lambda e: AskExit())
+        self.protocol("WM_DELETE_WINDOW", lambda: close_windows())
+        self.bind('<Command-w>', lambda e: close_windows())
+        self.bind('<Escape>', lambda e: close_windows())
+
         self.title('Сравнение')
         side = int(cfg.ROOT.winfo_screenheight()*0.8)
         self.geometry(f'{side}x{side}')

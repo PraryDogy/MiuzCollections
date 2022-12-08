@@ -60,9 +60,9 @@ class CWindow(tkinter.Toplevel):
         cfg.ROOT.eval(f'tk::PlaceWindow {self} center')
         self.withdraw()
 
-        self.protocol("WM_DELETE_WINDOW", lambda: close_windows())
-        self.bind('<Command-w>', lambda e: close_windows())
-        self.bind('<Escape>', lambda e: close_windows())
+        self.protocol("WM_DELETE_WINDOW", lambda: self.destroy())
+        self.bind('<Command-w>', lambda e: self.destroy())
+        self.bind('<Escape>', lambda e: self.destroy())
         self.resizable(0,0)
 
 
@@ -103,12 +103,10 @@ class ImgBtns(CFrame):
 
 class AskExit(CWindow):
     def __init__(self):
+        print('run ask exit')
         CWindow.__init__(self)
         self.bind('<Return>', lambda e: self.on_exit())
         self.protocol("WM_DELETE_WINDOW", lambda: self.destroy())
-
-        self.unbind('<Command-w>')
-        self.unbind('<Escape>')
         self.bind('<Command-w>', lambda e: self.destroy())
         self.bind('<Escape>', lambda e: self.destroy())
 

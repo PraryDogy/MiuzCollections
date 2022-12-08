@@ -27,7 +27,6 @@ class MainGui:
         cfg.ROOT.createcommand("tk::mac::Quit" , AskExit)
 
         cfg.ROOT.bind('<Command-w>', lambda e: cfg.ROOT.withdraw())
-        cfg.ROOT.bind('<Command-q>', lambda e: AskExit())
 
         if cfg.config['MINIMIZE']:
             cfg.ROOT.protocol("WM_DELETE_WINDOW", lambda: cfg.ROOT.withdraw())
