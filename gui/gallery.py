@@ -19,7 +19,7 @@ from database import Dbase, Thumbs
 from utils import convert_to_rgb, crop_image, decode_image
 
 from .widgets import CButton, CFrame, CLabel, CSep
-from .viewer import PreviewWindow
+from .img_viewer import PreviewWindow
 
 
 class Gallery(CFrame):
@@ -76,7 +76,7 @@ class MenuButtons(tkmacosx.SFrame):
 
         for name_btn, name_coll in for_btns:
             btn = CButton(self, text=name_btn)
-            btn.configure(height=1, width=13 ,pady=5, anchor=tkinter.W, padx=10)
+            btn.configure(pady=5, anchor=tkinter.W, padx=10)
             btn.pack(fill=tkinter.X, padx=(0, 15))
             btns.append(btn)
             if name_coll == cfg.config['CURR_COLL']:

@@ -51,7 +51,7 @@ class SettingsSection(CLabel, CButton):
     """
     def __init__(self, master):
         CButton.__init__(self, master, text='Настройки', padx=5)
-        self.configure(width=8, height=1)
+        self.configure(width=8)
         self.cmd(lambda e: self.open_settings(self))
 
     def open_settings(self, btn: CButton):
@@ -69,7 +69,7 @@ class UpdateSection(CLabel, CButton):
     """
     def __init__(self, master):
         CButton.__init__(self, master, text='Обновить', padx=5)
-        self.configure(width=8, height=1)
+        self.configure(width=8)
         self.cmd(lambda e: self.updater(self))
 
     def updater(self, btn: CButton):
@@ -101,7 +101,7 @@ class CompareTitle(CFrame):
         subtitle.pack(side=tkinter.LEFT)
 
         cancel = CButton(master, text='Отмена')
-        cancel.configure(height=1, width=10)
+        cancel.configure(width=8)
         cancel.cmd(lambda e: self.cancel())
         cancel.pack(side=tkinter.LEFT, padx=(15, 0))
         cfg.ROOT.bind('<Escape>', lambda e: self.cancel())

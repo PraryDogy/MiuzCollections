@@ -1,7 +1,7 @@
 import tkinter
 
 import cfg
-from utils import place_center, close_windows
+from utils import place_center, close_windows, get_windows
 
 from .macosx_menu import CLabel
 from .widgets import ImgBtns, CWindow, CloseBtn, AskExit
@@ -14,11 +14,6 @@ class Globals:
 
 
 globs = Globals()
-
-
-def get_windows():
-    widgets = tuple(i for i in cfg.ROOT.winfo_children())
-    return tuple(i for i in widgets if isinstance(i, tkinter.Toplevel))
 
 
 def get_widgets(window: tkinter.Toplevel):
@@ -48,12 +43,6 @@ def switch_image():
 class CompareWindow(CWindow):
     def __init__(self):
         CWindow.__init__(self)
-
-        self.bind('<Command-q>', lambda e: AskExit())
-        self.protocol("WM_DELETE_WINDOW", lambda: close_windows())
-        self.bind('<Command-w>', lambda e: close_windows())
-        self.bind('<Escape>', lambda e: close_windows())
-
         self.title('Сравнение')
         side = int(cfg.ROOT.winfo_screenheight()*0.8)
         self.geometry(f'{side}x{side}')

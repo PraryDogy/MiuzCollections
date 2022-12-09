@@ -5,7 +5,12 @@ import tkinter
 from functools import partial
 
 import cfg
-from utils import encrypt_cfg, my_copy, place_center, close_windows
+from utils import close_windows, encrypt_cfg, focus_last, my_copy, place_center
+
+
+def close():
+    close_windows()
+    focus_last()
 
 
 class CSep(tkinter.Frame):
@@ -15,8 +20,9 @@ class CSep(tkinter.Frame):
 
 class CButton(tkinter.Label):
     def __init__(self, master: tkinter, **kwargs):
-        tkinter.Label.__init__(
-            self, master, bg=cfg.BGBUTTON, fg=cfg.BGFONT, **kwargs)
+        tkinter.Label.__init__(self, master, **kwargs)
+        self.configure(bg=cfg.BGBUTTON, fg=cfg.BGFONT, width=13, height=1)
+
         self.bind('<Enter>', lambda e: self.enter())
         self.bind('<Leave>', lambda e: self.leave())
 
@@ -56,21 +62,22 @@ class CWindow(tkinter.Toplevel):
         center screen
         cmd+w, escape and X button bind to close window
         """
-        tkinter.Toplevel.__init__(self, bg=cfg.BGCOLOR, padx=15, pady=15)
+        tkinter.Toplevel.__init__(self)
         cfg.ROOT.eval(f'tk::PlaceWindow {self} center')
         self.withdraw()
 
-        self.protocol("WM_DELETE_WINDOW", lambda: self.destroy())
-        self.bind('<Command-w>', lambda e: self.destroy())
-        self.bind('<Escape>', lambda e: self.destroy())
+        self.protocol("WM_DELETE_WINDOW", lambda: close())
+        self.bind('<Command-w>', lambda e: close())
+        self.bind('<Escape>', lambda e: close())
+        self.bind('<Command-q>', lambda e: AskExit())
         self.resizable(0,0)
+        self.configure(bg=cfg.BGCOLOR, padx=15, pady=15)
 
 
 class CloseBtn(CButton):
     def __init__(self, master: tkinter.Widget, **kwargs):
         CButton.__init__(self, master, **kwargs)
-        self.configure(height=1, width=13)
-        self.cmd(lambda e: master.winfo_toplevel().destroy())
+        self.cmd(lambda e: close())
 
 
 class ImgBtns(CFrame):
@@ -78,12 +85,10 @@ class ImgBtns(CFrame):
         CFrame.__init__(self, master, **kwargs)
 
         copy_btn = CButton(self, text='Копировать имя')
-        copy_btn.configure(height=1, width=13)
         copy_btn.cmd(lambda e: self.copy_name(copy_btn))
         copy_btn.pack(side=tkinter.LEFT, padx=(0, 15))
 
         open_btn = CButton(self, text='Открыть папку')
-        open_btn.configure(height=1, width=13)
         open_btn.cmd(partial(self.open_folder, open_btn))
         open_btn.pack(side=tkinter.LEFT, padx=(0, 15))
 
@@ -103,12 +108,11 @@ class ImgBtns(CFrame):
 
 class AskExit(CWindow):
     def __init__(self):
-        print('run ask exit')
         CWindow.__init__(self)
         self.bind('<Return>', lambda e: self.on_exit())
-        self.protocol("WM_DELETE_WINDOW", lambda: self.destroy())
-        self.bind('<Command-w>', lambda e: self.destroy())
-        self.bind('<Escape>', lambda e: self.destroy())
+        self.protocol("WM_DELETE_WINDOW", lambda: self.close_ask())
+        self.bind('<Command-w>', lambda e: self.close_ask())
+        self.bind('<Escape>', lambda e: self.close_ask())
 
         lbl = CLabel(self, text='Выйти?')
         lbl.pack()
@@ -120,7 +124,7 @@ class AskExit(CWindow):
         exit.cmd(lambda e: self.on_exit())
 
         cancel = CButton(self, text='Отмена')
-        cancel.cmd(lambda e: self.destroy())
+        cancel.cmd(lambda e: self.close_ask())
 
         [i.configure(height=1, width=11) for i in (exit, cancel)]
         [i.pack(side=tkinter.LEFT, padx=5) for i in (exit, cancel)]
@@ -128,6 +132,10 @@ class AskExit(CWindow):
         place_center(self)
         self.deiconify()
         self.grab_set()
+
+    def close_ask(self):
+        self.destroy()
+        focus_last()
 
     def on_exit(self):
         w, h = cfg.ROOT.winfo_width(), cfg.ROOT.winfo_height()

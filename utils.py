@@ -149,6 +149,11 @@ def smb_check():
     return True
 
 
+def get_windows():
+    all = tuple(i for i in cfg.ROOT.winfo_children())
+    return tuple(i for i in all if isinstance(i, tkinter.Toplevel))
+
+
 def close_windows():
     "Close all top levels"
     if cfg.COMPARE:
@@ -156,8 +161,11 @@ def close_windows():
         cfg.STATUSBAR_NORMAL()
         [i.configure(bg=cfg.BGCOLOR) for i in cfg.THUMBS]
 
-    all = tuple(i for i in cfg.ROOT.winfo_children())
-    windows = tuple(i for i in all if isinstance(i, tkinter.Toplevel))
-    [i.destroy() for i in windows]
-
+    [i.destroy() for i in get_windows()]
     cfg.ROOT.focus_force()
+
+
+def focus_last():
+    "Sets focus to last opened window or root"
+    wins = get_windows()
+    [wins[-1].focus_force() if len(wins) > 0 else cfg.ROOT.focus_force()]

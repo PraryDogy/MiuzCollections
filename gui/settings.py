@@ -27,10 +27,6 @@ vars = {
 
 
 class Settings(CWindow):
-    """
-    Tkinter toplevel with settings gui.
-    """
-
     def __init__(self):
         CWindow.__init__(self)
         self.title('Настройки')
@@ -56,10 +52,6 @@ class Settings(CWindow):
         self.deiconify()
         self.grab_set()
 
-    def on_exit(self):
-        self.destroy()
-        cfg.ROOT.focus_force()
-
 
 class Widgets(CFrame):
     """
@@ -83,7 +75,7 @@ class Widgets(CFrame):
         descr_scan.pack(pady=(0, 5), anchor=tkinter.W)
 
         scan_btn = CButton(master, text='Полное сканирование')
-        scan_btn.configure(height=1, width=17)
+        scan_btn.configure(width=17)
         scan_btn.cmd(lambda e: self.full_scan())
         scan_btn.pack()
 
@@ -153,7 +145,7 @@ class Widgets(CFrame):
             btn_c.cmd(partial(self.copy_input, vars[widget], btn_c))
             btn_v = CButton(frame_btns, text='Вставить')
             btn_v.cmd(partial(self.paste_input, vars[widget], btn_v))
-            [i.configure(height=1, width=9) for i in (btn_c, btn_v)]
+            [i.configure(width=9) for i in (btn_c, btn_v)]
             [i.pack(side=tkinter.LEFT, padx=(5)) for i in (btn_c, btn_v)]
 
             sep = CSep(master)
@@ -173,12 +165,12 @@ class Widgets(CFrame):
         rest_frame.pack(pady=(0, 15))
 
         restore_btn = CButton(rest_frame, text='По умолчанию')
-        restore_btn.configure(height=1, width=12)
+        restore_btn.configure(width=12)
         restore_btn.cmd(lambda e, x=restore_btn: self.restore(x))
         restore_btn.pack(side=tkinter.LEFT, padx=(0, 10))
 
         reset_button = CButton(rest_frame, text='Полный сброс')
-        reset_button.configure(height=1, width=12)
+        reset_button.configure(width=12)
         reset_button.cmd(lambda e: self.full_reset())
         reset_button.pack(side=tkinter.RIGHT)
 
@@ -187,11 +179,10 @@ class Widgets(CFrame):
 
         save_btn = CButton(below_frame, text='Сохранить')
         save_btn.cmd(lambda e: self.save_settings(master))
-        save_btn.configure(height=1, width=12)
+        save_btn.configure(width=12)
         save_btn.pack(side=tkinter.LEFT, padx=(0, 10))
 
         cancel_btn = CloseBtn(below_frame, text='Отмена')
-        cancel_btn.configure(height=1, width=12)
         cancel_btn.pack(side=tkinter.RIGHT)
 
     def full_scan(self):
@@ -257,12 +248,6 @@ class Widgets(CFrame):
         btn.press()
         ins.delete(0, 'end')
         ins.insert(0, my_paste())
-
-    # def cancel(self, master: tkinter.Frame):
-    #     """
-    #     Cancel button command.
-    #     """
-    #     master.winfo_toplevel().destroy()
 
     def save_settings(self, master: tkinter.Frame):
         """

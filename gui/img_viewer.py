@@ -65,7 +65,6 @@ class PreviewWindow(CWindow):
             SmbChecker()
             return
 
-        self.bind('<Command-q>', lambda e: AskExit())
         self.title('Просмотр')
         side = int(cfg.ROOT.winfo_screenheight()*0.8)
         self.geometry(f'{side}x{side}')
@@ -142,7 +141,6 @@ class ImgButtons(ImgBtns):
         ImgBtns.__init__(self, master)
 
         comp_btn = CButton(self, text='Сравнить')
-        comp_btn.configure(height=1, width=13)
         comp_btn.cmd(lambda e: self.compare(comp_btn))
         comp_btn.pack(side=tkinter.RIGHT)
 
