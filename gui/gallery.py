@@ -133,8 +133,7 @@ class ImagesThumbs(tkmacosx.SFrame):
         self.clmns = (cfg.config['GEOMETRY'][0]-cfg.MENU_W)//cfg.THUMB_SIZE
 
         title = CLabel(
-            self, text=cfg.config['CURR_COLL'],
-            font=('Arial', 45, 'bold'))
+            self, text=cfg.config['CURR_COLL'], font=('Arial', 45, 'bold'))
         title.pack(pady=(0, 15))
 
         if cfg.config['CURR_COLL'] == 'last':
@@ -209,7 +208,7 @@ class ImagesThumbs(tkmacosx.SFrame):
         """
         Converts image modified date to year
         * input: ((`img`, `src`, `date modified`), ...)
-        * returns: list turples: (img ready for tkinter label, src, year)
+        * returns: list turples: (`ImageTk.PhotoImage`, `src`, `year`)
         """
         result = []
         for img, src, modified in thumbs:
@@ -219,8 +218,8 @@ class ImagesThumbs(tkmacosx.SFrame):
 
     def years_list(self, thumbs: list):
         """
+        Returns list of lists.
         Splits one list of images into images lists by year.
-        * returns: list of lists
         * param `thumbs`: list tuples (img, src, year)
         # Example
 
