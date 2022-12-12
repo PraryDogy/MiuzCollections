@@ -150,17 +150,22 @@ class ImagesThumbs(tkmacosx.SFrame):
 
         decoded_images = self.decode_thumbs(res)
         converted_years = self.convert_year(decoded_images)
-        thumbs = self.split_years(converted_years)
 
-        for y in thumbs:
-            year_label = CLabel(
-                self, text=y[-1][-1], font=('Arial', 35, 'bold'))
-            year_label.pack(pady=(15, 15))
-            self.pack_rows(y, self.clmns, self, [i[1] for i in res])
+        all_src = tuple(i[1] for i in converted_years)
+        self.years = set(year for _, _, year in converted_years)
+
+        years_split = self.years_list(converted_years)
+
+        packed_thumbs = tuple(self.pack_thumbs(self, i, all_src) for i in years_split)
+        packed_titles = reversed(tuple(self.pack_title(self, i) for i in self.years))
+
+        for title, row in zip(packed_titles, packed_thumbs):
+            title.pack(pady=(15, 15))
+            row.pack(fill=tkinter.Y, expand=True, anchor=tkinter.W)
 
     def thumbnails_reload(self):
         """
-        Destroys self.Run init again
+        Destroys `ImagesThumbs` object and run it again.
         """
         selected = ''
         if cfg.COMPARE:
@@ -184,7 +189,7 @@ class ImagesThumbs(tkmacosx.SFrame):
         """
         Prepares encoded images from database for tkinter.
         * input: ((`img`, `src`, `date modified`), ...)
-        * returns: list turples: (img ready to tkinter label, src, modified)
+        * returns: list turples: (`ImageTk.PhotoImage`, `src`, `date modified`)
         """
         result = []
         for blob, src, modified in thumbs:
@@ -200,11 +205,11 @@ class ImagesThumbs(tkmacosx.SFrame):
 
         return result
 
-    def convert_year(self, thumbs:list):
+    def convert_year(self, thumbs: list):
         """
         Converts image modified date to year
         * input: ((`img`, `src`, `date modified`), ...)
-        * returns: list turples: (img ready to tkinter label, src, year)
+        * returns: list turples: (img ready for tkinter label, src, year)
         """
         result = []
         for img, src, modified in thumbs:
@@ -212,55 +217,85 @@ class ImagesThumbs(tkmacosx.SFrame):
             result.append((img, src, year))
         return result
 
-    def split_years(self, thumbs: list):
+    def years_list(self, thumbs: list):
         """
-        Splits a list into lists by year.
+        Splits one list of images into images lists by year.
         * returns: list of lists
-        * param `thumbs`: list tuples (imageTk, image src, image year modified)
+        * param `thumbs`: list tuples (img, src, year)
+        # Example
+
+        ```
+        imgs = (
+            (img, src, 2020), (img2, src, 2017), (img6, src, 2020),
+            (img3, src, 2017), ...
+            )
+
+        years_list(imgs)
+        > [
+            [(img, src, 2020), (img2, src, 2020)],
+            [(img6, src, 2017), (img3, src, 2017)]
+            ]
+        ```
         """
-        years = set(year for _, _, year in thumbs)
         list_years = []
-        for y in years:
+        for y in self.years:
             tmp = tuple(
                 (img, src, year) for img, src, year in thumbs if year == y)
             list_years.append(tmp)
         list_years.reverse()
         return list_years
 
-    def pack_rows(
-        self, thumbs: list, clmns: int, master: tkinter.Frame, all_src: list):
+    def pack_thumbs(
+        self, master: tkinter.Frame, thumbs: list, all_src: list):
         """
-        Splits list of tuples by the number of lists.
-        Each list is row with number of columns based on 'clmns'.
+        Returns tkinter frames with packed thumbnails.
 
-        In short we create images grid with a number columns from images list
-        with tkinter pack method.
-        Tkinter pack don't have 'new line' method and we need create
-        tkinter frame for each row with images. For this we split big list
-        into small lists, each of which is row with tkinter labels.
+        Packs every thumbnail as tkinter label in row.
+        Every row is tkinter frame for number thumbnails, based on `self.clmns`
+        Binds thumbnail to mouse left click.
+        Opens `img_veiewer` on thumbnail click.
 
-        * param `thumbs`: list tuples(imageTk, image src, image year)
-        * param `clmns`: int from database > config > clmns > value
+        * param `thumbs`: list tuples(decoded img, src, year)
         * param `master`: tkinter frame
         * param `all_src`: list of paths of all images
+
+        # Example
+        ```
+        thumbnails = list with 27 images
+        clmns = 5
+        > pack_thumbs function will create 6 rows with 5 images, each row
+        > with 5 images. And last row with 2 images.
+        ```
         """
-        img_rows = [thumbs[x:x+clmns] for x in range(0, len(thumbs), clmns)]
-        for row in img_rows:
-            row_frame = CFrame(master)
-            row_frame.pack(fill=tkinter.Y, expand=True, anchor=tkinter.W)
-            for image, src, _ in row:
-                thumb = CButton(row_frame)
-                thumb['width'] = cfg.THUMB_SIZE
-                thumb['height'] = cfg.THUMB_SIZE
-                thumb['image'] = image
-                thumb['text'] = src
-                thumb['bg'] = cfg.BGCOLOR
-                thumb.image = image
-                thumb.cmd(partial(self.open_preview, src, all_src))
-                thumb.bind('<Enter>', lambda e, a=thumb: self.enter(a))
-                thumb.bind('<Leave>', lambda e, a=thumb: self.leave(a))
-                thumb.pack(side=tkinter.LEFT)
-                cfg.THUMBS.append(thumb)
+        year_frame = CFrame(master)
+
+        for i, item in enumerate(thumbs):
+
+            if i%self.clmns == 0:
+                row = CFrame(year_frame)
+                row.pack(fill=tkinter.Y, expand=True, anchor=tkinter.W)
+
+            thumb = CButton(row)
+            thumb.configure(
+                width=cfg.THUMB_SIZE, height=cfg.THUMB_SIZE, bg=cfg.BGCOLOR,
+                image=item[0],text=item[1])
+
+            thumb.image_names = item[0]
+            thumb.cmd(partial(self.open_preview, item[1], all_src))
+
+            thumb.bind('<Enter>', lambda e, a=thumb: self.enter(a))
+            thumb.bind('<Leave>', lambda e, a=thumb: self.leave(a))
+
+            thumb.pack(side=tkinter.LEFT)
+            cfg.THUMBS.append(thumb)
+        
+        return year_frame
+
+    def pack_title(self, master: tkinter.Widget, year):
+        """
+        Returns tkinter label with title text.
+        """
+        return CLabel(master, text=year, font=('Arial', 35, 'bold'))
 
     def enter(self, thumb: CButton):
         if thumb['bg'] != cfg.BGPRESSED:

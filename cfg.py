@@ -30,12 +30,12 @@ BGBUTTON = "#2C2C2C"
 BGPRESSED = '#395432'
 BGSELECTED = '#4E4769'
 THUMB_SIZE = 150
-MENU_W = 0
 
 # tkinter global variables for avaibility from any place
 ROOT = tkinter.Tk()
 ROOT.withdraw()
 
+MENU_W = 0
 LIVE_LBL = tkinter.Label
 THUMBS = []
 FLAG = False
