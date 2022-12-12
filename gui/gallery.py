@@ -29,10 +29,15 @@ class Gallery(CFrame):
     """
     def __init__(self, master):
         CFrame.__init__(self, master)
-        MenuButtons(self).pack(
-            pady=(0, 0), padx=(0, 15), side=tkinter.LEFT, fill=tkinter.Y)
-        ImagesThumbs(self).pack(
-            expand=True, fill=tkinter.BOTH, side=tkinter.RIGHT)
+
+        menu = MenuButtons(self)
+        menu.pack(pady=(0, 0), padx=(0, 15), side=tkinter.LEFT, fill=tkinter.Y)
+        cfg.ROOT.update_idletasks()
+        cfg.MENU_W = menu.winfo_reqwidth()
+
+        imgs = ImagesThumbs(self)
+        imgs.pack(expand=True, fill=tkinter.BOTH, side=tkinter.RIGHT)
+
         cfg.ROOT.bind('<ButtonRelease-1>', self.update_gui)
 
     def update_gui(self, e):
@@ -124,12 +129,14 @@ class ImagesThumbs(tkmacosx.SFrame):
         cfg.THUMBNAILS_RELOAD = self.thumbnails_reload
         tkmacosx.SFrame.__init__(
             self, master, bg=cfg.BGCOLOR, scrollbarwidth=7)
-        w = cfg.config['GEOMETRY'][0]
-        self.clmns = (w//158)-1
+
+        self.clmns = (cfg.config['GEOMETRY'][0]-cfg.MENU_W)//cfg.THUMB_SIZE
+
         title = CLabel(
             self, text=cfg.config['CURR_COLL'],
             font=('Arial', 45, 'bold'))
         title.pack(pady=(0, 15))
+
         if cfg.config['CURR_COLL'] == 'last':
             title.configure(text='Последние добавленные')
             res = Dbase.conn.execute(sqlalchemy.select(
@@ -140,10 +147,12 @@ class ImagesThumbs(tkmacosx.SFrame):
                     Thumbs.img150, Thumbs.src, Thumbs.modified).where(
                     Thumbs.collection==cfg.config['CURR_COLL']).order_by(
                     -Thumbs.modified)).fetchall()
-        thumbs = self.load_thumbs(res)
-        if len(thumbs) == 0:
-            return
-        for y in self.split_years(thumbs):
+
+        decoded_images = self.decode_thumbs(res)
+        converted_years = self.convert_year(decoded_images)
+        thumbs = self.split_years(converted_years)
+
+        for y in thumbs:
             year_label = CLabel(
                 self, text=y[-1][-1], font=('Arial', 35, 'bold'))
             year_label.pack(pady=(15, 15))
@@ -171,24 +180,37 @@ class ImagesThumbs(tkmacosx.SFrame):
                     i.configure(bg=cfg.BGPRESSED)
                     break
 
-    def load_thumbs(self, all_images: list):
+    def decode_thumbs(self, thumbs: tuple):
         """
-        Loads thumbnails from database > thumbnails based on size from
-        database > config > size > value.
-        * returns: list turples: (img, src, modified)
+        Prepares encoded images from database for tkinter.
+        * input: ((`img`, `src`, `date modified`), ...)
+        * returns: list turples: (img ready to tkinter label, src, modified)
         """
-        thumbs = []
-        for blob, src, mod in all_images:
+        result = []
+        for blob, src, modified in thumbs:
             try:
                 decoded = decode_image(blob)
                 cropped = crop_image(decoded)
                 rgb = convert_to_rgb(cropped)
-                photo = ImageTk.PhotoImage(rgb)
-                year = datetime.fromtimestamp(mod).year
-                thumbs.append((photo, src, year))
+                img = ImageTk.PhotoImage(rgb)
+                result.append((img, src, modified))
+
             except Exception:
                 print(traceback.format_exc())
-        return thumbs
+
+        return result
+
+    def convert_year(self, thumbs:list):
+        """
+        Converts image modified date to year
+        * input: ((`img`, `src`, `date modified`), ...)
+        * returns: list turples: (img ready to tkinter label, src, year)
+        """
+        result = []
+        for img, src, modified in thumbs:
+            year = datetime.fromtimestamp(modified).year
+            result.append((img, src, year))
+        return result
 
     def split_years(self, thumbs: list):
         """
@@ -199,7 +221,8 @@ class ImagesThumbs(tkmacosx.SFrame):
         years = set(year for _, _, year in thumbs)
         list_years = []
         for y in years:
-            tmp = [(im, src, year) for im, src, year in thumbs if year == y]
+            tmp = tuple(
+                (img, src, year) for img, src, year in thumbs if year == y)
             list_years.append(tmp)
         list_years.reverse()
         return list_years
