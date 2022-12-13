@@ -88,11 +88,8 @@ def search_collections():
     Returns list of dirs.
     Looking for all folders in `cfg.COLL_FOLDER`
     """
-    colls = []
-    for sub_coll in os.listdir(cfg.config['COLL_FOLDER']):
-        colls.append(os.path.join(cfg.config['COLL_FOLDER'], sub_coll))
-    return colls
-
+    return tuple(
+        os.path.join(cfg.config['COLL_FOLDER'], i) for i in os.listdir(cfg.config['COLL_FOLDER']))
 
 def search_retouched(list_dirs: list):
     """
@@ -138,9 +135,8 @@ def db_images():
     Loads from Database > Thumbs: `src`, `size`, `created`,
     `modified`, `collection` to tuples list
     """
-    names =[
-        Thumbs.src, Thumbs.size, Thumbs.created,
-        Thumbs.modified, Thumbs.collection]
+    names = (Thumbs.src, Thumbs.size, Thumbs.created,
+            Thumbs.modified, Thumbs.collection)
     return Dbase.conn.execute(sqlalchemy.select(names)).fetchall()
 
 
