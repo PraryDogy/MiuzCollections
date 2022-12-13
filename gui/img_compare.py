@@ -45,7 +45,8 @@ class CompareWindow(CWindow):
         CWindow.__init__(self)
         self.title('Сравнение')
         side = int(cfg.ROOT.winfo_screenheight()*0.8)
-        self.geometry(f'{side}x{side}')
+        self.geometry(f'{int(side*1.3)}x{side}')
+        self.configure(pady=0, padx=0)
 
         win1, win2 = get_windows()[:2]
 
@@ -58,11 +59,10 @@ class CompareWindow(CWindow):
         cfg.IMG_SRC = globs.src1
 
         image_frame = ImageFrame(self)
-        image_frame.pack(pady=(0, 15), expand=True, fill=tkinter.BOTH)
+        image_frame.pack(pady=(0, 15), expand=1, fill=tkinter.BOTH)
 
         ImgButtons(self).pack(pady=(0, 15))
         ImgInfo(self).pack(pady=(0, 15))
-        CloseBtn(self, text='Закрыть').pack()
 
         cfg.ROOT.update_idletasks()
         place_center(self)

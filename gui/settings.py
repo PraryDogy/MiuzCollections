@@ -40,7 +40,7 @@ class Settings(CWindow):
 
         scrollable = tkmacosx.SFrame(
             self, bg=cfg.BGCOLOR, scrollbarwidth=7)
-        scrollable.pack(fill=tkinter.BOTH, expand=True)
+        scrollable.pack(fill=tkinter.BOTH, expand=1)
 
         bottom_frame = CFrame(self)
         bottom_frame.pack(padx=(0, 7))

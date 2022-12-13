@@ -8,7 +8,7 @@ import cfg
 from scaner import scaner
 from utils import smb_check
 
-from .widgets import CButton, CFrame, CLabel, CSep, SmbChecker
+from .widgets import CButton, CFrame, CLabel, CSep, SmbAlert
 from .settings import Settings
 
 
@@ -79,7 +79,7 @@ class UpdateSection(CLabel, CButton):
         """
         if not cfg.FLAG:
             if not smb_check():
-                SmbChecker()
+                SmbAlert()
                 return
             btn.press()
             scaner()

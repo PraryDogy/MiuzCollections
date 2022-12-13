@@ -36,7 +36,7 @@ class Gallery(CFrame):
         cfg.MENU_W = menu.winfo_reqwidth()
 
         imgs = ImagesThumbs(self)
-        imgs.pack(expand=True, fill=tkinter.BOTH, side=tkinter.RIGHT)
+        imgs.pack(expand=1, fill=tkinter.BOTH, side=tkinter.RIGHT)
 
         cfg.ROOT.bind('<ButtonRelease-1>', self.update_gui)
 
@@ -160,7 +160,7 @@ class ImagesThumbs(tkmacosx.SFrame):
 
         for title, row in zip(packed_titles, packed_thumbs):
             title.pack(pady=(15, 15))
-            row.pack(fill=tkinter.Y, expand=True, anchor=tkinter.W)
+            row.pack(fill=tkinter.Y, expand=1, anchor=tkinter.W)
 
     def thumbnails_reload(self):
         """
@@ -177,7 +177,7 @@ class ImagesThumbs(tkmacosx.SFrame):
         cfg.config['GEOMETRY'][0], cfg.config['GEOMETRY'][1] = w, h
         self.destroy()
         thumbs = ImagesThumbs(self.master)
-        thumbs.pack(expand=True, fill=tkinter.BOTH, side=tkinter.RIGHT)
+        thumbs.pack(expand=1, fill=tkinter.BOTH, side=tkinter.RIGHT)
         if cfg.COMPARE:
             for i in cfg.THUMBS:
                 if selected in i['text']:
@@ -272,7 +272,7 @@ class ImagesThumbs(tkmacosx.SFrame):
 
             if i%self.clmns == 0:
                 row = CFrame(year_frame)
-                row.pack(fill=tkinter.Y, expand=True, anchor=tkinter.W)
+                row.pack(fill=tkinter.Y, expand=1, anchor=tkinter.W)
 
             thumb = CButton(row)
             thumb.configure(

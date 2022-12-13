@@ -13,7 +13,7 @@ from utils import (close_windows, convert_to_rgb, decode_image, get_coll_name,
                    place_center, resize_image, smb_check)
 
 from .widgets import (AskExit, CButton, CLabel, CloseBtn, CWindow,
-                           ImgBtns, SmbChecker)
+                           ImgBtns, SmbAlert)
 from .img_compare import CompareWindow
 
 
@@ -23,22 +23,21 @@ class Globals:
     img_info = tkinter.Label
     img_frame = tkinter.Label
     curr_img = ImageTk
-
+    info_w = 43
 
 globs = Globals()
 
 
 def pack_widgets(win: tkinter.Toplevel):
     image_frame = ImgFrame(win)
-    image_frame.pack(pady=(0, 15), expand=True, fill=tkinter.BOTH)
+    image_frame.pack(pady=(0, 15), expand=1, fill=tkinter.BOTH)
 
     ImgButtons(win).pack(pady=(0, 15))
     ImgInfo(win).pack(pady=(0, 15))
-    CloseBtn(win, text='Закрыть').pack()
 
     if globs.height == 0:
         cfg.ROOT.update_idletasks()
-        globs.height = image_frame.winfo_height()-2
+        globs.height = image_frame.winfo_height()
         globs.width = win.winfo_width()
 
     image_frame.place_thumbnail()
@@ -62,12 +61,13 @@ class PreviewWindow(CWindow):
 
         if not smb_check():
             close_windows()
-            SmbChecker()
+            SmbAlert()
             return
 
         self.title('Просмотр')
         side = int(cfg.ROOT.winfo_screenheight()*0.8)
-        self.geometry(f'{side}x{side}')
+        self.geometry(f'{int(side*1.3)}x{side}')
+        self.configure(pady=0, padx=0)
 
         cfg.IMG_SRC, globs.all_src = src, all_src
 
@@ -165,9 +165,14 @@ class ImgInfo(CLabel):
         globs.img_info = self
 
         name = cfg.IMG_SRC.split(os.sep)[-1]
+        name = self.name_cut(name)
+
         path = cfg.IMG_SRC.replace(cfg.config["COLL_FOLDER"], "Коллекции")
         path = path.replace(cfg.config["PHOTO_DIR"], "Фото")
+        path = self.name_cut(path)
+
         filesize = round(os.path.getsize(cfg.IMG_SRC)/(1024*1024), 2)
+
         filemod = datetime.fromtimestamp(os.path.getmtime(cfg.IMG_SRC))
         filemod = filemod.strftime("%d-%m-%Y, %H:%M:%S")
 
@@ -179,4 +184,7 @@ class ImgInfo(CLabel):
                 f'\nДата изменения: {filemod}')
 
         self.configure(
-            text=txt, justify=tkinter.LEFT, anchor=tkinter.W, width=43)
+            text=txt, justify=tkinter.LEFT, anchor=tkinter.W, width=globs.info_w)
+
+    def name_cut(self, name: str):
+        return [name[:globs.info_w]+'...' if len(name) > globs.info_w else name][0]

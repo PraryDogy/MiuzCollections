@@ -146,7 +146,7 @@ class AskExit(CWindow):
         quit()
 
 
-class SmbChecker(tkinter.Toplevel):
+class SmbAlert(tkinter.Toplevel):
     def __init__(self):
         CWindow.__init__(self)
         self.title('Нет подключения')

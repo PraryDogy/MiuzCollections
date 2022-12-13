@@ -34,7 +34,7 @@ class MainGui:
             cfg.ROOT.protocol("WM_DELETE_WINDOW", AskExit)
 
         CSep(cfg.ROOT).pack(fill=tkinter.X, pady=(30, 20))
-        Gallery(cfg.ROOT).pack(fill=tkinter.BOTH, expand=True)
+        Gallery(cfg.ROOT).pack(fill=tkinter.BOTH, expand=1)
         CSep(cfg.ROOT).pack(fill=tkinter.X, pady=10)
         StatusBar(cfg.ROOT).pack(pady=(0, 10))
         BarMenu()
