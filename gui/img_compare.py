@@ -11,7 +11,7 @@ class Globals:
     img1, src1, info1 = None, str, str
     img2, src2, info2 = None, str, str
     img_widget, info_widget = tkinter.Label, tkinter.Label
-
+    count = 0
 
 globs = Globals()
 
@@ -53,8 +53,16 @@ class CompareWindow(CWindow):
         try:
             globs.img1, globs.src1, globs.info1 = get_widgets(win1)
             globs.img2, globs.src2, globs.info2 = get_widgets(win2)
+        
         except KeyError:
-            [i.destroy() for i in get_windows()]
+            if globs.count >= 3:
+                self.error_exit()
+                return
+
+            globs.count += 1
+            self.destroy()
+            print('compare window key error')
+            return
 
         cfg.IMG_SRC = globs.src1
 

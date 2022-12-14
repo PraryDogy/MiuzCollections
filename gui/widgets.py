@@ -73,6 +73,9 @@ class CWindow(tkinter.Toplevel):
         self.resizable(0,0)
         self.configure(bg=cfg.BGCOLOR, padx=15, pady=15)
 
+    def error_exit(self):
+        close()
+
 
 class CloseBtn(CButton):
     def __init__(self, master: tkinter.Widget, **kwargs):

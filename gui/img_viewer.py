@@ -12,9 +12,8 @@ from database import Dbase, Thumbs
 from utils import (close_windows, convert_to_rgb, decode_image, get_coll_name,
                    place_center, resize_image, smb_check)
 
-from .widgets import (AskExit, CButton, CLabel, CloseBtn, CWindow,
-                           ImgBtns, SmbAlert)
 from .img_compare import CompareWindow
+from .widgets import CButton, CLabel, CWindow, ImgBtns, SmbAlert
 
 
 class Globals:
