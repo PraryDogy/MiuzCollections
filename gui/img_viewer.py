@@ -73,8 +73,14 @@ class PreviewWindow(CWindow):
         pack_widgets(self)
 
         if cfg.COMPARE:
+            t1 = threading.Thread(target=cfg.STBAR_WAIT)
+            t1.start()
+            while t1.is_alive():
+                cfg.ROOT.update()
+            cfg.STBAR_WAIT
             globs.img_frame.place_image()
             CompareWindow()
+            cfg.STBAR_NORM()
             return
 
         cfg.ROOT.update_idletasks()
@@ -146,7 +152,7 @@ class ImgButtons(ImgBtns):
     def compare(self, btn: CButton):
         btn.press()
         if not cfg.COMPARE:
-            cfg.STATUSBAR_COMPARE()
+            cfg.STBAR_COMPARE()
             for i in cfg.THUMBS:
                 if i['text'] == cfg.IMG_SRC:
                     i['bg'] = cfg.BGPRESSED

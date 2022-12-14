@@ -44,8 +44,10 @@ IMG_SRC = str
 
 # gui functions 
 THUMBNAILS_RELOAD = object
-STATUSBAR_NORMAL = object
-STATUSBAR_COMPARE = object
+STBAR_NORM = object
+STBAR_COMPARE = object
+STBAR_WAIT = object
+
 
 def defaults():
     return {

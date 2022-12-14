@@ -1,16 +1,17 @@
 import tkinter
 
 import cfg
-from utils import place_center, close_windows, get_windows
+from utils import get_windows, place_center
 
 from .macosx_menu import CLabel
-from .widgets import ImgBtns, CWindow, CloseBtn, AskExit
+from .widgets import CWindow, ImgBtns
 
 
 class Globals:
     img1, src1, info1 = None, str, str
     img2, src2, info2 = None, str, str
     img_widget, info_widget = tkinter.Label, tkinter.Label
+    curr_txt = str
     count = 0
 
 globs = Globals()
@@ -30,14 +31,14 @@ def get_widgets(window: tkinter.Toplevel):
 
 
 def switch_image():
-    if globs.src1 == cfg.IMG_SRC:
+    if globs.curr_txt == globs.info1:
         globs.img_widget['image'] = globs.img2
         globs.info_widget['text'] = globs.info2
-        cfg.IMG_SRC = globs.src2
+        globs.curr_txt = globs.info2
     else:
         globs.img_widget['image'] = globs.img1
         globs.info_widget['text'] = globs.info1
-        cfg.IMG_SRC = globs.src1
+        globs.curr_txt = globs.info1
 
 
 class CompareWindow(CWindow):
@@ -53,7 +54,6 @@ class CompareWindow(CWindow):
         try:
             globs.img1, globs.src1, globs.info1 = get_widgets(win1)
             globs.img2, globs.src2, globs.info2 = get_widgets(win2)
-        
         except KeyError:
             if globs.count >= 3:
                 self.error_exit()
@@ -64,7 +64,7 @@ class CompareWindow(CWindow):
             print('compare window key error')
             return
 
-        cfg.IMG_SRC = globs.src1
+        globs.curr_txt = globs.info1
 
         image_frame = ImageFrame(self)
         image_frame.pack(pady=(0, 15), expand=1, fill=tkinter.BOTH)

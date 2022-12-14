@@ -18,8 +18,9 @@ class StatusBar(CFrame):
     """
     def __init__(self, master):
         CFrame.__init__(self, master)
-        cfg.STATUSBAR_NORMAL = self.pack_widgets
-        cfg.STATUSBAR_COMPARE = self.pack_compare
+        cfg.STBAR_NORM = self.pack_widgets
+        cfg.STBAR_COMPARE = self.pack_compare
+        cfg.STBAR_WAIT = self.wait_compare
         self.pack_widgets()
 
     def pack_widgets(self):
@@ -36,6 +37,10 @@ class StatusBar(CFrame):
         widgets = tuple(v for k, v in self.children.items())
         [i.destroy() for i in widgets]
         CompareTitle(self)
+
+    def wait_compare(self):
+        widgets = tuple(v for k, v in self.children.items())
+        widgets[0]['text'] = 'Подготовка'
 
 
 class FakeLabel(CLabel):
@@ -108,7 +113,7 @@ class CompareTitle(CFrame):
 
     def cancel(self):
         cfg.ROOT.unbind('<Escape>')
-        cfg.STATUSBAR_NORMAL()
+        cfg.STBAR_NORM()
         for i in cfg.THUMBS:
             if i['bg'] == cfg.BGPRESSED:
                 i['bg'] = cfg.BGCOLOR

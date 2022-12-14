@@ -158,7 +158,6 @@ def close_windows():
     "Close all top levels"
     if cfg.COMPARE:
         cfg.COMPARE = False
-        cfg.STATUSBAR_NORMAL()
         [i.configure(bg=cfg.BGCOLOR) for i in cfg.THUMBS]
 
     [i.destroy() for i in get_windows()]
