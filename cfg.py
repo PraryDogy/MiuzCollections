@@ -8,7 +8,6 @@ import shutil
 import tkinter
 
 from cryptography.fernet import Fernet, InvalidToken
-
 from utils import encrypt_cfg
 
 # app info
@@ -35,7 +34,6 @@ THUMB_SIZE = 150
 ROOT = tkinter.Tk()
 ROOT.withdraw()
 
-MENU_W = 0
 LIVE_LBL = tkinter.Label
 THUMBS = []
 FLAG = False

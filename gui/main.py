@@ -36,7 +36,7 @@ class MainGui:
         CSep(cfg.ROOT).pack(fill=tkinter.X, pady=(30, 20))
         Gallery(cfg.ROOT).pack(fill=tkinter.BOTH, expand=1)
         CSep(cfg.ROOT).pack(fill=tkinter.X, pady=10)
-        StatusBar(cfg.ROOT).pack(pady=(0, 10))
+        self.st_bar = StatusBar(cfg.ROOT).pack(pady=(0, 10))
         BarMenu()
         cfg.ROOT.eval(f'tk::PlaceWindow {cfg.ROOT} center')
         w, h, x, y = cfg.config['GEOMETRY']

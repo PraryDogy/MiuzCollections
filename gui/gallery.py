@@ -21,6 +21,8 @@ from utils import convert_to_rgb, crop_image, decode_image
 from .widgets import CButton, CFrame, CLabel, CSep
 from .img_viewer import PreviewWindow
 
+menu_w = 0
+
 
 class Gallery(CFrame):
     """
@@ -29,11 +31,13 @@ class Gallery(CFrame):
     """
     def __init__(self, master):
         CFrame.__init__(self, master)
-
+        
         menu = MenuButtons(self)
         menu.pack(pady=(0, 0), padx=(0, 15), side=tkinter.LEFT, fill=tkinter.Y)
         cfg.ROOT.update_idletasks()
-        cfg.MENU_W = menu.winfo_reqwidth()
+
+        global menu_w
+        menu_w = menu.winfo_reqwidth()
 
         imgs = ImagesThumbs(self)
         imgs.pack(expand=1, fill=tkinter.BOTH, side=tkinter.RIGHT)
@@ -73,6 +77,7 @@ class MenuButtons(tkmacosx.SFrame):
             for_btns.append((name_btn[:13], coll_item))
         for_btns.sort()
         btns = []
+
         last = CButton(self, text='Последние')
         last.configure(height=1, width=13, pady=5, anchor=tkinter.W, padx=10)
         last.cmd(partial(self.collection_folder, 'last', last, btns))
@@ -130,7 +135,7 @@ class ImagesThumbs(tkmacosx.SFrame):
         tkmacosx.SFrame.__init__(
             self, master, bg=cfg.BGCOLOR, scrollbarwidth=7)
 
-        self.clmns = (cfg.config['GEOMETRY'][0]-cfg.MENU_W)//cfg.THUMB_SIZE
+        self.clmns = (cfg.config['GEOMETRY'][0]-menu_w)//cfg.THUMB_SIZE
 
         title = CLabel(
             self, text=cfg.config['CURR_COLL'], font=('Arial', 45, 'bold'))
