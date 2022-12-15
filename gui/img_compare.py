@@ -45,6 +45,7 @@ class ImgCompare(CWindow):
         label = CLabel(self)
         label['bg']='black'
         label['image'] = self.img1
+        label['height'] = 1
         label.bind('<ButtonRelease-1>', lambda e: self.switch_img())
         return label
 
@@ -57,14 +58,18 @@ class ImgCompare(CWindow):
             text=self.info1, width=43)
         return label
 
+    def set_vars(self, img, info, src):
+        self.img_frame['image'] = img
+        self.i_frame['text'] = info
+        self.curr_src = src
+        cfg.IMG_SRC = src
+
     def switch_img(self):
         if self.src1 == self.curr_src:
-            self.img_frame['image'] = self.img2
-            self.i_frame['text'] = self.info2
-            self.curr_src = self.src2
-            cfg.IMG_SRC = self.src2
+            self.set_vars(self.img2, self.info2, self.src2)
         else:
-            self.img_frame['image'] = self.img1
-            self.i_frame['text'] = self.info1
-            self.curr_src = self.src1
-            cfg.IMG_SRC = self.src1
+            self.set_vars(self.img1, self.info1, self.src1)
+
+
+        cfg.ROOT.update_idletasks()
+        print(self.img_frame.winfo_height())

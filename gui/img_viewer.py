@@ -51,26 +51,18 @@ class ImgViewer(CWindow):
         self.width = self.winfo_width()
 
         self.thumb_place()
+        self.img_place()
 
         if cfg.COMPARE:
-            t1 = threading.Thread(target=cfg.STBAR_WAIT)
-            t1.start()
-            while t1.is_alive():
-                cfg.ROOT.update()
-            self.img_place()
-            ImgCompare()
-            cfg.STBAR_NORM()
+            self.run_compare()
             return
 
         place_center(self)
         self.deiconify()
         self.grab_set()
-        
-        self.img_place()
-
 
     def img_widget(self):
-        label = CLabel(self)
+        label = CLabel(self, width=1)
         label['bg']='black'
         label.bind('<ButtonRelease-1>', lambda e: self.img_click(e))
         self.bind('<Left>', lambda e: self.switch_img(self.img_ind()-1))
@@ -90,6 +82,14 @@ class ImgViewer(CWindow):
             text=self.create_info(), justify=tkinter.LEFT,
             anchor=tkinter.W, width=self.ln)
         return label
+
+    def run_compare(self):
+        t1 = threading.Thread(target=cfg.STBAR_WAIT)
+        t1.start()
+        while t1.is_alive():
+            cfg.ROOT.update()
+        ImgCompare()
+        cfg.STBAR_NORM()
 
     def switch_img(self, ind: int):
         try:
