@@ -97,6 +97,7 @@ class Gallery(CFrame):
     def thumbnails_widget(self):
         parent = CFrame(self)
         scrollable = tkmacosx.SFrame(parent, bg=cfg.BGCOLOR, scrollbarwidth=7)
+        scrollable.pack(expand=1, fill=tkinter.BOTH, side=tkinter.RIGHT)
 
         self.clmns = (cfg.config['GEOMETRY'][0]-self.menu_w)//cfg.THUMB_SIZE
 
@@ -172,8 +173,8 @@ class Gallery(CFrame):
 
         self.thumbs_widget.destroy()
 
-        thumbs = self.thumbnails_widget()
-        thumbs.pack(expand=1, fill=tkinter.BOTH, side=tkinter.RIGHT)
+        self.thumbs_widget = self.thumbnails_widget()
+        self.thumbs_widget.pack(expand=1, fill=tkinter.BOTH, side=tkinter.RIGHT)
         if cfg.COMPARE:
             for i in cfg.THUMBS:
                 if selected in i['text']:

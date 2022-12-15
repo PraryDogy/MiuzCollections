@@ -288,11 +288,11 @@ def scaner():
             update_nocollection(aged=True)
 
         Dbase.conn.execute('VACUUM')
-        try:
-            cfg.THUMBNAILS_RELOAD()
-        except Exception:
-            print('images_reset error')
-            os.execv(sys.executable, ['python'] + sys.argv)
+        # try:
+        cfg.THUMBNAILS_RELOAD()
+        # except Exception:
+        #     print('images_reset error')
+        #     # os.execv(sys.executable, ['python'] + sys.argv)
         cfg.FLAG = False
 
     t1 = threading.Thread(target=__scan, daemon=True)
