@@ -161,6 +161,7 @@ def close_windows():
         [i.configure(bg=cfg.BGCOLOR) for i in cfg.THUMBS]
 
     [i.destroy() for i in get_windows()]
+    cfg.WINS.clear()
     cfg.ROOT.focus_force()
 
 

@@ -8,6 +8,7 @@ import shutil
 import tkinter
 
 from cryptography.fernet import Fernet, InvalidToken
+
 from utils import encrypt_cfg
 
 # app info
@@ -46,6 +47,7 @@ STBAR_NORM = object
 STBAR_COMPARE = object
 STBAR_WAIT = object
 
+WINS = []
 
 def defaults():
     return {
