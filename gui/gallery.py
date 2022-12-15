@@ -31,16 +31,16 @@ class Gallery(CFrame):
     """
     def __init__(self, master):
         CFrame.__init__(self, master)
-        
-        menu = MenuButtons(self)
+        cfg.THUMBNAILS_RELOAD = self.thumbnails_reload
+
+        menu = self.menu_widget()
         menu.pack(pady=(0, 0), padx=(0, 15), side=tkinter.LEFT, fill=tkinter.Y)
         cfg.ROOT.update_idletasks()
 
-        global menu_w
-        menu_w = menu.winfo_reqwidth()
+        self.menu_w = menu.winfo_reqwidth()
 
-        imgs = ImagesThumbs(self)
-        imgs.pack(expand=1, fill=tkinter.BOTH, side=tkinter.RIGHT)
+        self.thumbs_widget = self.thumbnails_widget()
+        self.thumbs_widget.pack(expand=1, fill=tkinter.BOTH, side=tkinter.RIGHT)
 
         cfg.ROOT.bind('<ButtonRelease-1>', self.update_gui)
 
@@ -51,20 +51,11 @@ class Gallery(CFrame):
             cfg.config['GEOMETRY'][0] = new_w
             cfg.THUMBNAILS_RELOAD()
 
-
-class MenuButtons(tkmacosx.SFrame):
-    """
-    Creates tkinter buttons with vertical pack.
-    Buttons based on list of collections.
-    List of collections based on Database > Thumbs.collection.
-    * param `master`: tkinter frame
-    """
-    def __init__(self, master):
-        self.master = master
-        tkmacosx.SFrame.__init__(
-            self, master, bg=cfg.BGCOLOR, scrollbarwidth=7, width=170)
+    def menu_widget(self):
+        scrollable = tkmacosx.SFrame(
+            self, bg=cfg.BGCOLOR, scrollbarwidth=7, width=170)
         title = CLabel(
-            self, text='Коллекции', font=('Arial', 22, 'bold'))
+            scrollable, text='Коллекции', font=('Arial', 22, 'bold'))
         title.pack(pady=(20, 20), padx=(0, 15))
 
         load_colls = Dbase.conn.execute(
@@ -78,25 +69,67 @@ class MenuButtons(tkmacosx.SFrame):
         for_btns.sort()
         btns = []
 
-        last = CButton(self, text='Последние')
+        last = CButton(scrollable, text='Последние')
         last.configure(height=1, width=13, pady=5, anchor=tkinter.W, padx=10)
         last.cmd(partial(self.collection_folder, 'last', last, btns))
         last.pack(fill=tkinter.X, padx=(0, 15), pady=(0, 15))
         btns.append(last)
 
         for name_btn, name_coll in for_btns:
-            btn = CButton(self, text=name_btn)
+            btn = CButton(scrollable, text=name_btn)
             btn.configure(pady=5, anchor=tkinter.W, padx=10)
+            btn.cmd(partial(self.collection_folder, name_coll, btn, btns))
             btn.pack(fill=tkinter.X, padx=(0, 15))
             btns.append(btn)
+
             if name_coll == cfg.config['CURR_COLL']:
                 btn.configure(bg=cfg.BGPRESSED)
-            btn.cmd(partial(self.collection_folder, name_coll, btn, btns))
-            sep = CSep(self)
+
+            sep = CSep(scrollable)
             sep['bg'] = '#272727'
             sep.pack(fill=tkinter.X, padx=(0, 15))
+    
         if cfg.config['CURR_COLL'] == 'last':
             last.configure(bg=cfg.BGPRESSED)
+
+        return scrollable
+
+    def thumbnails_widget(self):
+        scrollable = tkmacosx.SFrame(self, bg=cfg.BGCOLOR, scrollbarwidth=7)
+
+        self.clmns = (cfg.config['GEOMETRY'][0]-self.menu_w)//cfg.THUMB_SIZE
+
+        title = CLabel(
+            scrollable, text=cfg.config['CURR_COLL'], font=('Arial', 45, 'bold'))
+        title.pack(pady=(0, 15))
+
+        if cfg.config['CURR_COLL'] == 'last':
+            title.configure(text='Последние добавленные')
+            res = Dbase.conn.execute(sqlalchemy.select(
+                    Thumbs.img150, Thumbs.src, Thumbs.modified).order_by(
+                    -Thumbs.modified).limit(120)).fetchall()
+        else:
+            res = Dbase.conn.execute(sqlalchemy.select(
+                    Thumbs.img150, Thumbs.src, Thumbs.modified).where(
+                    Thumbs.collection==cfg.config['CURR_COLL']).order_by(
+                    -Thumbs.modified)).fetchall()
+
+        decoded_images = self.decode_thumbs(res)
+        converted_years = self.convert_year(decoded_images)
+
+        all_src = tuple(i[1] for i in converted_years)
+        self.years = set(year for _, _, year in converted_years)
+
+        years_split = self.years_list(converted_years)
+
+        packed_thumbs = tuple(self.pack_thumbs(scrollable, i, all_src) for i in years_split)
+        packed_titles = reversed(tuple(self.pack_title(scrollable, i) for i in self.years))
+
+        for title, row in zip(packed_titles, packed_thumbs):
+            title.pack(pady=(15, 15))
+            row.pack(fill=tkinter.Y, expand=1, anchor=tkinter.W)
+
+        return scrollable
 
     def collection_folder(self, coll: str, btn: CButton, btns: list, e):
         """
@@ -121,52 +154,6 @@ class MenuButtons(tkmacosx.SFrame):
         cfg.config['CURR_COLL'] = coll
         cfg.THUMBNAILS_RELOAD()
 
-
-class ImagesThumbs(tkmacosx.SFrame):
-    """
-    Creates images grid based on database thumbnails.
-    Grid is labels with images created with pack method.
-    Number of columns in each row based on Database > Config > clmns > value.
-    * param `master`: tkmacosx scrollable frame.
-    """
-    def __init__(self, master):
-        self.master = master
-        cfg.THUMBNAILS_RELOAD = self.thumbnails_reload
-        tkmacosx.SFrame.__init__(
-            self, master, bg=cfg.BGCOLOR, scrollbarwidth=7)
-
-        self.clmns = (cfg.config['GEOMETRY'][0]-menu_w)//cfg.THUMB_SIZE
-
-        title = CLabel(
-            self, text=cfg.config['CURR_COLL'], font=('Arial', 45, 'bold'))
-        title.pack(pady=(0, 15))
-
-        if cfg.config['CURR_COLL'] == 'last':
-            title.configure(text='Последние добавленные')
-            res = Dbase.conn.execute(sqlalchemy.select(
-                    Thumbs.img150, Thumbs.src, Thumbs.modified).order_by(
-                    -Thumbs.modified).limit(120)).fetchall()
-        else:
-            res = Dbase.conn.execute(sqlalchemy.select(
-                    Thumbs.img150, Thumbs.src, Thumbs.modified).where(
-                    Thumbs.collection==cfg.config['CURR_COLL']).order_by(
-                    -Thumbs.modified)).fetchall()
-
-        decoded_images = self.decode_thumbs(res)
-        converted_years = self.convert_year(decoded_images)
-
-        all_src = tuple(i[1] for i in converted_years)
-        self.years = set(year for _, _, year in converted_years)
-
-        years_split = self.years_list(converted_years)
-
-        packed_thumbs = tuple(self.pack_thumbs(self, i, all_src) for i in years_split)
-        packed_titles = reversed(tuple(self.pack_title(self, i) for i in self.years))
-
-        for title, row in zip(packed_titles, packed_thumbs):
-            title.pack(pady=(15, 15))
-            row.pack(fill=tkinter.Y, expand=1, anchor=tkinter.W)
-
     def thumbnails_reload(self):
         """
         Destroys `ImagesThumbs` object and run it again.
@@ -178,10 +165,13 @@ class ImagesThumbs(tkmacosx.SFrame):
                     selected = i['text']
                     break
         cfg.THUMBS.clear()
+
         w, h = cfg.ROOT.winfo_width(), cfg.ROOT.winfo_height()
         cfg.config['GEOMETRY'][0], cfg.config['GEOMETRY'][1] = w, h
-        self.destroy()
-        thumbs = ImagesThumbs(self.master)
+        
+        self.thumbs_widget.pack_forget()
+        self.thumbs_widget.destroy()
+        thumbs = self.thumbnails_widget()
         thumbs.pack(expand=1, fill=tkinter.BOTH, side=tkinter.RIGHT)
         if cfg.COMPARE:
             for i in cfg.THUMBS:
