@@ -95,7 +95,8 @@ class Gallery(CFrame):
         return scrollable
 
     def thumbnails_widget(self):
-        scrollable = tkmacosx.SFrame(self, bg=cfg.BGCOLOR, scrollbarwidth=7)
+        parent = CFrame(self)
+        scrollable = tkmacosx.SFrame(parent, bg=cfg.BGCOLOR, scrollbarwidth=7)
 
         self.clmns = (cfg.config['GEOMETRY'][0]-self.menu_w)//cfg.THUMB_SIZE
 
@@ -129,7 +130,7 @@ class Gallery(CFrame):
             title.pack(pady=(15, 15))
             row.pack(fill=tkinter.Y, expand=1, anchor=tkinter.W)
 
-        return scrollable
+        return parent
 
     def collection_folder(self, coll: str, btn: CButton, btns: list, e):
         """
@@ -168,9 +169,9 @@ class Gallery(CFrame):
 
         w, h = cfg.ROOT.winfo_width(), cfg.ROOT.winfo_height()
         cfg.config['GEOMETRY'][0], cfg.config['GEOMETRY'][1] = w, h
-        
-        self.thumbs_widget.pack_forget()
+
         self.thumbs_widget.destroy()
+
         thumbs = self.thumbnails_widget()
         thumbs.pack(expand=1, fill=tkinter.BOTH, side=tkinter.RIGHT)
         if cfg.COMPARE:

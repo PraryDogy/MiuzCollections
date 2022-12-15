@@ -8,3 +8,4 @@ build/
 __Dist/
 database.db
 venv/
+.vscode/
