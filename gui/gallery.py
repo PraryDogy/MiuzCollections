@@ -19,7 +19,7 @@ from database import Dbase, Thumbs
 from utils import convert_to_rgb, crop_image, decode_image
 
 from .widgets import CButton, CFrame, CLabel, CSep
-from .img_viewer import PreviewWindow
+from .img_viewer import ImgViewer
 
 menu_w = 0
 
@@ -310,4 +310,4 @@ class ImagesThumbs(tkmacosx.SFrame):
             thumb['bg'] = cfg.BGCOLOR
 
     def open_preview(self, src, all_src, e):
-        PreviewWindow(src, all_src)
+        ImgViewer(src, all_src)

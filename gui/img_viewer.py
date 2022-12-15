@@ -16,47 +16,12 @@ from .img_compare import CompareWindow
 from .widgets import CButton, CLabel, CWindow, ImgBtns, SmbAlert
 
 
-all_src = []
-width, height = 0, 0
-img_info = tkinter.Label
-img_frame = tkinter.Label
-info_w = 43
-
-
-def pack_widgets(win: tkinter.Toplevel):
-    image_frame = ImgFrame(win)
-    image_frame.pack(pady=(0, 15), expand=1, fill=tkinter.BOTH)
-
-    ImgButtons(win).pack(pady=(0, 15))
-    ImgInfo(win).pack(pady=(0, 15))
-
-    global height, width
-    if height == 0:
-        cfg.ROOT.update_idletasks()
-        height = image_frame.winfo_height()
-        width = win.winfo_width()
-
-    image_frame.place_thumbnail()
-
-
-def switch_image(master: tkinter.Widget, index: int, all_src: list):
-    try:
-        cfg.IMG_SRC = all_src[index]
-    except IndexError:
-        cfg.IMG_SRC = all_src[0]
-    master = master.winfo_toplevel()
-    for i in master.winfo_children():
-        i.destroy()
-    pack_widgets(master)
-    img_frame.place_image()
-
-
-class PreviewWindow(CWindow):
-    def __init__(self, src: str, src_list: list):
+class ImgViewer(CWindow):
+    def __init__(self, src: str, all_src: list):
         CWindow.__init__(self)
 
-        global all_src
-        all_src = src_list
+        self.all_src = all_src
+        self.height = 0
         cfg.IMG_SRC = src
 
         if not smb_check():
@@ -69,14 +34,14 @@ class PreviewWindow(CWindow):
         self.geometry(f'{int(side*1.3)}x{side}')
         self.configure(pady=0, padx=0)
 
-        pack_widgets(self)
+        self.pack_widgets()
 
         if cfg.COMPARE:
             t1 = threading.Thread(target=cfg.STBAR_WAIT)
             t1.start()
             while t1.is_alive():
                 cfg.ROOT.update()
-            img_frame.place_image()
+            self.img_place()
             CompareWindow()
             cfg.STBAR_NORM()
             return
@@ -85,76 +50,94 @@ class PreviewWindow(CWindow):
         place_center(self)
         self.deiconify()
         self.grab_set()
-        img_frame.place_image()
+        
+        self.img_place()
 
+    def pack_widgets(self):
+        self.img_frame = self.img_widget()
+        self.img_frame.pack(pady=(0, 15), expand=1, fill=tkinter.BOTH)
 
-class ImgFrame(CLabel):
-    def __init__(self, master: tkinter.Toplevel):
-        CLabel.__init__(self, master, borderwidth=0)
+        self.btns = self.btns_widget()
+        self.btns.pack(pady=(0, 15))
+        
+        self.info_frame = self.info_widget()
+        self.info_frame.pack(pady=(0, 15))
 
-        global img_frame
-        img_frame = self
+        if self.height == 0:
+            cfg.ROOT.update_idletasks()
+            self.height = self.img_frame.winfo_height()
+            self.width = self.winfo_width()
 
-        self['bg']='black'
-        self.bind('<ButtonRelease-1>', lambda e: self.click_image(e))
-        master.bind('<Left>', lambda e: switch_image(self, self.img_ind()-1), all_src)
-        master.bind('<Right>', lambda e: switch_image(self, self.img_ind()+1), all_src)
+        self.img_thumbnail()
+
+    def switch_img(self, ind: int):
+        try:
+            cfg.IMG_SRC = self.all_src[ind]
+        except IndexError:
+            cfg.IMG_SRC = self.all_src[0]
+
+        for i in self.winfo_children():
+            i.destroy()
+        self.pack_widgets()
+        self.img_place()
+
+    def img_widget(self):
+        label = CLabel(self)
+        label['bg']='black'
+        label.bind('<ButtonRelease-1>', lambda e: self.img_click(e))
+        self.bind('<Left>', lambda e: self.switch_img(self.img_ind()-1))
+        self.bind('<Right>', lambda e: self.switch_img(self.img_ind()+1))
+        return label
 
     def img_ind(self) -> int: 
-        return all_src.index(cfg.IMG_SRC)
+        return self.all_src.index(cfg.IMG_SRC)
 
-    def set_img(self, img):
+    def img_set(self, img):
         img_tk = ImageTk.PhotoImage(img)
-        self.configure(image=img_tk)
-        self.image = img_tk
+        self.img_frame.configure(image=img_tk)
+        self.img_frame.image_names = img_tk
 
-    def click_image(self, e: tkinter.Event):
-        if e.x <= width//2:
+    def img_click(self, e: tkinter.Event):
+        if e.x <= self.width//2:
             index = self.img_ind() - 1
         else:
             index = self.img_ind() + 1
-        switch_image(self, index, all_src)
+        self.switch_img(index)
 
-    def place_thumbnail(self):
+    def img_thumbnail(self):
         thumb = Dbase.conn.execute(sqlalchemy.select(Thumbs.img150).where(
             Thumbs.src == cfg.IMG_SRC)).first()[0]
         decoded = decode_image(thumb)
-        resized = resize_image(decoded, width, height, False)
+        resized = resize_image(decoded, self.width, self.height, False)
         self.img_h, self.img_w = resized.shape[:2]
         rgb_image = convert_to_rgb(resized)
-        self.set_img(rgb_image)
+        self.img_set(rgb_image)
 
-    def __place_image(self):
-        global img_info
-
+    def __img_place(self):
         img_read = cv2.imread(cfg.IMG_SRC)
         resized = cv2.resize(
             img_read, (self.img_w, self.img_h), interpolation=cv2.INTER_AREA)
         img_rgb = convert_to_rgb(resized)
-        self.set_img(img_rgb)
+        self.img_set(img_rgb)
 
-        t = img_info['text']
+        t = self.info_frame['text']
         h, w = img_read.shape[:2]
+        self.info_frame['text'] = t.replace('Загрузка', f'{w} x {h}')
 
-        img_info['text'] = t.replace('Загрузка', f'{w} x {h}')
-        self['text'] = cfg.IMG_SRC
-
-    def place_image(self):
-        task = threading.Thread(target=self.__place_image)
+    def img_place(self):
+        task = threading.Thread(target=self.__img_place)
         task.start()
         while task.is_alive():
             cfg.ROOT.update()
 
-
-class ImgButtons(ImgBtns):
-    def __init__(self, master):
-        ImgBtns.__init__(self, master)
-
-        comp_btn = CButton(self, text='Сравнить')
-        comp_btn.cmd(lambda e: self.compare(comp_btn))
+    def btns_widget (self):
+        btns_frame = ImgBtns(self)
+        comp_btn = CButton(btns_frame, text='Сравнить')
+        comp_btn.cmd(lambda e: self.btn_compare(comp_btn))
         comp_btn.pack(side=tkinter.RIGHT)
+        return btns_frame
 
-    def compare(self, btn: CButton):
+    def btn_compare(self, btn: CButton):
         btn.press()
         if not cfg.COMPARE:
             cfg.STBAR_COMPARE()
@@ -168,19 +151,16 @@ class ImgButtons(ImgBtns):
             cfg.COMPARE = True
             return
 
-
-class ImgInfo(CLabel):
-    def __init__(self, master: tkinter.Widget):
-        CLabel.__init__(self, master)
-        global img_info, info_w
-        img_info = self
+    def info_widget(self):
+        label = CLabel(self)
+        ln = 43
 
         name = cfg.IMG_SRC.split(os.sep)[-1]
-        name = self.name_cut(name)
+        name = self.name_cut(name, ln)
 
         path = cfg.IMG_SRC.replace(cfg.config["COLL_FOLDER"], "Коллекции")
         path = path.replace(cfg.config["PHOTO_DIR"], "Фото")
-        path = self.name_cut(path)
+        path = self.name_cut(path, ln)
 
         filesize = round(os.path.getsize(cfg.IMG_SRC)/(1024*1024), 2)
 
@@ -194,8 +174,10 @@ class ImgInfo(CLabel):
                 f'\nРазмер: {filesize} мб'
                 f'\nДата изменения: {filemod}')
 
-        self.configure(
-            text=txt, justify=tkinter.LEFT, anchor=tkinter.W, width=info_w)
+        label.configure(
+            text=txt, justify=tkinter.LEFT, anchor=tkinter.W, width=ln)
+        
+        return label
 
-    def name_cut(self, name: str):
-        return [name[:info_w]+'...' if len(name) > info_w else name][0]
+    def name_cut(self, name: str, ln: int):
+        return [name[:ln]+'...' if len(name) > ln else name][0]
