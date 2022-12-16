@@ -21,8 +21,6 @@ from utils import convert_to_rgb, crop_image, decode_image
 from .widgets import CButton, CFrame, CLabel, CSep
 from .img_viewer import ImgViewer
 
-menu_w = 0
-
 
 class Gallery(CFrame):
     """

@@ -41,6 +41,7 @@ class ImgCompare(CWindow):
         self.deiconify()
         self.grab_set()
 
+
     def img_widget(self):
         label = CLabel(self)
         label['bg']='black'
@@ -65,6 +66,7 @@ class ImgCompare(CWindow):
         cfg.IMG_SRC = src
 
     def switch_img(self):
+        print(self.img1, self.img2)
         if self.src1 == self.curr_src:
             self.set_vars(self.img2, self.info2, self.src2)
         else:

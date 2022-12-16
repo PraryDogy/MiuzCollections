@@ -14,6 +14,7 @@ from utils import (close_windows, convert_to_rgb, decode_image, get_coll_name,
 
 from .img_compare import ImgCompare
 from .widgets import CButton, CLabel, CWindow, ImgBtns, SmbAlert
+from time import time
 
 
 class ImgViewer(CWindow):
@@ -25,7 +26,6 @@ class ImgViewer(CWindow):
             SmbAlert()
             return
 
-        cfg.WINS.append(self)
         cfg.IMG_SRC = img_src
         self.img_src = img_src
         self.all_src = all_src
@@ -51,16 +51,17 @@ class ImgViewer(CWindow):
         self.width = self.winfo_width()
 
         self.thumb_place()
+        self.task = cfg.ROOT.after(500, self.img_place)
+
+        cfg.WINS.append(self)
 
         if cfg.COMPARE:
-            self.run_compare()
+            cfg.ROOT.after(501, self.run_compare)
             return
 
         place_center(self)
         self.deiconify()
         self.grab_set()
-
-        self.img_place()
 
     def img_widget(self):
         label = CLabel(self, width=1)
@@ -91,16 +92,16 @@ class ImgViewer(CWindow):
             cfg.ROOT.update()
         ImgCompare()
         cfg.STBAR_NORM()
+        print('run compare')
 
     def switch_img(self, ind: int):
+        cfg.ROOT.after_cancel(self.task)
         try:
             cfg.IMG_SRC = self.all_src[ind]
         except IndexError:
             cfg.IMG_SRC = self.all_src[0]
-
         self.thumb_place()
-        self.img_place()
-        self.info_frame['text'] = self.create_info()
+        self.task = cfg.ROOT.after(500, self.img_place)
 
     def img_ind(self) -> int: 
         return self.all_src.index(cfg.IMG_SRC)
@@ -125,17 +126,13 @@ class ImgViewer(CWindow):
         rgb_image = convert_to_rgb(resized)
         self.img_set(rgb_image)
 
-    def __task(self):
+    def img_place(self):
+        print('place image')
         img_read = cv2.imread(cfg.IMG_SRC)
         resized = resize_image(img_read, self.width, self.height, False)
         img_rgb = convert_to_rgb(resized)
         self.img_set(img_rgb)
-
-    def img_place(self):
-        task = threading.Thread(target=self.__task)
-        task.start()
-        while task.is_alive():
-            cfg.ROOT.update()
+        self.info_frame['text'] = self.create_info()
 
     def btn_compare(self, btn: CButton):
         btn.press()
