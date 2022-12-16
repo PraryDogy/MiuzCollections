@@ -122,7 +122,8 @@ def resize_image(img, widget_w, widget_h, thumbnail: bool):
     else:
         f1 = widget_w / w
         f2 = widget_h / h
-        f = min(f1, f2)
+        # f = min(f1, f2)
+        f = f2
         new_w, new_h = (int(w * f), int(h * f))
 
     return cv2.resize(img, (new_w, new_h), interpolation=cv2.INTER_AREA)

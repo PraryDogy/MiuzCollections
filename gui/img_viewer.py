@@ -51,7 +51,6 @@ class ImgViewer(CWindow):
         self.width = self.winfo_width()
 
         self.thumb_place()
-        self.img_place()
 
         if cfg.COMPARE:
             self.run_compare()
@@ -60,6 +59,8 @@ class ImgViewer(CWindow):
         place_center(self)
         self.deiconify()
         self.grab_set()
+
+        self.img_place()
 
     def img_widget(self):
         label = CLabel(self, width=1)
@@ -121,14 +122,12 @@ class ImgViewer(CWindow):
             Thumbs.src == cfg.IMG_SRC)).first()[0]
         decoded = decode_image(thumb)
         resized = resize_image(decoded, self.width, self.height, False)
-        self.img_h, self.img_w = resized.shape[:2]
         rgb_image = convert_to_rgb(resized)
         self.img_set(rgb_image)
 
     def __task(self):
         img_read = cv2.imread(cfg.IMG_SRC)
-        resized = cv2.resize(
-            img_read, (self.img_w, self.img_h), interpolation=cv2.INTER_AREA)
+        resized = resize_image(img_read, self.width, self.height, False)
         img_rgb = convert_to_rgb(resized)
         self.img_set(img_rgb)
 

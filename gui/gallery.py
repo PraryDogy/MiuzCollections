@@ -33,14 +33,14 @@ class Gallery(CFrame):
         CFrame.__init__(self, master)
         cfg.THUMBNAILS_RELOAD = self.thumbnails_reload
 
-        menu = self.menu_widget()
-        menu.pack(pady=(0, 0), padx=(0, 15), side=tkinter.LEFT, fill=tkinter.Y)
+        menu_wid = self.menu_widget()
+        menu_wid.pack(pady=(0, 0), padx=(0, 15), side=tkinter.LEFT, fill=tkinter.Y)
         cfg.ROOT.update_idletasks()
 
-        self.menu_w = menu.winfo_reqwidth()
+        self.menu_w = menu_wid.winfo_reqwidth()
 
-        self.thumbs_widget = self.thumbnails_widget()
-        self.thumbs_widget.pack(expand=1, fill=tkinter.BOTH, side=tkinter.RIGHT)
+        self.thumbs_wid = self.thumbnails_widget()
+        self.thumbs_wid.pack(expand=1, fill=tkinter.BOTH, side=tkinter.RIGHT)
 
         cfg.ROOT.bind('<ButtonRelease-1>', self.update_gui)
 
@@ -171,10 +171,10 @@ class Gallery(CFrame):
         w, h = cfg.ROOT.winfo_width(), cfg.ROOT.winfo_height()
         cfg.config['GEOMETRY'][0], cfg.config['GEOMETRY'][1] = w, h
 
-        self.thumbs_widget.destroy()
+        self.thumbs_wid.destroy()
 
-        self.thumbs_widget = self.thumbnails_widget()
-        self.thumbs_widget.pack(expand=1, fill=tkinter.BOTH, side=tkinter.RIGHT)
+        self.thumbs_wid = self.thumbnails_widget()
+        self.thumbs_wid.pack(expand=1, fill=tkinter.BOTH, side=tkinter.RIGHT)
         if cfg.COMPARE:
             for i in cfg.THUMBS:
                 if selected in i['text']:
@@ -259,8 +259,8 @@ class Gallery(CFrame):
         ```
         thumbnails = list with 27 images
         clmns = 5
-        > pack_thumbs function will create 6 rows with 5 images, each row
-        > with 5 images. And last row with 2 images.
+        > pack_thumbs function will create 5 rows with 5 images, each row
+        > with 5 images. And 6st row with 2 images.
         ```
         """
         year_frame = CFrame(master)
@@ -288,9 +288,6 @@ class Gallery(CFrame):
         return year_frame
 
     def pack_title(self, master: tkinter.Widget, year):
-        """
-        Returns tkinter label with title text.
-        """
         return CLabel(master, text=year, font=('Arial', 35, 'bold'))
 
     def enter(self, thumb: CButton):
