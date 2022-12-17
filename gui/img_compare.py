@@ -1,10 +1,10 @@
 import tkinter
 
 import cfg
-from utils import get_windows, place_center
+from utils import place_center
 
 from .macosx_menu import CLabel
-from .widgets import CWindow, ImgBtns
+from .widgets import CWindow, ImgBtns, InfoWidget
 
 
 class ImgCompare(CWindow):
@@ -18,14 +18,18 @@ class ImgCompare(CWindow):
 
         self.img1 = cfg.WINS[0].img_frame['image']
         self.src1 = cfg.WINS[0].img_src
-        self.info1 = cfg.WINS[0].info_frame['text']
+        info1_l, _, info1_r = cfg.WINS[0].info_frame.winfo_children()
+        self.info1_l, self.info1_r = info1_l['text'], info1_r['text']
 
         self.img2 = cfg.WINS[1].img_frame['image']
         self.src2 = cfg.WINS[1].img_src
-        self.info2 = cfg.WINS[1].info_frame['text']
+        info2_l, _, info2_r = cfg.WINS[1].info_frame.winfo_children()
+        self.info2_l, self.info2_r = info2_l['text'], info2_r['text']
 
         self.curr_src = self.src1
         cfg.IMG_SRC = self.src1
+
+        self.ln = 43
 
         self.img_frame = self.img_widget()
         self.img_frame.pack(pady=(0, 15), expand=1, fill=tkinter.BOTH)
@@ -33,14 +37,13 @@ class ImgCompare(CWindow):
         self.btns = self.btns_widget()
         self.btns.pack(pady=(0, 15))
 
-        self.i_frame = self.info_widget()
-        self.i_frame.pack(pady=(0, 15))
+        self.info_frame = self.info_widget()
+        self.info_frame.pack(pady=(0, 15))
 
         cfg.ROOT.update_idletasks()
         place_center(self)
         self.deiconify()
         self.grab_set()
-
 
     def img_widget(self):
         label = CLabel(self)
@@ -54,24 +57,20 @@ class ImgCompare(CWindow):
         return ImgBtns(self)
 
     def info_widget(self):
-        label = CLabel(
-            self, anchor=tkinter.W, justify=tkinter.LEFT,
-            text=self.info1, width=43)
-        return label
+        info_widget = InfoWidget(self, self.ln, self.info1_l, self.info1_r)
+        return info_widget
 
-    def set_vars(self, img, info, src):
+    def set_vars(self, img, src, l_info, r_info):
         self.img_frame['image'] = img
-        self.i_frame['text'] = info
         self.curr_src = src
         cfg.IMG_SRC = src
 
+        info_l, _, info_r = self.info_frame.winfo_children()
+        info_l['text'] = l_info
+        info_r['text'] = r_info
+
     def switch_img(self):
-        print(self.img1, self.img2)
         if self.src1 == self.curr_src:
-            self.set_vars(self.img2, self.info2, self.src2)
+            self.set_vars(self.img2, self.src2, self.info2_l, self.info2_r)
         else:
-            self.set_vars(self.img1, self.info1, self.src1)
-
-
-        cfg.ROOT.update_idletasks()
-        print(self.img_frame.winfo_height())
+            self.set_vars(self.img1, self.src1, self.info1_l, self.info1_r)

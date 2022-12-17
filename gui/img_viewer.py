@@ -13,8 +13,7 @@ from utils import (close_windows, convert_to_rgb, decode_image, get_coll_name,
                    place_center, resize_image, smb_check)
 
 from .img_compare import ImgCompare
-from .widgets import CButton, CLabel, CWindow, ImgBtns, SmbAlert
-from time import time
+from .widgets import CButton, CLabel, CWindow, ImgBtns, SmbAlert, InfoWidget
 
 
 class ImgViewer(CWindow):
@@ -79,11 +78,9 @@ class ImgViewer(CWindow):
         return btns_frame
 
     def info_widget(self):
-        label = CLabel(self)
-        label.configure(
-            text=self.create_info(), justify=tkinter.LEFT,
-            anchor=tkinter.W, width=self.ln)
-        return label
+        info1, info2 = self.create_info()
+        info_widget = InfoWidget(self, self.ln, info1, info2)
+        return info_widget
 
     def run_compare(self):
         t1 = threading.Thread(target=cfg.STBAR_WAIT)
@@ -127,12 +124,13 @@ class ImgViewer(CWindow):
         self.img_set(rgb_image)
 
     def img_place(self):
-        print('place image')
         img_read = cv2.imread(cfg.IMG_SRC)
         resized = resize_image(img_read, self.width, self.height, False)
         img_rgb = convert_to_rgb(resized)
         self.img_set(img_rgb)
-        self.info_frame['text'] = self.create_info()
+
+        info1, _, info2 = self.info_frame.winfo_children()
+        info1['text'], info2['text'] = self.create_info()
 
     def btn_compare(self, btn: CButton):
         btn.press()
@@ -163,12 +161,15 @@ class ImgViewer(CWindow):
 
         w, h = Image.open(cfg.IMG_SRC).size
 
-        return (f'Коллекция: {get_coll_name(cfg.IMG_SRC)}'
-                f'\nИмя: {name}'
-                f'\nПуть: {path}'
-                f'\nРазрешение: {w}x{h}'
+        t1 = (f'Разрешение: {w}x{h}'
                 f'\nРазмер: {filesize} мб'
                 f'\nДата изменения: {filemod}')
+
+        t2 = (f'Коллекция: {get_coll_name(cfg.IMG_SRC)}'
+                f'\nИмя: {name}'
+                f'\nПуть: {path}')
+
+        return (t1, t2)
 
     def name_cut(self, name: str, ln: int):
         return [name[:ln]+'...' if len(name) > ln else name][0]

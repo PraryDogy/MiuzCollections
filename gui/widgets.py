@@ -109,6 +109,25 @@ class ImgBtns(CFrame):
         threading.Thread(target=open).start()
 
 
+class InfoWidget(CFrame):
+    def __init__(self, master: tkinter, ln, info1, info2, **kwargs):
+        CFrame.__init__(self, master, **kwargs)
+
+        label1 = CLabel(self)
+        label1.configure(
+            text=info1, justify=tkinter.LEFT,
+            anchor=tkinter.E, width=ln)
+        label1.pack(side=tkinter.LEFT, anchor=tkinter.E)
+
+        CSep(self).pack(side=tkinter.LEFT, fill=tkinter.Y, padx=10)
+
+        label2 = CLabel(self)
+        label2.configure(
+            text=info2, justify=tkinter.LEFT,
+            anchor=tkinter.W, width=ln)
+        label2.pack(side=tkinter.LEFT)
+
+
 class AskExit(CWindow):
     def __init__(self):
         CWindow.__init__(self)
