@@ -28,7 +28,7 @@ class MainGui:
 
         cfg.ROOT.bind('<Command-w>', lambda e: cfg.ROOT.withdraw())
 
-        if cfg.config['MINIMIZE']:
+        if cfg.config['MINIMIZE'] == 1:
             cfg.ROOT.protocol("WM_DELETE_WINDOW", lambda: cfg.ROOT.withdraw())
         else:
             cfg.ROOT.protocol("WM_DELETE_WINDOW", AskExit)

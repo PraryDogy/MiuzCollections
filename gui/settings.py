@@ -12,7 +12,7 @@ from tkinter import filedialog
 import tkmacosx
 
 import cfg
-from utils import encrypt_cfg, my_copy, my_paste, place_center
+from utils import encrypt_cfg, my_copy, my_paste, place_center, close_windows
 
 from .widgets import AskExit, CButton, CFrame, CLabel, CloseBtn, CSep, CWindow
 
@@ -40,7 +40,6 @@ class Settings(CWindow):
 
         self.ln = int(self.winfo_width()*0.9)
 
-
         scrolllable = tkmacosx.SFrame(
             self, bg=cfg.BGCOLOR, scrollbarwidth=7)
         scrolllable.pack(fill=tkinter.BOTH, expand=1)
@@ -61,7 +60,6 @@ class Settings(CWindow):
 
         self.save_widget(bottom_frame).pack()
 
-        # cfg.ROOT.update_idletasks()
         place_center(self)
         self.deiconify()
         self.grab_set()
@@ -180,10 +178,11 @@ class Settings(CWindow):
 
 
         check_box = tkinter.Checkbutton(min_frame, bg=cfg.BGCOLOR)
+        check_box['command'] = lambda: self.checkbox_cmd(check_box)
+        [check_box.select() if cfg.config['MINIMIZE'] == 1 else False]
 
         check_lbl = CLabel(min_frame, text='Свернуть вместо закрыть')
 
-        [check_box.select() if cfg.config['MINIMIZE'] == 1 else False]
         [i.pack(side=tkinter.LEFT) for i in (check_box, check_lbl)]
 
         rest_frame = CFrame(frame)
@@ -213,6 +212,13 @@ class Settings(CWindow):
         cancel_btn.pack(side=tkinter.RIGHT)
 
         return frame
+
+    def checkbox_cmd(self, master: tkinter.Checkbutton):
+        if cfg.config['MINIMIZE'] == 1:
+            cfg.config['MINIMIZE'] = 0
+        else:
+            cfg.config['MINIMIZE'] = 1
+            master.select()
 
     def full_scan(self):
         """
@@ -290,16 +296,21 @@ class Settings(CWindow):
         Get text from all text fields in advanced settings and save to
         cfg.json
         """
-        # cfg.config['PHOTO_DIR'] = alls['PHOTODIR_LBL']['text']
-        # cfg.config['COLL_FOLDER'] = alls['COLLFOLDERS_LBL']['text']
-        # cfg.config['RT_FOLDER'] = alls['RTFOLDER_ENTRY'].get()
-        # cfg.config['FILE_AGE'] = alls['FILEAGE_ENTRY'].get()
-        # cfg.config['MINIMIZE'] = alls['MIN_CHECKBOX'].get()
-        # encrypt_cfg(cfg.config)
+        path1, path2, entry1, entry2, checkbox = self.get_widgets()
 
-        # if cfg.config['MINIMIZE']:
-        #     cfg.ROOT.protocol("WM_DELETE_WINDOW", lambda: cfg.ROOT.withdraw())
-        # else:
-        #     cfg.ROOT.protocol("WM_DELETE_WINDOW", AskExit)
+        cfg.config['PHOTO_DIR'] = path1['text']
+        cfg.config['COLL_FOLDER'] = path2['text']
+        cfg.config['RT_FOLDER'] = entry1.get()
+        
+        file_age = entry2.get()
+        if type(file_age) == int and file_age < 1000:
+            cfg.config['FILE_AGE'] = entry2.get()
 
-        # master.winfo_toplevel().destroy()
+        encrypt_cfg(cfg.config)
+
+        if cfg.config['MINIMIZE'] == 1:
+            cfg.ROOT.protocol("WM_DELETE_WINDOW", lambda: cfg.ROOT.withdraw())
+        else:
+            cfg.ROOT.protocol("WM_DELETE_WINDOW", AskExit)
+
+        close_windows()
