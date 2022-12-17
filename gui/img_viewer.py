@@ -55,6 +55,7 @@ class ImgViewer(CWindow):
         cfg.WINS.append(self)
 
         if cfg.COMPARE:
+            cfg.ROOT.after(0, cfg.STBAR_WAIT())
             cfg.ROOT.after(501, self.run_compare)
             return
 
