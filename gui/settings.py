@@ -16,7 +16,7 @@ from utils import encrypt_cfg, my_copy, my_paste, place_center
 
 from .widgets import AskExit, CButton, CFrame, CLabel, CloseBtn, CSep, CWindow
 
-vars = {
+aalls = {
     'PHOTODIR_LBL': tkinter.Label,
     'COLLFOLDERS_LBL': tkinter.Label,
     'RTFOLDER_ENTRY': tkinter.Entry,
@@ -30,36 +30,46 @@ class Settings(CWindow):
     def __init__(self):
         CWindow.__init__(self)
         self.title('Настройки')
+        self.resizable(1, 1)
 
         self.geometry(
             f'{int(cfg.ROOT.winfo_width()*0.5)}x'
             f'{int(cfg.ROOT.winfo_height()*0.8)}')
 
         cfg.ROOT.update_idletasks()
-        vars['text_length'] = int(self.winfo_width()*0.9)
 
-        scrollable = tkmacosx.SFrame(
+        self.ln = int(self.winfo_width()*0.9)
+
+
+        scrolllable = tkmacosx.SFrame(
             self, bg=cfg.BGCOLOR, scrollbarwidth=7)
-        scrollable.pack(fill=tkinter.BOTH, expand=1)
+        scrolllable.pack(fill=tkinter.BOTH, expand=1)
+
+        self.scan_widget(scrolllable).pack()
+
+        self.dirs_wid = self.dirs_widget(scrolllable)
+        self.dirs_wid.pack()
+
+        self.entries_wid = self.entries_widget(scrolllable)
+        self.entries_wid.pack()
+
+        self.options_wid = self.options_widget(scrolllable)
+        self.options_wid.pack()
 
         bottom_frame = CFrame(self)
         bottom_frame.pack(padx=(0, 7))
 
-        Widgets(scrollable, bottom_frame)
+        self.save_widget(bottom_frame).pack()
 
-        cfg.ROOT.update_idletasks()
+        # cfg.ROOT.update_idletasks()
         place_center(self)
         self.deiconify()
         self.grab_set()
 
+    def scan_widget(self, master: tkinter):
+        frame = CFrame(master)
 
-class Widgets(CFrame):
-    """
-    Tkinter frame with general app settings.
-    * param `master`: tkinter frame
-    """
-    def __init__(self, master: tkmacosx.SFrame, bottom_frame: tkinter.Frame):
-        title = CLabel(master, text='Настройки', font=('Arial', 22, 'bold'))
+        title = CLabel(frame, text='Настройки', font=('Arial', 22, 'bold'))
         title.pack(pady=10)
 
         txt2 = (
@@ -68,100 +78,115 @@ class Widgets(CFrame):
             'Нажмите "Полное сканирование", чтобы обновить фотографии всех '
             'коллекций за все время c 2018 года.'
             )
-        descr_scan = CLabel(master)
+        descr_scan = CLabel(frame)
         descr_scan.configure(
             text=txt2, justify=tkinter.LEFT,
-            wraplength=vars['text_length'])
+            wraplength=self.ln)
         descr_scan.pack(pady=(0, 5), anchor=tkinter.W)
 
-        scan_btn = CButton(master, text='Полное сканирование')
+        scan_btn = CButton(frame, text='Полное сканирование')
         scan_btn.configure(width=17)
         scan_btn.cmd(lambda e: self.full_scan())
         scan_btn.pack()
 
-        sep = CSep(master)
+        sep = CSep(frame)
         sep.pack(padx=40, pady=(40, 20), fill=tkinter.X)
 
-        for title, value, widget in zip(
-            ['Все фото.', 'Коллекции.'],
-            [cfg.config['PHOTO_DIR'], cfg.config['COLL_FOLDER']],
-            ['PHOTODIR_LBL', 'COLLFOLDERS_LBL']):
+        return frame
 
-            gallery_descr = CLabel(
-                master, text=title, justify=tkinter.LEFT,
-                wraplength=vars['text_length'],
+    def dirs_widget(self, master: tkinter):
+        frame = CFrame(master)
+
+        for title, value in zip(
+            ('Все фото', 'Коллекции'),
+            (cfg.config['PHOTO_DIR'], cfg.config['COLL_FOLDER'])
+            ):
+
+            title_lbl = CLabel(
+                frame, text=title, justify=tkinter.LEFT,
+                wraplength=self.ln,
                 font=('Arial', 22, 'bold'))
-            gallery_descr.pack()
+            title_lbl.pack()
 
-            vars[widget] = CLabel(
-                master, text=value, justify=tkinter.LEFT,
-                wraplength=vars['text_length'])
-            vars[widget].pack(
-                padx=(10, 0), pady=(5, 0))
+            path_lbl = CLabel(
+                frame, text=value, justify=tkinter.LEFT, wraplength=self.ln)
+            path_lbl.pack(padx=(10, 0), pady=(5, 0))
 
-            gallery_btn = CButton(master, text='Обзор')
-            gallery_btn.pack(
+            select_path = CButton(frame, text='Обзор')
+            select_path.pack(
                 pady=(5, 0), padx=(5, 0))
-            gallery_btn.configure(height=1, width=9)
+            select_path.configure(width=9)
+            select_path.cmd(
+                lambda e, x=path_lbl: self.select_path(x))
 
-            gallery_btn.cmd(
-                lambda e, x=vars[widget]: self.select_path(x))
+            CSep(frame).pack(padx=40, pady=20, fill=tkinter.X)
+        
+        return frame
 
-            sep = CSep(master)
-            sep.pack(padx=40, pady=20, fill=tkinter.X)
-
-        txt3 = (
+    def entries_widget(self, master: tkinter):
+        frame = CFrame(master)
+        
+        t1 = (
             'Программа ищет отретушированные фото в папках с данным именем.'
             )
 
-        txt4 = (
+        t2 = (
             'По умолчанию программа ищет отретушированные фотографии за '
             f'последние {cfg.config["FILE_AGE"]} дней. Можно указать другое '
             'количество дней. Чем больше число, тем дольше сканирование.'
             )
 
-        for descr, value, widget in zip(
-            [txt3, txt4],
-            [cfg.config['RT_FOLDER'], cfg.config['FILE_AGE']],
-            ['RTFOLDER_ENTRY', 'FILEAGE_ENTRY']):
+        for descr, value in zip(
+            (t1, t2),
+            (cfg.config['RT_FOLDER'], cfg.config['FILE_AGE'])
+            ):
 
-            lbl = CLabel(
-                master, justify=tkinter.LEFT,
-                wraplength=vars['text_length'], text=descr)
-            lbl.pack(anchor=tkinter.W, pady=(0, 10))
+            description_lbl = CLabel(
+                frame, justify=tkinter.LEFT,
+                wraplength=self.ln, text=descr)
+            description_lbl.pack(anchor=tkinter.W, pady=(0, 10))
 
-            vars[widget] = tkinter.Entry(
-                master, bg=cfg.BGBUTTON, fg=cfg.BGFONT,
+            entry = tkinter.Entry(
+                frame, bg=cfg.BGBUTTON, fg=cfg.BGFONT,
                 insertbackground=cfg.BGFONT, selectbackground=cfg.BGPRESSED,
                 highlightthickness=5, highlightbackground=cfg.BGBUTTON,
                 highlightcolor=cfg.BGBUTTON, bd=0, justify='center', width=35)
 
-            vars[widget].insert(0, value)
-            vars[widget].pack(pady=(0, 10))
+            entry.insert(0, value)
+            entry.pack(pady=(0, 10))
 
-            frame_btns = CFrame(master)
+            frame_btns = CFrame(frame)
             frame_btns.pack()
+
             btn_c = CButton(frame_btns, text='Копировать')
-            btn_c.cmd(partial(self.copy_input, vars[widget], btn_c))
+            btn_c.cmd(partial(self.copy_input, entry, btn_c))
+
             btn_v = CButton(frame_btns, text='Вставить')
-            btn_v.cmd(partial(self.paste_input, vars[widget], btn_v))
+            btn_v.cmd(partial(self.paste_input, entry, btn_v))
+
             [i.configure(width=9) for i in (btn_c, btn_v)]
             [i.pack(side=tkinter.LEFT, padx=(5)) for i in (btn_c, btn_v)]
 
-            sep = CSep(master)
+            sep = CSep(frame)
             sep.pack(padx=40, pady=20, fill=tkinter.X)
 
-        min_frame = CFrame(master)
+        return frame
+
+    def options_widget(self, master: tkinter):
+        frame = CFrame(master)
+
+        min_frame = CFrame(frame)
         min_frame.pack(pady = (0, 15))
 
-        vars['MIN_CHECKBOX'] = tkinter.IntVar()
-        check_box = tkinter.Checkbutton(
-            min_frame, bg=cfg.BGCOLOR, variable=vars['MIN_CHECKBOX'])
-        check_lbl = CLabel(min_frame, text='Свернуть вместо закрыть')
-        [check_box.select() if cfg.config['MINIMIZE'] else False]
-        [i.pack(side=tkinter.LEFT) for i in [check_box, check_lbl]]
 
-        rest_frame = CFrame(master)
+        check_box = tkinter.Checkbutton(min_frame, bg=cfg.BGCOLOR)
+
+        check_lbl = CLabel(min_frame, text='Свернуть вместо закрыть')
+
+        [check_box.select() if cfg.config['MINIMIZE'] == 1 else False]
+        [i.pack(side=tkinter.LEFT) for i in (check_box, check_lbl)]
+
+        rest_frame = CFrame(frame)
         rest_frame.pack(pady=(0, 15))
 
         restore_btn = CButton(rest_frame, text='По умолчанию')
@@ -174,16 +199,20 @@ class Widgets(CFrame):
         reset_button.cmd(lambda e: self.full_reset())
         reset_button.pack(side=tkinter.RIGHT)
 
-        below_frame = CFrame(bottom_frame)
-        below_frame.pack(pady=(15, 15))
+        return frame
 
-        save_btn = CButton(below_frame, text='Сохранить')
-        save_btn.cmd(lambda e: self.save_settings(master))
+    def save_widget(self, master: tkinter):
+        frame = CFrame(master)
+
+        save_btn = CButton(frame, text='Сохранить')
+        save_btn.cmd(lambda e: self.save_settings(frame))
         save_btn.configure(width=12)
         save_btn.pack(side=tkinter.LEFT, padx=(0, 10))
 
-        cancel_btn = CloseBtn(below_frame, text='Отмена')
+        cancel_btn = CloseBtn(frame, text='Отмена')
         cancel_btn.pack(side=tkinter.RIGHT)
+
+        return frame
 
     def full_scan(self):
         """
@@ -205,6 +234,18 @@ class Widgets(CFrame):
 
         widget['text'] = path
 
+    def get_widgets(self):
+        paths = self.dirs_wid.winfo_children()
+        path1, path2 = paths[1], paths[5]
+
+        entries = self.entries_wid.winfo_children()
+        entry1, entry2 = entries[1], entries[5]
+
+        options = self.options_wid.winfo_children()[0]
+        checkbox = options.winfo_children()[0]
+
+        return (path1, path2, entry1, entry2, checkbox)
+
     def restore(self, btn: CButton):
         """
         Gets advanced settings values from cfg and write to cfg.json
@@ -213,22 +254,17 @@ class Widgets(CFrame):
         """
         btn.press()
 
-        for widget, default, value in zip(
-            [vars['PHOTODIR_LBL'], vars['COLLFOLDERS_LBL']],
-            [cfg.defaults['PHOTO_DIR'], cfg.defaults['COLL_FOLDER']],
-            ['PHOTO_DIR', 'COLL_FOLDER']):
+        path1, path2, entry1, entry2, checkbox = self.get_widgets()
+        defaults = cfg.defaults()
 
-            widget['text'] = default
-            cfg.config[value] = default
+        path1['text'] = defaults['PHOTO_DIR']
+        path2['text'] = defaults['COLL_FOLDER']
 
-        for widget, default, value in zip(
-            [vars['RTFOLDER_ENTRY'], vars['FILEAGE_ENTRY']],
-            [cfg.defaults['RT_FOLDER'], cfg.defaults['FILE_AGE']],
-            ['RT_FOLDER', 'FILE_AGE']):
+        [i.delete(0, 'end') for i in (entry1, entry2)]
+        entry1.insert(0, defaults['RT_FOLDER'])
+        entry2.insert(0, defaults['FILE_AGE'])
 
-            widget.delete(0, 'end')
-            widget.insert(0, default)
-            cfg.config[value] = default
+        checkbox.select()
 
     def copy_input(self, ins: tkinter.Entry, btn: CButton, e: tkinter.Event):
         """
@@ -254,16 +290,16 @@ class Widgets(CFrame):
         Get text from all text fields in advanced settings and save to
         cfg.json
         """
-        cfg.config['PHOTO_DIR'] = vars['PHOTODIR_LBL']['text']
-        cfg.config['COLL_FOLDER'] = vars['COLLFOLDERS_LBL']['text']
-        cfg.config['RT_FOLDER'] = vars['RTFOLDER_ENTRY'].get()
-        cfg.config['FILE_AGE'] = vars['FILEAGE_ENTRY'].get()
-        cfg.config['MINIMIZE'] = vars['MIN_CHECKBOX'].get()
-        encrypt_cfg(cfg.config)
+        # cfg.config['PHOTO_DIR'] = alls['PHOTODIR_LBL']['text']
+        # cfg.config['COLL_FOLDER'] = alls['COLLFOLDERS_LBL']['text']
+        # cfg.config['RT_FOLDER'] = alls['RTFOLDER_ENTRY'].get()
+        # cfg.config['FILE_AGE'] = alls['FILEAGE_ENTRY'].get()
+        # cfg.config['MINIMIZE'] = alls['MIN_CHECKBOX'].get()
+        # encrypt_cfg(cfg.config)
 
-        if cfg.config['MINIMIZE']:
-            cfg.ROOT.protocol("WM_DELETE_WINDOW", lambda: cfg.ROOT.withdraw())
-        else:
-            cfg.ROOT.protocol("WM_DELETE_WINDOW", AskExit)
+        # if cfg.config['MINIMIZE']:
+        #     cfg.ROOT.protocol("WM_DELETE_WINDOW", lambda: cfg.ROOT.withdraw())
+        # else:
+        #     cfg.ROOT.protocol("WM_DELETE_WINDOW", AskExit)
 
-        master.winfo_toplevel().destroy()
+        # master.winfo_toplevel().destroy()

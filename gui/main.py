@@ -10,7 +10,7 @@ import cfg
 from .macosx_menu import BarMenu
 from .widgets import AskExit, CSep
 from .gallery import Gallery
-from .status_bar import StatusBar
+from .st_bar import StatusBar
 
 
 class MainGui:

@@ -61,6 +61,7 @@ class CWindow(tkinter.Toplevel):
         resizable 0
         center screen
         cmd+w, escape and X button bind to close window
+        withdraw = true
         """
         tkinter.Toplevel.__init__(self)
         cfg.ROOT.eval(f'tk::PlaceWindow {self} center')

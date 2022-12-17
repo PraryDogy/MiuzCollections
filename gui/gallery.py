@@ -1,7 +1,3 @@
-"""
-Gui menu and images grid.
-"""
-
 import os
 import re
 import subprocess
