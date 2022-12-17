@@ -12,7 +12,7 @@ class ImgCompare(CWindow):
         CWindow.__init__(self)
 
         self.title('Сравнение')
-        side = int(cfg.ROOT.winfo_screenheight()*0.8)
+        side = int(cfg.ROOT.winfo_screenheight()*0.9)
         self.geometry(f'{int(side*1.3)}x{side}')
         self.configure(pady=0, padx=0)
 
