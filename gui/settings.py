@@ -16,15 +16,6 @@ from utils import encrypt_cfg, my_copy, my_paste, place_center, close_windows
 
 from .widgets import AskExit, CButton, CFrame, CLabel, CloseBtn, CSep, CWindow
 
-aalls = {
-    'PHOTODIR_LBL': tkinter.Label,
-    'COLLFOLDERS_LBL': tkinter.Label,
-    'RTFOLDER_ENTRY': tkinter.Entry,
-    'FILEAGE_ENTRY':tkinter.Entry,
-    'MIN_CHECKBOX': tkinter.Checkbutton,
-    'text_length': 1,
-    }
-
 
 class Settings(CWindow):
     def __init__(self):
@@ -204,7 +195,7 @@ class Settings(CWindow):
         frame = CFrame(master)
 
         save_btn = CButton(frame, text='Сохранить')
-        save_btn.cmd(lambda e: self.save_settings(frame))
+        save_btn.cmd(self.save_settings)
         save_btn.configure(width=12)
         save_btn.pack(side=tkinter.LEFT, padx=(0, 10))
 
@@ -232,13 +223,13 @@ class Settings(CWindow):
         shutil.rmtree(cfg.CFG_DIR)
         os.execv(sys.executable, ['python'] + sys.argv)
 
-    def select_path(self, widget):
+    def select_path(self, master: tkinter.Label):
         path = filedialog.askdirectory()
 
         if len(path) == 0:
             return
 
-        widget['text'] = path
+        master['text'] = path
 
     def get_widgets(self):
         paths = self.dirs_wid.winfo_children()
@@ -262,6 +253,9 @@ class Settings(CWindow):
 
         path1, path2, entry1, entry2, checkbox = self.get_widgets()
         defaults = cfg.defaults()
+        entry1: tkinter.Entry
+        entry2: tkinter.Entry
+        checkbox: tkinter.Checkbutton
 
         path1['text'] = defaults['PHOTO_DIR']
         path2['text'] = defaults['COLL_FOLDER']
@@ -272,31 +266,33 @@ class Settings(CWindow):
 
         checkbox.select()
 
-    def copy_input(self, ins: tkinter.Entry, btn: CButton, e: tkinter.Event):
+    def copy_input(self, master: tkinter.Entry, btn: CButton):
         """
         Gets text from current text input field and copy to clipboard.
         * param `ins`: tkinter entry current text input
         * param `btn`: current button
         """
         btn.press()
-        my_copy(ins.get())
+        my_copy(master.get())
 
-    def paste_input(self, ins: tkinter.Entry, btn: CButton, e: tkinter.Event):
+    def paste_input(self, master: tkinter.Entry, btn: CButton, e):
         """
         Gets text from clipboard and paste in text input field.
         * param `ins`: tkinter entry current text input
         * param `btn`: current button
         """
         btn.press()
-        ins.delete(0, 'end')
-        ins.insert(0, my_paste())
+        master.delete(0, 'end')
+        master.insert(0, my_paste())
 
-    def save_settings(self, master: tkinter.Frame):
+    def save_settings(self):
         """
         Get text from all text fields in advanced settings and save to
         cfg.json
         """
         path1, path2, entry1, entry2, checkbox = self.get_widgets()
+        entry1: tkinter.Entry
+        entry2: tkinter.Entry
 
         cfg.config['PHOTO_DIR'] = path1['text']
         cfg.config['COLL_FOLDER'] = path2['text']
