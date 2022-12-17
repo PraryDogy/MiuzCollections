@@ -31,7 +31,7 @@ class ImgViewer(CWindow):
         self.ln = 43
 
         self.title('Просмотр')
-        side = int(cfg.ROOT.winfo_screenheight()*0.8)
+        side = int(cfg.ROOT.winfo_screenheight()*0.9)
         self.geometry(f'{int(side*1.3)}x{side}')
         self.configure(pady=0, padx=0)
 
@@ -63,7 +63,7 @@ class ImgViewer(CWindow):
         self.grab_set()
 
     def img_widget(self):
-        label = CLabel(self, width=1)
+        label = CLabel(self)
         label['bg']='black'
         label.bind('<ButtonRelease-1>', lambda e: self.img_click(e))
         self.bind('<Left>', lambda e: self.switch_img(self.img_ind()-1))
