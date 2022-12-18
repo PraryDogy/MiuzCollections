@@ -1,10 +1,10 @@
 import cfg
-from gui import main
+from gui import gui
 from scaner import scaner
 from utils import smb_check
 
 def load_all():
-    main.MainGui()
+    gui()
     cfg.ROOT.deiconify()
     if smb_check():
         scaner()

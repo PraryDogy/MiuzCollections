@@ -1,7 +1,3 @@
-"""
-Tkinter toplevel gui with app settings.
-"""
-
 import os
 import shutil
 import sys

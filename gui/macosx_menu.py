@@ -1,7 +1,3 @@
-"""
-Mac osx bar menus.
-"""
-
 import tkinter
 
 import cfg

@@ -1,9 +1,4 @@
-"""
-This is general gui with all elements.
-"""
-
 import tkinter
-from functools import partial
 
 import cfg
 

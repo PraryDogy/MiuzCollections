@@ -24,6 +24,7 @@ KEY = 'QaovKbF1YpKCM9e-HE2wvn30lIqCbeYTUcONcdLpV18='
 CFG_DIR = os.path.join(
     os.path.expanduser('~'), 'Library/Application Support/Miuz Gallery')
 
+# gui settings
 BGFONT = "#E2E2E2"
 BGCOLOR = "#1A1A1A"
 BGBUTTON = "#2C2C2C"
@@ -31,15 +32,13 @@ BGPRESSED = '#395432'
 BGSELECTED = '#4E4769'
 THUMB_SIZE = 150
 
-# tkinter global variables for avaibility from any place
-ROOT = tkinter.Tk()
-ROOT.withdraw()
-
 # flags
 FLAG = False
 COMPARE = False
 
 # gui objects for global access
+ROOT = tkinter.Tk()
+ROOT.withdraw()
 IMG_SRC = str
 LIVE_LBL = tkinter.Label
 GALLERY = object

@@ -1,7 +1,3 @@
-"""
-Gui for status bar.
-"""
-
 import tkinter
 
 import cfg

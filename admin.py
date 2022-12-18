@@ -1,6 +1,3 @@
-import database
-
-
 def print_alive(name_func='', what_print=''):
     """Prints output:
     function name, sometext.
