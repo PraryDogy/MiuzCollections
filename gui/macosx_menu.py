@@ -21,7 +21,7 @@ class BarMenu(tkinter.Menu):
         menubar.add_cascade(label="Меню", menu=self)
         self.add_command(
             label='Настройки', command=Settings)
-        self.add_command(label="О программе", command=About)
+        self.add_command(label="О программе", command=self.about_widget)
         self.add_separator()
         self.add_command(label="Выход", command=cfg.ROOT.destroy)
         cfg.ROOT.createcommand(
@@ -29,10 +29,8 @@ class BarMenu(tkinter.Menu):
             lambda: cfg.ROOT.tk.call('tk::mac::standardAboutPanel'))
         cfg.ROOT.configure(menu=menubar)
 
-
-class About(CWindow):
-    def __init__(self):
-        CWindow.__init__(self)
+    def about_widget(self):
+        win = CWindow()
         made = (
             f'{cfg.APP_NAME} {cfg.APP_VER}'
             '\n\nCreated by Evgeny Loshkarev'
@@ -41,12 +39,12 @@ class About(CWindow):
             '\n\nEmail: evlosh@gmail.com'
             '\nTelegram: evlosh'
             )
-        author = CLabel(self, text=made)
+        author = CLabel(win, text=made)
         author.pack(pady=(0, 10))
-        close_btn = CloseBtn(self, text='Закрыть')
+        close_btn = CloseBtn(win, text='Закрыть')
         close_btn.pack()
 
         cfg.ROOT.update_idletasks()
-        place_center(self)
-        self.deiconify()
-        self.grab_set()
+        place_center(win)
+        win.deiconify()
+        win.grab_set()

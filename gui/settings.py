@@ -49,7 +49,7 @@ class Settings(CWindow):
         bottom_frame = CFrame(self)
         bottom_frame.pack(padx=(0, 7))
 
-        self.save_widget(bottom_frame).pack()
+        self.cancel_widget(bottom_frame).pack()
 
         place_center(self)
         self.deiconify()
@@ -167,7 +167,6 @@ class Settings(CWindow):
         min_frame = CFrame(frame)
         min_frame.pack(pady = (0, 15))
 
-
         check_box = tkinter.Checkbutton(min_frame, bg=cfg.BGCOLOR)
         check_box['command'] = lambda: self.checkbox_cmd(check_box)
         [check_box.select() if cfg.config['MINIMIZE'] == 1 else False]
@@ -191,11 +190,11 @@ class Settings(CWindow):
 
         return frame
 
-    def save_widget(self, master: tkinter):
+    def cancel_widget(self, master: tkinter):
         frame = CFrame(master)
 
         save_btn = CButton(frame, text='Сохранить')
-        save_btn.cmd(self.save_settings)
+        save_btn.cmd(lambda e: self.save_settings())
         save_btn.configure(width=12)
         save_btn.pack(side=tkinter.LEFT, padx=(0, 10))
 
@@ -205,6 +204,7 @@ class Settings(CWindow):
         return frame
 
     def checkbox_cmd(self, master: tkinter.Checkbutton):
+        print('123')
         if cfg.config['MINIMIZE'] == 1:
             cfg.config['MINIMIZE'] = 0
         else:

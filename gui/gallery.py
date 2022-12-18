@@ -25,10 +25,13 @@ class Gallery(CFrame):
     """
     def __init__(self, master):
         CFrame.__init__(self, master)
-        cfg.THUMBNAILS_RELOAD = self.thumbnails_reload
+        cfg.GALLERY = self
+        self.thumbs_list = []
 
         menu_wid = self.menu_widget()
         menu_wid.pack(pady=(0, 0), padx=(0, 15), side=tkinter.LEFT, fill=tkinter.Y)
+        menu_wid: tkinter.Frame
+
         cfg.ROOT.update_idletasks()
 
         self.menu_w = menu_wid.winfo_reqwidth()
@@ -43,7 +46,7 @@ class Gallery(CFrame):
         new_w = cfg.ROOT.winfo_width()
         if new_w != int(root_w):
             cfg.config['GEOMETRY'][0] = new_w
-            cfg.THUMBNAILS_RELOAD()
+            self.thumbnails_reload()
 
     def menu_widget(self):
         scrollable = tkmacosx.SFrame(
@@ -148,7 +151,7 @@ class Gallery(CFrame):
             btn_item['bg'] = cfg.BGBUTTON
         btn['bg'] = cfg.BGPRESSED
         cfg.config['CURR_COLL'] = coll
-        cfg.THUMBNAILS_RELOAD()
+        self.thumbnails_reload()
 
     def thumbnails_reload(self):
         """
@@ -156,11 +159,11 @@ class Gallery(CFrame):
         """
         selected = ''
         if cfg.COMPARE:
-            for i in cfg.THUMBS:
+            for i in self.thumbs_list:
                 if i['bg'] == cfg.BGPRESSED:
                     selected = i['text']
                     break
-        cfg.THUMBS.clear()
+        self.thumbs_list.clear()
 
         w, h = cfg.ROOT.winfo_width(), cfg.ROOT.winfo_height()
         cfg.config['GEOMETRY'][0], cfg.config['GEOMETRY'][1] = w, h
@@ -170,7 +173,8 @@ class Gallery(CFrame):
         self.thumbs_wid = self.thumbnails_widget()
         self.thumbs_wid.pack(expand=1, fill=tkinter.BOTH, side=tkinter.RIGHT)
         if cfg.COMPARE:
-            for i in cfg.THUMBS:
+            for i in self.thumbs_list:
+                i: tkinter.Button
                 if selected in i['text']:
                     i.configure(bg=cfg.BGPRESSED)
                     break
@@ -261,7 +265,7 @@ class Gallery(CFrame):
 
         for i, item in enumerate(thumbs):
 
-            if i%self.clmns == 0:
+            if i % self.clmns == 0:
                 row = CFrame(year_frame)
                 row.pack(fill=tkinter.Y, expand=1, anchor=tkinter.W)
 
@@ -277,7 +281,7 @@ class Gallery(CFrame):
             thumb.bind('<Leave>', lambda e, a=thumb: self.leave(a))
 
             thumb.pack(side=tkinter.LEFT)
-            cfg.THUMBS.append(thumb)
+            self.thumbs_list.append(thumb)
         
         return year_frame
 

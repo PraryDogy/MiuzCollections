@@ -52,10 +52,8 @@ class ImgViewer(CWindow):
         self.thumb_place()
         self.task = cfg.ROOT.after(500, self.img_place)
 
-        cfg.WINS.append(self)
-
         if cfg.COMPARE:
-            cfg.ROOT.after(0, cfg.STBAR_WAIT())
+            cfg.ROOT.after(0, cfg.ST_BAR.wait)
             cfg.ROOT.after(501, self.run_compare)
             return
 
@@ -84,13 +82,12 @@ class ImgViewer(CWindow):
         return info_widget
 
     def run_compare(self):
-        t1 = threading.Thread(target=cfg.STBAR_WAIT)
+        t1 = threading.Thread(target=cfg.ST_BAR.wait)
         t1.start()
         while t1.is_alive():
             cfg.ROOT.update()
         ImgCompare()
-        cfg.STBAR_NORM()
-        print('run compare')
+        cfg.ST_BAR.normal()
 
     def switch_img(self, ind: int):
         cfg.ROOT.after_cancel(self.task)
@@ -136,8 +133,8 @@ class ImgViewer(CWindow):
     def btn_compare(self, btn: CButton):
         btn.press()
         if not cfg.COMPARE:
-            cfg.STBAR_COMPARE()
-            for i in cfg.THUMBS:
+            cfg.ST_BAR.compare()
+            for i in cfg.GALLERY.thumbs_list:
                 if i['text'] == cfg.IMG_SRC:
                     i['bg'] = cfg.BGPRESSED
                     break

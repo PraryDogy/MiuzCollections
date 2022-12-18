@@ -1,7 +1,7 @@
 import tkinter
 
 import cfg
-from utils import place_center
+from utils import place_center, get_windows
 
 from .macosx_menu import CLabel
 from .widgets import CWindow, ImgBtns, InfoWidget
@@ -16,14 +16,16 @@ class ImgCompare(CWindow):
         self.geometry(f'{int(side*1.3)}x{side}')
         self.configure(pady=0, padx=0)
 
-        self.img1 = cfg.WINS[0].img_frame['image']
-        self.src1 = cfg.WINS[0].img_src
-        info1_l, _, info1_r = cfg.WINS[0].info_frame.winfo_children()
+        wins = get_windows()
+
+        self.img1 = wins[0].img_frame['image']
+        self.src1 = wins[0].img_src
+        info1_l, _, info1_r = wins[0].info_frame.winfo_children()
         self.info1_l, self.info1_r = info1_l['text'], info1_r['text']
 
-        self.img2 = cfg.WINS[1].img_frame['image']
-        self.src2 = cfg.WINS[1].img_src
-        info2_l, _, info2_r = cfg.WINS[1].info_frame.winfo_children()
+        self.img2 = wins[1].img_frame['image']
+        self.src2 = wins[1].img_src
+        info2_l, _, info2_r = wins[1].info_frame.winfo_children()
         self.info2_l, self.info2_r = info2_l['text'], info2_r['text']
 
         self.curr_src = self.src1

@@ -159,10 +159,9 @@ def close_windows():
     "Close all top levels"
     if cfg.COMPARE:
         cfg.COMPARE = False
-        [i.configure(bg=cfg.BGCOLOR) for i in cfg.THUMBS]
+        [i.configure(bg=cfg.BGCOLOR) for i in cfg.GALLERY.thumbs_list]
 
     [i.destroy() for i in get_windows()]
-    cfg.WINS.clear()
     cfg.ROOT.focus_force()
 
 

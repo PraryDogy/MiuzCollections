@@ -18,46 +18,41 @@ class StatusBar(CFrame):
     """
     def __init__(self, master):
         CFrame.__init__(self, master)
-        cfg.STBAR_NORM = self.pack_widgets
-        cfg.STBAR_COMPARE = self.pack_compare
-        cfg.STBAR_WAIT = self.wait_compare
-        self.pack_widgets()
+        cfg.ST_BAR = self
+        self.normal()
 
-    def pack_widgets(self):
+    def normal(self):
         widgets = tuple(v for k, v in self.children.items())
         [i.destroy() for i in widgets]
-        FakeLabel(self).pack(side=tkinter.LEFT, padx=(0, 15))
-        SettingsSection(self).pack(side=tkinter.LEFT)
-        CSep(self).pack(
-            fill=tkinter.Y, side=tkinter.LEFT, padx=(15, 15))
-        UpdateSection(self).pack(side=tkinter.LEFT, padx=(0, 15))
-        DynamicSection(self).pack(side=tkinter.LEFT, padx=(0, 15))
 
-    def pack_compare(self):
+        self.fake_widget(self).pack(side=tkinter.LEFT, padx=(0, 15))
+        self.settings_widget(self).pack(side=tkinter.LEFT)
+        CSep(self).pack(fill=tkinter.Y, side=tkinter.LEFT, padx=(15, 15))
+        self.update_widget(self).pack(side=tkinter.LEFT, padx=(0, 15))
+        live_wid = self.live_widget(self)
+        live_wid.pack(side=tkinter.LEFT, padx=(0, 15))
+        cfg.LIVE_LBL = live_wid
+
+    def compare(self):
         widgets = tuple(v for k, v in self.children.items())
         [i.destroy() for i in widgets]
-        CompareTitle(self)
+        self.compare_wid = self.compare_widget(self)
+        self.compare_wid.pack()
 
-    def wait_compare(self):
-        widgets = tuple(v for k, v in self.children.items())
+    def wait(self):
+        widgets = self.compare_wid.winfo_children()
         widgets[0]['text'] = 'Подготовка'
 
+    def fake_widget(self, master: tkinter):
+        label = CLabel(master, text='Обновление 00%')
+        label['fg'] = cfg.BGCOLOR
+        return label
 
-class FakeLabel(CLabel):
-    def __init__(self, master):
-        CLabel.__init__(self, master, text='Обновление 00%')
-        self['fg'] = cfg.BGCOLOR
-        cfg.LIVE_LBL = self
-
-
-class SettingsSection(CLabel, CButton):
-    """
-    Tkinter frame with button function open gui settings and description.
-    """
-    def __init__(self, master):
-        CButton.__init__(self, master, text='Настройки', padx=5)
-        self.configure(width=8)
-        self.cmd(lambda e: self.open_settings(self))
+    def settings_widget(self, master: tkinter):
+        btn = CButton(master, text='Настройки', padx=5)
+        btn['width'] = 8
+        btn.cmd(lambda e: self.open_settings(btn))
+        return btn
 
     def open_settings(self, btn: CButton):
         """
@@ -67,15 +62,11 @@ class SettingsSection(CLabel, CButton):
         btn.press()
         Settings()
 
-
-class UpdateSection(CLabel, CButton):
-    """
-    Tkinter frame with button function update collections and description.
-    """
-    def __init__(self, master):
-        CButton.__init__(self, master, text='Обновить', padx=5)
-        self.configure(width=8)
-        self.cmd(lambda e: self.updater(self))
+    def update_widget(self, master: tkinter):
+        btn = CButton(master, text='Обновить', padx=5)
+        btn['width'] = 8
+        btn.cmd(lambda e: self.updater(btn))
+        return btn
 
     def updater(self, btn: CButton):
         """
@@ -89,32 +80,30 @@ class UpdateSection(CLabel, CButton):
             btn.press()
             scaner()
 
+    def live_widget(self, master):
+        lbl = CLabel(master, text='Обновление 00%')
+        lbl['fg'] = cfg.BGCOLOR
+        return lbl
 
-class DynamicSection(CLabel):
-    def __init__(self, master):
-        CLabel.__init__(self, master, text='Обновление 00%')
-        self['fg'] = cfg.BGCOLOR
-        cfg.LIVE_LBL = self
+    def compare_widget(self, master: tkinter):
+        frame = CFrame(master)
 
-
-class CompareTitle(CFrame):
-    def __init__(self, master: tkinter.Frame):
-        subtitle = CLabel(
-            master, 
-            fg=cfg.BGFONT,
+        subtitle = CLabel(frame,fg=cfg.BGFONT,
             text='Выберите фото для сравнения или нажмите Esc для отмены')
         subtitle.pack(side=tkinter.LEFT)
 
-        cancel = CButton(master, text='Отмена')
-        cancel.configure(width=8)
+        cancel = CButton(frame, text='Отмена')
+        cancel['width'] = 8
         cancel.cmd(lambda e: self.cancel())
         cancel.pack(side=tkinter.LEFT, padx=(15, 0))
         cfg.ROOT.bind('<Escape>', lambda e: self.cancel())
 
+        return frame
+
     def cancel(self):
         cfg.ROOT.unbind('<Escape>')
-        cfg.STBAR_NORM()
-        for i in cfg.THUMBS:
+        self.normal()
+        for i in cfg.GALLERY.thumbs_list:
             if i['bg'] == cfg.BGPRESSED:
                 i['bg'] = cfg.BGCOLOR
                 break

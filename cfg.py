@@ -35,19 +35,16 @@ THUMB_SIZE = 150
 ROOT = tkinter.Tk()
 ROOT.withdraw()
 
-LIVE_LBL = tkinter.Label
-THUMBS = []
+# flags
 FLAG = False
 COMPARE = False
+
+# gui objects for global access
 IMG_SRC = str
+LIVE_LBL = tkinter.Label
+GALLERY = object
+ST_BAR = object
 
-# gui functions 
-THUMBNAILS_RELOAD = object
-STBAR_NORM = object
-STBAR_COMPARE = object
-STBAR_WAIT = object
-
-WINS = []
 
 def defaults():
     return {
