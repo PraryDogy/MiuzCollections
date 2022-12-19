@@ -26,7 +26,6 @@ class Gallery(CFrame):
     def __init__(self, master):
         CFrame.__init__(self, master)
         cfg.GALLERY = self
-        self.thumbs_list = []
 
         menu_wid = self.menu_widget()
         menu_wid.pack(pady=(0, 0), padx=(0, 15), side=tkinter.LEFT, fill=tkinter.Y)
@@ -48,6 +47,16 @@ class Gallery(CFrame):
             cfg.config['GEOMETRY'][0] = new_w
             self.thumbnails_reload()
 
+    def place_thumb(self, thumbnail):
+        cropped = crop_image(thumbnail)
+        rgb_thumb = convert_to_rgb(cropped)
+        img_tk = ImageTk.PhotoImage(rgb_thumb)
+        self.compare_img.configure(image=img_tk)
+        self.compare_img.image_names = img_tk
+
+    def remove_thumb(self):
+        self.compare_img['image'] = ''
+
     def menu_widget(self):
         scrollable = tkmacosx.SFrame(
             self, bg=cfg.BGCOLOR, scrollbarwidth=7, width=170)
@@ -56,7 +65,7 @@ class Gallery(CFrame):
         title.pack(pady=(20, 20), padx=(0, 15))
 
         self.compare_img = CLabel(scrollable)
-        self.compare_img.pack(fill=tkinter.BOTH, expand=True)
+        self.compare_img.pack(padx=(0, 15), pady=(0, 15))
 
         load_colls = Dbase.conn.execute(
             sqlalchemy.select(Thumbs.collection)).fetchall()
@@ -160,14 +169,6 @@ class Gallery(CFrame):
         """
         Destroys `ImagesThumbs` object and run it again.
         """
-        selected = ''
-        if cfg.COMPARE:
-            for i in self.thumbs_list:
-                if i['bg'] == cfg.BGPRESSED:
-                    selected = i['text']
-                    break
-        self.thumbs_list.clear()
-
         w, h = cfg.ROOT.winfo_width(), cfg.ROOT.winfo_height()
         cfg.config['GEOMETRY'][0], cfg.config['GEOMETRY'][1] = w, h
 
@@ -175,12 +176,6 @@ class Gallery(CFrame):
 
         self.thumbs_wid = self.thumbnails_widget()
         self.thumbs_wid.pack(expand=1, fill=tkinter.BOTH, side=tkinter.RIGHT)
-        if cfg.COMPARE:
-            for i in self.thumbs_list:
-                i: tkinter.Button
-                if selected in i['text']:
-                    i.configure(bg=cfg.BGPRESSED)
-                    break
 
     def decode_thumbs(self, thumbs: tuple):
         """
@@ -284,7 +279,6 @@ class Gallery(CFrame):
             thumb.bind('<Leave>', lambda e, a=thumb: self.leave(a))
 
             thumb.pack(side=tkinter.LEFT)
-            self.thumbs_list.append(thumb)
         
         return year_frame
 

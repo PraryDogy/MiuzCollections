@@ -82,12 +82,9 @@ class ImgViewer(CWindow):
         return info_widget
 
     def run_compare(self):
-        t1 = threading.Thread(target=cfg.ST_BAR.wait)
-        t1.start()
-        while t1.is_alive():
-            cfg.ROOT.update()
         ImgCompare()
         cfg.ST_BAR.normal()
+        cfg.GALLERY.remove_thumb()
 
     def switch_img(self, ind: int):
         cfg.ROOT.after_cancel(self.task)
@@ -113,13 +110,19 @@ class ImgViewer(CWindow):
             index = self.img_ind() + 1
         self.switch_img(index)
 
-    def thumb_place(self):
+    def thumb_load(self):
+        """
+        Returns decoded non resized thumbnail from database
+        """
         thumb = Dbase.conn.execute(sqlalchemy.select(Thumbs.img150).where(
             Thumbs.src == cfg.IMG_SRC)).first()[0]
-        decoded = decode_image(thumb)
-        resized = resize_image(decoded, self.width, self.height, False)
-        rgb_image = convert_to_rgb(resized)
-        self.img_set(rgb_image)
+        return decode_image(thumb)
+
+    def thumb_place(self):
+        thumb = self.thumb_load()
+        resized = resize_image(thumb, self.width, self.height, False)
+        rgb_thumb = convert_to_rgb(resized)
+        self.img_set(rgb_thumb)
 
     def img_place(self):
         img_read = cv2.imread(cfg.IMG_SRC)
@@ -134,14 +137,11 @@ class ImgViewer(CWindow):
         btn.press()
         if not cfg.COMPARE:
             cfg.ST_BAR.compare()
-            for i in cfg.GALLERY.thumbs_list:
-                if i['text'] == cfg.IMG_SRC:
-                    i['bg'] = cfg.BGPRESSED
-                    break
             win = self.winfo_toplevel()
             win.withdraw()
             win.grab_release()
             cfg.COMPARE = True
+            cfg.GALLERY.place_thumb(self.thumb_load())
             return
 
     def create_info(self):

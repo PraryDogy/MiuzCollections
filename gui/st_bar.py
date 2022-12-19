@@ -99,10 +99,7 @@ class StatusBar(CFrame):
     def cancel(self):
         cfg.ROOT.unbind('<Escape>')
         self.normal()
-        for i in cfg.GALLERY.thumbs_list:
-            if i['bg'] == cfg.BGPRESSED:
-                i['bg'] = cfg.BGCOLOR
-                break
         cfg.COMPARE = False
+        cfg.GALLERY.remove_thumb()
         windows = tuple(v for k, v in cfg.ROOT.children.items() if "preview" in k)
         [w.destroy() for w in windows]
