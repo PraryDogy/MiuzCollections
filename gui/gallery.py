@@ -55,6 +55,9 @@ class Gallery(CFrame):
             scrollable, text='Коллекции', font=('Arial', 22, 'bold'))
         title.pack(pady=(20, 20), padx=(0, 15))
 
+        self.compare_img = CLabel(scrollable)
+        self.compare_img.pack(fill=tkinter.BOTH, expand=True)
+
         load_colls = Dbase.conn.execute(
             sqlalchemy.select(Thumbs.collection)).fetchall()
         colls_list = set(i[0] for i in load_colls)

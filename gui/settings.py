@@ -26,6 +26,7 @@ class Settings(CWindow):
         cfg.ROOT.update_idletasks()
 
         self.ln = int(self.winfo_width()*0.9)
+        self.minimize = tkinter.IntVar(value=cfg.config['MINIMIZE'])
 
         scrolllable = tkmacosx.SFrame(
             self, bg=cfg.BGCOLOR, scrollbarwidth=7)
@@ -165,7 +166,7 @@ class Settings(CWindow):
 
         check_box = tkinter.Checkbutton(min_frame, bg=cfg.BGCOLOR)
         check_box['command'] = lambda: self.checkbox_cmd(check_box)
-        [check_box.select() if cfg.config['MINIMIZE'] == 1 else False]
+        [check_box.select() if self.minimize.get() == 1 else check_box.deselect()]
 
         check_lbl = CLabel(min_frame, text='Свернуть вместо закрыть')
 
@@ -200,11 +201,11 @@ class Settings(CWindow):
         return frame
 
     def checkbox_cmd(self, master: tkinter.Checkbutton):
-        print('123')
-        if cfg.config['MINIMIZE'] == 1:
-            cfg.config['MINIMIZE'] = 0
-        else:
-            cfg.config['MINIMIZE'] = 1
+        if self.minimize.get() == 1:
+            self.minimize.set(0)
+            master.deselect()
+        elif self.minimize.get() == 0:
+            self.minimize.set(1)
             master.select()
 
     def full_scan(self):
@@ -297,6 +298,8 @@ class Settings(CWindow):
         file_age = entry2.get()
         if type(file_age) == int and file_age < 1000:
             cfg.config['FILE_AGE'] = entry2.get()
+
+        cfg.config['MINIMIZE'] = self.minimize.get()
 
         encrypt_cfg(cfg.config)
 
