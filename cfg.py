@@ -53,6 +53,7 @@ def defaults():
         'RT_FOLDER': 'Retouch',
         'FILE_AGE': 60,
         'GEOMETRY': [700, 500, 0, 0],
+        'WIN_GEOMETRY': [700, 500],
         'CURR_COLL': 'last',
         'TYPE_SCAN': '',
         'MINIMIZE': 1

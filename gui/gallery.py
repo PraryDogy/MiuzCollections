@@ -78,9 +78,12 @@ class Gallery(CFrame):
 
     def menu_widget(self, master):
         scrollable = tkmacosx.SFrame(
-            master, bg=cfg.BGCOLOR, scrollbarwidth=7, width=cfg.THUMB_SIZE)
+            master, bg=cfg.BGCOLOR, scrollbarwidth=7, width=cfg.THUMB_SIZE+30)
 
-        compare_frame = CFrame(scrollable)
+        parent = CFrame(scrollable)
+        parent.pack(padx=15)
+
+        compare_frame = CFrame(parent)
         compare_frame.pack()
 
         self.compare_title = CLabel(compare_frame)
@@ -89,7 +92,7 @@ class Gallery(CFrame):
         self.compare_img = CLabel(compare_frame)
         self.compare_img.pack(pady=(0, 15))
 
-        menu_frame = CFrame(scrollable)
+        menu_frame = CFrame(parent)
         menu_frame.pack()
 
         title = CLabel(

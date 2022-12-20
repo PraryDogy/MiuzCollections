@@ -5,7 +5,7 @@ from datetime import datetime
 
 import cv2
 import sqlalchemy
-from PIL import ImageTk, Image
+from PIL import Image, ImageTk
 
 import cfg
 from database import Dbase, Thumbs
@@ -13,7 +13,8 @@ from utils import (close_windows, convert_to_rgb, decode_image, get_coll_name,
                    place_center, resize_image, smb_check)
 
 from .img_compare import ImgCompare
-from .widgets import CButton, CLabel, CWindow, ImgBtns, SmbAlert, InfoWidget
+from .widgets import (CButton, CFrame, CLabel, CWindow, ImgBtns, InfoWidget,
+                      SmbAlert)
 
 
 class ImgViewer(CWindow):
@@ -31,24 +32,25 @@ class ImgViewer(CWindow):
         self.ln = 43
 
         self.title('Просмотр')
-        side = int(cfg.ROOT.winfo_screenheight()*0.8)
-        self.geometry(f'{int(side*1.3)}x{side}')
+
+        self.win_width, self.win_height = cfg.config['WIN_GEOMETRY']
+        self.geometry(f'{self.win_width}x{self.win_height}')
+
         self.configure(pady=0, padx=0)
         self.resizable(1, 1)
 
         self.img_frame = self.img_widget()
         self.img_frame.pack(pady=(0, 15), expand=1, fill=tkinter.BOTH)
 
-        self.btns = self.btns_widget()
-        self.btns.pack(pady=(0, 15))
+        self.btns_frame = self.btns_widget()
+        self.btns_frame.pack(pady=(0, 15))
         
         self.info_frame = self.info_widget()
         self.info_frame.pack(pady=(0, 15))
 
         cfg.ROOT.update_idletasks()
 
-        self.height = self.img_frame.winfo_height()
-        self.width = self.winfo_width()
+        self.img_height = self.img_frame.winfo_height()
 
         self.thumb_place()
         self.task = cfg.ROOT.after(500, self.img_place)
@@ -61,6 +63,21 @@ class ImgViewer(CWindow):
         place_center(self)
         self.deiconify()
         self.grab_set()
+
+        self.bind('<ButtonRelease-1>', lambda e: self.resize_win(e))
+
+    def resize_win(self, event: tkinter.Event):
+        w, h = self.winfo_width(), self.winfo_height()
+
+        if w != self.win_width or h != self.win_height:
+
+            self.img_height = self.img_frame.winfo_height()
+            self.win_width = w
+            self.win_height = h
+            cfg.config['WIN_GEOMETRY'] = [self.win_width, self.win_height]
+
+            self.thumb_place()
+            cfg.ROOT.after(500, self.img_place)
 
     def img_widget(self):
         label = CLabel(self)
@@ -105,7 +122,7 @@ class ImgViewer(CWindow):
         self.img_frame.image_names = img_tk
 
     def img_click(self, e: tkinter.Event):
-        if e.x <= self.width//2:
+        if e.x <= self.win_width//2:
             index = self.img_ind() - 1
         else:
             index = self.img_ind() + 1
@@ -121,13 +138,13 @@ class ImgViewer(CWindow):
 
     def thumb_place(self):
         thumb = self.thumb_load()
-        resized = resize_image(thumb, self.width, self.height, False)
+        resized = resize_image(thumb, self.win_width, self.img_height, False)
         rgb_thumb = convert_to_rgb(resized)
         self.img_set(rgb_thumb)
 
     def img_place(self):
         img_read = cv2.imread(cfg.IMG_SRC)
-        resized = resize_image(img_read, self.width, self.height, False)
+        resized = resize_image(img_read, self.win_width, self.img_height, False)
         img_rgb = convert_to_rgb(resized)
         self.img_set(img_rgb)
 
