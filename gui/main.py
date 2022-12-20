@@ -15,7 +15,7 @@ class MainGui:
     """
     def __init__(self):
         cfg.ROOT.title('MiuzGallery')
-        cfg.ROOT.configure(bg=cfg.BGCOLOR, padx=15, pady=0)
+        cfg.ROOT.configure(bg=cfg.BGCOLOR)
 
         cfg.ROOT.createcommand(
             'tk::mac::ReopenApplication', lambda: cfg.ROOT.deiconify())
@@ -28,11 +28,13 @@ class MainGui:
         else:
             cfg.ROOT.protocol("WM_DELETE_WINDOW", AskExit)
 
-        CSep(cfg.ROOT).pack(fill=tkinter.X, pady=(30, 20))
+        CSep(cfg.ROOT).pack(fill=tkinter.X, pady=15)
         Gallery(cfg.ROOT).pack(fill=tkinter.BOTH, expand=1)
         CSep(cfg.ROOT).pack(fill=tkinter.X, pady=10)
-        self.st_bar = StatusBar(cfg.ROOT).pack(pady=(0, 10))
+        StatusBar(cfg.ROOT).pack(pady=(0, 10))
+        
         BarMenu()
+
         cfg.ROOT.eval(f'tk::PlaceWindow {cfg.ROOT} center')
         w, h, x, y = cfg.config['GEOMETRY']
         cfg.ROOT.geometry(f'{w}x{h}+{x}+{y}')

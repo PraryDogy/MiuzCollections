@@ -31,9 +31,10 @@ class ImgViewer(CWindow):
         self.ln = 43
 
         self.title('Просмотр')
-        side = int(cfg.ROOT.winfo_screenheight()*0.9)
+        side = int(cfg.ROOT.winfo_screenheight()*0.8)
         self.geometry(f'{int(side*1.3)}x{side}')
         self.configure(pady=0, padx=0)
+        self.resizable(1, 1)
 
         self.img_frame = self.img_widget()
         self.img_frame.pack(pady=(0, 15), expand=1, fill=tkinter.BOTH)

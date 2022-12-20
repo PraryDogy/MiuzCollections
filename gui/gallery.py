@@ -27,45 +27,74 @@ class Gallery(CFrame):
         CFrame.__init__(self, master)
         cfg.GALLERY = self
 
-        menu_wid = self.menu_widget()
-        menu_wid.pack(pady=(0, 0), padx=(0, 15), side=tkinter.LEFT, fill=tkinter.Y)
+        menu_wid = self.menu_widget(self)
+        menu_wid.pack(fill=tkinter.Y, side=tkinter.LEFT)
         menu_wid: tkinter.Frame
 
         cfg.ROOT.update_idletasks()
 
         self.menu_w = menu_wid.winfo_reqwidth()
 
-        self.thumbs_wid = self.thumbnails_widget()
+        self.thumbs_wid = self.thumbnails_widget(self)
         self.thumbs_wid.pack(expand=1, fill=tkinter.BOTH, side=tkinter.RIGHT)
 
         cfg.ROOT.bind('<ButtonRelease-1>', self.update_gui)
 
-    def update_gui(self, e):
+    def update_gui(self, e: tkinter.Event):
         root_w = cfg.config['GEOMETRY'][0]
         new_w = cfg.ROOT.winfo_width()
-        if new_w != int(root_w):
+        if new_w != root_w:
             cfg.config['GEOMETRY'][0] = new_w
             self.thumbnails_reload()
+
+    def thumbnails_reload(self):
+        """
+        Destroys `ImagesThumbs` object and run it again.
+        """
+        w, h = cfg.ROOT.winfo_width(), cfg.ROOT.winfo_height()
+        cfg.config['GEOMETRY'][0], cfg.config['GEOMETRY'][1] = w, h
+
+        self.thumbs_wid.destroy()
+
+        self.thumbs_wid = self.thumbnails_widget(self)
+        self.thumbs_wid.pack(expand=1, fill=tkinter.BOTH, side=tkinter.RIGHT)
 
     def place_thumb(self, thumbnail):
         cropped = crop_image(thumbnail)
         rgb_thumb = convert_to_rgb(cropped)
         img_tk = ImageTk.PhotoImage(rgb_thumb)
-        self.compare_img.configure(image=img_tk)
+
+        self.compare_img['image'] = img_tk
         self.compare_img.image_names = img_tk
+
+        self.compare_title['text'] = 'В списке сравнения:'
+
+        self.compare_title.pack()
+        self.compare_img.pack()
 
     def remove_thumb(self):
         self.compare_img['image'] = ''
+        self.compare_title['text'] = ''
 
-    def menu_widget(self):
+    def menu_widget(self, master):
         scrollable = tkmacosx.SFrame(
-            self, bg=cfg.BGCOLOR, scrollbarwidth=7, width=170)
-        title = CLabel(
-            scrollable, text='Коллекции', font=('Arial', 22, 'bold'))
-        title.pack(pady=(20, 20), padx=(0, 15))
+            master, bg=cfg.BGCOLOR, scrollbarwidth=7, width=cfg.THUMB_SIZE)
 
-        self.compare_img = CLabel(scrollable)
-        self.compare_img.pack(padx=(0, 15), pady=(0, 15))
+        compare_frame = CFrame(scrollable)
+        compare_frame.pack()
+
+        self.compare_title = CLabel(compare_frame)
+        self.compare_title.pack()
+
+        self.compare_img = CLabel(compare_frame)
+        self.compare_img.pack(pady=(0, 15))
+
+        menu_frame = CFrame(scrollable)
+        menu_frame.pack()
+
+        title = CLabel(
+            menu_frame, text='Коллекции', font=('Arial', 22, 'bold'))
+        title.pack(pady=(0,15))
 
         load_colls = Dbase.conn.execute(
             sqlalchemy.select(Thumbs.collection)).fetchall()
@@ -78,33 +107,33 @@ class Gallery(CFrame):
         for_btns.sort()
         btns = []
 
-        last = CButton(scrollable, text='Последние')
-        last.configure(height=1, width=13, pady=5, anchor=tkinter.W, padx=10)
+        last = CButton(menu_frame, text='Последние')
+        last.configure(width=13, pady=5, anchor=tkinter.W, padx=10)
         last.cmd(partial(self.collection_folder, 'last', last, btns))
-        last.pack(fill=tkinter.X, padx=(0, 15), pady=(0, 15))
+        last.pack(fill=tkinter.X, pady=(0, 15))
         btns.append(last)
 
         for name_btn, name_coll in for_btns:
-            btn = CButton(scrollable, text=name_btn)
-            btn.configure(pady=5, anchor=tkinter.W, padx=10)
+            btn = CButton(menu_frame, text=name_btn)
+            btn.configure(width=13, pady=5, anchor=tkinter.W, padx=10)
             btn.cmd(partial(self.collection_folder, name_coll, btn, btns))
-            btn.pack(fill=tkinter.X, padx=(0, 15))
+            btn.pack(fill=tkinter.X)
             btns.append(btn)
 
             if name_coll == cfg.config['CURR_COLL']:
                 btn.configure(bg=cfg.BGPRESSED)
 
-            sep = CSep(scrollable)
+            sep = CSep(menu_frame)
             sep['bg'] = '#272727'
-            sep.pack(fill=tkinter.X, padx=(0, 15))
+            sep.pack(fill=tkinter.X)
     
         if cfg.config['CURR_COLL'] == 'last':
             last.configure(bg=cfg.BGPRESSED)
 
         return scrollable
 
-    def thumbnails_widget(self):
-        parent = CFrame(self)
+    def thumbnails_widget(self, master: tkinter):
+        parent = CFrame(master)
         scrollable = tkmacosx.SFrame(parent, bg=cfg.BGCOLOR, scrollbarwidth=7)
         scrollable.pack(expand=1, fill=tkinter.BOTH, side=tkinter.RIGHT)
 
@@ -164,18 +193,6 @@ class Gallery(CFrame):
         btn['bg'] = cfg.BGPRESSED
         cfg.config['CURR_COLL'] = coll
         self.thumbnails_reload()
-
-    def thumbnails_reload(self):
-        """
-        Destroys `ImagesThumbs` object and run it again.
-        """
-        w, h = cfg.ROOT.winfo_width(), cfg.ROOT.winfo_height()
-        cfg.config['GEOMETRY'][0], cfg.config['GEOMETRY'][1] = w, h
-
-        self.thumbs_wid.destroy()
-
-        self.thumbs_wid = self.thumbnails_widget()
-        self.thumbs_wid.pack(expand=1, fill=tkinter.BOTH, side=tkinter.RIGHT)
 
     def decode_thumbs(self, thumbs: tuple):
         """
