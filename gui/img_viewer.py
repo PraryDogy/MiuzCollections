@@ -75,8 +75,8 @@ class ImgViewer(CWindow):
             wids = sum(i.winfo_reqheight() for i in self.winfo_children())
 
             if new_h < wids:
-                self.win_h = wids
-                self.geometry(f'{new_w}x{wids}')
+                self.win_h = self.winfo_reqheight()
+                self.geometry(f'{new_w}x{self.win_h}')
             else:
                 self.win_height = new_h
 
