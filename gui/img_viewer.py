@@ -67,13 +67,20 @@ class ImgViewer(CWindow):
         self.bind('<ButtonRelease-1>', lambda e: self.resize_win(e))
 
     def resize_win(self, event: tkinter.Event):
-        w, h = self.winfo_width(), self.winfo_height()
+        new_w, new_h = self.winfo_width(), self.winfo_height()
 
-        if w != self.win_width or h != self.win_height:
+        if new_w != self.win_width or new_h != self.win_height:
 
             self.img_height = self.img_frame.winfo_height()
-            self.win_width = w
-            self.win_height = h
+            wids = sum(i.winfo_reqheight() for i in self.winfo_children())
+
+            if new_h < wids:
+                self.win_h = wids
+                self.geometry(f'{new_w}x{wids}')
+            else:
+                self.win_height = new_h
+
+            self.win_width = new_w
             cfg.config['WIN_GEOMETRY'] = [self.win_width, self.win_height]
 
             self.thumb_place()

@@ -12,8 +12,8 @@ class ImgCompare(CWindow):
         CWindow.__init__(self)
 
         self.title('Сравнение')
-        side = int(cfg.ROOT.winfo_screenheight()*0.8)
-        self.geometry(f'{int(side*1.3)}x{side}')
+        self.win_width, self.win_height = cfg.config['WIN_GEOMETRY']
+        self.geometry(f'{self.win_width}x{self.win_height}')
         self.configure(pady=0, padx=0)
 
         wins = get_windows()
