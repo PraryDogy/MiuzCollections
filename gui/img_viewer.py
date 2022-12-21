@@ -1,5 +1,5 @@
 import os
-import threading
+from functools import partial
 import tkinter
 from datetime import datetime
 
@@ -39,21 +39,24 @@ class ImgViewer(CWindow):
         self.configure(pady=0, padx=0)
         self.resizable(1, 1)
 
-        self.img_frame = self.img_widget()
-        self.img_frame.pack(pady=(0, 15), expand=1, fill=tkinter.BOTH)
+        self.img_frame = self.img_widget(self)
+        self.img_frame.pack(pady=(0, 15))
 
-        self.btns_frame = self.btns_widget()
+        self.btns_frame = self.btns_widget(self)
         self.btns_frame.pack(pady=(0, 15))
         
-        self.info_frame = self.info_widget()
+        self.info_frame = self.info_widget(self)
         self.info_frame.pack(pady=(0, 15))
 
         cfg.ROOT.update_idletasks()
 
-        self.img_height = self.img_frame.winfo_height()
+        wids = sum(i.winfo_reqheight() for i in self.winfo_children()[1:]) + 15*3
+        self.img_height = self.win_height - wids
+        self.img_frame['width'] = self.win_width
+        self.img_frame['height'] = self.img_height
 
-        self.thumb_place()
-        self.task = cfg.ROOT.after(500, self.img_place)
+        self.thumb_place(self.win_width, self.img_height)
+        self.task = cfg.ROOT.after(500, lambda: self.img_place(self.win_width, self.img_height))
 
         if cfg.COMPARE:
             cfg.ROOT.after(0, cfg.ST_BAR.wait)
@@ -71,39 +74,38 @@ class ImgViewer(CWindow):
 
         if new_w != self.win_width or new_h != self.win_height:
 
-            self.img_height = self.img_frame.winfo_height()
-            wids = sum(i.winfo_reqheight() for i in self.winfo_children())
-
-            if new_h < wids:
-                self.win_h = self.winfo_reqheight()
-                self.geometry(f'{new_w}x{self.win_h}')
-            else:
-                self.win_height = new_h
-
+            wids = sum(i.winfo_reqheight() for i in self.winfo_children()[1:]) + 15*3
+            self.img_height = new_h - wids
+            
+            self.win_height = new_h
             self.win_width = new_w
+
+            self.img_frame['width'] = self.win_width
+            self.img_frame['height'] = self.img_height
+
             cfg.config['WIN_GEOMETRY'] = [self.win_width, self.win_height]
 
-            self.thumb_place()
-            cfg.ROOT.after(500, self.img_place)
+            self.thumb_place(self.win_width, self.img_height)
+            cfg.ROOT.after(500, lambda: self.img_place(self.win_width, self.img_height))
 
-    def img_widget(self):
-        label = CLabel(self)
+    def img_widget(self, master: tkinter):
+        label = CLabel(master)
         label['bg']='black'
         label.bind('<ButtonRelease-1>', lambda e: self.img_click(e))
         self.bind('<Left>', lambda e: self.switch_img(self.img_ind()-1))
         self.bind('<Right>', lambda e: self.switch_img(self.img_ind()+1))
         return label
 
-    def btns_widget (self):
-        btns_frame = ImgBtns(self)
+    def btns_widget (self, master: tkinter):
+        btns_frame = ImgBtns(master)
         comp_btn = CButton(btns_frame, text='Сравнить')
         comp_btn.cmd(lambda e: self.btn_compare(comp_btn))
         comp_btn.pack(side=tkinter.RIGHT)
         return btns_frame
 
-    def info_widget(self):
+    def info_widget(self, master: tkinter):
         info1, info2 = self.create_info()
-        info_widget = InfoWidget(self, self.ln, info1, info2)
+        info_widget = InfoWidget(master, self.ln, info1, info2)
         return info_widget
 
     def run_compare(self):
@@ -117,8 +119,8 @@ class ImgViewer(CWindow):
             cfg.IMG_SRC = self.all_src[ind]
         except IndexError:
             cfg.IMG_SRC = self.all_src[0]
-        self.thumb_place()
-        self.task = cfg.ROOT.after(500, self.img_place)
+        self.thumb_place(self.win_width, self.img_height)
+        self.task = cfg.ROOT.after(500, lambda: self.img_place(self.win_width, self.img_height))
 
     def img_ind(self) -> int: 
         return self.all_src.index(cfg.IMG_SRC)
@@ -143,15 +145,15 @@ class ImgViewer(CWindow):
             Thumbs.src == cfg.IMG_SRC)).first()[0]
         return decode_image(thumb)
 
-    def thumb_place(self):
+    def thumb_place(self, width, height):
         thumb = self.thumb_load()
-        resized = resize_image(thumb, self.win_width, self.img_height, False)
+        resized = resize_image(thumb, width, height, False)
         rgb_thumb = convert_to_rgb(resized)
         self.img_set(rgb_thumb)
 
-    def img_place(self):
+    def img_place(self, width, height):
         img_read = cv2.imread(cfg.IMG_SRC)
-        resized = resize_image(img_read, self.win_width, self.img_height, False)
+        resized = resize_image(img_read, width, height, False)
         img_rgb = convert_to_rgb(resized)
         self.img_set(img_rgb)
 
