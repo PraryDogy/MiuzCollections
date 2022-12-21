@@ -69,12 +69,12 @@ class Gallery(CFrame):
 
         self.compare_title['text'] = 'В списке сравнения:'
 
-        self.compare_title.pack()
-        self.compare_img.pack()
+        self.compare_frame.pack(side=tkinter.TOP)
 
     def remove_thumb(self):
         self.compare_img['image'] = ''
         self.compare_title['text'] = ''
+        self.compare_frame.pack_forget()
 
     def menu_widget(self, master):
         scrollable = tkmacosx.SFrame(
@@ -83,17 +83,16 @@ class Gallery(CFrame):
         parent = CFrame(scrollable)
         parent.pack(padx=15)
 
-        compare_frame = CFrame(parent)
-        compare_frame.pack()
+        self.compare_frame = CFrame(parent)
 
-        self.compare_title = CLabel(compare_frame)
+        self.compare_title = CLabel(self.compare_frame)
         self.compare_title.pack()
 
-        self.compare_img = CLabel(compare_frame)
+        self.compare_img = CLabel(self.compare_frame)
         self.compare_img.pack(pady=(0, 15))
 
         menu_frame = CFrame(parent)
-        menu_frame.pack()
+        menu_frame.pack(side=tkinter.BOTTOM)
 
         title = CLabel(
             menu_frame, text='Коллекции', font=('Arial', 22, 'bold'))
