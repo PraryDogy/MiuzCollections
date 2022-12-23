@@ -274,8 +274,9 @@ class Gallery(CFrame):
         ```
         thumbnails = list with 27 images
         clmns = 5
-        > pack_thumbs function will create 5 rows with 5 images, each row
-        > with 5 images. And 6st row with 2 images.
+        > pack_thumbs will create 5 rows
+        > each row with 5 images
+        > and 6st row with 2 images.
         ```
         """
         year_frame = CFrame(master)
