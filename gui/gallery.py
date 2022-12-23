@@ -200,7 +200,7 @@ class Gallery(CFrame):
         """
         Prepares encoded images from database for tkinter.
         * input: ((`img`, `src`, `date modified`), ...)
-        * returns: list turples: (`ImageTk.PhotoImage`, `src`, `date modified`)
+        * returns: list turples: ((`decoded img`, `src`, `date modified`), ...)
         """
         result = []
         for blob, src, modified in thumbs:
@@ -220,7 +220,7 @@ class Gallery(CFrame):
         """
         Converts image modified date to year
         * input: ((`img`, `src`, `date modified`), ...)
-        * returns: list turples: (`ImageTk.PhotoImage`, `src`, `year`)
+        * returns: list turples: ((`img`, `src`, `year`), ...)
         """
         result = []
         for img, src, modified in thumbs:
@@ -243,8 +243,9 @@ class Gallery(CFrame):
 
         years_list(imgs)
         > [
-            [(img, src, 2020), (img2, src, 2020)],
-            [(img6, src, 2017), (img3, src, 2017)]
+            [(img, src, 2020), (img2, src, 2020), ...],
+            [(img6, src, 2017), (img3, src, 2017), ...],
+            ...
             ]
         ```
         """
