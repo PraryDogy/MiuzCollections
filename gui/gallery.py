@@ -15,7 +15,7 @@ from database import Dbase, Thumbs
 from utils import convert_to_rgb, crop_image, decode_image
 
 from .widgets import CButton, CFrame, CLabel, CSep
-from .img_viewer import ImgViewer
+from . import ImgViewer
 
 
 class Gallery(CFrame):

@@ -2,10 +2,8 @@ import tkinter
 
 import cfg
 
-from .macosx_menu import BarMenu
 from .widgets import AskExit, CSep
-from .gallery import Gallery
-from .st_bar import StatusBar
+from . import StatusBar, Gallery, BarMenu
 
 
 class MainGui:

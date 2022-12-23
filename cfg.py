@@ -15,14 +15,13 @@ from utils import encrypt_cfg
 APP_NAME = 'MiuzGallery'
 APP_VER = '3.2.4'
 
-DB_VER = '1.1'
-DB_NAME = f'db {DB_VER}.db'
-
 KEY = 'QaovKbF1YpKCM9e-HE2wvn30lIqCbeYTUcONcdLpV18='
-
-# database info
 CFG_DIR = os.path.join(
     os.path.expanduser('~'), 'Library/Application Support/Miuz Gallery')
+
+# database info
+DB_VER = '1.1'
+DB_NAME = f'db {DB_VER}.db'
 
 # gui settings
 BGFONT = "#E2E2E2"

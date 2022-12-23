@@ -5,7 +5,7 @@ from scaner import scaner
 from utils import smb_check
 
 from .widgets import CButton, CFrame, CLabel, CSep, SmbAlert
-from .settings import Settings
+from . import Settings
 
 
 class StatusBar(CFrame):

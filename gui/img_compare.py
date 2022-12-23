@@ -1,10 +1,9 @@
 import tkinter
 
 import cfg
-from utils import place_center, get_windows
+from utils import get_windows, place_center
 
-from .macosx_menu import CLabel
-from .widgets import CWindow, ImgBtns, InfoWidget
+from .widgets import CLabel, CWindow, ImgBtns, InfoWidget
 
 
 class ImgCompare(CWindow):

@@ -1,5 +1,4 @@
 import os
-from functools import partial
 import tkinter
 from datetime import datetime
 
@@ -12,9 +11,8 @@ from database import Dbase, Thumbs
 from utils import (close_windows, convert_to_rgb, decode_image, get_coll_name,
                    place_center, resize_image, smb_check)
 
-from .img_compare import ImgCompare
-from .widgets import (CButton, CFrame, CLabel, CWindow, ImgBtns, InfoWidget,
-                      SmbAlert)
+from . import ImgCompare
+from .widgets import CButton, CLabel, CWindow, ImgBtns, InfoWidget, SmbAlert
 
 
 class ImgViewer(CWindow):
@@ -26,7 +24,6 @@ class ImgViewer(CWindow):
             SmbAlert()
             return
 
-        # cfg.IMG_SRC = img_src
         self.img_src = img_src
         self.all_src = all_src
         self.ln = 43

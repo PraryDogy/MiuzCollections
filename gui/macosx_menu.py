@@ -4,7 +4,7 @@ import cfg
 from utils import place_center
 
 from .widgets import CLabel, CWindow, CloseBtn
-from .settings import Settings
+from . import Settings
 
 
 class BarMenu(tkinter.Menu):
