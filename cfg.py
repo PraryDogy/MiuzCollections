@@ -1,6 +1,3 @@
-"""
-Global variables & settings.
-"""
 
 import json
 import os
@@ -39,8 +36,9 @@ COMPARE = False
 ROOT = tkinter.Tk()
 ROOT.withdraw()
 
-GALLERY = object
-ST_BAR = object
+from gui import StatusBar, Gallery
+GALLERY = Gallery
+ST_BAR = StatusBar
 
 
 def defaults():

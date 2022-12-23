@@ -99,9 +99,6 @@ class ImgBtns(CFrame):
         open_btn.cmd(partial(self.open_folder, open_btn))
         open_btn.pack(side=tkinter.LEFT, padx=(0, 15))
 
-    def change_src(self, new_src):
-        self.img_src = new_src
-
     def copy_name(self, btn: CButton):
         btn.press()
         my_copy(self.img_src.split(os.sep)[-1].split('.')[0])

@@ -64,7 +64,7 @@ class ImgCompare(CWindow):
         self.img_frame['image'] = img
         self.curr_src = src
 
-        self.btns_frame.change_src(src)
+        self.btns_frame.img_src = src
 
         info_l, _, info_r = self.info_frame.winfo_children()
         info_l['text'] = l_info

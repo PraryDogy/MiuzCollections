@@ -114,10 +114,10 @@ class ImgViewer(CWindow):
         cfg.ROOT.after_cancel(self.task)
         try:
             self.img_src = self.all_src[ind]
-            self.btns_frame.change_src(self.img_src)
+            self.btns_frame.img_src = self.img_src
         except IndexError:
             self.img_src = self.all_src[0]
-            self.btns_frame.change_src(self.img_src)
+            self.btns_frame.img_src = self.img_src
 
         self.thumb_place(self.win_width, self.img_height)
         self.task = cfg.ROOT.after(500, lambda: self.img_place(self.win_width, self.img_height))
