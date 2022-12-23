@@ -23,11 +23,15 @@ class StatusBar(CFrame):
 
         self.fake_widget(self).pack(side=tkinter.LEFT, padx=(0, 15))
         self.settings_widget(self).pack(side=tkinter.LEFT)
+
         CSep(self).pack(fill=tkinter.Y, side=tkinter.LEFT, padx=(15, 15))
+
         self.update_widget(self).pack(side=tkinter.LEFT, padx=(0, 15))
-        live_wid = self.live_widget(self)
-        live_wid.pack(side=tkinter.LEFT, padx=(0, 15))
-        cfg.LIVE_LBL = live_wid
+
+        self.dynamic_lbl = self.live_widget(self)
+        self.dynamic_lbl.pack(side=tkinter.LEFT, padx=(0, 15))
+
+        # cfg.LIVE_LBL = live_wid
 
     def compare(self):
         widgets = tuple(v for k, v in self.children.items())

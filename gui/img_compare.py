@@ -29,15 +29,14 @@ class ImgCompare(CWindow):
         self.info2_l, self.info2_r = info2_l['text'], info2_r['text']
 
         self.curr_src = self.src1
-        cfg.IMG_SRC = self.src1
 
         self.ln = 43
 
         self.img_frame = self.img_widget()
         self.img_frame.pack(pady=(0, 15), expand=1, fill=tkinter.BOTH)
 
-        self.btns = self.btns_widget()
-        self.btns.pack(pady=(0, 15))
+        self.btns_frame = self.btns_widget()
+        self.btns_frame.pack(pady=(0, 15))
 
         self.info_frame = self.info_widget()
         self.info_frame.pack(pady=(0, 15))
@@ -56,7 +55,7 @@ class ImgCompare(CWindow):
         return label
 
     def btns_widget(self):
-        return ImgBtns(self)
+        return ImgBtns(self, self.src1)
 
     def info_widget(self):
         info_widget = InfoWidget(self, self.ln, self.info1_l, self.info1_r)
@@ -65,7 +64,8 @@ class ImgCompare(CWindow):
     def set_vars(self, img, src, l_info, r_info):
         self.img_frame['image'] = img
         self.curr_src = src
-        cfg.IMG_SRC = src
+
+        self.btns_frame.change_src(src)
 
         info_l, _, info_r = self.info_frame.winfo_children()
         info_l['text'] = l_info

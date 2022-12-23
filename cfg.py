@@ -39,8 +39,7 @@ COMPARE = False
 # gui objects for global access
 ROOT = tkinter.Tk()
 ROOT.withdraw()
-IMG_SRC = str
-LIVE_LBL = tkinter.Label
+
 GALLERY = object
 ST_BAR = object
 

@@ -19,7 +19,7 @@ from utils import encrypt_cfg, get_coll_name, resize_image, smb_check
 
 def update_livelabel(text: str):
     try:
-        cfg.LIVE_LBL['text'] = text
+        cfg.ST_BAR.dynamic_lbl['text'] = text
     except tkinter.TclError:
         # print('livelabel was destroyed')
         pass
@@ -234,7 +234,7 @@ def update_collections():
     Searchs images.
     Updates the database thumbnails.
     """
-    cfg.LIVE_LBL['fg'] = cfg.BGFONT
+    cfg.ST_BAR.dynamic_lbl['fg'] = cfg.BGFONT
     update_livelabel('Обновление 10%')
     images = search_images(search_collections())
     update_livelabel('Обновление 20%')
@@ -270,7 +270,7 @@ def update_nocollection(aged: bool):
     update_livelabel('Обновление 90%')
     new_images(images)
     try:
-        cfg.LIVE_LBL['fg'] = cfg.BGCOLOR
+        cfg.ST_BAR.dynamic_lbl['fg'] = cfg.BGCOLOR
     except tkinter.TclError:
         print('livelabel was destroyed')
 

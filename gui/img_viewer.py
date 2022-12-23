@@ -26,7 +26,7 @@ class ImgViewer(CWindow):
             SmbAlert()
             return
 
-        cfg.IMG_SRC = img_src
+        # cfg.IMG_SRC = img_src
         self.img_src = img_src
         self.all_src = all_src
         self.ln = 43
@@ -97,7 +97,7 @@ class ImgViewer(CWindow):
         return label
 
     def btns_widget (self, master: tkinter):
-        btns_frame = ImgBtns(master)
+        btns_frame = ImgBtns(master, self.img_src)
         comp_btn = CButton(btns_frame, text='Сравнить')
         comp_btn.cmd(lambda e: self.btn_compare(comp_btn))
         comp_btn.pack(side=tkinter.RIGHT)
@@ -116,14 +116,17 @@ class ImgViewer(CWindow):
     def switch_img(self, ind: int):
         cfg.ROOT.after_cancel(self.task)
         try:
-            cfg.IMG_SRC = self.all_src[ind]
+            self.img_src = self.all_src[ind]
+            self.btns_frame.change_src(self.img_src)
         except IndexError:
-            cfg.IMG_SRC = self.all_src[0]
+            self.img_src = self.all_src[0]
+            self.btns_frame.change_src(self.img_src)
+
         self.thumb_place(self.win_width, self.img_height)
         self.task = cfg.ROOT.after(500, lambda: self.img_place(self.win_width, self.img_height))
 
     def img_ind(self) -> int: 
-        return self.all_src.index(cfg.IMG_SRC)
+        return self.all_src.index(self.img_src)
 
     def img_set(self, img):
         img_tk = ImageTk.PhotoImage(img)
@@ -142,7 +145,7 @@ class ImgViewer(CWindow):
         Returns decoded non resized thumbnail from database
         """
         thumb = Dbase.conn.execute(sqlalchemy.select(Thumbs.img150).where(
-            Thumbs.src == cfg.IMG_SRC)).first()[0]
+            Thumbs.src==self.img_src)).first()[0]
         return decode_image(thumb)
 
     def thumb_place(self, width, height):
@@ -152,7 +155,7 @@ class ImgViewer(CWindow):
         self.img_set(rgb_thumb)
 
     def img_place(self, width, height):
-        img_read = cv2.imread(cfg.IMG_SRC)
+        img_read = cv2.imread(self.img_src)
         resized = resize_image(img_read, width, height, False)
         img_rgb = convert_to_rgb(resized)
         self.img_set(img_rgb)
@@ -172,25 +175,25 @@ class ImgViewer(CWindow):
             return
 
     def create_info(self):
-        name = cfg.IMG_SRC.split(os.sep)[-1]
+        name = self.img_src.split(os.sep)[-1]
         name = self.name_cut(name, self.ln)
 
-        path = cfg.IMG_SRC.replace(cfg.config["COLL_FOLDER"], "Коллекции")
+        path = self.img_src.replace(cfg.config["COLL_FOLDER"], "Коллекции")
         path = path.replace(cfg.config["PHOTO_DIR"], "Фото")
         path = self.name_cut(path, self.ln)
 
-        filesize = round(os.path.getsize(cfg.IMG_SRC)/(1024*1024), 2)
+        filesize = round(os.path.getsize(self.img_src)/(1024*1024), 2)
 
-        filemod = datetime.fromtimestamp(os.path.getmtime(cfg.IMG_SRC))
+        filemod = datetime.fromtimestamp(os.path.getmtime(self.img_src))
         filemod = filemod.strftime("%d-%m-%Y, %H:%M:%S")
 
-        w, h = Image.open(cfg.IMG_SRC).size
+        w, h = Image.open(self.img_src).size
 
         t1 = (f'Разрешение: {w}x{h}'
                 f'\nРазмер: {filesize} мб'
                 f'\nДата изменения: {filemod}')
 
-        t2 = (f'Коллекция: {get_coll_name(cfg.IMG_SRC)}'
+        t2 = (f'Коллекция: {get_coll_name(self.img_src)}'
                 f'\nИмя: {name}'
                 f'\nПуть: {path}')
 

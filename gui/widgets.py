@@ -85,8 +85,11 @@ class CloseBtn(CButton):
 
 
 class ImgBtns(CFrame):
-    def __init__(self, master: tkinter, **kwargs):
+    def __init__(self, master: tkinter, img_src, **kwargs):
         CFrame.__init__(self, master, **kwargs)
+
+        self.img_src = img_src
+        self.img_src: str
 
         copy_btn = CButton(self, text='Копировать имя')
         copy_btn.cmd(lambda e: self.copy_name(copy_btn))
@@ -96,13 +99,16 @@ class ImgBtns(CFrame):
         open_btn.cmd(partial(self.open_folder, open_btn))
         open_btn.pack(side=tkinter.LEFT, padx=(0, 15))
 
+    def change_src(self, new_src):
+        self.img_src = new_src
+
     def copy_name(self, btn: CButton):
         btn.press()
-        my_copy(cfg.IMG_SRC.split(os.sep)[-1].split('.')[0])
+        my_copy(self.img_src.split(os.sep)[-1].split('.')[0])
 
     def open_folder(self, btn: CButton, e: tkinter.Event):
         btn.press()
-        path = os.sep.join(cfg.IMG_SRC.split(os.sep)[:-1])
+        path = os.path.split(self.img_src)[0]
 
         def open():
             subprocess.check_output(["/usr/bin/open", path])
