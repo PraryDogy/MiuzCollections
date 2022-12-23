@@ -35,10 +35,8 @@ COMPARE = False
 # gui objects for global access
 ROOT = tkinter.Tk()
 ROOT.withdraw()
-
-from gui import StatusBar, Gallery
-GALLERY = Gallery
-ST_BAR = StatusBar
+GALLERY = object
+ST_BAR = object
 
 
 def defaults():
