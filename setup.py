@@ -9,8 +9,13 @@ import shutil
 
 from setuptools import setup
 import cfg
+import icnsutil
 
 
+src = './icon.png'
+img = icnsutil.IcnsFile()
+img.add_media(file=src)
+img.write(f'./icon.icns')
 
 APP = ['start.py']
 DATA_FILES = [

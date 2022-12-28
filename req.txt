@@ -3,3 +3,4 @@ Pillow
 SQLAlchemy
 tkmacosx
 cryptography
+icnsutil
