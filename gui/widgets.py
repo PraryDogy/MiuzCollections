@@ -5,7 +5,7 @@ import tkinter
 from functools import partial
 
 import cfg
-from utils import close_windows, encrypt_cfg, focus_last, my_copy, place_center
+from utils import close_windows, write_cfg, focus_last, my_copy, place_center
 
 
 def close():
@@ -167,7 +167,7 @@ class AskExit(CWindow):
         w, h = cfg.ROOT.winfo_width(), cfg.ROOT.winfo_height()
         x, y = cfg.ROOT.winfo_x(), cfg.ROOT.winfo_y()
         cfg.config['GEOMETRY'] = [w, h, x, y]
-        encrypt_cfg(cfg.config)
+        write_cfg(cfg.config)
         cfg.FLAG = False
         quit()
 

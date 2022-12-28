@@ -10,18 +10,19 @@
 
 import json
 import os
+import shutil
 import subprocess
 import tkinter
 
 import cv2
 import numpy
-from cryptography.fernet import Fernet
+from cryptography.fernet import Fernet, InvalidToken
 from PIL import Image
 
 import cfg
 
 
-def encrypt_cfg(data: dict):
+def write_cfg(data: dict):
     """
     Converts dict with json dumps and enctypt converted with fernet module.
     Writes enctypted data to `cfg.json` in `cfg.CFG_DIR`
@@ -31,6 +32,27 @@ def encrypt_cfg(data: dict):
     encrypted = key.encrypt(json.dumps(data).encode("utf-8"))
     with open(os.path.join(cfg.CFG_DIR, 'cfg'), 'wb') as file:
         file.write(encrypted)
+
+
+
+def read_cfg(what_read: str):
+    """
+    Decrypts `cfg.json` from `cfg.CFG_DIR` and returns dict.
+    """
+    key = Fernet(cfg.KEY)
+    with open(what_read, 'rb') as file:
+        data = file.read()
+    try:
+        return json.loads(key.decrypt(data).decode("utf-8"))
+    except InvalidToken:
+        # if config file is older than 3.0.8 version
+        # that means indeed replace database file & config file
+        config = cfg.defaults
+        write_cfg(config)
+        shutil.copyfile(
+            os.path.join(os.path.dirname(__file__), 'db.db'),
+            os.path.join(cfg.CFG_DIR, cfg.DB_NAME))
+        return config
 
 
 def get_coll_name(src: str):

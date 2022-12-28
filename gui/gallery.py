@@ -38,14 +38,19 @@ class Gallery(CFrame):
         self.thumbs_wid = self.thumbnails_widget(self)
         self.thumbs_wid.pack(expand=1, fill=tkinter.BOTH, side=tkinter.RIGHT)
 
+        self.clmns = 0
+
         cfg.ROOT.bind('<ButtonRelease-1>', self.update_gui)
 
     def update_gui(self, e: tkinter.Event):
-        root_w = cfg.config['GEOMETRY'][0]
+        old_w = cfg.config['GEOMETRY'][0]
         new_w = cfg.ROOT.winfo_width()
-        if new_w != root_w:
+
+        if new_w != old_w:
             cfg.config['GEOMETRY'][0] = new_w
-            self.thumbnails_reload()
+
+            if self.clmns != self.clmns_count():
+                self.thumbnails_reload()
 
     def thumbnails_reload(self):
         """
@@ -134,12 +139,15 @@ class Gallery(CFrame):
 
         return scrollable
 
+    def clmns_count(self):
+            return (cfg.config['GEOMETRY'][0]-self.menu_w)//cfg.THUMB_SIZE
+
     def thumbnails_widget(self, master: tkinter):
         parent = CFrame(master)
         scrollable = tkmacosx.SFrame(parent, bg=cfg.BGCOLOR, scrollbarwidth=7)
         scrollable.pack(expand=1, fill=tkinter.BOTH, side=tkinter.RIGHT)
 
-        self.clmns = (cfg.config['GEOMETRY'][0]-self.menu_w)//cfg.THUMB_SIZE
+        self.clmns = self.clmns_count()
 
         title = CLabel(
             scrollable, text=cfg.config['CURR_COLL'], font=('Arial', 45, 'bold'))

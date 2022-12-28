@@ -1,20 +1,16 @@
-
-import json
 import os
 import shutil
 import tkinter
 
-from cryptography.fernet import Fernet, InvalidToken
-
-from utils import encrypt_cfg
+from utils import write_cfg, read_cfg
 
 # app info
-APP_NAME = 'MiuzGallery'
+APP_NAME = 'MiuzPhoto'
 APP_VER = '3.2.4'
 
 KEY = 'QaovKbF1YpKCM9e-HE2wvn30lIqCbeYTUcONcdLpV18='
 CFG_DIR = os.path.join(
-    os.path.expanduser('~'), 'Library/Application Support/Miuz Gallery')
+    os.path.expanduser('~'), f'Library/Application Support/{APP_NAME}')
 
 # database info
 DB_VER = '1.1'
@@ -38,10 +34,7 @@ ROOT.withdraw()
 GALLERY = object
 ST_BAR = object
 
-
-def defaults():
-    return {
-        'APP_VER': APP_VER,
+default_vars = {
         'PHOTO_DIR': '/Volumes/Shares/Marketing/Photo',
         'COLL_FOLDER': '/Volumes/Shares/Marketing/Photo/_Collections',
         'RT_FOLDER': 'Retouch',
@@ -53,26 +46,9 @@ def defaults():
         'MINIMIZE': 1
         }
 
-
-def read_cfg(what_read: str):
-    """
-    Decrypts `cfg.json` from `cfg.CFG_DIR` and returns dict.
-    """
-    key = Fernet(KEY)
-    with open(what_read, 'rb') as file:
-        data = file.read()
-    try:
-        return json.loads(key.decrypt(data).decode("utf-8"))
-    except InvalidToken:
-        # if config file is older than 3.0.8 version
-        # that means indeed replace database file & config file
-        config = defaults()
-        encrypt_cfg(config)
-        shutil.copyfile(
-            os.path.join(os.path.dirname(__file__), 'db.db'),
-            os.path.join(CFG_DIR, DB_NAME))
-        return config
-
+old_path = os.path.join(os.path.split(CFG_DIR)[0], 'Miuz Gallery')
+if os.path.exists(old_path):
+    shutil.rmtree(old_path)
 
 if not os.path.exists(CFG_DIR):
     os.mkdir(CFG_DIR)
@@ -89,12 +65,11 @@ for file in os.listdir(CFG_DIR):
 if os.path.exists(os.path.join(CFG_DIR, 'cfg')):
     config = read_cfg(os.path.join(CFG_DIR, 'cfg'))
 else:
-    config = defaults()
-    encrypt_cfg(config)
+    config = default_vars
+    write_cfg(config)
 
-defs = defaults()
-part1 = {k:v for k, v in config.items() if k in defs.keys()}
-part2 = {k:v for k, v in defs.items() if k not in config.keys()}
+part1 = {k:v for k, v in config.items() if k in default_vars.keys()}
+part2 = {k:v for k, v in default_vars.items() if k not in config.keys()}
 new_config = {**part1, **part2}
-encrypt_cfg(new_config) if new_config.keys() != config.keys() else False
+write_cfg(new_config) if new_config.keys() != config.keys() else False
 config = new_config if new_config.keys() != config.keys() else config

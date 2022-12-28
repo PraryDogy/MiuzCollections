@@ -14,7 +14,7 @@ import sqlalchemy
 import cfg
 from admin import print_alive
 from database import Dbase, Thumbs
-from utils import encrypt_cfg, get_coll_name, resize_image, smb_check
+from utils import write_cfg, get_coll_name, resize_image, smb_check
 
 
 def update_livelabel(text: str):
@@ -282,7 +282,7 @@ def scaner():
         update_collections()
         if cfg.config['TYPE_SCAN'] == 'full':
             cfg.config['TYPE_SCAN'] = ''
-            encrypt_cfg(cfg.config)
+            write_cfg(cfg.config)
             update_nocollection(aged=False)
         else:
             update_nocollection(aged=True)

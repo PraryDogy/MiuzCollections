@@ -8,7 +8,7 @@ from tkinter import filedialog
 import tkmacosx
 
 import cfg
-from utils import encrypt_cfg, my_copy, my_paste, place_center, close_windows
+from utils import write_cfg, my_copy, my_paste, place_center, close_windows
 
 from .widgets import AskExit, CButton, CFrame, CLabel, CloseBtn, CSep, CWindow
 
@@ -213,7 +213,7 @@ class Settings(CWindow):
         Reload app and run Utils Scaner with full scan method.
         """
         cfg.config['TYPE_SCAN'] = 'full'
-        encrypt_cfg(cfg.config)
+        write_cfg(cfg.config)
         os.execv(sys.executable, ['python'] + sys.argv)
 
     def full_reset(self):
@@ -301,7 +301,7 @@ class Settings(CWindow):
 
         cfg.config['MINIMIZE'] = self.minimize.get()
 
-        encrypt_cfg(cfg.config)
+        write_cfg(cfg.config)
 
         if cfg.config['MINIMIZE'] == 1:
             cfg.ROOT.protocol("WM_DELETE_WINDOW", lambda: cfg.ROOT.withdraw())
