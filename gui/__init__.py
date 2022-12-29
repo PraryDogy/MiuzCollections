@@ -11,7 +11,7 @@ import cfg
 
 class InitGui:
     def __init__(self):
-        cfg.ROOT.title('MiuzGallery')
+        cfg.ROOT.title(cfg.APP_NAME)
         cfg.ROOT.configure(bg=cfg.BGCOLOR)
 
         cfg.ROOT.createcommand(
