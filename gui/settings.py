@@ -19,43 +19,30 @@ class Settings(CWindow):
         self.title('Настройки')
         self.resizable(1, 1)
 
-        self.geometry(
-            f'{int(cfg.ROOT.winfo_width()*0.5)}x'
-            f'{int(cfg.ROOT.winfo_height()*0.8)}')
+        self.minimize = tkinter.IntVar(value=cfg.config['MINIMIZE'])
+
+        self.main_wid = self.main_widget(self)
+        self.main_wid.pack()
 
         cfg.ROOT.update_idletasks()
 
-        self.ln = int(self.winfo_width()*0.9)
-        self.minimize = tkinter.IntVar(value=cfg.config['MINIMIZE'])
+        self.geometry(
+            f'{cfg.ROOT.winfo_width()//2}x'
+            f'{self.winfo_height()}')
 
-        scrolllable = tkmacosx.SFrame(
-            self, bg=cfg.BGCOLOR, scrollbarwidth=7)
-        scrolllable.pack(fill=tkinter.BOTH, expand=1)
-
-        self.dirs_wid = self.dirs_widget(scrolllable)
-        self.dirs_wid.pack()
-
-        self.options_wid = self.options_widget(scrolllable)
-        self.options_wid.pack()
-
-        bottom_frame = CFrame(self)
-        bottom_frame.pack(padx=(0, 7))
-
-        self.cancel_widget(bottom_frame).pack()
+        cfg.ROOT.update_idletasks()
 
         place_center(self)
         self.deiconify()
         self.grab_set()
 
-    def dirs_widget(self, master: tkinter):
+    def main_widget(self, master: tkinter):
         frame = CFrame(master)
-
         title_lbl = CLabel(
                 frame,
                 text = "Коллекции",
                 justify = tkinter.LEFT,
-                wraplength = self.ln,
-                font = ('Arial', 22, 'bold')
+                font = ('Arial', 22, 'bold'),
                 )
         title_lbl.pack()
 
@@ -63,36 +50,31 @@ class Settings(CWindow):
             frame,
             text = cfg.config['COLL_FOLDER'],
             justify = tkinter.LEFT,
-            wraplength = self.ln
+            wraplength = 400
             )
         path_lbl.pack(padx=(10, 0), pady=(5, 0))
 
         select_path = CButton(frame, text='Обзор')
-        select_path.pack(pady=(5, 0), padx=(5, 0))
+        select_path.pack(pady=(15, 0), padx=(5, 0))
         select_path.configure(width=9)
         select_path.cmd(lambda e, x=path_lbl: self.select_path(x))
 
         CSep(frame).pack(padx=40, pady=20, fill=tkinter.X)
-        
-        return frame
 
 
-    def options_widget(self, master: tkinter):
-        frame = CFrame(master)
+        checkbox_frame = CFrame(frame)
+        checkbox_frame.pack(pady = (0, 15))
 
-        min_frame = CFrame(frame)
-        min_frame.pack(pady = (0, 15))
-
-        check_box = tkinter.Checkbutton(min_frame, bg=cfg.BGCOLOR)
+        check_box = tkinter.Checkbutton(checkbox_frame, bg=cfg.BGCOLOR)
         check_box['command'] = lambda: self.checkbox_cmd(check_box)
         [check_box.select() if self.minimize.get() == 1 else check_box.deselect()]
 
-        check_lbl = CLabel(min_frame, text='Свернуть вместо закрыть')
+        check_lbl = CLabel(checkbox_frame, text='Свернуть вместо закрыть')
 
         [i.pack(side=tkinter.LEFT) for i in (check_box, check_lbl)]
 
         rest_frame = CFrame(frame)
-        rest_frame.pack(pady=(0, 15))
+        rest_frame.pack()
 
         restore_btn = CButton(rest_frame, text='По умолчанию')
         restore_btn.configure(width=12)
@@ -102,20 +84,21 @@ class Settings(CWindow):
         reset_button = CButton(rest_frame, text='Очистить кэш')
         reset_button.configure(width=12)
         reset_button.cmd(lambda e: self.full_reset())
-        reset_button.pack(side=tkinter.RIGHT)
+        reset_button.pack(side=tkinter.LEFT)
 
-        return frame
+        CSep(frame).pack(padx=40, pady=20, fill=tkinter.X)
 
-    def cancel_widget(self, master: tkinter):
-        frame = CFrame(master)
+        cancel_frame = CFrame(frame)
+        cancel_frame.pack()
 
-        save_btn = CButton(frame, text='Сохранить')
+        save_btn = CButton(cancel_frame, text='Сохранить')
         save_btn.cmd(lambda e: self.save_settings())
         save_btn.configure(width=12)
         save_btn.pack(side=tkinter.LEFT, padx=(0, 10))
 
-        cancel_btn = CloseBtn(frame, text='Отмена')
-        cancel_btn.pack(side=tkinter.RIGHT)
+        cancel_btn = CloseBtn(cancel_frame, text='Отмена')
+        cancel_btn.configure(width=12)
+        cancel_btn.pack(side=tkinter.LEFT)
 
         return frame
 
@@ -140,13 +123,11 @@ class Settings(CWindow):
         master['text'] = path
 
     def get_widgets(self):
-        paths = self.dirs_wid.winfo_children()
-        path1 = paths[1]
+        children = self.main_wid.winfo_children()
 
-        options = self.options_wid.winfo_children()[0]
-        checkbox = options.winfo_children()[0]
+        checkbox = children[4].winfo_children()[0]
 
-        return (path1, checkbox)
+        return (children[1], checkbox)
 
     def restore(self, btn: CButton):
         """
@@ -195,7 +176,8 @@ class Settings(CWindow):
         write_cfg(cfg.config)
 
         if cfg.config['MINIMIZE'] == 1:
-            cfg.ROOT.protocol("WM_DELETE_WINDOW", lambda: cfg.ROOT.withdraw())
+            cfg.ROOT.protocol("WM_DELETE_WINDOW", lambda: cfg.ROOT.iconify())
+
         else:
             cfg.ROOT.protocol("WM_DELETE_WINDOW", AskExit)
 
