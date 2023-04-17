@@ -176,7 +176,6 @@ class ImgViewer(CWindow):
         name = self.name_cut(name, self.ln)
 
         path = self.img_src.replace(cfg.config["COLL_FOLDER"], "Коллекции")
-        path = path.replace(cfg.config["PHOTO_DIR"], "Фото")
         path = self.name_cut(path, self.ln)
 
         filesize = round(os.path.getsize(self.img_src)/(1024*1024), 2)

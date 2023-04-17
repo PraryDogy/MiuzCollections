@@ -35,20 +35,12 @@ GALLERY = object
 ST_BAR = object
 
 default_vars = {
-        'PHOTO_DIR': '/Volumes/Shares/Marketing/Photo',
         'COLL_FOLDER': '/Volumes/Shares/Marketing/Photo/_Collections',
-        'RT_FOLDER': 'Retouch',
-        'FILE_AGE': 60,
         'GEOMETRY': [700, 500, 0, 0],
         'WIN_GEOMETRY': [700, 500],
         'CURR_COLL': 'last',
-        'TYPE_SCAN': '',
         'MINIMIZE': 1
         }
-
-old_path = os.path.join(os.path.split(CFG_DIR)[0], 'Miuz Gallery')
-if os.path.exists(old_path):
-    shutil.rmtree(old_path)
 
 if not os.path.exists(CFG_DIR):
     os.mkdir(CFG_DIR)
@@ -62,14 +54,26 @@ for file in os.listdir(CFG_DIR):
     if file.endswith('.db') and file != DB_NAME:
         os.remove(os.path.join(CFG_DIR, file))
 
-if os.path.exists(os.path.join(CFG_DIR, 'cfg')):
-    config = read_cfg(os.path.join(CFG_DIR, 'cfg'))
+if os.path.exists(os.path.join(CFG_DIR, 'cfg.json')):
+    config = read_cfg()
 else:
     config = default_vars
     write_cfg(config)
 
-part1 = {k:v for k, v in config.items() if k in default_vars.keys()}
-part2 = {k:v for k, v in default_vars.items() if k not in config.keys()}
-new_config = {**part1, **part2}
-write_cfg(new_config) if new_config.keys() != config.keys() else False
-config = new_config if new_config.keys() != config.keys() else config
+# part1 = {
+#     k:v 
+#     for k, v in config.items()
+#     if k in default_vars.keys()
+#     }
+
+# part2 = {
+#     k:v for
+#     k, v in default_vars.items()
+#     if k not in config.keys()
+#     }
+
+# new_config = {**part1, **part2}
+
+# if new_config.keys() != config.keys():
+#     write_cfg(new_config)
+#     config = new_config
