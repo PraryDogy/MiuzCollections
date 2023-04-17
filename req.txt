@@ -2,6 +2,7 @@ cffi==1.15.1
 colour==0.1.5
 cryptography==38.0.4
 greenlet==2.0.1
+icnsutil==1.1.0
 importlib-metadata==5.1.0
 numpy==1.21.6
 opencv-python==4.6.0.66

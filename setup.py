@@ -50,7 +50,7 @@ setup(
 
 
 parent = os.path.dirname(__file__)
-LIB = '/Users/Loshkarev/Documents/Разное/Projects/files/lib'
+LIB = os.path.join(os.path.dirname(__file__), 'lib')
 pasteHere = os.path.join(os.path.dirname(__file__), 'dist',
                         f'{cfg.APP_NAME}.app', 'Contents', 'lib')
 
