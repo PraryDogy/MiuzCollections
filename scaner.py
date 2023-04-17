@@ -25,7 +25,7 @@ def insert_row(**kw):
     resized = resize_image(image, cfg.THUMB_SIZE, cfg.THUMB_SIZE, True)
     encoded_img = cv2.imencode('.jpg', resized)[1].tobytes()
     values = {
-        'img150': encoded_img, 
+        'img150': encoded_img,
         'src':kw['src'],
         'size':kw['size'],
         'created':kw['birth'],
@@ -45,33 +45,33 @@ def search_collections():
         )
 
 
-def search_images(list_dirs: list):
+def get_images(list_dirs: list):
     """
     Looking for `.jpeg` files in list of dirs.
     Creates list of tuples with
     `src`, int `size`, int `created`, int `modified`
     """
-    all_files = []
+    all_files = [
+        os.path.join(root, file)
 
-    for path in list_dirs:
-        for root, _, files in os.walk(path):
-            for file in files:
-                all_files.append(os.path.join(root, file))
+        for collection in list_dirs
+        for root, _, files in os.walk(collection)
+        for file in files
+        ]
 
-    jpegs = set()
-    for src in all_files:
+    return {
+        (
+            src,
+            int(os.path.getsize(src)),
+            int(os.stat(src).st_birthtime),
+            int(os.stat(src).st_mtime),
+            )
+        for src in all_files
+        if src.endswith(('.jpg', '.jpeg', '.JPG', '.JPEG', '.png'))
+        }
 
-        if src.endswith(('.jpg', '.jpeg', '.JPG', '.JPEG')):
-            attr = os.stat(src)
-            size = int(os.path.getsize(src))
-            created = int(attr.st_birthtime)
-            modified = int(attr.st_mtime)
-            jpegs.add((src, size, created, modified))
 
-    return list(jpegs)
-
-
-def db_images():
+def load_db_images():
     """
     Loads from Database > Thumbs: `src`, `size`, `created`,
     `modified`, `collection` to tuples list
@@ -82,7 +82,6 @@ def db_images():
         Thumbs.size,
         Thumbs.created,
         Thumbs.modified,
-        Thumbs.collection
         )
         ).fetchall()
 
@@ -92,33 +91,31 @@ def removed_images():
     Checks whether each item in the `load_db` list has been
     deleted with os.exists method
     """
-    files = db_images()
-    for src, _, _, _, _ in files:
-        if not os.path.exists(src):
-            print('removed file', src)
+    for data in load_db_images():
+        if not os.path.exists(data[0]):
+            print('removed file', data[0])
             Dbase.conn.execute(
-                sqlalchemy.delete(Thumbs).where(Thumbs.src==src))
+                sqlalchemy.delete(Thumbs)
+                .where(Thumbs.src==data[0])
+                )
 
 
-def new_images(list_dirs: list):
+def new_images(images_list: list):
     """
     Adds new line with thumnails to database if list item
     not in `load_db` list and exists in `SearchImages` list
 
     * param `list_dirs`: list of tuples from `SearchImages`
     """
-    files = db_images()
-    db_colls = list(
-        (size, created, mod) for _, size, created, mod, _ in files)
-    for src, size, created, mod in list_dirs:
-        print_alive(sys._getframe().f_code.co_name, src)
+    for src, size, created, mod in images_list:
 
-        if (size, created, mod) not in db_colls:
+        if (src, size, created, mod) not in load_db_images():
             print('add new file', src)
-            # update_livelabel('Добавляю новые фото')
+
             coll = get_coll_name(src)
-            insert_row(src=src, size=size, birth=created,
-                            mod=mod, coll=coll)
+            insert_row(
+                src = src, size = size, birth = created,mod=mod, coll=coll
+                )
 
 
 def update_collections():
@@ -127,30 +124,26 @@ def update_collections():
     Searchs images.
     Updates the database thumbnails.
     """
-    images = search_images(search_collections())
+    cfg.FLAG = True
+    collections_dirs = search_collections()
+    images = get_images(collections_dirs)
     removed_images()
     new_images(images)
+    cfg.FLAG = False
 
 
 def scaner():
-    def __scan():
-        """Run Files Scaner & Database Updater from utils"""
-        cfg.FLAG = True
-
-        update_collections()
-
-        Dbase.conn.commit()
-        cfg.GALLERY.thumbnails_reload()
-        cfg.FLAG = False
-
     cfg.ST_BAR.enable_live_lbl()
 
-    t1 = threading.Thread(target=__scan, daemon=True)
+    t1 = threading.Thread(target=update_collections, daemon=True)
     t1.start()
+
     while t1.is_alive():
+
         cfg.ROOT.update()
+
         if not cfg.FLAG:
-            cfg.ROOT.update()
+            cfg.GALLERY.thumbnails_reload()
             break
-    
+
     cfg.ST_BAR.disable_live_lbl()

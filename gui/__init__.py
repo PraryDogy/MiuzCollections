@@ -18,10 +18,10 @@ class InitGui:
             'tk::mac::ReopenApplication', lambda: cfg.ROOT.deiconify())
         cfg.ROOT.createcommand("tk::mac::Quit" , AskExit)
 
-        cfg.ROOT.bind('<Command-w>', lambda e: cfg.ROOT.withdraw())
+        cfg.ROOT.bind('<Command-w>', lambda e: cfg.ROOT.iconify())
 
         if cfg.config['MINIMIZE'] == 1:
-            cfg.ROOT.protocol("WM_DELETE_WINDOW", lambda: cfg.ROOT.withdraw())
+            cfg.ROOT.protocol("WM_DELETE_WINDOW", lambda: cfg.ROOT.iconify())
         else:
             cfg.ROOT.protocol("WM_DELETE_WINDOW", AskExit)
 
