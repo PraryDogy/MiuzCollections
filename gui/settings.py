@@ -2,15 +2,18 @@ import os
 import shutil
 import sys
 import tkinter
-from functools import partial
 from tkinter import filedialog
 
 import tkmacosx
 
 import cfg
-from utils import write_cfg, my_copy, my_paste, place_center, close_windows
+from utils import close_windows, my_copy, my_paste, place_center, write_cfg
 
 from .widgets import AskExit, CButton, CFrame, CLabel, CloseBtn, CSep, CWindow
+
+path_widget = tkinter.Label
+checkbox_widget = tkinter.Checkbutton
+live_widget = tkinter.Label
 
 
 class Settings(CWindow):
@@ -36,7 +39,11 @@ class Settings(CWindow):
         self.deiconify()
         self.grab_set()
 
+        self.update_live_lbl()
+
     def main_widget(self, master: tkinter):
+        global path_widget, checkbox_widget, live_widget
+
         frame = CFrame(master)
         title_lbl = CLabel(
                 frame,
@@ -46,35 +53,39 @@ class Settings(CWindow):
                 )
         title_lbl.pack()
 
-        path_lbl = CLabel(
+        path_widget = CLabel(
             frame,
             text = cfg.config['COLL_FOLDER'],
             justify = tkinter.LEFT,
             wraplength = 400
             )
-        path_lbl.pack(padx=(10, 0), pady=(5, 0))
+        path_widget.pack(padx=(10, 0), pady=(5, 0))
 
         select_path = CButton(frame, text='Обзор')
         select_path.pack(pady=(15, 0), padx=(5, 0))
         select_path.configure(width=9)
-        select_path.cmd(lambda e, x=path_lbl: self.select_path(x))
-
-        CSep(frame).pack(padx=40, pady=20, fill=tkinter.X)
-
+        select_path.cmd(lambda e, x=path_widget: self.select_path(x))
 
         checkbox_frame = CFrame(frame)
-        checkbox_frame.pack(pady = (0, 15))
+        checkbox_frame.pack(pady = (15, 0))
 
-        check_box = tkinter.Checkbutton(checkbox_frame, bg=cfg.BGCOLOR)
-        check_box['command'] = lambda: self.checkbox_cmd(check_box)
-        [check_box.select() if self.minimize.get() == 1 else check_box.deselect()]
+        checkbox_widget = tkinter.Checkbutton(
+            checkbox_frame,
+            bg=cfg.BGCOLOR
+            )
+        checkbox_widget['command'] = lambda: self.checkbox_cmd(checkbox_widget)
+        [
+            checkbox_widget.select()
+            if self.minimize.get() == 1
+            else checkbox_widget.deselect()
+            ]
 
-        check_lbl = CLabel(checkbox_frame, text='Свернуть вместо закрыть')
+        checkbox_lbl = CLabel(checkbox_frame, text='Свернуть вместо закрыть')
 
-        [i.pack(side=tkinter.LEFT) for i in (check_box, check_lbl)]
+        [i.pack(side=tkinter.LEFT) for i in (checkbox_widget, checkbox_lbl)]
 
         rest_frame = CFrame(frame)
-        rest_frame.pack()
+        rest_frame.pack(pady=(15, 0))
 
         restore_btn = CButton(rest_frame, text='По умолчанию')
         restore_btn.configure(width=12)
@@ -86,10 +97,17 @@ class Settings(CWindow):
         reset_button.cmd(lambda e: self.full_reset())
         reset_button.pack(side=tkinter.LEFT)
 
-        CSep(frame).pack(padx=40, pady=20, fill=tkinter.X)
+        live_widget = CLabel(
+            frame,
+            width = self.winfo_width(),
+            text = cfg.LIVE_TEXT
+            )
+        live_widget.pack(padx=15, pady=(15, 0))
 
         cancel_frame = CFrame(frame)
         cancel_frame.pack()
+
+        CSep(cancel_frame).pack(pady=15, fill=tkinter.X)
 
         save_btn = CButton(cancel_frame, text='Сохранить')
         save_btn.cmd(lambda e: self.save_settings())
@@ -101,6 +119,14 @@ class Settings(CWindow):
         cancel_btn.pack(side=tkinter.LEFT)
 
         return frame
+
+    def update_live_lbl(self):
+        global live_widget
+        live_widget["text"] = cfg.LIVE_TEXT
+        print(live_widget["text"])
+
+        if self.winfo_exists():
+            cfg.ROOT.after(1000, self.update_live_lbl)
 
     def checkbox_cmd(self, master: tkinter.Checkbutton):
         if self.minimize.get() == 1:
@@ -122,13 +148,6 @@ class Settings(CWindow):
 
         master['text'] = path
 
-    def get_widgets(self):
-        children = self.main_wid.winfo_children()
-
-        checkbox = children[4].winfo_children()[0]
-
-        return (children[1], checkbox)
-
     def restore(self, btn: CButton):
         """
         Gets advanced settings values from cfg and write to cfg.json
@@ -136,41 +155,15 @@ class Settings(CWindow):
         * param `btn`: current tkinter button
         """
         btn.press()
-
-        path2, checkbox = self.get_widgets()
-        checkbox: tkinter.Checkbutton
-
-        path2['text'] = cfg.default_vars['COLL_FOLDER']
-
-        checkbox.select()
-
-    def copy_input(self, master: tkinter.Entry, btn: CButton):
-        """
-        Gets text from current text input field and copy to clipboard.
-        * param `ins`: tkinter entry current text input
-        * param `btn`: current button
-        """
-        btn.press()
-        my_copy(master.get())
-
-    def paste_input(self, master: tkinter.Entry, btn: CButton, e):
-        """
-        Gets text from clipboard and paste in text input field.
-        * param `ins`: tkinter entry current text input
-        * param `btn`: current button
-        """
-        btn.press()
-        master.delete(0, 'end')
-        master.insert(0, my_paste())
+        path_widget['text'] = cfg.default_vars['COLL_FOLDER']
+        checkbox_widget.select()
 
     def save_settings(self):
         """
         Get text from all text fields in advanced settings and save to
         cfg.json
         """
-        coll_path, checkbox = self.get_widgets()
-
-        cfg.config['COLL_FOLDER'] = coll_path['text']
+        cfg.config['COLL_FOLDER'] = path_widget['text']
         cfg.config['MINIMIZE'] = self.minimize.get()
 
         write_cfg(cfg.config)

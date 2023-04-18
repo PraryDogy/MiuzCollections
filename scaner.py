@@ -26,38 +26,33 @@ def insert_row(**kw):
     encoded_img = cv2.imencode('.jpg', resized)[1].tobytes()
     values = {
         'img150': encoded_img,
-        'src':kw['src'],
-        'size':kw['size'],
-        'created':kw['birth'],
-        'modified':kw['mod'],
-        'collection':kw['coll']}
+        'src': kw['src'],
+        'size': kw['size'],
+        'created': kw['birth'],
+        'modified': kw['mod'],
+        'collection': kw['coll']
+        }
     Dbase.conn.execute(sqlalchemy.insert(Thumbs).values(values))
 
 
-def search_collections():
-    """
-    Returns list of dirs.
-    Looking for all folders in `cfg.COLL_FOLDER`
-    """
-    return (
-        os.path.join(cfg.config['COLL_FOLDER'], i)
-        for i in os.listdir(cfg.config['COLL_FOLDER'])
-        )
+def change_live_lvl(text):
+    cfg.LIVE_TEXT = "Обновляю данные:\n" + text
 
 
-def get_images(list_dirs: list):
+def get_images():
     """
     Looking for `.jpeg` files in list of dirs.
     Creates list of tuples with
     `src`, int `size`, int `created`, int `modified`
     """
-    all_files = [
-        os.path.join(root, file)
-
-        for collection in list_dirs
-        for root, _, files in os.walk(collection)
-        for file in files
+    all_files = (
+        [
+        os.path.join(root, file),
+        change_live_lvl(root)
         ]
+        for root, _, files in os.walk(cfg.config["COLL_FOLDER"])
+        for file in files
+        )
 
     return {
         (
@@ -66,7 +61,7 @@ def get_images(list_dirs: list):
             int(os.stat(src).st_birthtime),
             int(os.stat(src).st_mtime),
             )
-        for src in all_files
+        for src, _ in all_files
         if src.endswith(('.jpg', '.jpeg', '.JPG', '.JPEG', '.png'))
         }
 
@@ -93,6 +88,7 @@ def removed_images():
     """
     for data in load_db_images():
         if not os.path.exists(data[0]):
+            change_live_lvl("Удаляю лишнее")
             print('removed file', data[0])
             Dbase.conn.execute(
                 sqlalchemy.delete(Thumbs)
@@ -111,6 +107,7 @@ def new_images(images_list: list):
 
         if (src, size, created, mod) not in load_db_images():
             print('add new file', src)
+            change_live_lvl("Добавляю новые фото")
 
             coll = get_coll_name(src)
             insert_row(
@@ -125,11 +122,11 @@ def update_collections():
     Updates the database thumbnails.
     """
     cfg.FLAG = True
-    collections_dirs = search_collections()
-    images = get_images(collections_dirs)
+    images = get_images()
     removed_images()
     new_images(images)
     cfg.FLAG = False
+    cfg.LIVE_TEXT = "MiuzPhoto"
 
 
 def scaner():

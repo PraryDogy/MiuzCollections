@@ -6,7 +6,7 @@ from utils import write_cfg, read_cfg
 
 # app info
 APP_NAME = 'MiuzPhoto'
-APP_VER = '3.3.0'
+APP_VER = '3.3.1'
 
 KEY = 'QaovKbF1YpKCM9e-HE2wvn30lIqCbeYTUcONcdLpV18='
 CFG_DIR = os.path.join(
@@ -27,6 +27,7 @@ THUMB_SIZE = 150
 # flags
 FLAG = False
 COMPARE = False
+LIVE_TEXT = "MiuzPhoto"
 
 # gui objects for global access
 ROOT = tkinter.Tk()
