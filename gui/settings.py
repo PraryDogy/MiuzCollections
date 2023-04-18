@@ -123,7 +123,6 @@ class Settings(CWindow):
     def update_live_lbl(self):
         global live_widget
         live_widget["text"] = cfg.LIVE_TEXT
-        print(live_widget["text"])
 
         if self.winfo_exists():
             cfg.ROOT.after(1000, self.update_live_lbl)
