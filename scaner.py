@@ -11,6 +11,8 @@ from database import Dbase, Thumbs
 from utils import get_coll_name, resize_image
 
 
+FLAG = False
+
 def insert_row(**kw):
     """
     Adds new line to Database > Thumbs with new thumbnails.
@@ -67,9 +69,7 @@ def get_images():
 
 
 def load_db_images():
-    """
-    Loads from Database > Thumbs: `src`, `size`, `created`,
-    `modified`, `collection` to tuples list
+    """Returns list of tuples [(`src`, `size`, `created`, `modified`), ...]
     """
     return Dbase.conn.execute(
         sqlalchemy.select(
@@ -81,20 +81,25 @@ def load_db_images():
         ).fetchall()
 
 
-def removed_images():
+def removed_images(images_list: list):
     """
     Checks whether each item in the `load_db` list has been
     deleted with os.exists method
     """
+    global FLAG
+
     for data in load_db_images():
-        if not os.path.exists(data[0]):
+        if data not in images_list:
+
             change_live_lvl("Удаляю лишнее")
             print('removed file', data[0])
+
             Dbase.conn.execute(
                 sqlalchemy.delete(Thumbs)
                 .where(Thumbs.src==data[0])
                 )
 
+            FLAG = True
 
 def new_images(images_list: list):
     """
@@ -103,6 +108,8 @@ def new_images(images_list: list):
 
     * param `list_dirs`: list of tuples from `SearchImages`
     """
+    global FLAG
+
     for src, size, created, mod in images_list:
 
         if (src, size, created, mod) not in load_db_images():
@@ -114,6 +121,8 @@ def new_images(images_list: list):
                 src = src, size = size, birth = created,mod=mod, coll=coll
                 )
 
+            FLAG = True
+
 
 def update_collections():
     """
@@ -123,13 +132,14 @@ def update_collections():
     """
     cfg.FLAG = True
     images = get_images()
-    removed_images()
+    removed_images(images)
     new_images(images)
     cfg.FLAG = False
     cfg.LIVE_TEXT = "MiuzPhoto"
 
 
 def scaner():
+    global FLAG
     cfg.ST_BAR.enable_live_lbl()
 
     t1 = threading.Thread(target=update_collections, daemon=True)
@@ -139,8 +149,11 @@ def scaner():
 
         cfg.ROOT.update()
 
-        if not cfg.FLAG:
+        if not cfg.FLAG and FLAG:
             cfg.GALLERY.thumbnails_reload()
+            FLAG = False
             break
 
     cfg.ST_BAR.disable_live_lbl()
+
+    # cfg.ROOT.after(1000, scaner)
