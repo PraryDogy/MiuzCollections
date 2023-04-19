@@ -24,14 +24,8 @@ class Settings(CWindow):
 
         self.minimize = tkinter.IntVar(value=cfg.config['MINIMIZE'])
 
-        self.main_wid = self.main_widget(self)
+        self.main_wid = self.main_widget()
         self.main_wid.pack()
-
-        cfg.ROOT.update_idletasks()
-
-        self.geometry(
-            f'{cfg.ROOT.winfo_width()//2}x'
-            f'{self.winfo_height()}')
 
         cfg.ROOT.update_idletasks()
 
@@ -41,15 +35,17 @@ class Settings(CWindow):
 
         self.update_live_lbl()
 
-    def main_widget(self, master: tkinter):
+    def main_widget(self):
         global path_widget, checkbox_widget, live_widget
 
-        frame = CFrame(master)
+        frame = CFrame(self)
+
         title_lbl = CLabel(
                 frame,
                 text = "Коллекции",
                 justify = tkinter.LEFT,
                 font = ('Arial', 22, 'bold'),
+                width = 30,
                 )
         title_lbl.pack()
 
@@ -99,7 +95,8 @@ class Settings(CWindow):
 
         live_widget = CLabel(
             frame,
-            width = self.winfo_width(),
+            width = 30,
+            wraplength = 400,
             text = cfg.LIVE_TEXT
             )
         live_widget.pack(padx=15, pady=(15, 0))
