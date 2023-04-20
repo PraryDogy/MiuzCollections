@@ -150,10 +150,9 @@ def scaner():
         cfg.ROOT.update()
 
         if not cfg.FLAG and FLAG:
-            cfg.GALLERY.thumbnails_reload()
+            cfg.GALLERY.reload_thumbs()
             FLAG = False
             break
 
+    cfg.GALLERY.reload_menu()
     cfg.ST_BAR.disable_live_lbl()
-
-    # cfg.ROOT.after(1000, scaner)

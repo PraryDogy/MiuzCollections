@@ -39,4 +39,8 @@ class InitGui:
 
         cfg.ROOT.eval(f'tk::PlaceWindow {cfg.ROOT} center')
         w, h, x, y = cfg.config['GEOMETRY']
+
+        if w < 50 or h < 50:
+            w, h = 500, 500
+
         cfg.ROOT.geometry(f'{w}x{h}+{x}+{y}')

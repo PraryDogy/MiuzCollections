@@ -22,7 +22,7 @@ class Settings(CWindow):
         self.title('Настройки')
         self.resizable(1, 1)
 
-        self.minimize = tkinter.IntVar(value=cfg.config['MINIMIZE'])
+        self.minimize = tkinter.IntVar(value = cfg.config['MINIMIZE'])
 
         self.main_wid = self.main_widget()
         self.main_wid.pack()
@@ -55,19 +55,19 @@ class Settings(CWindow):
             justify = tkinter.LEFT,
             wraplength = 400
             )
-        path_widget.pack(padx=(10, 0), pady=(5, 0))
+        path_widget.pack(padx = 15, pady = (5, 0))
 
-        select_path = CButton(frame, text='Обзор')
-        select_path.pack(pady=(15, 0), padx=(5, 0))
-        select_path.configure(width=9)
-        select_path.cmd(lambda e, x=path_widget: self.select_path(x))
+        select_path = CButton(frame, text = 'Обзор')
+        select_path.pack(pady = (15, 0), padx = (5, 0))
+        select_path.configure(width = 9)
+        select_path.cmd(lambda e, x = path_widget: self.select_path(x))
 
         checkbox_frame = CFrame(frame)
         checkbox_frame.pack(pady = (15, 0))
 
         checkbox_widget = tkinter.Checkbutton(
             checkbox_frame,
-            bg=cfg.BGCOLOR
+            bg = cfg.BGCOLOR
             )
         checkbox_widget['command'] = lambda: self.checkbox_cmd(checkbox_widget)
         [
@@ -75,45 +75,45 @@ class Settings(CWindow):
             if self.minimize.get() == 1
             else checkbox_widget.deselect()
             ]
+        checkbox_widget.pack(side = tkinter.LEFT)
 
-        checkbox_lbl = CLabel(checkbox_frame, text='Свернуть вместо закрыть')
-
-        [i.pack(side=tkinter.LEFT) for i in (checkbox_widget, checkbox_lbl)]
+        checkbox_lbl = CLabel(checkbox_frame, text = 'Свернуть вместо закрыть')
+        checkbox_lbl.pack(side = tkinter.LEFT)
 
         rest_frame = CFrame(frame)
-        rest_frame.pack(pady=(15, 0))
+        rest_frame.pack(pady = (15, 0))
 
-        restore_btn = CButton(rest_frame, text='По умолчанию')
-        restore_btn.configure(width=12)
-        restore_btn.cmd(lambda e, x=restore_btn: self.restore(x))
-        restore_btn.pack(side=tkinter.LEFT, padx=(0, 10))
+        restore_btn = CButton(rest_frame, text = 'По умолчанию')
+        restore_btn.configure(width = 12)
+        restore_btn.cmd(lambda e, x = restore_btn: self.restore(x))
+        restore_btn.pack(side = tkinter.LEFT, padx = (0, 10))
 
-        reset_button = CButton(rest_frame, text='Очистить кэш')
-        reset_button.configure(width=12)
+        reset_button = CButton(rest_frame, text = 'Очистить кэш')
+        reset_button.configure(width = 12)
         reset_button.cmd(lambda e: self.full_reset())
-        reset_button.pack(side=tkinter.LEFT)
+        reset_button.pack(side = tkinter.LEFT)
 
         live_widget = CLabel(
             frame,
-            width = 30,
+            text = cfg.LIVE_TEXT,
+            justify = tkinter.LEFT,
             wraplength = 400,
-            text = cfg.LIVE_TEXT
             )
-        live_widget.pack(padx=15, pady=(15, 0))
+        live_widget.pack(padx = 15, pady = (15, 0))
 
         cancel_frame = CFrame(frame)
         cancel_frame.pack()
 
-        CSep(cancel_frame).pack(pady=15, fill=tkinter.X)
+        CSep(cancel_frame).pack(pady = 15, fill = tkinter.X)
 
-        save_btn = CButton(cancel_frame, text='Сохранить')
+        save_btn = CButton(cancel_frame, text = 'Сохранить')
         save_btn.cmd(lambda e: self.save_settings())
-        save_btn.configure(width=12)
-        save_btn.pack(side=tkinter.LEFT, padx=(0, 10))
+        save_btn.configure(width = 12)
+        save_btn.pack(side = tkinter.LEFT, padx = (0, 10))
 
-        cancel_btn = CloseBtn(cancel_frame, text='Отмена')
-        cancel_btn.configure(width=12)
-        cancel_btn.pack(side=tkinter.LEFT)
+        cancel_btn = CloseBtn(cancel_frame, text = 'Отмена')
+        cancel_btn.configure(width = 12)
+        cancel_btn.pack(side = tkinter.LEFT)
 
         return frame
 

@@ -27,65 +27,30 @@ class Gallery(CFrame):
         CFrame.__init__(self, master)
         cfg.GALLERY = self
 
-        menu_wid = self.menu_widget(self)
-        menu_wid.pack(fill=tkinter.Y, side=tkinter.LEFT)
-        menu_wid: tkinter.Frame
+        self.menu_parrent = self.load_menu_parent(self)
+        self.menu_parrent.pack(fill=tkinter.Y, side=tkinter.LEFT)
+
+        self.menu_buttons = self.load_menu_buttons()
+        self.menu_buttons.pack()
 
         cfg.ROOT.update_idletasks()
 
-        self.menu_w = menu_wid.winfo_reqwidth()
-
-        self.thumbs_wid = self.thumbnails_widget(self)
-        self.thumbs_wid.pack(expand=1, fill=tkinter.BOTH, side=tkinter.RIGHT)
+        self.thumbs_widget = self.load_thumbs_widget(self)
+        self.thumbs_widget.pack(expand=1, fill=tkinter.BOTH, side=tkinter.RIGHT)
 
         self.clmns = 0
 
         cfg.ROOT.bind('<ButtonRelease-1>', self.update_gui)
 
-    def update_gui(self, e: tkinter.Event):
-        old_w = cfg.config['GEOMETRY'][0]
-        new_w = cfg.ROOT.winfo_width()
+    def load_menu_parent(self, master):
+        frame = tkmacosx.SFrame(
+            master,
+            bg = cfg.BGCOLOR,
+            scrollbarwidth = 7,
+            width = 180
+            )
 
-        if new_w != old_w:
-            cfg.config['GEOMETRY'][0] = new_w
-
-            if self.clmns != self.clmns_count():
-                self.thumbnails_reload()
-
-    def thumbnails_reload(self):
-        """
-        Destroys `ImagesThumbs` object and run it again.
-        """
-        w, h = cfg.ROOT.winfo_width(), cfg.ROOT.winfo_height()
-        cfg.config['GEOMETRY'][0], cfg.config['GEOMETRY'][1] = w, h
-
-        self.thumbs_wid.destroy()
-
-        self.thumbs_wid = self.thumbnails_widget(self)
-        self.thumbs_wid.pack(expand=1, fill=tkinter.BOTH, side=tkinter.RIGHT)
-
-    def place_thumb(self, thumbnail):
-        cropped = crop_image(thumbnail)
-        rgb_thumb = convert_to_rgb(cropped)
-        img_tk = ImageTk.PhotoImage(rgb_thumb)
-
-        self.compare_img['image'] = img_tk
-        self.compare_img.image_names = img_tk
-
-        self.compare_title['text'] = 'В списке сравнения:'
-
-        self.compare_frame.pack(side=tkinter.TOP)
-
-    def remove_thumb(self):
-        self.compare_img['image'] = ''
-        self.compare_title['text'] = ''
-        self.compare_frame.pack_forget()
-
-    def menu_widget(self, master):
-        scrollable = tkmacosx.SFrame(
-            master, bg=cfg.BGCOLOR, scrollbarwidth=7, width=cfg.THUMB_SIZE+30)
-
-        parent = CFrame(scrollable)
+        parent = CFrame(frame)
         parent.pack(padx=15)
 
         self.compare_frame = CFrame(parent)
@@ -99,13 +64,21 @@ class Gallery(CFrame):
         menu_frame = CFrame(parent)
         menu_frame.pack(side=tkinter.BOTTOM)
 
+        return frame
+
+    def load_menu_buttons(self):
+        frame = CFrame(self.menu_parrent)
+
         title = CLabel(
-            menu_frame, text='Коллекции', font=('Arial', 22, 'bold'))
+            frame, text='Коллекции', font=('Arial', 22, 'bold'))
         title.pack(pady=(0,15))
 
-        load_colls = Dbase.conn.execute(
-            sqlalchemy.select(Thumbs.collection)).fetchall()
-        colls_list = set(i[0] for i in load_colls)
+        colls_list = Dbase.conn.execute(
+            sqlalchemy.select(Thumbs.collection)
+            .distinct()
+            ).fetchall()
+        colls_list = (i[0] for i in colls_list)
+
         for_btns = []
         for coll_item in colls_list:
             name_btn = coll_item.replace(
@@ -114,14 +87,14 @@ class Gallery(CFrame):
         for_btns.sort()
         btns = []
 
-        last = CButton(menu_frame, text='Последние')
+        last = CButton(frame, text='Последние')
         last.configure(width=13, pady=5, anchor=tkinter.W, padx=10)
         last.cmd(partial(self.collection_folder, 'last', last, btns))
         last.pack(fill=tkinter.X, pady=(0, 15))
         btns.append(last)
 
         for name_btn, name_coll in for_btns:
-            btn = CButton(menu_frame, text=name_btn)
+            btn = CButton(frame, text=name_btn)
             btn.configure(width=13, pady=5, anchor=tkinter.W, padx=10)
             btn.cmd(partial(self.collection_folder, name_coll, btn, btns))
             btn.pack(fill=tkinter.X)
@@ -130,19 +103,16 @@ class Gallery(CFrame):
             if name_coll == cfg.config['CURR_COLL']:
                 btn.configure(bg=cfg.BGPRESSED)
 
-            sep = CSep(menu_frame)
+            sep = CSep(frame)
             sep['bg'] = '#272727'
             sep.pack(fill=tkinter.X)
     
         if cfg.config['CURR_COLL'] == 'last':
             last.configure(bg=cfg.BGPRESSED)
 
-        return scrollable
+        return frame
 
-    def clmns_count(self):
-            return (cfg.config['GEOMETRY'][0]-self.menu_w)//cfg.THUMB_SIZE
-
-    def thumbnails_widget(self, master: tkinter):
+    def load_thumbs_widget(self, master: tkinter):
         parent = CFrame(master)
         scrollable = tkmacosx.SFrame(parent, bg=cfg.BGCOLOR, scrollbarwidth=7)
         scrollable.pack(expand=1, fill=tkinter.BOTH, side=tkinter.RIGHT)
@@ -181,6 +151,54 @@ class Gallery(CFrame):
 
         return parent
 
+    def update_gui(self, e: tkinter.Event):
+        old_w = cfg.config['GEOMETRY'][0]
+        new_w = cfg.ROOT.winfo_width()
+
+        if new_w != old_w:
+            cfg.config['GEOMETRY'][0] = new_w
+
+            if self.clmns != self.clmns_count():
+                self.reload_thumbs()
+
+    def reload_thumbs(self):
+        """
+        Destroys `ImagesThumbs` object and run it again.
+        """
+        w, h = cfg.ROOT.winfo_width(), cfg.ROOT.winfo_height()
+        cfg.config['GEOMETRY'][0], cfg.config['GEOMETRY'][1] = w, h
+
+        self.thumbs_widget.destroy()
+
+        self.thumbs_widget = self.load_thumbs_widget(self)
+        self.thumbs_widget.pack(expand=1, fill=tkinter.BOTH, side=tkinter.RIGHT)
+
+    def reload_menu(self):
+        self.menu_buttons.destroy()
+        self.menu_buttons = self.load_menu_buttons()
+        self.menu_buttons.pack()
+        return
+
+    def clmns_count(self):
+            return (cfg.config['GEOMETRY'][0]-180)//cfg.THUMB_SIZE
+
+    def place_thumb(self, thumbnail):
+        cropped = crop_image(thumbnail)
+        rgb_thumb = convert_to_rgb(cropped)
+        img_tk = ImageTk.PhotoImage(rgb_thumb)
+
+        self.compare_img['image'] = img_tk
+        self.compare_img.image_names = img_tk
+
+        self.compare_title['text'] = 'В списке сравнения:'
+
+        self.compare_frame.pack(side=tkinter.TOP)
+
+    def remove_thumb(self):
+        self.compare_img['image'] = ''
+        self.compare_title['text'] = ''
+        self.compare_frame.pack_forget()
+
     def collection_folder(self, coll: str, btn: CButton, btns: list, e):
         """
         Changes all buttons color to default and change color for
@@ -192,17 +210,21 @@ class Gallery(CFrame):
         * param `btn`: tkinter curren button object
         * param `btns`: list of created tkinter buttons
         """
+        if coll != "last":
+            coll_path = os.path.join(os.sep, cfg.config['COLL_FOLDER'], coll)
+        else:
+            coll_path = cfg.config['COLL_FOLDER']
+
         if btn['bg'] == cfg.BGPRESSED:
             btn['bg'] = cfg.BGSELECTED
             cfg.ROOT.after(200, lambda: btn.configure(bg=cfg.BGPRESSED))
-            coll_path = os.path.join(os.sep, cfg.config['COLL_FOLDER'], coll)
             subprocess.check_output(["/usr/bin/open", coll_path])
             return
         for btn_item in btns:
             btn_item['bg'] = cfg.BGBUTTON
         btn['bg'] = cfg.BGPRESSED
         cfg.config['CURR_COLL'] = coll
-        self.thumbnails_reload()
+        self.reload_thumbs()
 
     def decode_thumbs(self, thumbs: tuple):
         """

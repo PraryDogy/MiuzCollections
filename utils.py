@@ -60,10 +60,8 @@ def get_coll_name(src: str):
     > Без коллекций
     ```
     """
-    coll_name = 'Без коллекций'
     if cfg.config['COLL_FOLDER'] in src:
-        coll_name = src.split(cfg.config['COLL_FOLDER'])[-1].split(os.sep)[1]
-    return coll_name
+        return src.split(cfg.config['COLL_FOLDER'])[-1].split(os.sep)[1]
 
 
 def place_center(top_level: tkinter.Toplevel):
