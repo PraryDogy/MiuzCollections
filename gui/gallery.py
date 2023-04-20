@@ -127,7 +127,7 @@ class Gallery(CFrame):
             title.configure(text='Последние добавленные')
             res = Dbase.conn.execute(sqlalchemy.select(
                     Thumbs.img150, Thumbs.src, Thumbs.modified).order_by(
-                    -Thumbs.modified).limit(120)).fetchall()
+                    -Thumbs.modified)).fetchall()
         else:
             res = Dbase.conn.execute(sqlalchemy.select(
                     Thumbs.img150, Thumbs.src, Thumbs.modified).where(
