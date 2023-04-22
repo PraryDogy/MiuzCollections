@@ -70,6 +70,6 @@ class StBar(CFrame):
         cfg.ROOT.unbind('<Escape>')
         self.normal_mode()
         cfg.COMPARE = False
-        cfg.GALLERY.remove_thumb()
+        cfg.MENU.remove_thumb()
         windows = (v for k, v in cfg.ROOT.children.items() if "preview" in k)
         [w.destroy() for w in windows]
