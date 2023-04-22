@@ -31,7 +31,8 @@ OPTIONS = {
     'CFBundleIdentifier':f'com.evlosh.{cfg.APP_NAME}',
     'NSHumanReadableCopyright': (
         'Created by Evgeny Loshkarev'
-        '\nCopyright © 2023 MIUZ Diamonds. All rights reserved.')
+        '\nCopyright © 2023 MIUZ Diamonds.'
+        '\nAll rights reserved.')
     }
     }
 

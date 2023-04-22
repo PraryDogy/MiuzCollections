@@ -91,24 +91,16 @@ class ImgBtns(CFrame):
         self.img_src = img_src
         self.img_src: str
 
-        copy_btn = CButton(self, text='Копировать имя')
-        copy_btn.cmd(lambda e: self.copy_name(copy_btn))
-        copy_btn.pack(side=tkinter.LEFT, padx=(0, 15))
-
-        open_btn = CButton(self, text='Открыть папку')
+        open_btn = CButton(self, text='Показать в Finder')
         open_btn.cmd(partial(self.open_folder, open_btn))
         open_btn.pack(side=tkinter.LEFT, padx=(0, 15))
-
-    def copy_name(self, btn: CButton):
-        btn.press()
-        my_copy(self.img_src.split(os.sep)[-1].split('.')[0])
 
     def open_folder(self, btn: CButton, e: tkinter.Event):
         btn.press()
         path = os.path.split(self.img_src)[0]
 
         def open():
-            subprocess.check_output(["/usr/bin/open", path])
+            subprocess.call(["open", "-R", self.img_src])
 
         threading.Thread(target=open).start()
 
@@ -166,7 +158,12 @@ class AskExit(CWindow):
     def on_exit(self):
         w, h = cfg.ROOT.winfo_width(), cfg.ROOT.winfo_height()
         x, y = cfg.ROOT.winfo_x(), cfg.ROOT.winfo_y()
-        cfg.config['GEOMETRY'] = [w, h, x, y]
+
+        cfg.config['ROOT_W'] = w
+        cfg.config['ROOT_H'] = h
+        cfg.config['ROOT_X'] = x
+        cfg.config['ROOT_Y'] = y
+
         write_cfg(cfg.config)
         cfg.FLAG = False
         quit()

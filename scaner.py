@@ -136,8 +136,8 @@ def update_collections():
     new_images(images)
     cfg.FLAG = False
     cfg.LIVE_TEXT = (
-    "MiuzPhoto. Created by Evgeny Loshkarev"
-    "\nCopyright © 2023 MIUZ Diamonds. All rights reserved."
+    "Created by Evgeny Loshkarev"
+    "\nCopyright © 2023 MIUZ Diamonds."
     )
 
 

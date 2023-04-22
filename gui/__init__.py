@@ -38,9 +38,11 @@ class InitGui:
         BarMenu()
 
         cfg.ROOT.eval(f'tk::PlaceWindow {cfg.ROOT} center')
-        w, h, x, y = cfg.config['GEOMETRY']
 
-        if w < 50 or h < 50:
-            w, h = 500, 500
+        if cfg.config['ROOT_W'] < 50 or cfg.config['ROOT_H'] < 50:
+            cfg.config['ROOT_W'], cfg.config['ROOT_H'] = 700, 500
 
-        cfg.ROOT.geometry(f'{w}x{h}+{x}+{y}')
+        cfg.ROOT.geometry(
+            (f"{cfg.config['ROOT_W']}x{cfg.config['ROOT_H']}"
+            f"+{cfg.config['ROOT_X']}+{cfg.config['ROOT_Y']}")
+            )

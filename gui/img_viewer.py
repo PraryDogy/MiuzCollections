@@ -30,7 +30,8 @@ class ImgViewer(CWindow):
 
         self.title('Просмотр')
 
-        self.win_width, self.win_height = cfg.config['WIN_GEOMETRY']
+        self.win_width = cfg.config["PREVIEW_W"]
+        self.win_height = cfg.config["PREVIEW_H"]
         self.geometry(f'{self.win_width}x{self.win_height}')
 
         self.configure(pady=0, padx=0)
@@ -80,7 +81,8 @@ class ImgViewer(CWindow):
             self.img_frame['width'] = self.win_width
             self.img_frame['height'] = self.img_height
 
-            cfg.config['WIN_GEOMETRY'] = [self.win_width, self.win_height]
+            cfg.config['PREVIEW_W'] = self.win_width
+            cfg.config['PREVIEW_H'] = self.win_height
 
             self.thumb_place(self.win_width, self.img_height)
             cfg.ROOT.after(500, lambda: self.img_place(self.win_width, self.img_height))

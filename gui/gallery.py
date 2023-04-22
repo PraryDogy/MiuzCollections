@@ -19,7 +19,7 @@ from . import ImgViewer
 
 
 def clmns_count():
-    return (cfg.config['GEOMETRY'][0] - 180)//cfg.THUMB_SIZE
+    return (cfg.config['ROOT_W'] - 180)//cfg.THUMB_SIZE
 
 
 def decode_thumbs(thumbs: tuple):
@@ -116,12 +116,18 @@ class Gallery(CFrame):
             ).fetchall()
         colls_list = (i[0] for i in colls_list)
 
-        for_btns = []
-        for coll_item in colls_list:
-            name_btn = coll_item.replace(
-                re.search(r'(\d{0,30}\s){,1}', coll_item).group(), '')
-            for_btns.append((name_btn[:13], coll_item))
-        for_btns.sort()
+
+        menus = {
+            coll: re.sub(r'[^a-zA-Zа-яА-Я ]+', '', coll).lstrip()[:13]
+            for coll in colls_list
+            }
+
+        menus = dict(
+            sorted(
+                menus.items(),
+                key=lambda item: item[1].casefold()
+                ))
+
         btns = []
 
         last = CButton(frame, text='Последние')
@@ -130,14 +136,14 @@ class Gallery(CFrame):
         last.pack(fill=tkinter.X, pady=(0, 15))
         btns.append(last)
 
-        for name_btn, name_coll in for_btns:
-            btn = CButton(frame, text=name_btn)
+        for full_name, name in menus.items():
+            btn = CButton(frame, text = name)
             btn.configure(width=13, pady=5, anchor=tkinter.W, padx=10)
-            btn.cmd(partial(self.open_coll_folder, name_coll, btn, btns))
+            btn.cmd(partial(self.open_coll_folder, full_name, btn, btns))
             btn.pack(fill=tkinter.X)
             btns.append(btn)
 
-            if name_coll == cfg.config['CURR_COLL']:
+            if full_name == cfg.config['CURR_COLL']:
                 btn.configure(bg=cfg.BGPRESSED)
 
             sep = CSep(frame)
@@ -230,11 +236,11 @@ class Gallery(CFrame):
         return frame
 
     def update_gui(self, e: tkinter.Event):
-        old_w = cfg.config['GEOMETRY'][0]
+        old_w = cfg.config['ROOT_W']
         new_w = cfg.ROOT.winfo_width()
 
         if new_w != old_w:
-            cfg.config['GEOMETRY'][0] = new_w
+            cfg.config['ROOT_W'] = new_w
 
             if self.clmns != clmns_count():
                 self.reload_thumbs()
@@ -245,7 +251,7 @@ class Gallery(CFrame):
         Destroys `ImagesThumbs` object and run it again.
         """
         w, h = cfg.ROOT.winfo_width(), cfg.ROOT.winfo_height()
-        cfg.config['GEOMETRY'][0], cfg.config['GEOMETRY'][1] = w, h
+        cfg.config['ROOT_W'], cfg.config['ROOT_H'] = w, h
 
         self.thumbs_widget.destroy()
 

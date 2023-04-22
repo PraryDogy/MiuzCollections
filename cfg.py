@@ -6,9 +6,8 @@ from utils import write_cfg, read_cfg
 
 # app info
 APP_NAME = 'MiuzPhoto'
-APP_VER = '3.3.3'
+APP_VER = '3.3.4'
 
-KEY = 'QaovKbF1YpKCM9e-HE2wvn30lIqCbeYTUcONcdLpV18='
 CFG_DIR = os.path.join(
     os.path.expanduser('~'), f'Library/Application Support/{APP_NAME}')
 
@@ -28,8 +27,8 @@ THUMB_SIZE = 150
 FLAG = False
 COMPARE = False
 LIVE_TEXT = (
-    "MiuzPhoto. Created by Evgeny Loshkarev"
-    "\nCopyright © 2023 MIUZ Diamonds. All rights reserved."
+    "Created by Evgeny Loshkarev"
+    "\nCopyright © 2023 MIUZ Diamonds."
     )
 
 # gui objects for global access
@@ -40,10 +39,17 @@ ST_BAR = object
 
 default_vars = {
         'COLL_FOLDER': '/Volumes/Shares/Marketing/Photo/_Collections',
-        'GEOMETRY': [700, 500, 0, 0],
-        'WIN_GEOMETRY': [700, 500],
+
         'CURR_COLL': 'last',
-        'MINIMIZE': 1
+        'MINIMIZE': 1,
+
+        "ROOT_W": 700,
+        "ROOT_H": 500,
+        "ROOT_X": 0,
+        "ROOT_Y": 0,
+
+        "PREVIEW_W": 700,
+        "PREVIEW_H": 500
         }
 
 if not os.path.exists(CFG_DIR):
@@ -64,20 +70,20 @@ else:
     config = default_vars
     write_cfg(config)
 
-# part1 = {
-#     k:v 
-#     for k, v in config.items()
-#     if k in default_vars.keys()
-#     }
+old_keys = {
+    k:v 
+    for k, v in config.items()
+    if k in default_vars.keys()
+    }
 
-# part2 = {
-#     k:v for
-#     k, v in default_vars.items()
-#     if k not in config.keys()
-#     }
+new_keys = {
+    k:v for
+    k, v in default_vars.items()
+    if k not in config.keys()
+    }
 
-# new_config = {**part1, **part2}
+new_config = {**old_keys, **new_keys}
 
-# if new_config.keys() != config.keys():
-#     write_cfg(new_config)
-#     config = new_config
+if new_config.keys() != config.keys():
+    write_cfg(new_config)
+    config = new_config
