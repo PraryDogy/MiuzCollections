@@ -1,20 +1,13 @@
-# from database import Dbase, Thumbs
-# import sqlalchemy
-# from datetime import datetime
+data = [(1, 'sravan'), (1, 'ojaswi'), (1, 'bobby'),
+        (4, 'rohith'), (4, 'gnanesh'),
+        
+        ]
 
-# images = Dbase.conn.execute(
-#     sqlalchemy.select(
-#     Thumbs.src, Thumbs.created, Thumbs.modified, Thumbs.size
-#     )
-#     ).fetchall()
+images = {}
 
-# images_ = {}
-
-# for src, created, modified, size in images:
-#     print(datetime.fromtimestamp(created).year)
-#     images_.setdefault(
-#         datetime.fromtimestamp(created).year, []
-#         ).append(created)
-
-
-# print(images_)
+for num, word in data:
+    images.setdefault(
+        num, []
+        ).append(word)
+    
+print(images)
