@@ -18,6 +18,43 @@ from .widgets import CButton, CFrame, CLabel, CSep
 from . import ImgViewer
 
 
+def clmns_count():
+    return (cfg.config['GEOMETRY'][0] - 180)//cfg.THUMB_SIZE
+
+
+def decode_thumbs(thumbs: tuple):
+    """
+    Prepares images from database for tkinter.
+    * input: ((`img`, `src`, `date modified`), ...)
+    * returns: ((`img`, `src`, `date modified`), ...)
+    """
+    result = []
+    for blob, src, modified in thumbs:
+        try:
+            decoded = decode_image(blob)
+            cropped = crop_image(decoded)
+            rgb = convert_to_rgb(cropped)
+            img = ImageTk.PhotoImage(rgb)
+            result.append((img, src, modified))
+
+        except Exception:
+            print(traceback.format_exc())
+
+    return result
+
+def convert_year(thumbs: list):
+    """
+    Converts timestamp to year
+    * input: ((`img`, `src`, `date modified`), ...)
+    * returns: ((`img`, `src`, `year`), ...)
+    """
+    result = []
+    for img, src, modified in thumbs:
+        year = datetime.fromtimestamp(modified).year
+        result.append((img, src, year))
+    return result
+
+
 class Gallery(CFrame):
     """
     Creates tkinter frame with menu and grid of images.
@@ -89,14 +126,14 @@ class Gallery(CFrame):
 
         last = CButton(frame, text='Последние')
         last.configure(width=13, pady=5, anchor=tkinter.W, padx=10)
-        last.cmd(partial(self.collection_folder, 'last', last, btns))
+        last.cmd(partial(self.open_coll_folder, 'last', last, btns))
         last.pack(fill=tkinter.X, pady=(0, 15))
         btns.append(last)
 
         for name_btn, name_coll in for_btns:
             btn = CButton(frame, text=name_btn)
             btn.configure(width=13, pady=5, anchor=tkinter.W, padx=10)
-            btn.cmd(partial(self.collection_folder, name_coll, btn, btns))
+            btn.cmd(partial(self.open_coll_folder, name_coll, btn, btns))
             btn.pack(fill=tkinter.X)
             btns.append(btn)
 
@@ -113,43 +150,84 @@ class Gallery(CFrame):
         return frame
 
     def load_thumbs_widget(self, master: tkinter):
-        parent = CFrame(master)
-        scrollable = tkmacosx.SFrame(parent, bg=cfg.BGCOLOR, scrollbarwidth=7)
+        frame = CFrame(master)
+        scrollable = tkmacosx.SFrame(frame, bg=cfg.BGCOLOR, scrollbarwidth=7)
         scrollable.pack(expand=1, fill=tkinter.BOTH, side=tkinter.RIGHT)
 
-        self.clmns = self.clmns_count()
+        self.clmns = clmns_count()
 
         title = CLabel(
-            scrollable, text=cfg.config['CURR_COLL'], font=('Arial', 45, 'bold'))
+            scrollable,
+            text=cfg.config['CURR_COLL'],
+            font=('Arial', 45, 'bold')
+            )
         title.pack(pady=(0, 15))
 
         if cfg.config['CURR_COLL'] == 'last':
             title.configure(text='Последние добавленные')
-            res = Dbase.conn.execute(sqlalchemy.select(
-                    Thumbs.img150, Thumbs.src, Thumbs.modified).order_by(
-                    -Thumbs.modified)).fetchall()
+
+            res = Dbase.conn.execute(
+                sqlalchemy.select(
+                    Thumbs.img150,
+                    Thumbs.src,
+                    Thumbs.modified
+                    ).order_by(-Thumbs.modified)
+                    ).fetchall()
         else:
-            res = Dbase.conn.execute(sqlalchemy.select(
-                    Thumbs.img150, Thumbs.src, Thumbs.modified).where(
-                    Thumbs.collection==cfg.config['CURR_COLL']).order_by(
-                    -Thumbs.modified)).fetchall()
+            res = Dbase.conn.execute(
+                sqlalchemy.select(
+                    Thumbs.img150,
+                    Thumbs.src,
+                    Thumbs.modified
+                    ).where(
+                    Thumbs.collection == cfg.config['CURR_COLL']
+                    ).order_by(
+                    -Thumbs.modified)
+                    ).fetchall()
 
-        decoded_images = self.decode_thumbs(res)
-        converted_years = self.convert_year(decoded_images)
+        thumbs = decode_thumbs(res)
+        thumbs = convert_year(thumbs)
+        all_src = [src for img, src, year in thumbs]
 
-        all_src = tuple(i[1] for i in converted_years)
-        self.years = set(year for _, _, year in converted_years)
+        thumbs_dict = {}
+        for img, src, year in thumbs:
+            thumbs_dict.setdefault(year, []).append((img, src))
 
-        years_split = self.years_list(converted_years)
+        for year, img_list in thumbs_dict.items():
 
-        packed_thumbs = tuple(self.pack_thumbs(scrollable, i, all_src) for i in years_split)
-        packed_titles = reversed(tuple(self.pack_title(scrollable, i) for i in self.years))
+            year_frame = CLabel(
+                scrollable,
+                font=('Arial', 35, 'bold'),
+                text=year,
+                )
+            year_frame.pack(pady=15)
 
-        for title, row in zip(packed_titles, packed_thumbs):
-            title.pack(pady=(15, 15))
-            row.pack(fill=tkinter.Y, expand=1, anchor=tkinter.W)
+            img_row = CFrame(scrollable)
+            img_row.pack(fill=tkinter.Y, expand=1, anchor=tkinter.W)
 
-        return parent
+            for x, (img, src) in enumerate(img_list, 1):
+
+                thumb = CButton(img_row)
+                thumb.configure(
+                    width = cfg.THUMB_SIZE,
+                    height = cfg.THUMB_SIZE,
+                    bg=cfg.BGCOLOR,
+                    image = img,
+                    text = src
+                    )
+                thumb.pack(side=tkinter.LEFT)
+
+                thumb.image_names = img
+                thumb.cmd(partial(self.open_preview, src, all_src))
+
+                thumb.bind('<Enter>', lambda e, a=thumb: self.enter(a))
+                thumb.bind('<Leave>', lambda e, a=thumb: self.leave(a))
+
+                if x % self.clmns == 0:
+                    img_row = CFrame(scrollable)
+                    img_row.pack(fill=tkinter.Y, expand=1, anchor=tkinter.W)
+
+        return frame
 
     def update_gui(self, e: tkinter.Event):
         old_w = cfg.config['GEOMETRY'][0]
@@ -158,11 +236,12 @@ class Gallery(CFrame):
         if new_w != old_w:
             cfg.config['GEOMETRY'][0] = new_w
 
-            if self.clmns != self.clmns_count():
+            if self.clmns != clmns_count():
                 self.reload_thumbs()
 
     def reload_thumbs(self):
         """
+        External use
         Destroys `ImagesThumbs` object and run it again.
         """
         w, h = cfg.ROOT.winfo_width(), cfg.ROOT.winfo_height()
@@ -174,15 +253,18 @@ class Gallery(CFrame):
         self.thumbs_widget.pack(expand=1, fill=tkinter.BOTH, side=tkinter.RIGHT)
 
     def reload_menu(self):
+        """
+        External use
+        """
         self.menu_buttons.destroy()
         self.menu_buttons = self.load_menu_buttons()
         self.menu_buttons.pack()
         return
 
-    def clmns_count(self):
-            return (cfg.config['GEOMETRY'][0]-180)//cfg.THUMB_SIZE
-
     def place_thumb(self, thumbnail):
+        """
+        External use
+        """
         cropped = crop_image(thumbnail)
         rgb_thumb = convert_to_rgb(cropped)
         img_tk = ImageTk.PhotoImage(rgb_thumb)
@@ -195,146 +277,40 @@ class Gallery(CFrame):
         self.compare_frame.pack(side=tkinter.TOP)
 
     def remove_thumb(self):
+        """
+        External use
+        """
         self.compare_img['image'] = ''
         self.compare_title['text'] = ''
         self.compare_frame.pack_forget()
 
-    def collection_folder(self, coll: str, btn: CButton, btns: list, e):
-        """
-        Changes all buttons color to default and change color for
-        pressed button.
-        Updates database > config > currColl > value to collection from
-        button.
-        Runs GalleryReset.
-        * param `coll`: str, real collection name from path to img
-        * param `btn`: tkinter curren button object
-        * param `btns`: list of created tkinter buttons
-        """
+    def open_coll_folder(self, coll: str, btn: CButton, btns: list, e):
         if coll != "last":
-            coll_path = os.path.join(os.sep, cfg.config['COLL_FOLDER'], coll)
+            coll_path = os.path.join(
+                cfg.config['COLL_FOLDER'],
+                coll
+                )
         else:
             coll_path = cfg.config['COLL_FOLDER']
 
         if btn['bg'] == cfg.BGPRESSED:
             btn['bg'] = cfg.BGSELECTED
-            cfg.ROOT.after(200, lambda: btn.configure(bg=cfg.BGPRESSED))
+
+            cfg.ROOT.after(
+                200,
+                lambda: btn.configure(bg=cfg.BGPRESSED)
+                )
+
             subprocess.check_output(["/usr/bin/open", coll_path])
             return
+
         for btn_item in btns:
             btn_item['bg'] = cfg.BGBUTTON
+
         btn['bg'] = cfg.BGPRESSED
         cfg.config['CURR_COLL'] = coll
+
         self.reload_thumbs()
-
-    def decode_thumbs(self, thumbs: tuple):
-        """
-        Prepares encoded images from database for tkinter.
-        * input: ((`img`, `src`, `date modified`), ...)
-        * returns: list turples: ((`decoded img`, `src`, `date modified`), ...)
-        """
-        result = []
-        for blob, src, modified in thumbs:
-            try:
-                decoded = decode_image(blob)
-                cropped = crop_image(decoded)
-                rgb = convert_to_rgb(cropped)
-                img = ImageTk.PhotoImage(rgb)
-                result.append((img, src, modified))
-
-            except Exception:
-                print(traceback.format_exc())
-
-        return result
-
-    def convert_year(self, thumbs: list):
-        """
-        Converts image modified date to year
-        * input: ((`img`, `src`, `date modified`), ...)
-        * returns: list turples: ((`img`, `src`, `year`), ...)
-        """
-        result = []
-        for img, src, modified in thumbs:
-            year = datetime.fromtimestamp(modified).year
-            result.append((img, src, year))
-        return result
-
-    def years_list(self, thumbs: list):
-        """
-        Returns list of lists.
-        Splits one list of images into images lists by year.
-        * param `thumbs`: list tuples (img, src, year)
-        # Example
-
-        ```
-        imgs = (
-            (img, src, 2020), (img2, src, 2017), (img6, src, 2020),
-            (img3, src, 2017), ...
-            )
-
-        years_list(imgs)
-        > [
-            [(img, src, 2020), (img2, src, 2020), ...],
-            [(img6, src, 2017), (img3, src, 2017), ...],
-            ...
-            ]
-        ```
-        """
-        list_years = []
-        for y in self.years:
-            tmp = tuple(
-                (img, src, year) for img, src, year in thumbs if year == y)
-            list_years.append(tmp)
-        list_years.reverse()
-        return list_years
-
-    def pack_thumbs(
-        self, master: tkinter.Frame, thumbs: list, all_src: list):
-        """
-        Returns tkinter frames with packed thumbnails.
-
-        Packs every thumbnail as tkinter label in row.
-        Every row is tkinter frame for number thumbnails, based on `self.clmns`
-        Binds thumbnail to mouse left click.
-        Opens `img_veiewer` on thumbnail click.
-
-        * param `thumbs`: list tuples(decoded img, src, year)
-        * param `master`: tkinter frame
-        * param `all_src`: list of paths of all images
-
-        # Example
-        ```
-        thumbnails = list with 27 images
-        clmns = 5
-        > pack_thumbs will create 5 rows
-        > each row with 5 images
-        > and 6st row with 2 images.
-        ```
-        """
-        year_frame = CFrame(master)
-
-        for i, item in enumerate(thumbs):
-
-            if i % self.clmns == 0:
-                row = CFrame(year_frame)
-                row.pack(fill=tkinter.Y, expand=1, anchor=tkinter.W)
-
-            thumb = CButton(row)
-            thumb.configure(
-                width=cfg.THUMB_SIZE, height=cfg.THUMB_SIZE, bg=cfg.BGCOLOR,
-                image=item[0],text=item[1])
-
-            thumb.image_names = item[0]
-            thumb.cmd(partial(self.open_preview, item[1], all_src))
-
-            thumb.bind('<Enter>', lambda e, a=thumb: self.enter(a))
-            thumb.bind('<Leave>', lambda e, a=thumb: self.leave(a))
-
-            thumb.pack(side=tkinter.LEFT)
-        
-        return year_frame
-
-    def pack_title(self, master: tkinter.Widget, year):
-        return CLabel(master, text=year, font=('Arial', 35, 'bold'))
 
     def enter(self, thumb: CButton):
         if thumb['bg'] != cfg.BGPRESSED:

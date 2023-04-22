@@ -22,13 +22,12 @@ class StatusBar(CFrame):
         [i.destroy() for i in widgets]
 
         self.fake_widget(self).pack(side=tkinter.LEFT, padx=(0, 15))
+
         self.settings_widget(self).pack(side=tkinter.LEFT)
-
         CSep(self).pack(fill=tkinter.Y, side=tkinter.LEFT, padx=(15, 15))
+        self.update_widget(self).pack(side=tkinter.LEFT)
 
-        self.update_widget(self).pack(side=tkinter.LEFT, padx=(0, 15))
-
-        self.live_widget(self).pack(side=tkinter.LEFT, padx=(0, 15))
+        self.live_widget(self).pack(side=tkinter.LEFT, padx=(15, 0))
 
     def enable_live_lbl(self):
         live_lbl = [v for k, v in self.children.items()][-1]
@@ -49,7 +48,7 @@ class StatusBar(CFrame):
         widgets[0]['text'] = 'Подготовка'
 
     def fake_widget(self, master: tkinter):
-        label = CLabel(master, text='Обновляю данные%')
+        label = CLabel(master, text='Обновление')
         label['fg'] = cfg.BGCOLOR
         return label
 
@@ -86,7 +85,7 @@ class StatusBar(CFrame):
             scaner()
 
     def live_widget(self, master):
-        lbl = CLabel(master, text='Обновляю данные')
+        lbl = CLabel(master, text='Обновление')
         lbl['fg'] = cfg.BGCOLOR
         return lbl
 

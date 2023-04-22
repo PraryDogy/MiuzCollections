@@ -30,7 +30,7 @@ class BarMenu(tkinter.Menu):
         made = (
             f'{cfg.APP_NAME} {cfg.APP_VER}'
             '\n\nCreated by Evgeny Loshkarev'
-            '\nCopyright © 2022 MIUZ Diamonds.'
+            '\nCopyright © 2023 MIUZ Diamonds.'
             '\nAll rights reserved.'
             '\n\nEmail: evlosh@gmail.com'
             '\nTelegram: evlosh'

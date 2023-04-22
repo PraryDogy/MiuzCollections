@@ -135,7 +135,10 @@ def update_collections():
     removed_images(images)
     new_images(images)
     cfg.FLAG = False
-    cfg.LIVE_TEXT = "MiuzPhoto"
+    cfg.LIVE_TEXT = (
+    "MiuzPhoto. Created by Evgeny Loshkarev"
+    "\nCopyright © 2023 MIUZ Diamonds. All rights reserved."
+    )
 
 
 def scaner():

@@ -1,13 +1,14 @@
 import os
 import shutil
 import sys
+import threading
 import tkinter
 from tkinter import filedialog
 
 import tkmacosx
 
 import cfg
-from utils import close_windows, my_copy, my_paste, place_center, write_cfg
+from utils import close_windows, place_center, write_cfg
 
 from .widgets import AskExit, CButton, CFrame, CLabel, CloseBtn, CSep, CWindow
 
@@ -52,10 +53,12 @@ class Settings(CWindow):
         path_widget = CLabel(
             frame,
             text = cfg.config['COLL_FOLDER'],
+            anchor = tkinter.W,
             justify = tkinter.LEFT,
-            wraplength = 400
+            wraplength = 370,
+            width = 30,
             )
-        path_widget.pack(padx = 15, pady = (5, 0))
+        path_widget.pack(padx = 15, pady = (5, 0), fill=tkinter.X)
 
         select_path = CButton(frame, text = 'Обзор')
         select_path.pack(pady = (15, 0), padx = (5, 0))
@@ -95,11 +98,12 @@ class Settings(CWindow):
 
         live_widget = CLabel(
             frame,
-            text = cfg.LIVE_TEXT,
+            text = cfg.LIVE_TEXT.replace(cfg.config["COLL_FOLDER"], ""),
+            anchor = tkinter.W,
             justify = tkinter.LEFT,
-            wraplength = 400,
+            width = 30,
             )
-        live_widget.pack(padx = 15, pady = (15, 0))
+        live_widget.pack(padx = 15, pady = (15, 0), fill=tkinter.X)
 
         cancel_frame = CFrame(frame)
         cancel_frame.pack()
@@ -119,10 +123,10 @@ class Settings(CWindow):
 
     def update_live_lbl(self):
         global live_widget
-        live_widget["text"] = cfg.LIVE_TEXT
+        live_widget["text"] = cfg.LIVE_TEXT.replace(cfg.config["COLL_FOLDER"], "")
 
         if self.winfo_exists():
-            cfg.ROOT.after(1000, self.update_live_lbl)
+            cfg.ROOT.after(500, self.update_live_lbl)
 
     def checkbox_cmd(self, master: tkinter.Checkbutton):
         if self.minimize.get() == 1:
