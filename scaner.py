@@ -140,10 +140,13 @@ def update_collections():
     "\nCopyright © 2023 MIUZ Diamonds."
     )
 
+def st_bar_btn(text: str):
+    btn = cfg.ST_BAR.winfo_children()[2]
+    btn["text"] = text
 
 def scaner():
     global FLAG
-    cfg.ST_BAR.enable_live_lbl()
+    st_bar_btn("Обновление")
 
     t1 = threading.Thread(target=update_collections, daemon=True)
     t1.start()
@@ -154,8 +157,8 @@ def scaner():
 
         if not cfg.FLAG and FLAG:
             cfg.GALLERY.reload_thumbs()
+            cfg.GALLERY.reload_menu()
             FLAG = False
             break
 
-    cfg.GALLERY.reload_menu()
-    cfg.ST_BAR.disable_live_lbl()
+    st_bar_btn("Обновить")

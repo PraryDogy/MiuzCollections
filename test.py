@@ -1,5 +1,1 @@
-a = "123"
-"adsf"
-
-
-print(a)
+KEY = "AIzaSyDuHojbZmaAeBRXYsoa8BlfEFmnKYpj15U"

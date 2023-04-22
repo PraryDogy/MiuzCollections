@@ -34,8 +34,8 @@ LIVE_TEXT = (
 # gui objects for global access
 ROOT = tkinter.Tk()
 ROOT.withdraw()
-GALLERY = object
-ST_BAR = object
+GALLERY: tkinter.Frame = None
+ST_BAR: tkinter.Frame = None
 
 default_vars = {
         'COLL_FOLDER': '/Volumes/Shares/Marketing/Photo/_Collections',

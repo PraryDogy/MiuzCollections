@@ -57,7 +57,8 @@ class ImgViewer(CWindow):
         self.task = cfg.ROOT.after(500, lambda: self.img_place(self.win_width, self.img_height))
 
         if cfg.COMPARE:
-            cfg.ROOT.after(0, cfg.ST_BAR.wait)
+            st_bar = cfg.ST_BAR.winfo_children()[0]
+            cfg.ROOT.after(0, lambda: st_bar.configure(text="Подготовка"))
             cfg.ROOT.after(501, self.run_compare)
             return
 
@@ -109,7 +110,7 @@ class ImgViewer(CWindow):
 
     def run_compare(self):
         ImgCompare()
-        cfg.ST_BAR.normal()
+        cfg.ST_BAR.normal_widget()
         cfg.GALLERY.remove_thumb()
 
     def switch_img(self, ind: int):
@@ -165,7 +166,7 @@ class ImgViewer(CWindow):
     def btn_compare(self, btn: CButton):
         btn.press()
         if not cfg.COMPARE:
-            cfg.ST_BAR.compare()
+            cfg.ST_BAR.compare_widget()
             win = self.winfo_toplevel()
             win.withdraw()
             win.grab_release()
