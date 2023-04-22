@@ -30,8 +30,7 @@ class Thumbs(Dbase.base):
     """
     Sqlalchemy model.
 
-    *columns: img150, src, size, created, modified,
-    collection
+    *columns: img150, src, size, created, modified, collection
     """
 
     __tablename__ = 'thumbs'

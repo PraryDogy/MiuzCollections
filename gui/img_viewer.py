@@ -1,17 +1,7 @@
-import os
-import tkinter
-from datetime import datetime
-
-import cv2
-import sqlalchemy
-from PIL import Image, ImageTk
-
-import cfg
-from database import Dbase, Thumbs
-from utils import (close_windows, convert_to_rgb, decode_image, get_coll_name,
-                   place_center, resize_image, smb_check)
-
-from . import ImgCompare
+from . import (Dbase, Image, ImageTk, Thumbs, cfg, close_windows,
+               convert_to_rgb, cv2, datetime, decode_image, get_coll_name, os,
+               place_center, resize_image, smb_check, sqlalchemy, tkinter)
+from .img_compare import ImgCompare
 from .widgets import CButton, CLabel, CWindow, ImgBtns, InfoWidget, SmbAlert
 
 
@@ -110,8 +100,8 @@ class ImgViewer(CWindow):
 
     def run_compare(self):
         ImgCompare()
-        cfg.ST_BAR.normal_widget()
-        cfg.GALLERY.remove_thumb()
+        cfg.ST_BAR.normal_mode()
+        cfg.MENU.normal_mode()
 
     def switch_img(self, ind: int):
         cfg.ROOT.after_cancel(self.task)
@@ -166,12 +156,12 @@ class ImgViewer(CWindow):
     def btn_compare(self, btn: CButton):
         btn.press()
         if not cfg.COMPARE:
-            cfg.ST_BAR.compare_widget()
+            cfg.ST_BAR.compare_mode()
             win = self.winfo_toplevel()
             win.withdraw()
             win.grab_release()
             cfg.COMPARE = True
-            cfg.GALLERY.place_thumb(self.thumb_load())
+            cfg.MENU.compare_mode(self.thumb_load())
             return
 
     def create_info(self):

@@ -6,7 +6,6 @@ import cv2
 import sqlalchemy
 
 import cfg
-from admin import print_alive
 from database import Dbase, Thumbs
 from utils import get_coll_name, resize_image
 
@@ -156,8 +155,8 @@ def scaner():
         cfg.ROOT.update()
 
         if not cfg.FLAG and FLAG:
-            cfg.GALLERY.reload_thumbs()
-            cfg.GALLERY.reload_menu()
+            cfg.GALLERY.reload()
+            cfg.MENU.reload()
             FLAG = False
             break
 

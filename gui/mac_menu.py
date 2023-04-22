@@ -1,13 +1,9 @@
-import tkinter
-
-import cfg
-from utils import place_center
-
-from .widgets import CLabel, CWindow, CloseBtn
-from . import Settings
+from . import cfg, place_center, tkinter
+from .settings import Settings
+from .widgets import CLabel, CloseBtn, CWindow
 
 
-class BarMenu(tkinter.Menu):
+class MacMenu(tkinter.Menu):
     """
     Mac osx bar menu.
     """

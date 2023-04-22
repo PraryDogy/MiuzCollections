@@ -2,7 +2,7 @@ import os
 import shutil
 import tkinter
 
-from utils import write_cfg, read_cfg
+from utils import read_cfg, write_cfg
 
 # app info
 APP_NAME = 'MiuzPhoto'
@@ -22,6 +22,7 @@ BGBUTTON = "#2C2C2C"
 BGPRESSED = '#395432'
 BGSELECTED = '#4E4769'
 THUMB_SIZE = 150
+LIMIT = 300
 
 # flags
 FLAG = False
@@ -35,6 +36,7 @@ LIVE_TEXT = (
 ROOT = tkinter.Tk()
 ROOT.withdraw()
 GALLERY: tkinter.Frame = None
+MENU: tkinter.Frame = None
 ST_BAR: tkinter.Frame = None
 
 default_vars = {

@@ -1,15 +1,5 @@
-import os
-import shutil
-import sys
-import threading
-import tkinter
-from tkinter import filedialog
-
-import tkmacosx
-
-import cfg
-from utils import close_windows, place_center, write_cfg
-
+from . import (cfg, close_windows, filedialog, os, place_center, shutil, sys,
+               tkinter, write_cfg)
 from .widgets import AskExit, CButton, CFrame, CLabel, CloseBtn, CSep, CWindow
 
 path_widget = tkinter.Label

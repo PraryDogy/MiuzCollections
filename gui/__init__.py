@@ -1,12 +1,32 @@
-from .settings import Settings
-from .img_compare import ImgCompare
-from .img_viewer import ImgViewer
-from .macosx_menu import BarMenu
-from .st_bar import StatusBar
-from .gallery import Gallery
-from .widgets import AskExit, CSep
+import os
+import re
+import shutil
+import subprocess
+import sys
+import threading
 import tkinter
+import traceback
+from datetime import datetime
+from functools import partial
+from tkinter import filedialog
+
+import cv2
+import sqlalchemy
+import tkmacosx
+from PIL import Image, ImageTk
+
 import cfg
+from database import Dbase, Thumbs
+from scaner import scaner
+from utils import (close_windows, convert_to_rgb, crop_image, decode_image,
+                   focus_last, get_coll_name, get_windows, my_copy,
+                   place_center, resize_image, smb_check, write_cfg)
+
+from .gallery import Gallery
+from .mac_menu import MacMenu
+from .menu import Menu
+from .st_bar import StBar
+from .widgets import AskExit, CFrame, CSep
 
 
 class InitGui:
@@ -25,17 +45,23 @@ class InitGui:
         else:
             cfg.ROOT.protocol("WM_DELETE_WINDOW", AskExit)
 
-        CSep(cfg.ROOT).pack(fill=tkinter.X, pady=15)
+        CSep(cfg.ROOT).pack(fill=tkinter.X, pady=15, padx=15)
 
-        gallery_widget = Gallery(cfg.ROOT)
-        gallery_widget.pack(fill=tkinter.BOTH, expand=1)
+        menu_widget = Menu(cfg.ROOT)
+        menu_widget.pack(side=tkinter.LEFT, fill=tkinter.Y, pady=(0, 15))
 
-        CSep(cfg.ROOT).pack(fill=tkinter.X, pady=10)
+        right_frame = CFrame(cfg.ROOT)
+        right_frame.pack(fill=tkinter.BOTH, expand=1)
+    
+        gallery_widget = Gallery(right_frame)
+        gallery_widget.pack(fill=tkinter.BOTH, expand=1, padx=(15, 0))
 
-        stbar_widget = StatusBar(cfg.ROOT)
+        CSep(right_frame).pack(fill=tkinter.X, pady=10, padx=15)
+
+        stbar_widget = StBar(right_frame)
         stbar_widget.pack(pady=(0, 10))
 
-        BarMenu()
+        MacMenu()
 
         cfg.ROOT.eval(f'tk::PlaceWindow {cfg.ROOT} center')
 

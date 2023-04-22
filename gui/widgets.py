@@ -1,11 +1,5 @@
-import os
-import subprocess
-import threading
-import tkinter
-from functools import partial
-
-import cfg
-from utils import close_windows, write_cfg, focus_last, my_copy, place_center
+from . import (cfg, close_windows, focus_last, os, partial, place_center,
+               subprocess, threading, tkinter, write_cfg)
 
 
 def close():
@@ -183,7 +177,7 @@ class SmbAlert(tkinter.Toplevel):
             'Рекомендации:'
             '\n- Проверьте подключение к интернету.'
             '\n- Откройте любую папку на сетевом диске,'
-            '\n- Укажите правильный путь до галерии фото и коллекций'
+            '\n- Укажите правильный путь к коллекциям в настройках'
             '\n- Перезапустите приложение.'
 
             '\n\nПоддержка: loshkarev@miuz.ru'

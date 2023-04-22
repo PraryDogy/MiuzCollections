@@ -1,7 +1,4 @@
-import tkinter
-
-import cfg
-from utils import get_windows, place_center
+from . import cfg, get_windows, tkinter, place_center
 
 from .widgets import CLabel, CWindow, ImgBtns, InfoWidget
 

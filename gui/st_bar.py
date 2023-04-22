@@ -1,23 +1,19 @@
-import tkinter
-
-import cfg
-from scaner import scaner
-from utils import smb_check
+from . import cfg, tkinter, smb_check, scaner
 
 from .widgets import CButton, CFrame, CLabel, CSep, SmbAlert
-from . import Settings
+from .settings import Settings
 
 
-class StatusBar(CFrame):
+class StBar(CFrame):
     """
     Tkinter frame for all status bar gui items.
     """
     def __init__(self, master):
         CFrame.__init__(self, master)
         cfg.ST_BAR = self
-        self.normal_widget()
+        self.normal_mode()
 
-    def normal_widget(self):
+    def normal_mode(self):
         widgets = tuple(v for k, v in self.children.items())
         [i.destroy() for i in widgets]
 
@@ -33,7 +29,7 @@ class StatusBar(CFrame):
         btn.cmd(lambda e: self.update_cmd(btn))
         btn.pack(side=tkinter.LEFT)
 
-    def compare_widget(self):
+    def compare_mode(self):
         widgets = tuple(v for k, v in self.children.items())
         [i.destroy() for i in widgets]
 
@@ -72,7 +68,7 @@ class StatusBar(CFrame):
 
     def cancel_cmd(self):
         cfg.ROOT.unbind('<Escape>')
-        self.normal_widget()
+        self.normal_mode()
         cfg.COMPARE = False
         cfg.GALLERY.remove_thumb()
         windows = (v for k, v in cfg.ROOT.children.items() if "preview" in k)
