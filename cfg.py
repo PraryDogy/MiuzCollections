@@ -6,7 +6,7 @@ from utils import write_cfg, read_cfg
 
 # app info
 APP_NAME = 'MiuzPhoto'
-APP_VER = '3.3.2'
+APP_VER = '3.3.3'
 
 KEY = 'QaovKbF1YpKCM9e-HE2wvn30lIqCbeYTUcONcdLpV18='
 CFG_DIR = os.path.join(
@@ -27,7 +27,10 @@ THUMB_SIZE = 150
 # flags
 FLAG = False
 COMPARE = False
-LIVE_TEXT = "MiuzPhoto"
+LIVE_TEXT = (
+    "MiuzPhoto. Created by Evgeny Loshkarev"
+    "\nCopyright © 2023 MIUZ Diamonds. All rights reserved."
+    )
 
 # gui objects for global access
 ROOT = tkinter.Tk()
