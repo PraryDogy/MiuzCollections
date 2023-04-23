@@ -6,7 +6,7 @@ from utils import read_cfg, write_cfg
 
 # app info
 APP_NAME = 'MiuzCollections'
-APP_VER = '3.3.6'
+APP_VER = '3.4.0'
 
 CFG_DIR = os.path.join(
     os.path.expanduser('~'), f'Library/Application Support/{APP_NAME}')
