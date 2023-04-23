@@ -159,7 +159,7 @@ def scaner():
         cfg.ROOT.update()
 
         if not cfg.FLAG and FLAG:
-            cfg.GALLERY.reload()
+            cfg.GALLERY.reload_thumbnails()
             cfg.MENU.reload()
             FLAG = False
             break

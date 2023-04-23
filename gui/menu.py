@@ -1,7 +1,7 @@
 from . import (Dbase, ImageTk, Thumbs, cfg, convert_to_rgb, crop_image, os,
                partial, re, sqlalchemy, subprocess, tkinter, tkmacosx)
 from .widgets import CButton, CFrame, CLabel, CSep
-
+from .scaner_gui import ScanerGui
 
 __all__ = (
     "Menu"
@@ -75,6 +75,16 @@ class Menu(tkmacosx.SFrame):
         last.pack(pady=(0, 15))
         btns.append(last)
 
+        sep = CSep(frame)
+        sep['bg'] = '#272727'
+        sep.pack(fill=tkinter.X)
+        
+        scaner = CButton(frame, text = "Сканер")
+        scaner.configure(width=13, pady=5, anchor=tkinter.W, padx=10)
+        # scaner.pack(pady=(0, 15))
+        scaner.cmd(lambda e: self.scaner_cmd())
+        btns.append(scaner)
+
         for full_name, name in menus.items():
             btn = CButton(frame, text = name)
             btn.configure(width=13, pady=5, anchor=tkinter.W, padx=10)
@@ -93,6 +103,9 @@ class Menu(tkmacosx.SFrame):
             last.configure(bg=cfg.PRESSED)
 
         return frame
+
+    def scaner_cmd(self):
+        ScanerGui()
 
     def compare_mode(self, thumbnail):
         """
@@ -127,7 +140,7 @@ class Menu(tkmacosx.SFrame):
         return
     
     def open_coll_folder(self, coll: str, btn: CButton, btns: list, e):
-        cfg.LIMIT = 150
+        cfg.LIMIT = 300
 
         if coll != "last":
             coll_path = os.path.join(
@@ -154,4 +167,5 @@ class Menu(tkmacosx.SFrame):
         btn['bg'] = cfg.PRESSED
         cfg.config['CURR_COLL'] = coll
 
-        cfg.GALLERY.reload()
+        cfg.GALLERY.reload_scrollable()
+        cfg.GALLERY.reload_thumbnails()

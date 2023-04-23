@@ -25,7 +25,7 @@ months = {
 
 
 def clmns_count():
-    clmns = (cfg.config['ROOT_W'] - 180)//cfg.THUMB_SIZE
+    clmns = (cfg.config['ROOT_W'] - 180) // cfg.THUMB_SIZE
     return 1 if clmns == 0 else clmns
 
 
@@ -71,25 +71,30 @@ class Gallery(CFrame):
     def __init__(self, master):
         CFrame.__init__(self, master)
         cfg.GALLERY = self
+        self.clmns = 1
 
         cfg.ROOT.update_idletasks()
 
-        self.thumbs_widget = self.load_thumbs_widget(self)
-        self.thumbs_widget.pack(expand=1, fill=tkinter.BOTH, side=tkinter.RIGHT)
-
-        self.clmns = 1
+        self.load_scrollable()
+        self.load_thumbnails()
 
         cfg.ROOT.bind('<ButtonRelease-1>', self.update_gui)
 
-    def load_thumbs_widget(self, master: tkinter):
-        frame = CFrame(master)
-        scrollable = tkmacosx.SFrame(frame, bg=cfg.BG, scrollbarwidth=7)
-        scrollable.pack(expand=1, fill=tkinter.BOTH, side=tkinter.RIGHT)
+    def load_scrollable(self):
+        self.scroll_parrent = CFrame(self)
+        self.scroll_parrent.pack(expand=1, fill=tkinter.BOTH)
+
+        self.scrollable = tkmacosx.SFrame(
+            self.scroll_parrent, bg=cfg.BG, scrollbarwidth=7)
+        self.scrollable.pack(expand=1, fill=tkinter.BOTH)
+
+    def load_thumbnails(self):
+        self.thumbnails = CFrame(self.scrollable)
 
         self.clmns = clmns_count()
 
         title = CLabel(
-            scrollable,
+            self.thumbnails,
             text=cfg.config['CURR_COLL'],
             font=('Arial', 45, 'bold')
             )
@@ -113,8 +118,7 @@ class Gallery(CFrame):
                     Thumbs.modified
                     ).where(
                     Thumbs.collection == cfg.config['CURR_COLL']
-                    ).order_by(
-                    -Thumbs.modified)
+                    ).limit(cfg.LIMIT).order_by(-Thumbs.modified)
                     ).fetchall()
 
         thumbs = decode_thumbs(res)
@@ -128,13 +132,13 @@ class Gallery(CFrame):
         for year, img_list in thumbs_dict.items():
 
             year_frame = CLabel(
-                scrollable,
+                self.thumbnails,
                 font=('Arial', 20, 'bold'),
                 text=year,
                 )
             year_frame.pack(anchor=tkinter.W, pady=(15, 0))
 
-            img_row = CFrame(scrollable)
+            img_row = CFrame(self.thumbnails)
             img_row.pack(fill=tkinter.Y, expand=1, anchor=tkinter.W)
 
             for x, (img, src) in enumerate(img_list, 1):
@@ -156,20 +160,40 @@ class Gallery(CFrame):
                 thumb.bind('<Leave>', lambda e, a=thumb: self.leave(a))
 
                 if x % self.clmns == 0:
-                    img_row = CFrame(scrollable)
+                    img_row = CFrame(self.thumbnails)
                     img_row.pack(fill=tkinter.Y, expand=1, anchor=tkinter.W)
 
-        more_btn = CButton(scrollable, text="Показать еще")
+        more_btn = CButton(self.thumbnails, text="Показать еще")
         more_btn.cmd(lambda e: self.show_more(e))
         more_btn.pack(pady=(15, 0))
 
-        return frame
+        self.thumbnails.pack(expand=1, fill=tkinter.BOTH)
+
+    def reload_scrollable(self):
+        """
+        Reloads thumbnails with scroll frame.
+        """
+        self.scroll_parrent.destroy()
+        self.load_scrollable()
+
+    def reload_thumbnails(self):
+        """
+        Reloads thumbnails without scroll frame.
+        """
+        self.thumbnails.destroy()
+        self.load_thumbnails()
 
     def show_more(self, e: tkinter.Event):
+        """
+        Reloads thumbnails without scroll frame and with new number thumbnails.
+        """
         cfg.LIMIT += 150
-        self.reload()
+        self.reload_thumbnails()
 
     def update_gui(self, e: tkinter.Event):
+        """
+        Reloads thumbnails without scroll for new window size
+        """
         old_w = cfg.config['ROOT_W']
         new_w = cfg.ROOT.winfo_width()
 
@@ -177,20 +201,10 @@ class Gallery(CFrame):
             cfg.config['ROOT_W'] = new_w
 
             if self.clmns != clmns_count():
-                self.reload()
-
-    def reload(self):
-        """
-        External use
-        Destroys `ImagesThumbs` object and run it again.
-        """
-        w, h = cfg.ROOT.winfo_width(), cfg.ROOT.winfo_height()
-        cfg.config['ROOT_W'], cfg.config['ROOT_H'] = w, h
-
-        self.thumbs_widget.destroy()
-
-        self.thumbs_widget = self.load_thumbs_widget(self)
-        self.thumbs_widget.pack(expand=1, fill=tkinter.BOTH, side=tkinter.RIGHT)
+                w, h = cfg.ROOT.winfo_width(), cfg.ROOT.winfo_height()
+                cfg.config['ROOT_W'], cfg.config['ROOT_H'] = w, h
+                cfg.ROOT.update_idletasks()
+                self.reload_thumbnails()
 
     def enter(self, thumb: CButton):
         if thumb['bg'] != cfg.PRESSED:
