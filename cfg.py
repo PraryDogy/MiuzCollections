@@ -5,7 +5,7 @@ import tkinter
 from utils import read_cfg, write_cfg
 
 # app info
-APP_NAME = 'MiuzPhoto'
+APP_NAME = 'MiuzCollections'
 APP_VER = '3.3.6'
 
 CFG_DIR = os.path.join(
