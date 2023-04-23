@@ -2,6 +2,20 @@ from . import (cfg, close_windows, focus_last, os, partial, place_center,
                subprocess, threading, tkinter, write_cfg)
 
 
+__all__ = (
+    "CSep",
+    "CButton",
+    "CFrame",
+    "CLabel",
+    "CWindow",
+    "CloseBtn",
+    "ImgBtns",
+    "InfoWidget",
+    "AskExit",
+    "SmbAlert"
+    )
+
+
 def close():
     close_windows()
     focus_last()
@@ -9,13 +23,13 @@ def close():
 
 class CSep(tkinter.Frame):
     def __init__(self, master: tkinter):
-        tkinter.Frame.__init__(self, master, bg=cfg.BGBUTTON, height=1)
+        tkinter.Frame.__init__(self, master, bg=cfg.BUTTON, height=1)
 
 
 class CButton(tkinter.Label):
     def __init__(self, master: tkinter, **kwargs):
         tkinter.Label.__init__(self, master, **kwargs)
-        self.configure(bg=cfg.BGBUTTON, fg=cfg.BGFONT, width=13, height=1)
+        self.configure(bg=cfg.BUTTON, fg=cfg.FONT, width=13, height=1)
 
         self.bind('<Enter>', lambda e: self.enter())
         self.bind('<Leave>', lambda e: self.leave())
@@ -24,28 +38,28 @@ class CButton(tkinter.Label):
         self.bind('<ButtonRelease-1>', cmd)
 
     def press(self):
-        self.configure(bg=cfg.BGPRESSED)
-        cfg.ROOT.after(100, lambda: self.configure(bg=cfg.BGBUTTON))
+        self.configure(bg=cfg.PRESSED)
+        cfg.ROOT.after(100, lambda: self.configure(bg=cfg.BUTTON))
 
     def enter(self):
-        if self['bg'] != cfg.BGPRESSED:
-            self['bg'] = cfg.BGSELECTED
+        if self['bg'] != cfg.PRESSED:
+            self['bg'] = cfg.SELECTED
 
     def leave(self):
-        if self['bg'] != cfg.BGPRESSED:
-            self['bg'] = cfg.BGBUTTON
+        if self['bg'] != cfg.PRESSED:
+            self['bg'] = cfg.BUTTON
 
 
 class CFrame(tkinter.Frame):
     def __init__(self, master: tkinter, **kwargs):
         tkinter.Frame.__init__(self, master, **kwargs)
-        self.configure(bg=cfg.BGCOLOR)
+        self.configure(bg=cfg.BG)
 
 
 class CLabel(tkinter.Label):
     def __init__(self, master, **kwargs):
         tkinter.Label.__init__(self, master, **kwargs)
-        self.configure(bg=cfg.BGCOLOR, fg=cfg.BGFONT)
+        self.configure(bg=cfg.BG, fg=cfg.FONT)
 
 
 class CWindow(tkinter.Toplevel):
@@ -66,7 +80,7 @@ class CWindow(tkinter.Toplevel):
         self.bind('<Escape>', lambda e: close())
         self.bind('<Command-q>', lambda e: AskExit())
         self.resizable(0,0)
-        self.configure(bg=cfg.BGCOLOR, padx=15, pady=15)
+        self.configure(bg=cfg.BG, padx=15, pady=15)
 
     def error_exit(self):
         close()

@@ -3,6 +3,11 @@ from . import cfg, get_windows, tkinter, place_center
 from .widgets import CLabel, CWindow, ImgBtns, InfoWidget
 
 
+__all__ = (
+    "ImgCompare"
+    )
+
+
 class ImgCompare(CWindow):
     def __init__(self):
         CWindow.__init__(self)

@@ -4,6 +4,11 @@ from .widgets import CButton, CFrame, CLabel, CSep, SmbAlert
 from .settings import Settings
 
 
+__all__ = (
+    "StBar"
+    )
+
+
 class StBar(CFrame):
     """
     Tkinter frame for all status bar gui items.
@@ -35,7 +40,7 @@ class StBar(CFrame):
 
         subtitle = CLabel(
             self,
-            fg = cfg.BGFONT,
+            fg = cfg.FONT,
             text = 'Выберите фото для сравнения или нажмите Esc для отмены'
             )
         subtitle.pack(side=tkinter.LEFT)

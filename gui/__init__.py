@@ -1,3 +1,4 @@
+import calendar
 import os
 import re
 import shutil
@@ -19,8 +20,8 @@ import cfg
 from database import Dbase, Thumbs
 from scaner import scaner
 from utils import (close_windows, convert_to_rgb, crop_image, decode_image,
-                   focus_last, get_coll_name, get_windows, my_copy,
-                   place_center, resize_image, smb_check, write_cfg)
+                   focus_last, get_coll_name, get_windows, place_center,
+                   resize_image, smb_check, write_cfg)
 
 from .gallery import Gallery
 from .mac_menu import MacMenu
@@ -28,11 +29,21 @@ from .menu import Menu
 from .st_bar import StBar
 from .widgets import AskExit, CFrame, CSep
 
+__all__ = (
+    "Gallery",
+    "MacMenu",
+    "Menu",
+    "StBar",
+    "AskExit",
+    "CFrame",
+    "CSep"
+    )
 
-class InitGui:
+
+class Gui:
     def __init__(self):
         cfg.ROOT.title(cfg.APP_NAME)
-        cfg.ROOT.configure(bg=cfg.BGCOLOR)
+        cfg.ROOT.configure(bg=cfg.BG)
 
         cfg.ROOT.createcommand(
             'tk::mac::ReopenApplication', lambda: cfg.ROOT.deiconify())
@@ -45,7 +56,7 @@ class InitGui:
         else:
             cfg.ROOT.protocol("WM_DELETE_WINDOW", AskExit)
 
-        CSep(cfg.ROOT).pack(fill=tkinter.X, pady=15, padx=15)
+        CSep(cfg.ROOT).pack(fill=tkinter.X, pady=15, padx=(15, 5))
 
         menu_widget = Menu(cfg.ROOT)
         menu_widget.pack(side=tkinter.LEFT, fill=tkinter.Y, pady=(0, 15))
@@ -54,7 +65,7 @@ class InitGui:
         right_frame.pack(fill=tkinter.BOTH, expand=1)
     
         gallery_widget = Gallery(right_frame)
-        gallery_widget.pack(fill=tkinter.BOTH, expand=1, padx=(15, 0))
+        gallery_widget.pack(fill=tkinter.BOTH, expand=1, padx=(15, 5))
 
         CSep(right_frame).pack(fill=tkinter.X, pady=10, padx=15)
 

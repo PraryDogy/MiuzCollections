@@ -3,12 +3,17 @@ from . import (Dbase, ImageTk, Thumbs, cfg, convert_to_rgb, crop_image, os,
 from .widgets import CButton, CFrame, CLabel, CSep
 
 
+__all__ = (
+    "Menu"
+    )
+
+
 class Menu(tkmacosx.SFrame):
     def __init__(self, master: tkinter):
         tkmacosx.SFrame.__init__(
             self,
             master,
-            bg = cfg.BGCOLOR,
+            bg = cfg.BG,
             scrollbarwidth = 7,
             width = 180
             )
@@ -23,7 +28,7 @@ class Menu(tkmacosx.SFrame):
 
     def load_menu_parent(self):
         frame = CFrame(self)
-        frame.pack(padx=15)
+        frame.pack()
 
         self.compare_frame = CFrame(frame)
 
@@ -52,13 +57,14 @@ class Menu(tkmacosx.SFrame):
         colls_list = (i[0] for i in colls_list)
 
         menus = {
-            coll: re.sub(r'[^a-zA-Zа-яА-Я ]+', '', coll).lstrip()[:13]
+            coll: re.search("[A-Za-zА-Яа-я]+.{0,11}", coll).group(0)
             for coll in colls_list
             }
+
         menus = dict(
             sorted(
                 menus.items(),
-                key=lambda item: item[1].casefold()
+                key = lambda item: item[1].casefold()
                 ))
 
         btns = []
@@ -66,25 +72,25 @@ class Menu(tkmacosx.SFrame):
         last = CButton(frame, text='Последние')
         last.configure(width=13, pady=5, anchor=tkinter.W, padx=10)
         last.cmd(partial(self.open_coll_folder, 'last', last, btns))
-        last.pack(fill=tkinter.X, pady=(0, 15))
+        last.pack(pady=(0, 15))
         btns.append(last)
 
         for full_name, name in menus.items():
             btn = CButton(frame, text = name)
             btn.configure(width=13, pady=5, anchor=tkinter.W, padx=10)
             btn.cmd(partial(self.open_coll_folder, full_name, btn, btns))
-            btn.pack(fill=tkinter.X)
+            btn.pack()
             btns.append(btn)
 
             if full_name == cfg.config['CURR_COLL']:
-                btn.configure(bg=cfg.BGPRESSED)
+                btn.configure(bg=cfg.PRESSED)
 
             sep = CSep(frame)
             sep['bg'] = '#272727'
             sep.pack(fill=tkinter.X)
     
         if cfg.config['CURR_COLL'] == 'last':
-            last.configure(bg=cfg.BGPRESSED)
+            last.configure(bg=cfg.PRESSED)
 
         return frame
 
@@ -121,6 +127,8 @@ class Menu(tkmacosx.SFrame):
         return
     
     def open_coll_folder(self, coll: str, btn: CButton, btns: list, e):
+        cfg.LIMIT = 150
+
         if coll != "last":
             coll_path = os.path.join(
                 cfg.config['COLL_FOLDER'],
@@ -129,21 +137,21 @@ class Menu(tkmacosx.SFrame):
         else:
             coll_path = cfg.config['COLL_FOLDER']
 
-        if btn['bg'] == cfg.BGPRESSED:
-            btn['bg'] = cfg.BGSELECTED
+        if btn['bg'] == cfg.PRESSED:
+            btn['bg'] = cfg.SELECTED
 
             cfg.ROOT.after(
                 200,
-                lambda: btn.configure(bg=cfg.BGPRESSED)
+                lambda: btn.configure(bg=cfg.PRESSED)
                 )
 
             subprocess.check_output(["/usr/bin/open", coll_path])
             return
 
         for btn_item in btns:
-            btn_item['bg'] = cfg.BGBUTTON
+            btn_item['bg'] = cfg.BUTTON
 
-        btn['bg'] = cfg.BGPRESSED
+        btn['bg'] = cfg.PRESSED
         cfg.config['CURR_COLL'] = coll
 
         cfg.GALLERY.reload()

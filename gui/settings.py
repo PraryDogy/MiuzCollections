@@ -7,6 +7,11 @@ checkbox_widget = tkinter.Checkbutton
 live_widget = tkinter.Label
 
 
+__all__ = (
+    "Settings"
+    )
+
+
 class Settings(CWindow):
     def __init__(self):
         CWindow.__init__(self)
@@ -60,7 +65,7 @@ class Settings(CWindow):
 
         checkbox_widget = tkinter.Checkbutton(
             checkbox_frame,
-            bg = cfg.BGCOLOR
+            bg = cfg.BG
             )
         checkbox_widget['command'] = lambda: self.checkbox_cmd(checkbox_widget)
         [
@@ -113,10 +118,16 @@ class Settings(CWindow):
 
     def update_live_lbl(self):
         global live_widget
-        live_widget["text"] = cfg.LIVE_TEXT.replace(cfg.config["COLL_FOLDER"], "")
+
+        try:
+            live_widget["text"] = (
+                cfg.LIVE_TEXT.replace(cfg.config["COLL_FOLDER"], "")
+                )
+        except Exception:
+            print("no live label settings")
 
         if self.winfo_exists():
-            cfg.ROOT.after(500, self.update_live_lbl)
+            cfg.ROOT.after(1000, self.update_live_lbl)
 
     def checkbox_cmd(self, master: tkinter.Checkbutton):
         if self.minimize.get() == 1:

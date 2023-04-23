@@ -5,6 +5,11 @@ from .img_compare import ImgCompare
 from .widgets import CButton, CLabel, CWindow, ImgBtns, InfoWidget, SmbAlert
 
 
+__all__ = (
+    "ImgViewer"
+    )
+
+
 class ImgViewer(CWindow):
     def __init__(self, img_src: str, all_src: list):
         CWindow.__init__(self)

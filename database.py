@@ -10,6 +10,12 @@ import sqlalchemy.ext.declarative
 import cfg
 
 
+__all__ = (
+    "Dbase",
+    "Thumbs"
+    )
+
+
 class Dbase():
     """
     Checks database exists with DbChecker.

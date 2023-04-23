@@ -1,12 +1,32 @@
 from . import (Dbase, ImageTk, Thumbs, cfg, convert_to_rgb, crop_image,
                datetime, decode_image, partial, sqlalchemy, tkinter, tkmacosx,
-               traceback)
+               traceback, calendar)
 from .img_viewer import ImgViewer
 from .widgets import CButton, CFrame, CLabel
 
 
+__all__ = (
+    "Gallery"
+    )
+
+months = {
+    1: "Январь",
+    2: "Февраль",
+    3: "Март",
+    4: "Апрель",
+    5: "Май",
+    6: "Июнь",
+    7: "Июль",
+    8: "Август",
+    9: "Сентябрь",
+    10: "Октябрь",
+    11: "Ноябрь",
+    12: "Декабрь"}
+
+
 def clmns_count():
-    return (cfg.config['ROOT_W'] - 180)//cfg.THUMB_SIZE
+    clmns = (cfg.config['ROOT_W'] - 180)//cfg.THUMB_SIZE
+    return 1 if clmns == 0 else clmns
 
 
 def decode_thumbs(thumbs: tuple):
@@ -38,7 +58,8 @@ def convert_year(thumbs: list):
     result = []
     for img, src, modified in thumbs:
         year = datetime.fromtimestamp(modified).year
-        result.append((img, src, year))
+        month = datetime.fromtimestamp(modified).month
+        result.append((img, src, f"{months[month]} {year}"))
     return result
 
 
@@ -56,13 +77,13 @@ class Gallery(CFrame):
         self.thumbs_widget = self.load_thumbs_widget(self)
         self.thumbs_widget.pack(expand=1, fill=tkinter.BOTH, side=tkinter.RIGHT)
 
-        self.clmns = 0
+        self.clmns = 1
 
         cfg.ROOT.bind('<ButtonRelease-1>', self.update_gui)
 
     def load_thumbs_widget(self, master: tkinter):
         frame = CFrame(master)
-        scrollable = tkmacosx.SFrame(frame, bg=cfg.BGCOLOR, scrollbarwidth=7)
+        scrollable = tkmacosx.SFrame(frame, bg=cfg.BG, scrollbarwidth=7)
         scrollable.pack(expand=1, fill=tkinter.BOTH, side=tkinter.RIGHT)
 
         self.clmns = clmns_count()
@@ -108,10 +129,10 @@ class Gallery(CFrame):
 
             year_frame = CLabel(
                 scrollable,
-                font=('Arial', 35, 'bold'),
+                font=('Arial', 20, 'bold'),
                 text=year,
                 )
-            year_frame.pack(pady=15)
+            year_frame.pack(anchor=tkinter.W, pady=(15, 0))
 
             img_row = CFrame(scrollable)
             img_row.pack(fill=tkinter.Y, expand=1, anchor=tkinter.W)
@@ -122,7 +143,7 @@ class Gallery(CFrame):
                 thumb.configure(
                     width = cfg.THUMB_SIZE,
                     height = cfg.THUMB_SIZE,
-                    bg=cfg.BGCOLOR,
+                    bg=cfg.BG,
                     image = img,
                     text = src
                     )
@@ -138,7 +159,15 @@ class Gallery(CFrame):
                     img_row = CFrame(scrollable)
                     img_row.pack(fill=tkinter.Y, expand=1, anchor=tkinter.W)
 
+        more_btn = CButton(scrollable, text="Показать еще")
+        more_btn.cmd(lambda e: self.show_more(e))
+        more_btn.pack(pady=(15, 0))
+
         return frame
+
+    def show_more(self, e: tkinter.Event):
+        cfg.LIMIT += 150
+        self.reload()
 
     def update_gui(self, e: tkinter.Event):
         old_w = cfg.config['ROOT_W']
@@ -164,12 +193,12 @@ class Gallery(CFrame):
         self.thumbs_widget.pack(expand=1, fill=tkinter.BOTH, side=tkinter.RIGHT)
 
     def enter(self, thumb: CButton):
-        if thumb['bg'] != cfg.BGPRESSED:
-            thumb['bg'] = cfg.BGSELECTED
+        if thumb['bg'] != cfg.PRESSED:
+            thumb['bg'] = cfg.SELECTED
 
     def leave(self, thumb: CButton):
-        if thumb['bg'] != cfg.BGPRESSED:
-            thumb['bg'] = cfg.BGCOLOR
+        if thumb['bg'] != cfg.PRESSED:
+            thumb['bg'] = cfg.BG
 
     def open_preview(self, src, all_src, e):
         ImgViewer(src, all_src)

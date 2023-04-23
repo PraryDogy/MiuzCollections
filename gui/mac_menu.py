@@ -3,6 +3,11 @@ from .settings import Settings
 from .widgets import CLabel, CloseBtn, CWindow
 
 
+__all__ = (
+    "MacMenu"
+    )
+
+
 class MacMenu(tkinter.Menu):
     """
     Mac osx bar menu.

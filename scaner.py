@@ -1,5 +1,4 @@
 import os
-import sys
 import threading
 
 import cv2
@@ -8,6 +7,10 @@ import sqlalchemy
 import cfg
 from database import Dbase, Thumbs
 from utils import get_coll_name, resize_image
+
+__all__ = (
+    "scaner"
+    )
 
 
 FLAG = False
@@ -142,6 +145,7 @@ def update_collections():
 def st_bar_btn(text: str):
     btn = cfg.ST_BAR.winfo_children()[2]
     btn["text"] = text
+
 
 def scaner():
     global FLAG
