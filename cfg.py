@@ -6,14 +6,14 @@ from utils import read_cfg, write_cfg
 
 # app info
 APP_NAME = 'MiuzCollections'
+DB = "db.db"
 APP_VER = '3.4.0'
 
-CFG_DIR = os.path.join(
-    os.path.expanduser('~'), f'Library/Application Support/{APP_NAME}')
 
-# database info
-DB_VER = '1.1'
-DB_NAME = f'db {DB_VER}.db'
+CFG_DIR = os.path.join(
+    os.path.expanduser("~"),
+    f"Library/Application Support/{APP_NAME}"
+    )
 
 # gui settings
 FONT = "#E2E2E2"
@@ -23,7 +23,7 @@ PRESSED = '#395432'
 SELECTED = '#4E4769'
 
 THUMB_SIZE = 150
-LIMIT = 300
+LIMIT = 150
 
 # flags
 FLAG = False
@@ -58,14 +58,11 @@ default_vars = {
 if not os.path.exists(CFG_DIR):
     os.mkdir(CFG_DIR)
 
-if not os.path.exists(os.path.join(CFG_DIR, DB_NAME)):
+if not os.path.exists(os.path.join(CFG_DIR, DB)):
     shutil.copyfile(
-        os.path.join(os.path.dirname(__file__), 'db.db'),
-        os.path.join(CFG_DIR, DB_NAME))
-
-for file in os.listdir(CFG_DIR):
-    if file.endswith('.db') and file != DB_NAME:
-        os.remove(os.path.join(CFG_DIR, file))
+        DB,
+        os.path.join(CFG_DIR, DB)
+        )
 
 if os.path.exists(os.path.join(CFG_DIR, 'cfg.json')):
     config = read_cfg()

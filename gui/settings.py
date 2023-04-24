@@ -93,7 +93,7 @@ class Settings(CWindow):
 
         live_widget = CLabel(
             frame,
-            text = cfg.LIVE_TEXT.replace(cfg.config["COLL_FOLDER"], ""),
+            text = cfg.LIVE_TEXT,
             anchor = tkinter.W,
             justify = tkinter.LEFT,
             width = 30,
@@ -127,7 +127,7 @@ class Settings(CWindow):
             print("no live label settings")
 
         if self.winfo_exists():
-            cfg.ROOT.after(1000, self.update_live_lbl)
+            cfg.ROOT.after(100, self.update_live_lbl)
 
     def checkbox_cmd(self, master: tkinter.Checkbutton):
         if self.minimize.get() == 1:

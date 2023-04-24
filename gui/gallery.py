@@ -2,7 +2,7 @@ from . import (Dbase, ImageTk, Thumbs, cfg, convert_to_rgb, crop_image,
                datetime, decode_image, partial, sqlalchemy, tkinter, tkmacosx,
                traceback, calendar)
 from .img_viewer import ImgViewer
-from .widgets import CButton, CFrame, CLabel
+from .widgets import CButton, CFrame, CLabel, CSep
 
 
 __all__ = (
@@ -90,7 +90,6 @@ class Gallery(CFrame):
 
     def load_thumbnails(self):
         self.thumbnails = CFrame(self.scrollable)
-
         self.clmns = clmns_count()
 
         title = CLabel(
@@ -98,7 +97,7 @@ class Gallery(CFrame):
             text=cfg.config['CURR_COLL'],
             font=('Arial', 45, 'bold')
             )
-        title.pack(pady=(0, 15))
+        title.pack()
 
         if cfg.config['CURR_COLL'] == 'last':
             title.configure(text='Последние добавленные')
@@ -133,13 +132,13 @@ class Gallery(CFrame):
 
             year_frame = CLabel(
                 self.thumbnails,
-                font=('Arial', 20, 'bold'),
+                font=('Arial', 30, 'bold'),
                 text=year,
                 )
-            year_frame.pack(anchor=tkinter.W, pady=(15, 0))
+            year_frame.pack(pady=(35, 0))
 
             img_row = CFrame(self.thumbnails)
-            img_row.pack(fill=tkinter.Y, expand=1, anchor=tkinter.W)
+            img_row.pack(fill = tkinter.X, expand=1, anchor=tkinter.W)
 
             for x, (img, src) in enumerate(img_list, 1):
 

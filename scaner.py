@@ -52,7 +52,9 @@ def get_images():
     all_files = (
         [
         os.path.join(root, file),
-        change_live_lvl(root)
+        change_live_lvl(
+        f'Сканирую коллекции: {root.replace(cfg.config["COLL_FOLDER"], "Collections")}'
+        )
         ]
         for root, _, files in os.walk(cfg.config["COLL_FOLDER"])
         for file in files
@@ -90,15 +92,18 @@ def removed_images(images_list: list):
     """
     global FLAG
 
-    for data in load_db_images():
-        if data not in images_list:
+    for src, size, created, mod in load_db_images():
+        change_live_lvl(f"Обновляю информацию")
 
-            change_live_lvl("Удаляю лишнее")
-            print('removed file', data[0])
+        if (src, size, created, mod) not in images_list:
+
+            path, filename = os.path.split(src)
+            change_live_lvl(f"Удаляю: {filename}")
+            print('removed file', src)
 
             Dbase.conn.execute(
                 sqlalchemy.delete(Thumbs)
-                .where(Thumbs.src==data[0])
+                .where(Thumbs.src == src)
                 )
 
             FLAG = True
@@ -113,10 +118,13 @@ def new_images(images_list: list):
     global FLAG
 
     for src, size, created, mod in images_list:
+        path, filename = os.path.split(src)
+        change_live_lvl(f"Ищу новые фото: {filename}")
 
         if (src, size, created, mod) not in load_db_images():
+
             print('add new file', src)
-            change_live_lvl("Добавляю новые фото")
+            change_live_lvl(f"Добавляю фото: {filename}")
 
             coll = get_coll_name(src)
             insert_row(

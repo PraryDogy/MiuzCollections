@@ -57,7 +57,7 @@ class Menu(tkmacosx.SFrame):
         colls_list = (i[0] for i in colls_list)
 
         menus = {
-            coll: re.search("[A-Za-zА-Яа-я]+.{0,11}", coll).group(0)
+            coll: re.search("[A-Za-zА-Яа-я]+.{0,11}", coll).group(0)[:13]
             for coll in colls_list
             }
 
@@ -140,7 +140,7 @@ class Menu(tkmacosx.SFrame):
         return
     
     def open_coll_folder(self, coll: str, btn: CButton, btns: list, e):
-        cfg.LIMIT = 300
+        cfg.LIMIT = 150
 
         if coll != "last":
             coll_path = os.path.join(

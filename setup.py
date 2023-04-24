@@ -12,29 +12,47 @@ import cfg
 import icnsutil
 
 
-src = './icon.png'
+packages = [
+    'cffi',
+        'colour',
+        'greenlet',
+        'icnsutil',
+        'importlib-metadata',
+        'numpy',
+        'opencv-python',
+        'Pillow',
+        'pycparser',
+        'SQLAlchemy',
+        'tkmacosx',
+        'typing-extensions',
+        'zipp',
+        ]
+
+src = 'icon.png'
 img = icnsutil.IcnsFile()
 img.add_media(file=src)
-img.write(f'./icon.icns')
+img.write(f'icon.icns')
 
 APP = ['start.py']
+
 DATA_FILES = [
-    os.path.join(os.path.dirname(__file__), 'db.db'),
+    cfg.DB,
     ]
 
 OPTIONS = {
     'iconfile': 'icon.icns',
     'plist': {
-    'CFBundleName': cfg.APP_NAME,
-    'CFBundleShortVersionString':cfg.APP_VER,
-    'CFBundleVersion': cfg.APP_VER,
-    'CFBundleIdentifier':f'com.evlosh.{cfg.APP_NAME}',
-    'NSHumanReadableCopyright': (
-        'Created by Evgeny Loshkarev'
-        '\nCopyright © 2023 MIUZ Diamonds.'
-        '\nAll rights reserved.')
-    }
-    }
+        'CFBundleName': cfg.APP_NAME,
+        'CFBundleShortVersionString':cfg.APP_VER,
+        'CFBundleVersion': cfg.APP_VER,
+        'CFBundleIdentifier':f'com.evlosh.{cfg.APP_NAME}',
+        'NSHumanReadableCopyright': (
+            'Created by Evgeny Loshkarev'
+            '\nCopyright © 2023 MIUZ Diamonds.'
+            '\nAll rights reserved.'
+            )
+            }
+            }
 
 setup(
     app=APP,
@@ -42,26 +60,19 @@ setup(
     data_files=DATA_FILES,
     options={'py2app': OPTIONS},
     setup_requires=['py2app'],
-    install_requires=[
-        'opencv-python',
-        'Pillow',
-        'SQLAlchemy',
-        ]
+    install_requires=[]
     )
 
+shutil.copytree(
+    "lib",
+    f"dist/{cfg.APP_NAME}.app/Contents/lib"
+    )
 
-parent = os.path.dirname(__file__)
-LIB = os.path.join(os.path.dirname(__file__), 'lib')
-pasteHere = os.path.join(os.path.dirname(__file__), 'dist',
-                        f'{cfg.APP_NAME}.app', 'Contents', 'lib')
+shutil.move(
+    f"dist/{cfg.APP_NAME}.app",
+    os.path.expanduser(f"~/Desktop/{cfg.APP_NAME}")
+    )
 
-shutil.copytree(LIB, pasteHere)
-
-file = os.path.join(parent, 'dist', f'{cfg.APP_NAME}.app')
-desktop = os.path.join(
-    os.path.join(os.path.expanduser('~')), 'Desktop', f'{cfg.APP_NAME}.app')
-shutil.move(file, desktop)
-
-shutil.rmtree(os.path.join(parent, 'build'))
-shutil.rmtree(os.path.join(parent, '.eggs'))
-shutil.rmtree(os.path.join(parent, 'dist'))
+shutil.rmtree('build')
+shutil.rmtree('.eggs')
+shutil.rmtree('dist')
