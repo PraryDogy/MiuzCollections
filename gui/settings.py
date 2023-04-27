@@ -5,7 +5,7 @@ from .widgets import AskExit, CButton, CFrame, CLabel, CloseBtn, CSep, CWindow
 path_widget = tkinter.Label
 checkbox_widget = tkinter.Checkbutton
 live_widget = tkinter.Label
-
+save_btn = tkinter.Label
 
 __all__ = (
     "Settings"
@@ -32,7 +32,7 @@ class Settings(CWindow):
         self.update_live_lbl()
 
     def main_widget(self):
-        global path_widget, checkbox_widget, live_widget
+        global path_widget, checkbox_widget, live_widget, save_btn
 
         frame = CFrame(self)
 
@@ -58,7 +58,7 @@ class Settings(CWindow):
         select_path = CButton(frame, text = 'Обзор')
         select_path.pack(pady = (15, 0), padx = (5, 0))
         select_path.configure(width = 9)
-        select_path.cmd(lambda e, x = path_widget: self.select_path(x))
+        select_path.cmd(lambda e, x = path_widget: self.select_path_cmd(x))
 
         checkbox_frame = CFrame(frame)
         checkbox_frame.pack(pady = (15, 0))
@@ -83,13 +83,8 @@ class Settings(CWindow):
 
         restore_btn = CButton(rest_frame, text = 'По умолчанию')
         restore_btn.configure(width = 12)
-        restore_btn.cmd(lambda e, x = restore_btn: self.restore(x))
-        restore_btn.pack(side = tkinter.LEFT, padx = (0, 10))
-
-        reset_button = CButton(rest_frame, text = 'Очистить кэш')
-        reset_button.configure(width = 12)
-        reset_button.cmd(lambda e: self.full_reset())
-        reset_button.pack(side = tkinter.LEFT)
+        restore_btn.cmd(lambda e, x = restore_btn: self.default_cmd(x))
+        restore_btn.pack()
 
         live_widget = CLabel(
             frame,
@@ -106,7 +101,7 @@ class Settings(CWindow):
         CSep(cancel_frame).pack(pady = 15, fill = tkinter.X)
 
         save_btn = CButton(cancel_frame, text = 'Сохранить')
-        save_btn.cmd(lambda e: self.save_settings())
+        save_btn.cmd(lambda e: self.save_cmd())
         save_btn.configure(width = 12)
         save_btn.pack(side = tkinter.LEFT, padx = (0, 10))
 
@@ -137,19 +132,22 @@ class Settings(CWindow):
             self.minimize.set(1)
             master.select()
 
-    def full_reset(self):
-        shutil.rmtree(cfg.CFG_DIR)
-        os.execv(sys.executable, ['python'] + sys.argv)
-
-    def select_path(self, master: tkinter.Label):
+    def select_path_cmd(self, master: tkinter.Label):
         path = filedialog.askdirectory()
 
         if len(path) == 0:
             return
 
-        master['text'] = path
+        if master["text"] != path:
+            master['text'] = path
+            save_btn["text"] = "Перезапуск"
+            save_btn.cmd(lambda e: self.save_reload())
 
-    def restore(self, btn: CButton):
+    def save_reload(self):
+        self.save_cmd()
+        os.execv(sys.executable, ['python'] + sys.argv)
+
+    def default_cmd(self, btn: CButton):
         """
         Gets advanced settings values from cfg and write to cfg.json
         Sets default text in all text input fields in advanced settings.
@@ -159,7 +157,7 @@ class Settings(CWindow):
         path_widget['text'] = cfg.default_vars['COLL_FOLDER']
         checkbox_widget.select()
 
-    def save_settings(self):
+    def save_cmd(self):
         """
         Get text from all text fields in advanced settings and save to
         cfg.json

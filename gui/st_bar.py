@@ -29,10 +29,10 @@ class StBar(CFrame):
 
         CSep(self).pack(fill=tkinter.Y, side=tkinter.LEFT, padx=(15, 15))
 
-        btn = CButton(self, text='Обновить', padx=5)
-        btn['width'] = 10
-        btn.cmd(lambda e: self.update_cmd(btn))
-        btn.pack(side=tkinter.LEFT)
+        upd_btn = CButton(self, text='Обновить', padx=5)
+        upd_btn['width'] = 10
+        upd_btn.cmd(lambda e: self.update_cmd(btn))
+        upd_btn.pack(side=tkinter.LEFT)
 
     def compare_mode(self):
         widgets = tuple(v for k, v in self.children.items())
@@ -65,10 +65,11 @@ class StBar(CFrame):
         * param `btn`: tkinter button
         """
         if not cfg.FLAG:
+
             if not smb_check():
                 SmbAlert()
                 return
-            btn.press()
+
             scaner()
 
     def cancel_cmd(self):

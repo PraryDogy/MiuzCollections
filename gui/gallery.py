@@ -99,26 +99,27 @@ class Gallery(CFrame):
             )
         title.pack()
 
+        load_last = (
+            sqlalchemy.select(
+            Thumbs.img150, Thumbs.src, Thumbs.modified
+            ).limit(cfg.LIMIT).order_by(-Thumbs.modified)
+            )
+
         if cfg.config['CURR_COLL'] == 'last':
             title.configure(text='Последние добавленные')
+            res = Dbase.conn.execute(load_last).fetchall()
 
-            res = Dbase.conn.execute(
-                sqlalchemy.select(
-                    Thumbs.img150,
-                    Thumbs.src,
-                    Thumbs.modified
-                    ).limit(cfg.LIMIT).order_by(-Thumbs.modified)
-                    ).fetchall()
         else:
             res = Dbase.conn.execute(
                 sqlalchemy.select(
-                    Thumbs.img150,
-                    Thumbs.src,
-                    Thumbs.modified
-                    ).where(
-                    Thumbs.collection == cfg.config['CURR_COLL']
+                    Thumbs.img150, Thumbs.src, Thumbs.modified
+                    ).filter(Thumbs.collection == cfg.config['CURR_COLL']
                     ).limit(cfg.LIMIT).order_by(-Thumbs.modified)
                     ).fetchall()
+
+        if len(res) == 0:
+            title.configure(text='Последние добавленные')
+            res = Dbase.conn.execute(load_last).fetchall()
 
         thumbs = decode_thumbs(res)
         thumbs = convert_year(thumbs)

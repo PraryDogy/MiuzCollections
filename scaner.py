@@ -18,9 +18,10 @@ def change_live_lvl(text):
     cfg.LIVE_TEXT = "Обновляю данные:\n" + text
 
 
-def st_bar_btn(text: str):
+def st_bar_btn(text: str, color: str):
     btn = cfg.ST_BAR.winfo_children()[2]
     btn["text"] = text
+    btn["bg"] = color
 
 
 def update_collections():
@@ -139,9 +140,9 @@ def scaner():
     global NEED_UPDATE
 
     cfg.FLAG = True
-    st_bar_btn("Обновление")
+    st_bar_btn("Обновление", cfg.PRESSED)
 
-    t1 = threading.Thread(target=update_collections, daemon=True)
+    t1 = threading.Thread(target = update_collections, daemon = True)
     t1.start()
 
     while t1.is_alive():
@@ -157,5 +158,5 @@ def scaner():
         "\nCopyright © 2023 MIUZ Diamonds."
         )
 
-    st_bar_btn("Обновить")
+    st_bar_btn("Обновить", cfg.BUTTON)
     cfg.FLAG = False
