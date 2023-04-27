@@ -1,7 +1,3 @@
-"""
-Database module.
-"""
-
 import os
 
 import sqlalchemy
@@ -25,8 +21,8 @@ class Dbase():
     """
     __engine = sqlalchemy.create_engine(
         'sqlite:////' + os.path.join(cfg.CFG_DIR, cfg.DB),
-        connect_args={'check_same_thread':False,},
-        echo= False
+        connect_args = {'check_same_thread': False},
+        echo = False
         )
     conn = __engine.connect()
     base = sqlalchemy.ext.declarative.declarative_base()

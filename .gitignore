@@ -10,3 +10,4 @@ database.db
 venv/
 .vscode/
 lib/
+_test_coll/

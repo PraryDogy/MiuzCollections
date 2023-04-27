@@ -13,6 +13,7 @@ __all__ = (
     "read_cfg",
     "get_coll_name",
     "place_center",
+    "encode_image",
     "decode_image",
     "convert_to_rgb",
     "crop_image",
@@ -34,7 +35,6 @@ def write_cfg(data: dict):
         file.write(json.dumps(data, indent=4, ensure_ascii=True))
 
 
-
 def read_cfg():
     """
     Decrypts `cfg.json` from `cfg.CFG_DIR` and returns dict.
@@ -44,28 +44,7 @@ def read_cfg():
 
 
 def get_coll_name(src: str):
-    """
-    Returns collection name.
-    Returns `Без коллекций` if name not found.
-
-    Looking for collection name in path like object.
-    Name of collection must be follow next to `cfg.COLL_FOLDER`
-
-    # Example
-    ```
-    cfg.COLL_FOLDER = "collection"
-    collection_path = /path/to/collection/any_collection_name
-    print(get_coll_name(collection_path))
-    > any_collection_name
-
-    cfg.COLL_FOLDER = "collection"
-    collection_path = /some/path/without/coll_folder
-    print(get_coll_name(collection_path))
-    > Без коллекций
-    ```
-    """
-    if cfg.config['COLL_FOLDER'] in src:
-        return src.split(cfg.config['COLL_FOLDER'])[-1].split(os.sep)[1]
+    return src.split(cfg.config['COLL_FOLDER'])[-1].split(os.sep)[1]
 
 
 def place_center(top_level: tkinter.Toplevel):
@@ -78,6 +57,32 @@ def place_center(top_level: tkinter.Toplevel):
     yy = y + cfg.ROOT.winfo_height()//2 - top_level.winfo_height()//2
 
     top_level.geometry(f'+{xx}+{yy}')
+
+
+def resize_image(img, widget_w, widget_h, thumbnail: bool):
+    h, w = img.shape[:2]
+    aspect = w/h
+    if thumbnail:
+        if aspect > 1:
+            new_h, new_w = widget_h, round(widget_h*aspect)
+        elif aspect < 1:
+            new_h, new_w = round(widget_w/aspect), widget_w
+        elif aspect == 1:
+            new_h, new_w = widget_h, widget_h
+    else:
+        f1 = widget_w / w
+        f2 = widget_h / h
+        # f = min(f1, f2)
+        f = f2
+        new_w, new_h = (int(w * f), int(h * f))
+
+    return cv2.resize(img, (new_w, new_h), interpolation=cv2.INTER_AREA)
+
+
+def encone_image(src):
+    image = cv2.imread(src)
+    resized = resize_image(image, cfg.THUMB_SIZE, cfg.THUMB_SIZE, True)
+    return cv2.imencode('.jpg', resized)[1].tobytes()
 
 
 def decode_image(image):
@@ -115,26 +120,6 @@ def crop_image(img):
         delta = (width-height)//2
         cropped = img[0:height, delta:width-delta]
     return cropped[0:cfg.THUMB_SIZE, 0:cfg.THUMB_SIZE]
-
-
-def resize_image(img, widget_w, widget_h, thumbnail: bool):
-    h, w = img.shape[:2]
-    aspect = w/h
-    if thumbnail:
-        if aspect > 1:
-            new_h, new_w = widget_h, round(widget_h*aspect)
-        elif aspect < 1:
-            new_h, new_w = round(widget_w/aspect), widget_w
-        elif aspect == 1:
-            new_h, new_w = widget_h, widget_h
-    else:
-        f1 = widget_w / w
-        f2 = widget_h / h
-        # f = min(f1, f2)
-        f = f2
-        new_w, new_h = (int(w * f), int(h * f))
-
-    return cv2.resize(img, (new_w, new_h), interpolation=cv2.INTER_AREA)
 
 
 def smb_check():
