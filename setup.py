@@ -55,12 +55,12 @@ OPTIONS = {
             }
 
 setup(
-    app=APP,
-    name=cfg.APP_NAME,
-    data_files=DATA_FILES,
-    options={'py2app': OPTIONS},
-    setup_requires=['py2app'],
-    install_requires=[]
+    app = APP,
+    name = cfg.APP_NAME,
+    data_files = DATA_FILES,
+    options = {'py2app': OPTIONS},
+    setup_requires = ['py2app'],
+    install_requires = []
     )
 
 shutil.copytree(
@@ -70,7 +70,7 @@ shutil.copytree(
 
 shutil.move(
     f"dist/{cfg.APP_NAME}.app",
-    os.path.expanduser(f"~/Desktop/{cfg.APP_NAME}")
+    os.path.expanduser(f"~/Desktop/{cfg.APP_NAME}.app")
     )
 
 shutil.rmtree('build')
