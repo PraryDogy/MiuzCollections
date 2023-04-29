@@ -18,19 +18,18 @@ from PIL import Image, ImageTk
 
 import cfg
 from database import Dbase, Thumbs
-from scaner import scaner
-from utils import (close_windows, convert_to_rgb, crop_image, decode_image,
-                   focus_last, get_coll_name, get_windows, place_center,
-                   resize_image, smb_check, write_cfg)
+from scaner import *
+from utils import *
 
-from .gallery import Gallery
+from .context_menu import ThumbnailsMenu
+from .thumbnails import Thumbnails
 from .mac_menu import MacMenu
 from .menu import Menu
 from .st_bar import StBar
 from .widgets import AskExit, CFrame, CSep
 
 __all__ = (
-    "Gallery",
+    "Thumbnails",
     "MacMenu",
     "Menu",
     "StBar",
@@ -64,7 +63,7 @@ class Gui:
         right_frame = CFrame(cfg.ROOT)
         right_frame.pack(fill=tkinter.BOTH, expand=1)
     
-        gallery_widget = Gallery(right_frame)
+        gallery_widget = Thumbnails(right_frame)
         gallery_widget.pack(fill=tkinter.BOTH, expand=1, padx=(15, 5))
 
         CSep(right_frame).pack(fill=tkinter.X, pady=10, padx=15)
