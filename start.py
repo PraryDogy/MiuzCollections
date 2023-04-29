@@ -8,6 +8,7 @@ try:
     from scaner import scaner
     from utils import smb_check
 
+
     def load_all():
         Gui()
         cfg.ROOT.deiconify()
@@ -21,7 +22,7 @@ try:
 
 except Exception as e:
     e_type, e_val, e_tb = sys.exc_info()
-
     with open(f"{cfg.CFG_DIR}/log.txt", "w") as file:
-
         traceback.print_exception(e_type, e_val, e_tb, file = file)
+
+    print(e_type, e_val, e_tb)

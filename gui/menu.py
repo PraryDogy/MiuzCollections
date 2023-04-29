@@ -167,5 +167,5 @@ class Menu(tkmacosx.SFrame):
         btn['bg'] = cfg.PRESSED
         cfg.config['CURR_COLL'] = coll
 
-        cfg.GALLERY.reload_scrollable()
-        cfg.GALLERY.reload_thumbnails()
+        cfg.THUMBNAILS.reload_scrollable()
+        cfg.THUMBNAILS.reload_thumbnails()

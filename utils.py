@@ -6,7 +6,9 @@ import cv2
 import numpy
 from PIL import Image
 
+import subprocess
 import cfg
+import threading
 
 __all__ = (
     "write_cfg",
@@ -22,7 +24,33 @@ __all__ = (
     "get_windows",
     "close_windows",
     "focus_last",
+    "find_tiff",
+    "find_jpeg"
     )
+
+
+def find_tiff(src: str):
+
+    def task(root, file):
+        subprocess.call(["open", "-R", os.path.join(root, file)])
+
+    path, filename = os.path.split(src)
+    filename = filename.split(".")[0]
+
+    for root, dirs, files in os.walk(path):
+        for file in files:
+            if file.endswith((".psd", ".PSD", ".tiff", ".TIFF")):
+                if filename in file:
+                    threading.Thread(target=task, args=[root, file]).start()
+                    return True
+    return False
+
+
+def find_jpeg(src: str):
+    def task():
+        subprocess.call(["open", "-R", src])
+    threading.Thread(target = task).start()
+
 
 
 def write_cfg(data: dict):
@@ -79,7 +107,7 @@ def resize_image(img, widget_w, widget_h, thumbnail: bool):
     return cv2.resize(img, (new_w, new_h), interpolation=cv2.INTER_AREA)
 
 
-def encone_image(src):
+def encode_image(src):
     image = cv2.imread(src)
     resized = resize_image(image, cfg.THUMB_SIZE, cfg.THUMB_SIZE, True)
     return cv2.imencode('.jpg', resized)[1].tobytes()

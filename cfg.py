@@ -27,6 +27,8 @@ LIMIT = 150
 
 # flags
 FLAG = False
+SCANER_TASK = None
+
 COMPARE = False
 LIVE_TEXT = (
     "Created by Evgeny Loshkarev"
@@ -36,7 +38,7 @@ LIVE_TEXT = (
 # gui objects for global access
 ROOT = tkinter.Tk()
 ROOT.withdraw()
-GALLERY: tkinter.Frame = None
+THUMBNAILS: tkinter.Frame = None
 MENU: tkinter.Frame = None
 ST_BAR: tkinter.Frame = None
 

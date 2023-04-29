@@ -163,7 +163,11 @@ class AskExit(CWindow):
         self.destroy()
         focus_last()
 
+    def exit_task(self):
+        quit()
+
     def on_exit(self):
+
         w, h = cfg.ROOT.winfo_width(), cfg.ROOT.winfo_height()
         x, y = cfg.ROOT.winfo_x(), cfg.ROOT.winfo_y()
 
@@ -173,8 +177,9 @@ class AskExit(CWindow):
         cfg.config['ROOT_Y'] = y
 
         write_cfg(cfg.config)
+
         cfg.FLAG = False
-        quit()
+        exit()
 
 
 class SmbAlert(tkinter.Toplevel):

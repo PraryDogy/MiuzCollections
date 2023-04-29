@@ -1,9 +1,8 @@
 from . import (Dbase, Image, ImageTk, Thumbs, cfg, close_windows,
-               convert_to_rgb, cv2, datetime, decode_image, get_coll_name, os,
-               place_center, resize_image, smb_check, sqlalchemy, tkinter)
-from .img_compare import ImgCompare
-from .widgets import CButton, CLabel, CWindow, ImgBtns, InfoWidget, SmbAlert
-
+               convert_to_rgb, cv2, datetime, decode_image, find_tiff,
+               get_coll_name, os, place_center, resize_image, smb_check,
+               sqlalchemy, tkinter, find_jpeg)
+from .widgets import CButton, CFrame, CLabel, CWindow, InfoWidget, SmbAlert
 
 __all__ = (
     "ImgViewer"
@@ -32,13 +31,13 @@ class ImgViewer(CWindow):
         self.configure(pady=0, padx=0)
         self.resizable(1, 1)
 
-        self.img_frame = self.img_widget(self)
+        self.img_frame = self.img_widget()
         self.img_frame.pack(pady=(0, 15))
 
-        self.btns_frame = self.btns_widget(self)
+        self.btns_frame = self.btns_widget()
         self.btns_frame.pack(pady=(0, 15))
         
-        self.info_frame = self.info_widget(self)
+        self.info_frame = self.info_widget()
         self.info_frame.pack(pady=(0, 15))
 
         cfg.ROOT.update_idletasks()
@@ -83,30 +82,45 @@ class ImgViewer(CWindow):
             self.thumb_place(self.win_width, self.img_height)
             cfg.ROOT.after(500, lambda: self.img_place(self.win_width, self.img_height))
 
-    def img_widget(self, master: tkinter):
-        label = CLabel(master)
+    def img_widget(self):
+        label = CLabel(self)
         label['bg']='black'
         label.bind('<ButtonRelease-1>', lambda e: self.img_click(e))
         self.bind('<Left>', lambda e: self.switch_img(self.img_ind()-1))
         self.bind('<Right>', lambda e: self.switch_img(self.img_ind()+1))
         return label
 
-    def btns_widget (self, master: tkinter):
-        btns_frame = ImgBtns(master, self.img_src)
-        comp_btn = CButton(btns_frame, text='Сравнить')
-        comp_btn.cmd(lambda e: self.btn_compare(comp_btn))
-        comp_btn.pack(side=tkinter.RIGHT)
-        return btns_frame
+    def btns_widget (self):
+        frame = CFrame(self)
 
-    def info_widget(self, master: tkinter):
+        open_btn = CButton(frame, text='Показать в Finder')
+        open_btn.cmd(lambda e: self.find_jpeg(open_btn, e))
+        open_btn.pack(side=tkinter.LEFT, padx=(0, 15))
+
+        tiff_btn = CButton(frame, text = "Показать tiff")
+        tiff_btn.cmd(lambda e: self.find_tiff_cmd(tiff_btn, e))
+        tiff_btn.pack(side = tkinter.LEFT)
+
+        return frame
+    
+    def find_tiff_cmd(self, btn: CButton, e: tkinter.Event):
+        btn.press()
+
+        if not find_tiff(self.img_src):
+            btn["text"] = "Не могу найти tiff"
+            cfg.ROOT.after(
+                1000,
+                lambda: btn.configure(text = "Показать tiff")
+                )
+
+    def find_jpeg(self, btn: CButton, e: tkinter.Event):
+        btn.press()
+        find_jpeg(self.img_src)
+
+    def info_widget(self):
         info1, info2 = self.create_info()
-        info_widget = InfoWidget(master, self.ln, info1, info2)
+        info_widget = InfoWidget(self, self.ln, info1, info2)
         return info_widget
-
-    def run_compare(self):
-        ImgCompare()
-        cfg.ST_BAR.normal_mode()
-        cfg.MENU.normal_mode()
 
     def switch_img(self, ind: int):
         cfg.ROOT.after_cancel(self.task)

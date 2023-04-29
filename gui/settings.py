@@ -1,11 +1,11 @@
-from . import (cfg, close_windows, filedialog, os, place_center, shutil, sys,
-               tkinter, write_cfg)
+from . import (cfg, close_windows, filedialog, place_center, scaner, tkinter,
+               write_cfg)
 from .widgets import AskExit, CButton, CFrame, CLabel, CloseBtn, CSep, CWindow
 
 path_widget = tkinter.Label
 checkbox_widget = tkinter.Checkbutton
 live_widget = tkinter.Label
-save_btn = tkinter.Label
+SCAN_AGAIN = False
 
 __all__ = (
     "Settings"
@@ -32,7 +32,7 @@ class Settings(CWindow):
         self.update_live_lbl()
 
     def main_widget(self):
-        global path_widget, checkbox_widget, live_widget, save_btn
+        global path_widget, checkbox_widget, live_widget
 
         frame = CFrame(self)
 
@@ -58,7 +58,7 @@ class Settings(CWindow):
         select_path = CButton(frame, text = 'Обзор')
         select_path.pack(pady = (15, 0), padx = (5, 0))
         select_path.configure(width = 9)
-        select_path.cmd(lambda e, x = path_widget: self.select_path_cmd(x))
+        select_path.cmd(lambda e: self.select_path_cmd())
 
         checkbox_frame = CFrame(frame)
         checkbox_frame.pack(pady = (15, 0))
@@ -115,11 +115,10 @@ class Settings(CWindow):
         global live_widget
 
         try:
-            live_widget["text"] = (
-                cfg.LIVE_TEXT.replace(cfg.config["COLL_FOLDER"], "")
-                )
+            live_widget["text"] = cfg.LIVE_TEXT
         except Exception:
-            print("no live label settings")
+            # print("no live label settings")
+            pass
 
         if self.winfo_exists():
             cfg.ROOT.after(100, self.update_live_lbl)
@@ -132,36 +131,25 @@ class Settings(CWindow):
             self.minimize.set(1)
             master.select()
 
-    def select_path_cmd(self, master: tkinter.Label):
-        path = filedialog.askdirectory()
+    def select_path_cmd(self):
+        global path_widget, SCAN_AGAIN
+        path = filedialog.askdirectory(initialdir = cfg.config["COLL_FOLDER"])
 
         if len(path) == 0:
             return
 
-        if master["text"] != path:
-            master['text'] = path
-            save_btn["text"] = "Перезапуск"
-            save_btn.cmd(lambda e: self.save_reload())
-
-    def save_reload(self):
-        self.save_cmd()
-        os.execv(sys.executable, ['python'] + sys.argv)
+        if path_widget["text"] != path:
+            path_widget['text'] = path
+            SCAN_AGAIN = True
 
     def default_cmd(self, btn: CButton):
-        """
-        Gets advanced settings values from cfg and write to cfg.json
-        Sets default text in all text input fields in advanced settings.
-        * param `btn`: current tkinter button
-        """
         btn.press()
         path_widget['text'] = cfg.default_vars['COLL_FOLDER']
         checkbox_widget.select()
 
     def save_cmd(self):
-        """
-        Get text from all text fields in advanced settings and save to
-        cfg.json
-        """
+        global SCAN_AGAIN, SCANER_PERMISSION
+
         cfg.config['COLL_FOLDER'] = path_widget['text']
         cfg.config['MINIMIZE'] = self.minimize.get()
 
@@ -169,8 +157,16 @@ class Settings(CWindow):
 
         if cfg.config['MINIMIZE'] == 1:
             cfg.ROOT.protocol("WM_DELETE_WINDOW", lambda: cfg.ROOT.iconify())
-
         else:
             cfg.ROOT.protocol("WM_DELETE_WINDOW", AskExit)
 
         close_windows()
+
+        if SCAN_AGAIN:
+            SCAN_AGAIN = False
+            cfg.FLAG = False
+
+            while cfg.SCANER_TASK.is_alive():
+                cfg.ROOT.update()
+
+            scaner()
