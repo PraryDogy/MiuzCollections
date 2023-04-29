@@ -49,12 +49,14 @@ def reveal_finder(list_paths: list):
 
 def find_tiff(src: str):
     path, filename = os.path.split(src)
+    filename = filename.split(".")[0]
     images = []
 
     for root, dirs, files in os.walk(path):
         for file in files:
             if file.endswith((".tiff", ".TIFF", ".psd", ".PSD")):
-                images.append(os.path.join(root, file))
+                if filename in file:
+                    images.append(os.path.join(root, file))
 
     if images:
         threading.Thread(target=reveal_finder, args=[images]).start()

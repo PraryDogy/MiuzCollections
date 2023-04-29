@@ -140,13 +140,7 @@ class ImgViewer(CWindow):
     
     def find_tiff_cmd(self, btn: CButton, e: tkinter.Event):
         btn.press()
-
-        if not find_tiff(self.img_src):
-            btn["text"] = "Не могу найти tiff"
-            cfg.ROOT.after(
-                1000,
-                lambda: btn.configure(text = "Показать tiff")
-                )
+        find_tiff(self.img_src)
 
     def find_jpeg(self, btn: CButton, e: tkinter.Event):
         btn.press()
@@ -162,6 +156,7 @@ class ImgViewer(CWindow):
         try:
             self.img_src = self.all_src[ind]
             self.btns_frame.img_src = self.img_src
+            ContextMenu(self, self.img_src, self.all_src)
         except IndexError:
             self.img_src = self.all_src[0]
             self.btns_frame.img_src = self.img_src
