@@ -21,7 +21,6 @@ from database import Dbase, Thumbs
 from scaner import *
 from utils import *
 
-from .context_menu import ThumbnailsMenu
 from .thumbnails import Thumbnails
 from .mac_menu import MacMenu
 from .menu import Menu

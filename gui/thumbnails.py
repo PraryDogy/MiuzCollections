@@ -1,9 +1,8 @@
 from . import (Dbase, ImageTk, Thumbs, cfg, convert_to_rgb, crop_image,
-               datetime, decode_image, partial, sqlalchemy, tkinter, tkmacosx,
-               traceback, calendar)
+               datetime, decode_image, sqlalchemy, tkinter, tkmacosx,
+               traceback, find_jpeg, find_tiff, partial)
 from .img_viewer import ImgViewer
-from .widgets import CButton, CFrame, CLabel, CSep
-from .context_menu import ThumbnailsMenu
+from .widgets import CButton, CFrame, CLabel
 
 
 __all__ = (
@@ -64,6 +63,39 @@ def convert_year(thumbs: list):
     return result
 
 
+class ContextMenu(tkinter.Menu):
+    def __init__(self, master: tkinter.Label, src: str, all_src: list):
+        tkinter.Menu.__init__(
+            self,
+            master,
+            )
+
+        self.add_command(
+            label = "Просмотр",
+            command = lambda: ImgViewer(src, all_src)
+            )
+
+        self.add_separator()
+
+        self.add_command(
+            label = "Показать в Finder",
+            command = lambda: find_jpeg(src)
+            )
+
+        self.add_command(
+            label = "Показать tiff",
+            command = lambda: find_tiff(src)
+            )
+
+        master.bind("<Button-2>", self.do_popup)
+
+    def do_popup(self, event):
+        try:
+            self.tk_popup(event.x_root, event.y_root)
+        finally:
+            self.grab_release()
+
+
 class Thumbnails(CFrame):
     """
     Creates tkinter frame with menu and grid of images.
@@ -100,19 +132,16 @@ class Thumbnails(CFrame):
             )
         title.pack()
 
-        load_last = (
-            sqlalchemy.select(
+        load_last = sqlalchemy.select(
             Thumbs.img150, Thumbs.src, Thumbs.modified
             ).limit(cfg.LIMIT).order_by(-Thumbs.modified)
-            )
 
         if cfg.config['CURR_COLL'] == 'last':
             title.configure(text='Последние добавленные')
             res = Dbase.conn.execute(load_last).fetchall()
 
         else:
-            res = Dbase.conn.execute(
-                sqlalchemy.select(
+            res = Dbase.conn.execute(sqlalchemy.select(
                     Thumbs.img150, Thumbs.src, Thumbs.modified
                     ).filter(Thumbs.collection == cfg.config['CURR_COLL']
                     ).limit(cfg.LIMIT).order_by(-Thumbs.modified)
@@ -155,12 +184,12 @@ class Thumbnails(CFrame):
                 thumb.pack(side=tkinter.LEFT)
 
                 thumb.image_names = img
-                thumb.cmd(partial(self.open_preview, src, all_src))
+                thumb.cmd(partial(self.img_viewer, src, all_src))
 
                 thumb.bind('<Enter>', lambda e, a=thumb: self.enter(a))
                 thumb.bind('<Leave>', lambda e, a=thumb: self.leave(a))
 
-                ThumbnailsMenu(thumb, src, all_src)
+                ContextMenu(thumb, src, all_src)
 
                 if x % self.clmns == 0:
                     img_row = CFrame(self.thumbnails)
@@ -171,6 +200,9 @@ class Thumbnails(CFrame):
         more_btn.pack(pady=(15, 0))
 
         self.thumbnails.pack(expand=1, fill=tkinter.BOTH)
+
+    def img_viewer(self, src, all_src, e):
+        ImgViewer(src, all_src)
 
     def reload_scrollable(self):
         """
@@ -216,6 +248,3 @@ class Thumbnails(CFrame):
     def leave(self, thumb: CButton):
         if thumb['bg'] != cfg.PRESSED:
             thumb['bg'] = cfg.BG
-
-    def open_preview(self, src, all_src, e):
-        ImgViewer(src, all_src)

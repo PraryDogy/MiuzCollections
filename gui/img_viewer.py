@@ -4,9 +4,42 @@ from . import (Dbase, Image, ImageTk, Thumbs, cfg, close_windows,
                sqlalchemy, tkinter, find_jpeg)
 from .widgets import CButton, CFrame, CLabel, CWindow, InfoWidget, SmbAlert
 
+
 __all__ = (
     "ImgViewer"
     )
+
+
+class ContextMenu(tkinter.Menu):
+    def __init__(self, master: tkinter.Label, src: str, all_src: list):
+        tkinter.Menu.__init__(
+            self,
+            master,
+            )
+
+        self.add_command(
+            label = "Показать в Finder",
+            command = lambda: self.find_jpeg(src)
+            )
+
+        self.add_command(
+            label = "Показать tiff",
+            command = lambda: self.find_tiff(src)
+            )
+
+        master.bind("<Button-2>", self.do_popup)
+
+    def do_popup(self, event):
+        try:
+            self.tk_popup(event.x_root, event.y_root)
+        finally:
+            self.grab_release()
+
+    def find_jpeg(self, src):
+        find_jpeg(src)
+
+    def find_tiff(self, src):
+        find_tiff(src)
 
 
 class ImgViewer(CWindow):
@@ -61,6 +94,8 @@ class ImgViewer(CWindow):
         self.grab_set()
 
         self.bind('<ButtonRelease-1>', lambda e: self.resize_win(e))
+
+        ContextMenu(self, self.img_src, self.all_src)
 
     def resize_win(self, event: tkinter.Event):
         new_w, new_h = self.winfo_width(), self.winfo_height()

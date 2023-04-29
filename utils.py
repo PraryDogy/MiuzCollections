@@ -29,21 +29,35 @@ __all__ = (
     )
 
 
+def reveal_finder(list_paths: list):
+    paths = (
+        f"\"{i}\" as POSIX file"
+        for i in list_paths
+        )
+
+    paths = ", ".join(paths)
+
+    args = [
+        "-e", "tell application \"Finder\"",
+        "-e", f"reveal {{{paths}}}",
+        "-e", "activate",
+        "-e", "end tell",
+        ]
+
+    subprocess.call(["osascript", *args])
+
+
 def find_tiff(src: str):
-
-    def task(root, file):
-        subprocess.call(["open", "-R", os.path.join(root, file)])
-
     path, filename = os.path.split(src)
-    filename = filename.split(".")[0]
+    images = []
 
     for root, dirs, files in os.walk(path):
         for file in files:
-            if file.endswith((".psd", ".PSD", ".tiff", ".TIFF")):
-                if filename in file:
-                    threading.Thread(target=task, args=[root, file]).start()
-                    return True
-    return False
+            if file.endswith((".tiff", ".TIFF", ".psd", ".PSD")):
+                images.append(os.path.join(root, file))
+
+    if images:
+        threading.Thread(target=reveal_finder, args=[images]).start()
 
 
 def find_jpeg(src: str):
