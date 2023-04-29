@@ -95,7 +95,7 @@ class ImgViewer(CWindow):
 
         self.bind('<ButtonRelease-1>', lambda e: self.resize_win(e))
 
-        ContextMenu(self, self.img_src, self.all_src)
+        self.context = ContextMenu(self, self.img_src, self.all_src)
 
     def resize_win(self, event: tkinter.Event):
         new_w, new_h = self.winfo_width(), self.winfo_height()
@@ -156,7 +156,10 @@ class ImgViewer(CWindow):
         try:
             self.img_src = self.all_src[ind]
             self.btns_frame.img_src = self.img_src
-            ContextMenu(self, self.img_src, self.all_src)
+            self.context.destroy()
+            self.context = ContextMenu(self, self.img_src, self.all_src)
+
+            print(len(self.winfo_children()))
         except IndexError:
             self.img_src = self.all_src[0]
             self.btns_frame.img_src = self.img_src
