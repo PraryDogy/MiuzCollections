@@ -54,7 +54,7 @@ class Settings(CWindow):
         path_widget.pack(padx = 15, pady = (5, 0), fill=tkinter.X)
 
         select_path = CButton(frame, text = 'Обзор')
-        select_path.pack(pady = (15, 0), padx = (5, 0))
+        select_path.pack(pady = (5, 0), padx = (5, 0))
         select_path.configure(width = 9)
         select_path.cmd(lambda e: self.select_path_cmd())
 
@@ -75,6 +75,8 @@ class Settings(CWindow):
 
         checkbox_lbl = CLabel(checkbox_frame, text = 'Спрашивать при выходе')
         checkbox_lbl.pack(side = tkinter.LEFT)
+
+        checkbox_lbl.bind("<Button-1>", lambda e: self.checkbox_cmd(checkbox_widget))
 
         restore_btn = CButton(frame, text = 'Сброс')
         restore_btn.configure(width = 9)
