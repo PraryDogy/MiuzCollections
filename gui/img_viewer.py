@@ -92,11 +92,14 @@ class ImgViewer(CWindow):
         self.context = ContextMenu(self)
 
     def resize_win(self, event: tkinter.Event):
-        new_w, new_h = self.winfo_width(), self.winfo_height()
+        new_w, new_h = self.winfo_width(), self.winfo_height() + 15*3
 
         if new_w != self.win_width or new_h != self.win_height:
+            wids = sum(
+                i.winfo_reqheight()
+                for i in self.winfo_children()[1:]
+                ) + 15*3
 
-            wids = sum(i.winfo_reqheight() for i in self.winfo_children()[1:]) + 15*3
             self.img_height = new_h - wids
             
             self.win_height = new_h

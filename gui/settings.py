@@ -77,7 +77,7 @@ class Settings(CWindow):
         checkbox_lbl.pack(side = tkinter.LEFT)
 
         restore_btn = CButton(frame, text = 'Сброс')
-        restore_btn.configure(width = 12)
+        restore_btn.configure(width = 9)
         restore_btn.cmd(lambda e, x = restore_btn: self.default_cmd(x))
         restore_btn.pack(pady = (15, 0))
 
