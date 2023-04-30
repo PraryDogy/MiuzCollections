@@ -83,12 +83,6 @@ class ImgViewer(CWindow):
         self.thumb_place(self.win_width, self.img_height)
         self.task = cfg.ROOT.after(500, lambda: self.img_place(self.win_width, self.img_height))
 
-        if cfg.COMPARE:
-            st_bar = cfg.ST_BAR.winfo_children()[0]
-            cfg.ROOT.after(0, lambda: st_bar.configure(text="Подготовка"))
-            cfg.ROOT.after(501, self.run_compare)
-            return
-
         place_center(self)
         self.deiconify()
         self.grab_set()
@@ -204,17 +198,6 @@ class ImgViewer(CWindow):
 
         info1, _, info2 = self.info_frame.winfo_children()
         info1['text'], info2['text'] = self.create_info()
-
-    def btn_compare(self, btn: CButton):
-        btn.press()
-        if not cfg.COMPARE:
-            cfg.ST_BAR.compare_mode()
-            win = self.winfo_toplevel()
-            win.withdraw()
-            win.grab_release()
-            cfg.COMPARE = True
-            cfg.MENU.compare_mode(self.thumb_load())
-            return
 
     def create_info(self):
         name = src.split(os.sep)[-1]

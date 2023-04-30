@@ -7,6 +7,56 @@ __all__ = (
     "Menu"
     )
 
+menu_buttons = []
+
+
+def open_finder(collection_name):
+    if collection_name != "last":
+        coll_path = os.path.join(cfg.config['COLL_FOLDER'], collection_name)
+    else:
+        coll_path = cfg.config['COLL_FOLDER']
+
+    subprocess.check_output(["/usr/bin/open", coll_path])
+
+
+def show_collection(src, btn):
+    for btn_item in menu_buttons:
+        btn_item['bg'] = cfg.BUTTON
+
+    btn['bg'] = cfg.PRESSED
+    cfg.config['CURR_COLL'] = src
+
+    cfg.THUMBNAILS.reload_scrollable()
+    cfg.THUMBNAILS.reload_thumbnails()
+
+
+class ContextMenu(tkinter.Menu):
+    def __init__(self, master, collection_name):
+        tkinter.Menu.__init__(
+            self,
+            master,
+            )
+
+        self.add_command(
+            label = "Просмотр",
+            command = lambda: show_collection(collection_name, master)
+            )
+
+        self.add_separator()
+
+        self.add_command(
+            label = "Показать в Finder",
+            command = lambda: open_finder(collection_name)
+            )
+
+        master.bind("<Button-2>", self.do_popup)
+
+    def do_popup(self, event):
+        try:
+            self.tk_popup(event.x_root, event.y_root)
+        finally:
+            self.grab_release()
+
 
 class Menu(tkmacosx.SFrame):
     def __init__(self, master: tkinter):
@@ -29,14 +79,6 @@ class Menu(tkmacosx.SFrame):
     def load_menu_parent(self):
         frame = CFrame(self)
         frame.pack()
-
-        self.compare_frame = CFrame(frame)
-
-        self.compare_title = CLabel(self.compare_frame)
-        self.compare_title.pack()
-
-        self.compare_img = CLabel(self.compare_frame)
-        self.compare_img.pack(pady=(0, 15))
 
         menu_frame = CFrame(frame)
         menu_frame.pack(side=tkinter.BOTTOM)
@@ -67,13 +109,13 @@ class Menu(tkmacosx.SFrame):
                 key = lambda item: item[1].casefold()
                 ))
 
-        btns = []
-
         last = CButton(frame, text='Последние')
         last.configure(width=13, pady=5, anchor=tkinter.W, padx=10)
-        last.cmd(partial(self.open_coll_folder, 'last', last, btns))
+        last.cmd(partial(self.open_coll_folder, 'last', last))
         last.pack(pady=(0, 15))
-        btns.append(last)
+        menu_buttons.append(last)
+
+        ContextMenu(last, "last")
 
         sep = CSep(frame)
         sep['bg'] = '#272727'
@@ -83,16 +125,18 @@ class Menu(tkmacosx.SFrame):
         scaner.configure(width=13, pady=5, anchor=tkinter.W, padx=10)
         # scaner.pack(pady=(0, 15))
         scaner.cmd(lambda e: self.scaner_cmd())
-        btns.append(scaner)
+        menu_buttons.append(scaner)
 
-        for full_name, name in menus.items():
-            btn = CButton(frame, text = name)
+        for collection_name, menu_name in menus.items():
+            btn = CButton(frame, text = menu_name)
             btn.configure(width=13, pady=5, anchor=tkinter.W, padx=10)
-            btn.cmd(partial(self.open_coll_folder, full_name, btn, btns))
+            btn.cmd(partial(self.open_coll_folder, collection_name, btn))
             btn.pack()
-            btns.append(btn)
+            menu_buttons.append(btn)
 
-            if full_name == cfg.config['CURR_COLL']:
+            ContextMenu(btn, collection_name)
+
+            if collection_name == cfg.config['CURR_COLL']:
                 btn.configure(bg=cfg.PRESSED)
 
             sep = CSep(frame)
@@ -107,48 +151,18 @@ class Menu(tkmacosx.SFrame):
     def scaner_cmd(self):
         ScanerGui()
 
-    def compare_mode(self, thumbnail):
-        """
-        External use
-        """
-        cropped = crop_image(thumbnail)
-        rgb_thumb = convert_to_rgb(cropped)
-        img_tk = ImageTk.PhotoImage(rgb_thumb)
-
-        self.compare_img['image'] = img_tk
-        self.compare_img.image_names = img_tk
-
-        self.compare_title['text'] = 'В списке сравнения:'
-
-        self.compare_frame.pack(side=tkinter.TOP)
-
-    def normal_mode(self):
-        """
-        External use
-        """
-        self.compare_img['image'] = ''
-        self.compare_title['text'] = ''
-        self.compare_frame.pack_forget()
-
     def reload(self):
         """
         External use
         """
+        menu_buttons.clear()
         self.menu_buttons.destroy()
         self.menu_buttons = self.load_menu_buttons()
         self.menu_buttons.pack()
         return
     
-    def open_coll_folder(self, coll: str, btn: CButton, btns: list, e):
+    def open_coll_folder(self, coll: str, btn: CButton, e):
         cfg.LIMIT = 150
-
-        if coll != "last":
-            coll_path = os.path.join(
-                cfg.config['COLL_FOLDER'],
-                coll
-                )
-        else:
-            coll_path = cfg.config['COLL_FOLDER']
 
         if btn['bg'] == cfg.PRESSED:
             btn['bg'] = cfg.SELECTED
@@ -158,14 +172,7 @@ class Menu(tkmacosx.SFrame):
                 lambda: btn.configure(bg=cfg.PRESSED)
                 )
 
-            subprocess.check_output(["/usr/bin/open", coll_path])
+            open_finder(coll)
             return
 
-        for btn_item in btns:
-            btn_item['bg'] = cfg.BUTTON
-
-        btn['bg'] = cfg.PRESSED
-        cfg.config['CURR_COLL'] = coll
-
-        cfg.THUMBNAILS.reload_scrollable()
-        cfg.THUMBNAILS.reload_thumbnails()
+        show_collection(coll, btn)
