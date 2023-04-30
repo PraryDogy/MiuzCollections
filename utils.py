@@ -190,9 +190,6 @@ def get_windows():
 
 def close_windows():
     "Close all top levels"
-    if cfg.COMPARE:
-        cfg.COMPARE = False
-
     [i.destroy() for i in get_windows()]
     cfg.ROOT.focus_force()
 

@@ -73,23 +73,6 @@ class StBar(CFrame):
         upd_btn.cmd(lambda e: self.update_cmd(btn))
         upd_btn.pack(side=tkinter.LEFT)
 
-    def compare_mode(self):
-        widgets = tuple(v for k, v in self.children.items())
-        [i.destroy() for i in widgets]
-
-        subtitle = CLabel(
-            self,
-            fg = cfg.FONT,
-            text = 'Выберите фото для сравнения или нажмите Esc для отмены'
-            )
-        subtitle.pack(side=tkinter.LEFT)
-
-        cancel = CButton(self, text='Отмена')
-        cancel['width'] = 8
-        cancel.cmd(lambda e: self.cancel_cmd())
-        cancel.pack(side=tkinter.LEFT, padx=(15, 0))
-        cfg.ROOT.bind('<Escape>', lambda e: self.cancel_cmd())
-
     def settings_cmd(self, btn: CButton):
         """
         Opens settings gui.
@@ -114,11 +97,3 @@ class StBar(CFrame):
         else:
             print("scaner gui")
             ScanerGui()
-
-    def cancel_cmd(self):
-        cfg.ROOT.unbind('<Escape>')
-        self.normal_mode()
-        cfg.COMPARE = False
-        cfg.MENU.remove_thumb()
-        windows = (v for k, v in cfg.ROOT.children.items() if "preview" in k)
-        [w.destroy() for w in windows]

@@ -29,7 +29,6 @@ LIMIT = 150
 FLAG = False
 SCANER_TASK = None
 
-COMPARE = False
 LIVE_TEXT = ""
 
 # gui objects for global access
