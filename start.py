@@ -25,4 +25,5 @@ except Exception as e:
     with open(f"{cfg.CFG_DIR}/log.txt", "w") as file:
         traceback.print_exception(e_type, e_val, e_tb, file = file)
 
-    print(e_type, e_val, e_tb)
+    with open(f"{cfg.CFG_DIR}/log.txt", "r") as file:
+        print(file.read())

@@ -1,6 +1,4 @@
-from . import (cfg, close_windows, focus_last, os, partial, place_center,
-               subprocess, threading, tkinter, write_cfg)
-
+from . import cfg, close_windows, focus_last, on_exit, place_center, tkinter
 
 __all__ = (
     "CSep",
@@ -9,10 +7,9 @@ __all__ = (
     "CLabel",
     "CWindow",
     "CloseBtn",
-    "ImgBtns",
     "InfoWidget",
     "AskExit",
-    "SmbAlert"
+    "SmbAlert",
     )
 
 
@@ -78,7 +75,12 @@ class CWindow(tkinter.Toplevel):
         self.protocol("WM_DELETE_WINDOW", lambda: close())
         self.bind('<Command-w>', lambda e: close())
         self.bind('<Escape>', lambda e: close())
-        self.bind('<Command-q>', lambda e: AskExit())
+
+        if cfg.config["ASK_EXIT"] == 1:
+            self.bind('<Command-q>', lambda e: AskExit())
+        else:
+            self.bind('<Command-q>', lambda e: on_exit())
+
         self.resizable(0,0)
         self.configure(bg=cfg.BG, padx=15, pady=15)
 
@@ -90,27 +92,6 @@ class CloseBtn(CButton):
     def __init__(self, master: tkinter.Widget, **kwargs):
         CButton.__init__(self, master, **kwargs)
         self.cmd(lambda e: close())
-
-
-class ImgBtns(CFrame):
-    def __init__(self, master: tkinter, img_src, **kwargs):
-        CFrame.__init__(self, master, **kwargs)
-
-        self.img_src = img_src
-        self.img_src: str
-
-        open_btn = CButton(self, text='Показать в Finder')
-        open_btn.cmd(partial(self.open_folder, open_btn))
-        open_btn.pack(side=tkinter.LEFT, padx=(0, 15))
-
-    def open_folder(self, btn: CButton, e: tkinter.Event):
-        btn.press()
-        path = os.path.split(self.img_src)[0]
-
-        def open():
-            subprocess.call(["open", "-R", self.img_src])
-
-        threading.Thread(target=open).start()
 
 
 class InfoWidget(CFrame):
@@ -135,7 +116,7 @@ class InfoWidget(CFrame):
 class AskExit(CWindow):
     def __init__(self):
         CWindow.__init__(self)
-        self.bind('<Return>', lambda e: self.on_exit())
+        self.bind('<Return>', lambda e: on_exit())
         self.protocol("WM_DELETE_WINDOW", lambda: self.close_ask())
         self.bind('<Command-w>', lambda e: self.close_ask())
         self.bind('<Escape>', lambda e: self.close_ask())
@@ -147,7 +128,7 @@ class AskExit(CWindow):
         btns_frame.pack()
 
         exit = CButton(self, text='Выйти')
-        exit.cmd(lambda e: self.on_exit())
+        exit.cmd(lambda e: on_exit())
 
         cancel = CButton(self, text='Отмена')
         cancel.cmd(lambda e: self.close_ask())
@@ -165,21 +146,6 @@ class AskExit(CWindow):
 
     def exit_task(self):
         quit()
-
-    def on_exit(self):
-
-        w, h = cfg.ROOT.winfo_width(), cfg.ROOT.winfo_height()
-        x, y = cfg.ROOT.winfo_x(), cfg.ROOT.winfo_y()
-
-        cfg.config['ROOT_W'] = w
-        cfg.config['ROOT_H'] = h
-        cfg.config['ROOT_X'] = x
-        cfg.config['ROOT_Y'] = y
-
-        write_cfg(cfg.config)
-
-        cfg.FLAG = False
-        exit()
 
 
 class SmbAlert(tkinter.Toplevel):

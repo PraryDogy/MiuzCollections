@@ -25,7 +25,8 @@ __all__ = (
     "close_windows",
     "focus_last",
     "find_tiff",
-    "find_jpeg"
+    "find_jpeg",
+    "on_exit"
     )
 
 
@@ -55,7 +56,10 @@ def find_tiff(src: str):
     for root, dirs, files in os.walk(path):
         for file in files:
             if file.endswith((".tiff", ".TIFF", ".psd", ".PSD")):
-                if filename in file:
+
+                file_temp = file.split(".")[0]
+
+                if filename in file or file_temp in filename:
                     images.append(os.path.join(root, file))
 
     if images:
@@ -126,7 +130,10 @@ def resize_image(img, widget_w, widget_h, thumbnail: bool):
 def encode_image(src):
     image = cv2.imread(src)
     resized = resize_image(image, cfg.THUMB_SIZE, cfg.THUMB_SIZE, True)
-    return cv2.imencode('.jpg', resized)[1].tobytes()
+    try:
+        return cv2.imencode('.jpg', resized)[1].tobytes()
+    except cv2.error:
+        print("too big img")
 
 
 def decode_image(image):
@@ -194,3 +201,18 @@ def focus_last():
     "Sets focus to last opened window or root"
     wins = get_windows()
     [wins[-1].focus_force() if len(wins) > 0 else cfg.ROOT.focus_force()]
+
+
+def on_exit():
+    w, h = cfg.ROOT.winfo_width(), cfg.ROOT.winfo_height()
+    x, y = cfg.ROOT.winfo_x(), cfg.ROOT.winfo_y()
+
+    cfg.config['ROOT_W'] = w
+    cfg.config['ROOT_H'] = h
+    cfg.config['ROOT_X'] = x
+    cfg.config['ROOT_Y'] = y
+
+    write_cfg(cfg.config)
+
+    cfg.FLAG = False
+    quit()

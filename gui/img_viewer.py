@@ -10,8 +10,13 @@ __all__ = (
     )
 
 
+src = str
+all_src = []
+img_frame = tkinter.Frame
+
+
 class ContextMenu(tkinter.Menu):
-    def __init__(self, master: tkinter.Label, src: str, all_src: list):
+    def __init__(self, master: tkinter.Label):
         tkinter.Menu.__init__(
             self,
             master,
@@ -19,12 +24,12 @@ class ContextMenu(tkinter.Menu):
 
         self.add_command(
             label = "Показать в Finder",
-            command = lambda: self.find_jpeg(src)
+            command = lambda: find_jpeg(src)
             )
 
         self.add_command(
             label = "Показать tiff",
-            command = lambda: self.find_tiff(src)
+            command = lambda: find_tiff(src)
             )
 
         master.bind("<Button-2>", self.do_popup)
@@ -35,15 +40,10 @@ class ContextMenu(tkinter.Menu):
         finally:
             self.grab_release()
 
-    def find_jpeg(self, src):
-        find_jpeg(src)
-
-    def find_tiff(self, src):
-        find_tiff(src)
-
 
 class ImgViewer(CWindow):
-    def __init__(self, img_src: str, all_src: list):
+    def __init__(self, img_src: str, src_list: list):
+        global src, all_src
         CWindow.__init__(self)
 
         if not smb_check():
@@ -51,8 +51,8 @@ class ImgViewer(CWindow):
             SmbAlert()
             return
 
-        self.img_src = img_src
-        self.all_src = all_src
+        src = img_src
+        all_src = src_list
         self.ln = 43
 
         self.title('Просмотр')
@@ -95,7 +95,7 @@ class ImgViewer(CWindow):
 
         self.bind('<ButtonRelease-1>', lambda e: self.resize_win(e))
 
-        self.context = ContextMenu(self, self.img_src, self.all_src)
+        self.context = ContextMenu(self)
 
     def resize_win(self, event: tkinter.Event):
         new_w, new_h = self.winfo_width(), self.winfo_height()
@@ -140,11 +140,11 @@ class ImgViewer(CWindow):
     
     def find_tiff_cmd(self, btn: CButton, e: tkinter.Event):
         btn.press()
-        find_tiff(self.img_src)
+        find_tiff(src)
 
     def find_jpeg(self, btn: CButton, e: tkinter.Event):
         btn.press()
-        find_jpeg(self.img_src)
+        find_jpeg(src)
 
     def info_widget(self):
         info1, info2 = self.create_info()
@@ -152,23 +152,23 @@ class ImgViewer(CWindow):
         return info_widget
 
     def switch_img(self, ind: int):
+        global src
+
         cfg.ROOT.after_cancel(self.task)
         try:
-            self.img_src = self.all_src[ind]
-            self.btns_frame.img_src = self.img_src
+            src = all_src[ind]
+            self.btns_frame.img_src = src
             self.context.destroy()
-            self.context = ContextMenu(self, self.img_src, self.all_src)
-
-            print(len(self.winfo_children()))
+            self.context = ContextMenu(self)
         except IndexError:
-            self.img_src = self.all_src[0]
-            self.btns_frame.img_src = self.img_src
+            src = all_src[0]
+            self.btns_frame.img_src = src
 
         self.thumb_place(self.win_width, self.img_height)
         self.task = cfg.ROOT.after(500, lambda: self.img_place(self.win_width, self.img_height))
 
     def img_ind(self) -> int: 
-        return self.all_src.index(self.img_src)
+        return all_src.index(src)
 
     def img_set(self, img):
         img_tk = ImageTk.PhotoImage(img)
@@ -187,7 +187,7 @@ class ImgViewer(CWindow):
         Returns decoded non resized thumbnail from database
         """
         thumb = Dbase.conn.execute(sqlalchemy.select(Thumbs.img150).where(
-            Thumbs.src==self.img_src)).first()[0]
+            Thumbs.src==src)).first()[0]
         return decode_image(thumb)
 
     def thumb_place(self, width, height):
@@ -197,7 +197,7 @@ class ImgViewer(CWindow):
         self.img_set(rgb_thumb)
 
     def img_place(self, width, height):
-        img_read = cv2.imread(self.img_src)
+        img_read = cv2.imread(src)
         resized = resize_image(img_read, width, height, False)
         img_rgb = convert_to_rgb(resized)
         self.img_set(img_rgb)
@@ -217,24 +217,24 @@ class ImgViewer(CWindow):
             return
 
     def create_info(self):
-        name = self.img_src.split(os.sep)[-1]
+        name = src.split(os.sep)[-1]
         name = self.name_cut(name, self.ln)
 
-        path = self.img_src.replace(cfg.config["COLL_FOLDER"], "Коллекции")
+        path = src.replace(cfg.config["COLL_FOLDER"], "Коллекции")
         path = self.name_cut(path, self.ln)
 
-        filesize = round(os.path.getsize(self.img_src)/(1024*1024), 2)
+        filesize = round(os.path.getsize(src)/(1024*1024), 2)
 
-        filemod = datetime.fromtimestamp(os.path.getmtime(self.img_src))
+        filemod = datetime.fromtimestamp(os.path.getmtime(src))
         filemod = filemod.strftime("%d-%m-%Y, %H:%M:%S")
 
-        w, h = Image.open(self.img_src).size
+        w, h = Image.open(src).size
 
         t1 = (f'Разрешение: {w}x{h}'
                 f'\nРазмер: {filesize} мб'
                 f'\nДата изменения: {filemod}')
 
-        t2 = (f'Коллекция: {get_coll_name(self.img_src)}'
+        t2 = (f'Коллекция: {get_coll_name(src)}'
                 f'\nИмя: {name}'
                 f'\nПуть: {path}')
 

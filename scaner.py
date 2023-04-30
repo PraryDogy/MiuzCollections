@@ -15,7 +15,7 @@ UPDATE_THUMBNAILS = False
 
 
 def change_live_lvl(text):
-    cfg.LIVE_TEXT = "Обновляю данные:\n" + text
+    cfg.LIVE_TEXT = text
 
 
 def st_bar_btn(text: str, color: str):
@@ -158,10 +158,7 @@ def scaner():
     while cfg.SCANER_TASK.is_alive():
         cfg.ROOT.update()
 
-    cfg.LIVE_TEXT = (
-        "Created by Evgeny Loshkarev"
-        "\nCopyright © 2023 MIUZ Diamonds."
-        )
+    cfg.LIVE_TEXT = ""
 
     if UPDATE_THUMBNAILS:
         cfg.THUMBNAILS.reload_thumbnails()

@@ -1,10 +1,11 @@
-from . import (cfg, close_windows, filedialog, place_center, scaner, tkinter,
-               write_cfg)
-from .widgets import AskExit, CButton, CFrame, CLabel, CloseBtn, CSep, CWindow
+from database import *
+
+from . import (cfg, close_windows, filedialog, place_center, scaner,
+               sqlalchemy, tkinter, write_cfg, on_exit)
+from .widgets import *
 
 path_widget = tkinter.Label
 checkbox_widget = tkinter.Checkbutton
-live_widget = tkinter.Label
 SCAN_AGAIN = False
 
 __all__ = (
@@ -18,7 +19,7 @@ class Settings(CWindow):
         self.title('Настройки')
         self.resizable(1, 1)
 
-        self.minimize = tkinter.IntVar(value = cfg.config['MINIMIZE'])
+        self.ask_exit = tkinter.IntVar(value = cfg.config['ASK_EXIT'])
 
         self.main_wid = self.main_widget()
         self.main_wid.pack()
@@ -29,10 +30,8 @@ class Settings(CWindow):
         self.deiconify()
         self.grab_set()
 
-        self.update_live_lbl()
-
     def main_widget(self):
-        global path_widget, checkbox_widget, live_widget
+        global path_widget, checkbox_widget
 
         frame = CFrame(self)
 
@@ -70,30 +69,18 @@ class Settings(CWindow):
         checkbox_widget['command'] = lambda: self.checkbox_cmd(checkbox_widget)
         [
             checkbox_widget.select()
-            if self.minimize.get() == 1
+            if self.ask_exit.get() == 1
             else checkbox_widget.deselect()
             ]
         checkbox_widget.pack(side = tkinter.LEFT)
 
-        checkbox_lbl = CLabel(checkbox_frame, text = 'Свернуть вместо закрыть')
+        checkbox_lbl = CLabel(checkbox_frame, text = 'Спрашивать при выходе')
         checkbox_lbl.pack(side = tkinter.LEFT)
 
-        rest_frame = CFrame(frame)
-        rest_frame.pack(pady = (15, 0))
-
-        restore_btn = CButton(rest_frame, text = 'По умолчанию')
+        restore_btn = CButton(frame, text = 'Сброс')
         restore_btn.configure(width = 12)
         restore_btn.cmd(lambda e, x = restore_btn: self.default_cmd(x))
-        restore_btn.pack()
-
-        live_widget = CLabel(
-            frame,
-            text = cfg.LIVE_TEXT,
-            anchor = tkinter.W,
-            justify = tkinter.LEFT,
-            width = 30,
-            )
-        live_widget.pack(padx = 15, pady = (15, 0), fill=tkinter.X)
+        restore_btn.pack(pady = (15, 0))
 
         cancel_frame = CFrame(frame)
         cancel_frame.pack()
@@ -111,24 +98,12 @@ class Settings(CWindow):
 
         return frame
 
-    def update_live_lbl(self):
-        global live_widget
-
-        try:
-            live_widget["text"] = cfg.LIVE_TEXT
-        except Exception:
-            # print("no live label settings")
-            pass
-
-        if self.winfo_exists():
-            cfg.ROOT.after(100, self.update_live_lbl)
-
     def checkbox_cmd(self, master: tkinter.Checkbutton):
-        if self.minimize.get() == 1:
-            self.minimize.set(0)
+        if self.ask_exit.get() == 1:
+            self.ask_exit.set(0)
             master.deselect()
-        elif self.minimize.get() == 0:
-            self.minimize.set(1)
+        elif self.ask_exit.get() == 0:
+            self.ask_exit.set(1)
             master.select()
 
     def select_path_cmd(self):
@@ -143,30 +118,44 @@ class Settings(CWindow):
             SCAN_AGAIN = True
 
     def default_cmd(self, btn: CButton):
+        global SCAN_AGAIN
+
         btn.press()
         path_widget['text'] = cfg.default_vars['COLL_FOLDER']
         checkbox_widget.select()
+
+        Dbase.conn.execute(sqlalchemy.delete(Thumbs))
+        Dbase.conn.execute("VACUUM")
+
+        SCAN_AGAIN = True
 
     def save_cmd(self):
         global SCAN_AGAIN, SCANER_PERMISSION
 
         cfg.config['COLL_FOLDER'] = path_widget['text']
-        cfg.config['MINIMIZE'] = self.minimize.get()
+        cfg.config['ASK_EXIT'] = self.ask_exit.get()
+
+        if cfg.config["ASK_EXIT"] == 1:
+            cfg.ROOT.protocol("WM_DELETE_WINDOW", AskExit)
+            cfg.ROOT.createcommand("tk::mac::Quit" , AskExit)
+        else:
+            cfg.ROOT.createcommand("tk::mac::Quit" , on_exit)
+            cfg.ROOT.protocol("WM_DELETE_WINDOW", on_exit)
 
         write_cfg(cfg.config)
-
-        if cfg.config['MINIMIZE'] == 1:
-            cfg.ROOT.protocol("WM_DELETE_WINDOW", lambda: cfg.ROOT.iconify())
-        else:
-            cfg.ROOT.protocol("WM_DELETE_WINDOW", AskExit)
-
         close_windows()
+
+
+
 
         if SCAN_AGAIN:
             SCAN_AGAIN = False
             cfg.FLAG = False
 
-            while cfg.SCANER_TASK.is_alive():
-                cfg.ROOT.update()
+            try:
+                while cfg.SCANER_TASK.is_alive():
+                    cfg.ROOT.update()
+            except AttributeError:
+                print("no task scaner")
 
             scaner()

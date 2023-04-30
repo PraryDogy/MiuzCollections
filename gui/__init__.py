@@ -28,13 +28,7 @@ from .st_bar import StBar
 from .widgets import AskExit, CFrame, CSep
 
 __all__ = (
-    "Thumbnails",
-    "MacMenu",
-    "Menu",
-    "StBar",
-    "AskExit",
-    "CFrame",
-    "CSep"
+    "Gui"
     )
 
 
@@ -45,14 +39,16 @@ class Gui:
 
         cfg.ROOT.createcommand(
             'tk::mac::ReopenApplication', lambda: cfg.ROOT.deiconify())
-        cfg.ROOT.createcommand("tk::mac::Quit" , AskExit)
 
         cfg.ROOT.bind('<Command-w>', lambda e: cfg.ROOT.iconify())
 
-        if cfg.config['MINIMIZE'] == 1:
-            cfg.ROOT.protocol("WM_DELETE_WINDOW", lambda: cfg.ROOT.iconify())
-        else:
+        if cfg.config["ASK_EXIT"] == 1:
             cfg.ROOT.protocol("WM_DELETE_WINDOW", AskExit)
+            cfg.ROOT.createcommand("tk::mac::Quit" , AskExit)
+        else:
+            cfg.ROOT.createcommand("tk::mac::Quit" , on_exit)
+            cfg.ROOT.protocol("WM_DELETE_WINDOW", on_exit)
+        
 
         CSep(cfg.ROOT).pack(fill=tkinter.X, pady=15, padx=(15, 5))
 

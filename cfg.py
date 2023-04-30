@@ -7,7 +7,7 @@ from utils import read_cfg, write_cfg
 # app info
 APP_NAME = 'MiuzCollections'
 DB = "db.db"
-APP_VER = '3.4.1'
+APP_VER = '3.5.0'
 
 
 CFG_DIR = os.path.join(
@@ -30,10 +30,7 @@ FLAG = False
 SCANER_TASK = None
 
 COMPARE = False
-LIVE_TEXT = (
-    "Created by Evgeny Loshkarev"
-    "\nCopyright © 2023 MIUZ Diamonds."
-    )
+LIVE_TEXT = ""
 
 # gui objects for global access
 ROOT = tkinter.Tk()
@@ -46,7 +43,7 @@ default_vars = {
         'COLL_FOLDER': '/Volumes/Shares/Marketing/Photo/_Collections',
 
         'CURR_COLL': 'last',
-        'MINIMIZE': 1,
+        'ASK_EXIT': 1,
 
         "ROOT_W": 700,
         "ROOT_H": 500,
