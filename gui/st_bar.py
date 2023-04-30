@@ -104,15 +104,12 @@ class StBar(CFrame):
         * param `btn`: tkinter button
         """
         if not cfg.FLAG:
-
-            if not smb_check():
+            if smb_check():
+                scaner()
+            else:
                 SmbAlert()
                 return
-
-            scaner()
-        
         else:
-            print("scaner gui")
             ScanerGui()
 
     def cancel_cmd(self):

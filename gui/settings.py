@@ -1,7 +1,7 @@
 from database import *
 
 from . import (cfg, close_windows, filedialog, place_center, scaner,
-               sqlalchemy, tkinter, write_cfg, on_exit)
+               sqlalchemy, tkinter, write_cfg, on_exit, smb_check)
 from .widgets import *
 
 path_widget = tkinter.Label
@@ -17,7 +17,6 @@ class Settings(CWindow):
     def __init__(self):
         CWindow.__init__(self)
         self.title('Настройки')
-        self.resizable(1, 1)
 
         self.ask_exit = tkinter.IntVar(value = cfg.config['ASK_EXIT'])
 
@@ -157,5 +156,7 @@ class Settings(CWindow):
                     cfg.ROOT.update()
             except AttributeError:
                 print("no task scaner")
-
-            scaner()
+            if smb_check():
+                scaner()
+            else:
+                SmbAlert()
