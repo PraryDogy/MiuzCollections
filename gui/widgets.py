@@ -1,4 +1,4 @@
-from . import cfg, close_windows, focus_last, on_exit, place_center, tkinter
+from . import cfg, on_exit, place_center, tkinter
 
 __all__ = (
     "CSep",
@@ -7,15 +7,9 @@ __all__ = (
     "CLabel",
     "CWindow",
     "CloseBtn",
-    "InfoWidget",
     "AskExit",
     "SmbAlert",
     )
-
-
-def close():
-    close_windows()
-    focus_last()
 
 
 class CSep(tkinter.Frame):
@@ -72,9 +66,9 @@ class CWindow(tkinter.Toplevel):
         cfg.ROOT.eval(f'tk::PlaceWindow {self} center')
         self.withdraw()
 
-        self.protocol("WM_DELETE_WINDOW", lambda: close())
-        self.bind('<Command-w>', lambda e: close())
-        self.bind('<Escape>', lambda e: close())
+        self.protocol("WM_DELETE_WINDOW", lambda: self.close_win())
+        self.bind('<Command-w>', lambda e: self.close_win())
+        self.bind('<Escape>', lambda e: self.close_win())
 
         if cfg.config["ASK_EXIT"] == 1:
             self.bind('<Command-q>', lambda e: AskExit())
@@ -84,33 +78,16 @@ class CWindow(tkinter.Toplevel):
         self.resizable(0,0)
         self.configure(bg=cfg.BG, padx=15, pady=15)
 
-    def error_exit(self):
-        close()
+
+    def close_win(self):
+        self.destroy()
+        cfg.ROOT.focus_force()
 
 
 class CloseBtn(CButton):
     def __init__(self, master: tkinter.Widget, **kwargs):
         CButton.__init__(self, master, **kwargs)
-        self.cmd(lambda e: close())
-
-
-class InfoWidget(CFrame):
-    def __init__(self, master: tkinter, ln, info1, info2, **kwargs):
-        CFrame.__init__(self, master, **kwargs)
-
-        label1 = CLabel(self)
-        label1.configure(
-            text=info1, justify=tkinter.LEFT,
-            anchor=tkinter.E, width=ln)
-        label1.pack(side=tkinter.LEFT, anchor=tkinter.E)
-
-        CSep(self).pack(side=tkinter.LEFT, fill=tkinter.Y, padx=10)
-
-        label2 = CLabel(self)
-        label2.configure(
-            text=info2, justify=tkinter.LEFT,
-            anchor=tkinter.W, width=ln)
-        label2.pack(side=tkinter.LEFT)
+        self.cmd(lambda e: self.destroy())
 
 
 class AskExit(CWindow):
@@ -142,7 +119,7 @@ class AskExit(CWindow):
 
     def close_ask(self):
         self.destroy()
-        focus_last()
+        cfg.ROOT.focus_force()
 
     def exit_task(self):
         quit()

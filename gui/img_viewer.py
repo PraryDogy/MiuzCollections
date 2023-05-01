@@ -1,9 +1,8 @@
-from . import (Dbase, Image, ImageTk, Thumbs, cfg, close_windows,
-               convert_to_rgb, cv2, datetime, decode_image, find_tiff,
-               get_coll_name, os, place_center, resize_image, smb_check,
-               sqlalchemy, tkinter, find_jpeg)
-from .widgets import CButton, CFrame, CLabel, CWindow, InfoWidget, SmbAlert
-
+from . import (Dbase, Image, ImageTk, Thumbs, cfg,
+               convert_to_rgb, cv2, datetime, decode_image, find_jpeg,
+               find_tiff, get_coll_name, os, place_center, resize_image,
+               smb_check, sqlalchemy, tkinter, textwrap)
+from .widgets import CButton, CFrame, CLabel, CWindow, SmbAlert
 
 __all__ = (
     "ImgViewer"
@@ -13,14 +12,74 @@ __all__ = (
 src = str
 all_src = []
 img_frame = tkinter.Frame
+win = tkinter.Toplevel
+
+
+class ImageInfo(CWindow):
+    def __init__(self):
+        CWindow.__init__(self)
+        self.title("Инфо")
+        name = src.split(os.sep)[-1]
+        filemod = datetime.fromtimestamp(os.path.getmtime(src))
+        filemod = filemod.strftime("%d-%m-%Y, %H:%M:%S")
+        w, h = Image.open(src).size
+        filesize = round(os.path.getsize(src)/(1024*1024), 2)
+
+        coll = f'Коллекция: {get_coll_name(src)}'
+        name = f"Имя файла: {name}"
+        modified = f'Дата изменения: {filemod}'
+        res = f'Разрешение: {w}x{h}'
+        filesize = f"Размер: {filesize}мб"
+        path = f"Местонахождение: {src}"
+
+        ln = 50
+
+        rows = [
+            i if len(i) <= ln else i[:ln] + "..."
+            for i in (coll, name, modified, res, filesize, path)
+            ]
+        
+        text = "\n".join(rows)
+
+        lbl = CLabel(
+            self,
+            text = text,
+            justify = tkinter.LEFT,
+            anchor = tkinter.W,
+            width = 40,
+            )
+        lbl.pack()
+
+        self.protocol("WM_DELETE_WINDOW", lambda: self.close_win())
+        self.bind('<Command-w>', lambda e: self.close_win())
+        self.bind('<Escape>', lambda e: self.close_win())
+
+        cfg.ROOT.update_idletasks()
+
+        x, y = win.winfo_x(), win.winfo_y()
+        xx = x + win.winfo_width()//2 - self.winfo_width()//2
+        yy = y + win.winfo_height()//2 - self.winfo_height()//2
+
+        self.geometry(f'+{xx}+{yy}')
+
+        self.deiconify()
+        self.grab_set()
+
+    def close_win(self):
+        self.destroy()
+        win.focus_force()
 
 
 class ContextMenu(tkinter.Menu):
     def __init__(self, master: tkinter.Label):
-        tkinter.Menu.__init__(
-            self,
-            master,
+        tkinter.Menu.__init__(self, master)
+
+        self.add_command(
+            label = "Инфо",
+            command = lambda: ImageInfo()
             )
+
+        self.add_separator()
 
         self.add_command(
             label = "Показать в Finder",
@@ -43,45 +102,41 @@ class ContextMenu(tkinter.Menu):
 
 class ImgViewer(CWindow):
     def __init__(self, img_src: str, src_list: list):
-        global src, all_src
+        global src, all_src, win
         CWindow.__init__(self)
 
         if not smb_check():
-            close_windows()
+            self.destroy()
+            cfg.ROOT.focus_force()
             SmbAlert()
             return
 
+        win = self
         src = img_src
         all_src = src_list
-        self.ln = 43
 
-        self.title('Просмотр')
+        self.set_title()
+        self["bg"] = "black"
 
         self.win_width = cfg.config["PREVIEW_W"]
         self.win_height = cfg.config["PREVIEW_H"]
+
         self.geometry(f'{self.win_width}x{self.win_height}')
 
         self.configure(pady=0, padx=0)
         self.resizable(1, 1)
 
         self.img_frame = self.img_widget()
-        self.img_frame.pack(pady=(0, 15))
-
-        self.btns_frame = self.btns_widget()
-        self.btns_frame.pack(pady=(0, 15))
-        
-        self.info_frame = self.info_widget()
-        self.info_frame.pack(pady=(0, 15))
+        self.img_frame.pack()
 
         cfg.ROOT.update_idletasks()
 
-        wids = sum(i.winfo_reqheight() for i in self.winfo_children()[1:]) + 15*3
-        self.img_height = self.win_height - wids
         self.img_frame['width'] = self.win_width
-        self.img_frame['height'] = self.img_height
+        self.img_frame['height'] = self.win_height
 
-        self.thumb_place(self.win_width, self.img_height)
-        self.task = cfg.ROOT.after(500, lambda: self.img_place(self.win_width, self.img_height))
+        self.thumb_place(self.win_width, self.win_height)
+        self.task = cfg.ROOT.after(
+            500, lambda: self.img_place(self.win_width, self.win_height))
 
         place_center(self)
         self.deiconify()
@@ -92,27 +147,24 @@ class ImgViewer(CWindow):
         self.context = ContextMenu(self)
 
     def resize_win(self, event: tkinter.Event):
-        new_w, new_h = self.winfo_width(), self.winfo_height() + 15*3
+        new_w, new_h = self.winfo_width(), self.winfo_height()
 
         if new_w != self.win_width or new_h != self.win_height:
-            wids = sum(
-                i.winfo_reqheight()
-                for i in self.winfo_children()[1:]
-                ) + 15*3
+            wids = sum(i.winfo_reqheight() for i in self.winfo_children()[:-2])
 
-            self.img_height = new_h - wids
-            
+            self.win_height = new_h - wids
+
             self.win_height = new_h
             self.win_width = new_w
 
             self.img_frame['width'] = self.win_width
-            self.img_frame['height'] = self.img_height
+            self.img_frame['height'] = self.win_height
 
             cfg.config['PREVIEW_W'] = self.win_width
             cfg.config['PREVIEW_H'] = self.win_height
 
-            self.thumb_place(self.win_width, self.img_height)
-            cfg.ROOT.after(500, lambda: self.img_place(self.win_width, self.img_height))
+            self.thumb_place(self.win_width, self.win_height)
+            cfg.ROOT.after(500, lambda: self.img_place(self.win_width, self.win_height))
 
     def img_widget(self):
         label = CLabel(self)
@@ -121,19 +173,6 @@ class ImgViewer(CWindow):
         self.bind('<Left>', lambda e: self.switch_img(self.img_ind()-1))
         self.bind('<Right>', lambda e: self.switch_img(self.img_ind()+1))
         return label
-
-    def btns_widget (self):
-        frame = CFrame(self)
-
-        open_btn = CButton(frame, text='Показать в Finder')
-        open_btn.cmd(lambda e: self.find_jpeg(open_btn, e))
-        open_btn.pack(side=tkinter.LEFT, padx=(0, 15))
-
-        tiff_btn = CButton(frame, text = "Показать tiff")
-        tiff_btn.cmd(lambda e: self.find_tiff_cmd(tiff_btn, e))
-        tiff_btn.pack(side = tkinter.LEFT)
-
-        return frame
     
     def find_tiff_cmd(self, btn: CButton, e: tkinter.Event):
         btn.press()
@@ -143,28 +182,24 @@ class ImgViewer(CWindow):
         btn.press()
         find_jpeg(src)
 
-    def info_widget(self):
-        info1, info2 = self.create_info()
-        info_widget = InfoWidget(self, self.ln, info1, info2)
-        return info_widget
-
     def switch_img(self, ind: int):
         global src
 
         cfg.ROOT.after_cancel(self.task)
         try:
             src = all_src[ind]
-            self.btns_frame.img_src = src
             self.context.destroy()
             self.context = ContextMenu(self)
+            self.set_title()
+
         except IndexError:
             src = all_src[0]
-            self.btns_frame.img_src = src
+            self.set_title()
 
-        self.thumb_place(self.win_width, self.img_height)
-        self.task = cfg.ROOT.after(500, lambda: self.img_place(self.win_width, self.img_height))
+        self.thumb_place(self.win_width, self.win_height)
+        self.task = cfg.ROOT.after(500, lambda: self.img_place(self.win_width, self.win_height))
 
-    def img_ind(self) -> int: 
+    def img_ind(self) -> int:
         return all_src.index(src)
 
     def img_set(self, img):
@@ -173,11 +208,14 @@ class ImgViewer(CWindow):
         self.img_frame.image_names = img_tk
 
     def img_click(self, e: tkinter.Event):
-        if e.x <= self.win_width//2:
-            index = self.img_ind() - 1
-        else:
-            index = self.img_ind() + 1
-        self.switch_img(index)
+        if self.win_width == self.winfo_width():
+
+            if e.x <= self.win_width//2:
+                index = self.img_ind() - 1
+            else:
+                index = self.img_ind() + 1
+
+            self.switch_img(index)
 
     def thumb_load(self):
         """
@@ -197,34 +235,14 @@ class ImgViewer(CWindow):
         img_read = cv2.imread(src)
         resized = resize_image(img_read, width, height, False)
         img_rgb = convert_to_rgb(resized)
-        self.img_set(img_rgb)
+        try:
+            self.img_set(img_rgb)
+        except Exception as e:
+            print(e)
 
-        info1, _, info2 = self.info_frame.winfo_children()
-        info1['text'], info2['text'] = self.create_info()
-
-    def create_info(self):
+    def set_title(self):
         name = src.split(os.sep)[-1]
-        name = self.name_cut(name, self.ln)
+        collection_name = get_coll_name(src)
 
-        path = src.replace(cfg.config["COLL_FOLDER"], "Коллекции")
-        path = self.name_cut(path, self.ln)
+        self.title(f"{collection_name} - {name}")
 
-        filesize = round(os.path.getsize(src)/(1024*1024), 2)
-
-        filemod = datetime.fromtimestamp(os.path.getmtime(src))
-        filemod = filemod.strftime("%d-%m-%Y, %H:%M:%S")
-
-        w, h = Image.open(src).size
-
-        t1 = (f'Разрешение: {w}x{h}'
-                f'\nРазмер: {filesize} мб'
-                f'\nДата изменения: {filemod}')
-
-        t2 = (f'Коллекция: {get_coll_name(src)}'
-                f'\nИмя: {name}'
-                f'\nПуть: {path}')
-
-        return (t1, t2)
-
-    def name_cut(self, name: str, ln: int):
-        return [name[:ln]+'...' if len(name) > ln else name][0]

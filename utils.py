@@ -21,9 +21,6 @@ __all__ = (
     "crop_image",
     "resize_image",
     "smb_check",
-    "get_windows",
-    "close_windows",
-    "focus_last",
     "find_tiff",
     "find_jpeg",
     "on_exit"
@@ -181,23 +178,6 @@ def smb_check():
     if not os.path.exists(cfg.config['COLL_FOLDER']):
         return False
     return True
-
-
-def get_windows():
-    all = tuple(i for i in cfg.ROOT.winfo_children())
-    return tuple(i for i in all if isinstance(i, tkinter.Toplevel))
-
-
-def close_windows():
-    "Close all top levels"
-    [i.destroy() for i in get_windows()]
-    cfg.ROOT.focus_force()
-
-
-def focus_last():
-    "Sets focus to last opened window or root"
-    wins = get_windows()
-    [wins[-1].focus_force() if len(wins) > 0 else cfg.ROOT.focus_force()]
 
 
 def on_exit():

@@ -4,6 +4,7 @@ import re
 import shutil
 import subprocess
 import sys
+import textwrap
 import threading
 import tkinter
 import traceback
@@ -21,10 +22,10 @@ from database import Dbase, Thumbs
 from scaner import *
 from utils import *
 
-from .thumbnails import Thumbnails
 from .mac_menu import MacMenu
 from .menu import Menu
 from .st_bar import StBar
+from .thumbnails import Thumbnails
 from .widgets import AskExit, CFrame, CSep
 
 __all__ = (
