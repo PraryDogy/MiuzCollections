@@ -24,11 +24,6 @@ class ScanerGui(CWindow):
             )
         self.live_lbl.pack()
 
-        close = CButton(self, text = "Закрыть")
-        close.cmd(lambda e: self.destroy())
-        close["width"] = 12
-        close.pack(pady=(15, 0))
-
         cfg.ROOT.update_idletasks()
 
         place_center(self)
