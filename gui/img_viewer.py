@@ -68,6 +68,7 @@ class ImageInfo(CWindow):
     def close_win(self):
         self.destroy()
         win.focus_force()
+        win.grab_set()
 
 
 class ContextMenu(tkinter.Menu):
