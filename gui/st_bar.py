@@ -34,7 +34,10 @@ class ScanerGui(CWindow):
         self.update_livelbl()
 
     def update_livelbl(self):
-        self.live_lbl["text"] = cfg.LIVE_TEXT
+        try:
+            self.live_lbl["text"] = cfg.LIVE_TEXT
+        except Exception:
+            print("no livelabel")
         
         if self.winfo_exists():
             task = cfg.ROOT.after(100, self.update_livelbl)

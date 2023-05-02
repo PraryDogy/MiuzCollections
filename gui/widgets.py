@@ -149,6 +149,10 @@ class SmbAlert(CWindow):
         descr_lbl = CLabel(self, text=txt2, justify=tkinter.LEFT)
         descr_lbl.pack(padx=15, pady=(0, 15))
 
+        btn = CButton(self, text = "Закрыть")
+        btn.cmd(lambda e: self.destroy())
+        btn.pack()
+
         cfg.ROOT.update_idletasks()
         place_center(self)
         self.deiconify()
