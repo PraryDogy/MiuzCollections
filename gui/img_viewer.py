@@ -3,7 +3,6 @@ from . import (Dbase, Image, ImageTk, Thumbs, cfg,
                find_tiff, get_coll_name, os, place_center, resize_image,
                smb_check, sqlalchemy, tkinter, textwrap)
 from .widgets import CButton, CFrame, CLabel, CWindow, SmbAlert
-import macmouse
 
 __all__ = (
     "ImgViewer"
@@ -157,7 +156,11 @@ class ImgViewer(CWindow):
         self.resize_task = cfg.ROOT.after(500, lambda: self.resize_win())
 
     def resize_win(self):
-        new_w, new_h = self.winfo_width(), self.winfo_height()
+        try:
+            new_w, new_h = self.winfo_width(), self.winfo_height()
+        except Exception:
+            print("no win")
+            return
 
         if new_w != self.win_width or new_h != self.win_height:
             self.win_height = new_h

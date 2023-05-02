@@ -22,7 +22,7 @@ class CButton(tkinter.Label):
         tkinter.Label.__init__(self, master, **kwargs)
         self.configure(
             bg=cfg.BUTTON, fg=cfg.FONT, width=13, height=1,
-            font=("San Francisco Pro", 14, "normal"))
+            font=("San Francisco Pro", 13, "normal"))
 
         self.bind('<Enter>', lambda e: self.enter())
         self.bind('<Leave>', lambda e: self.leave())
@@ -53,7 +53,7 @@ class CLabel(tkinter.Label):
     def __init__(self, master, **kwargs):
         tkinter.Label.__init__(self, master, **kwargs)
         self.configure(
-            bg=cfg.BG, fg=cfg.FONT, font=("San Francisco Pro", 14, "normal")
+            bg=cfg.BG, fg=cfg.FONT, font=("San Francisco Pro", 13, "normal")
             )
 
 
@@ -137,8 +137,8 @@ class SmbAlert(CWindow):
 
         txt = 'Нет подключения к сетевому диску Miuz.'
         title_lbl = CLabel(
-            self, text=txt, font=('San Francisco Pro', 22, 'bold'), wraplength=350)
-        title_lbl.pack(pady=(10, 20), padx=20)
+            self, text=txt, font=('San Francisco Pro', 22, 'bold'))
+        title_lbl.pack(pady=(0, 5), padx=20)
 
         txt2 =(
             'Рекомендации:'
@@ -151,7 +151,7 @@ class SmbAlert(CWindow):
             '\nTelegram: evlosh'
             )
         descr_lbl = CLabel(self, text=txt2, justify=tkinter.LEFT, )
-        descr_lbl.pack(padx=15, pady=(0, 15))
+        descr_lbl.pack(padx=15, pady=(0, 5))
 
         btn = CButton(self, text = "Закрыть")
         btn.cmd(lambda e: self.destroy())

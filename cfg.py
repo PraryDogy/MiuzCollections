@@ -7,7 +7,7 @@ from utils import read_cfg, write_cfg
 # app info
 APP_NAME = 'MiuzCollections'
 DB = "db.db"
-APP_VER = '3.5.1'
+APP_VER = '3.5.2'
 
 CFG_DIR = os.path.join(
     os.path.expanduser("~"),
