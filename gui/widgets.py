@@ -20,7 +20,9 @@ class CSep(tkinter.Frame):
 class CButton(tkinter.Label):
     def __init__(self, master: tkinter, **kwargs):
         tkinter.Label.__init__(self, master, **kwargs)
-        self.configure(bg=cfg.BUTTON, fg=cfg.FONT, width=13, height=1)
+        self.configure(
+            bg=cfg.BUTTON, fg=cfg.FONT, width=13, height=1,
+            font=("San Francisco Pro", 14, "normal"))
 
         self.bind('<Enter>', lambda e: self.enter())
         self.bind('<Leave>', lambda e: self.leave())
@@ -29,15 +31,15 @@ class CButton(tkinter.Label):
         self.bind('<ButtonRelease-1>', cmd)
 
     def press(self):
-        self.configure(bg=cfg.PRESSED)
+        self.configure(bg=cfg.SELECTED)
         cfg.ROOT.after(100, lambda: self.configure(bg=cfg.BUTTON))
 
     def enter(self):
-        if self['bg'] != cfg.PRESSED:
-            self['bg'] = cfg.SELECTED
+        if self['bg'] != cfg.SELECTED:
+            self['bg'] = cfg.HOVERED
 
     def leave(self):
-        if self['bg'] != cfg.PRESSED:
+        if self['bg'] != cfg.SELECTED:
             self['bg'] = cfg.BUTTON
 
 
@@ -50,7 +52,9 @@ class CFrame(tkinter.Frame):
 class CLabel(tkinter.Label):
     def __init__(self, master, **kwargs):
         tkinter.Label.__init__(self, master, **kwargs)
-        self.configure(bg=cfg.BG, fg=cfg.FONT)
+        self.configure(
+            bg=cfg.BG, fg=cfg.FONT, font=("San Francisco Pro", 14, "normal")
+            )
 
 
 class CWindow(tkinter.Toplevel):
@@ -133,7 +137,7 @@ class SmbAlert(CWindow):
 
         txt = 'Нет подключения к сетевому диску Miuz.'
         title_lbl = CLabel(
-            self, text=txt, font=('Arial', 22, 'bold'), wraplength=350)
+            self, text=txt, font=('San Francisco Pro', 22, 'bold'), wraplength=350)
         title_lbl.pack(pady=(10, 20), padx=20)
 
         txt2 =(
@@ -146,7 +150,7 @@ class SmbAlert(CWindow):
             '\n\nПоддержка: loshkarev@miuz.ru'
             '\nTelegram: evlosh'
             )
-        descr_lbl = CLabel(self, text=txt2, justify=tkinter.LEFT)
+        descr_lbl = CLabel(self, text=txt2, justify=tkinter.LEFT, )
         descr_lbl.pack(padx=15, pady=(0, 15))
 
         btn = CButton(self, text = "Закрыть")

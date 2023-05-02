@@ -52,7 +52,9 @@ def find_tiff(src: str):
 
     for root, dirs, files in os.walk(path):
         for file in files:
-            if file.endswith((".tiff", ".TIFF", ".psd", ".PSD")):
+            if file.endswith(
+                (".tiff", ".TIFF", ".psd", ".PSD", ".psb", ".PSB")
+                ):
 
                 file_temp = file.split(".")[0]
 

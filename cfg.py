@@ -9,7 +9,6 @@ APP_NAME = 'MiuzCollections'
 DB = "db.db"
 APP_VER = '3.5.1'
 
-
 CFG_DIR = os.path.join(
     os.path.expanduser("~"),
     f"Library/Application Support/{APP_NAME}"
@@ -17,10 +16,10 @@ CFG_DIR = os.path.join(
 
 # gui settings
 FONT = "#E2E2E2"
-BG = "#1A1A1A"
-BUTTON = "#2C2C2C"
-PRESSED = '#395432'
-SELECTED = '#4E4769'
+BG = "#19191B"
+BUTTON = "#2A2A2D"
+SELECTED = '#0A58D0'
+HOVERED = '#3A3A3E'
 
 THUMB_SIZE = 150
 LIMIT = 150

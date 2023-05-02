@@ -23,7 +23,7 @@ def show_collection(src, btn):
     for btn_item in menu_buttons:
         btn_item['bg'] = cfg.BUTTON
 
-    btn['bg'] = cfg.PRESSED
+    btn['bg'] = cfg.SELECTED
     cfg.config['CURR_COLL'] = src
 
     cfg.THUMBNAILS.reload_scrollable()
@@ -88,8 +88,8 @@ class Menu(tkmacosx.SFrame):
     def load_menu_buttons(self):
         frame = CFrame(self)
 
-        title = CLabel(
-            frame, text='Коллекции', font=('Arial', 22, 'bold'))
+        title = CLabel(frame, text='Коллекции')
+        title.configure(font=('San Francisco Pro', 22, 'bold'))
         title.pack(pady=(0,15))
 
         colls_list = Dbase.conn.execute(
@@ -137,14 +137,14 @@ class Menu(tkmacosx.SFrame):
             ContextMenu(btn, collection_name)
 
             if collection_name == cfg.config['CURR_COLL']:
-                btn.configure(bg=cfg.PRESSED)
+                btn.configure(bg=cfg.SELECTED)
 
             sep = CSep(frame)
             sep['bg'] = '#272727'
             sep.pack(fill=tkinter.X)
     
         if cfg.config['CURR_COLL'] == 'last':
-            last.configure(bg=cfg.PRESSED)
+            last.configure(bg=cfg.SELECTED)
 
         return frame
 
@@ -164,12 +164,12 @@ class Menu(tkmacosx.SFrame):
     def open_coll_folder(self, coll: str, btn: CButton, e):
         cfg.LIMIT = 150
 
-        if btn['bg'] == cfg.PRESSED:
-            btn['bg'] = cfg.SELECTED
+        if btn['bg'] == cfg.SELECTED:
+            btn['bg'] = cfg.HOVERED
 
             cfg.ROOT.after(
                 200,
-                lambda: btn.configure(bg=cfg.PRESSED)
+                lambda: btn.configure(bg=cfg.SELECTED)
                 )
 
             open_finder(coll)

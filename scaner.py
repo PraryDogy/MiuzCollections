@@ -150,7 +150,7 @@ def scaner():
     global UPDATE_THUMBNAILS
 
     cfg.FLAG = True
-    st_bar_btn("Обновление", cfg.PRESSED)
+    st_bar_btn("Обновление", cfg.SELECTED)
 
     cfg.SCANER_TASK = threading.Thread(target = update_collections, daemon = True)
     cfg.SCANER_TASK.start()

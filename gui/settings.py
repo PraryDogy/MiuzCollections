@@ -39,9 +39,9 @@ class Settings(CWindow):
                 frame,
                 text = "Коллекции",
                 justify = tkinter.LEFT,
-                font = ('Arial', 22, 'bold'),
                 width = 30,
                 )
+        title_lbl.configure(font = ('San Francisco Pro', 22, 'bold'))
         title_lbl.pack()
 
         path_widget = CLabel(

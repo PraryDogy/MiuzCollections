@@ -21,11 +21,8 @@ class ScanerGui(CWindow):
     def load_main_widget(self):
         parent = CFrame(self)
 
-        lbl = CLabel(
-            parent,
-            text = "Сканер",
-            font=('Arial', 45, 'bold')
-            )
+        lbl = CLabel(parent, text = "Сканер")
+        lbl.configure(font=('San Francisco Pro', 45, 'bold'))
         lbl.pack()
 
         lbl = CLabel(

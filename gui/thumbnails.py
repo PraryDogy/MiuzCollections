@@ -111,7 +111,26 @@ class Thumbnails(CFrame):
         self.load_scrollable()
         self.load_thumbnails()
 
-        cfg.ROOT.bind('<ButtonRelease-1>', self.update_gui)
+        cfg.ROOT.bind('<Configure>', self.decect_resize)
+        self.resize_task = None
+
+    def decect_resize(self, e):
+        if self.resize_task:
+            cfg.ROOT.after_cancel(self.resize_task)
+        self.resize_task = cfg.ROOT.after(500, self.update_gui)
+
+    def update_gui(self):
+        old_w = cfg.config['ROOT_W']
+        new_w = cfg.ROOT.winfo_width()
+
+        if new_w != old_w:
+            cfg.config['ROOT_W'] = new_w
+
+            if self.clmns != clmns_count():
+                w, h = cfg.ROOT.winfo_width(), cfg.ROOT.winfo_height()
+                cfg.config['ROOT_W'], cfg.config['ROOT_H'] = w, h
+                cfg.ROOT.update_idletasks()
+                self.reload_thumbnails()
 
     def load_scrollable(self):
         self.scroll_parrent = CFrame(self)
@@ -128,8 +147,8 @@ class Thumbnails(CFrame):
         title = CLabel(
             self.thumbnails,
             text=cfg.config['CURR_COLL'],
-            font=('Arial', 45, 'bold')
             )
+        title.configure(font=('San Francisco Pro', 45, 'bold'))
         title.pack()
 
         load_last = sqlalchemy.select(
@@ -163,9 +182,9 @@ class Thumbnails(CFrame):
 
             year_frame = CLabel(
                 self.thumbnails,
-                font=('Arial', 30, 'bold'),
                 text=year,
                 )
+            year_frame.configure(font=('San Francisco Pro', 30, 'bold'))
             year_frame.pack(pady=(35, 0))
 
             img_row = CFrame(self.thumbnails)
@@ -225,26 +244,10 @@ class Thumbnails(CFrame):
         cfg.LIMIT += 150
         self.reload_thumbnails()
 
-    def update_gui(self, e: tkinter.Event):
-        """
-        Reloads thumbnails without scroll for new window size
-        """
-        old_w = cfg.config['ROOT_W']
-        new_w = cfg.ROOT.winfo_width()
-
-        if new_w != old_w:
-            cfg.config['ROOT_W'] = new_w
-
-            if self.clmns != clmns_count():
-                w, h = cfg.ROOT.winfo_width(), cfg.ROOT.winfo_height()
-                cfg.config['ROOT_W'], cfg.config['ROOT_H'] = w, h
-                cfg.ROOT.update_idletasks()
-                self.reload_thumbnails()
-
     def enter(self, thumb: CButton):
-        if thumb['bg'] != cfg.PRESSED:
-            thumb['bg'] = cfg.SELECTED
+        if thumb['bg'] != cfg.SELECTED:
+            thumb['bg'] = cfg.HOVERED
 
     def leave(self, thumb: CButton):
-        if thumb['bg'] != cfg.PRESSED:
+        if thumb['bg'] != cfg.SELECTED:
             thumb['bg'] = cfg.BG

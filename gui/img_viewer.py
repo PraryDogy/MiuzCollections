@@ -3,6 +3,7 @@ from . import (Dbase, Image, ImageTk, Thumbs, cfg,
                find_tiff, get_coll_name, os, place_center, resize_image,
                smb_check, sqlalchemy, tkinter, textwrap)
 from .widgets import CButton, CFrame, CLabel, CWindow, SmbAlert
+import macmouse
 
 __all__ = (
     "ImgViewer"
@@ -145,17 +146,20 @@ class ImgViewer(CWindow):
         self.wait_visibility()
         self.grab_set_global()
 
-        self.bind('<ButtonRelease-1>', lambda e: self.resize_win(e))
+        self.bind('<Configure>', self.decect_resize)
+        self.resize_task = None
+
         self.context = ContextMenu(self)
 
-    def resize_win(self, event: tkinter.Event):
+    def decect_resize(self, e):
+        if self.resize_task:
+            cfg.ROOT.after_cancel(self.resize_task)
+        self.resize_task = cfg.ROOT.after(500, lambda: self.resize_win())
+
+    def resize_win(self):
         new_w, new_h = self.winfo_width(), self.winfo_height()
 
         if new_w != self.win_width or new_h != self.win_height:
-            wids = sum(i.winfo_reqheight() for i in self.winfo_children()[:-2])
-
-            self.win_height = new_h - wids
-
             self.win_height = new_h
             self.win_width = new_w
 
@@ -166,12 +170,12 @@ class ImgViewer(CWindow):
             cfg.config['PREVIEW_H'] = self.win_height
 
             self.thumb_place(self.win_width, self.win_height)
-            cfg.ROOT.after(500, lambda: self.img_place(self.win_width, self.win_height))
+            cfg.ROOT.after(
+                500,
+                lambda: self.img_place(self.win_width, self.win_height)
+                )
 
             self.focus_force()
-
-            print("donwe")
-
 
     def img_widget(self):
         label = CLabel(self)
@@ -198,13 +202,15 @@ class ImgViewer(CWindow):
             self.context.destroy()
             self.context = ContextMenu(self)
             self.set_title()
-
         except IndexError:
             src = all_src[0]
             self.set_title()
 
         self.thumb_place(self.win_width, self.win_height)
-        self.task = cfg.ROOT.after(500, lambda: self.img_place(self.win_width, self.win_height))
+        self.task = cfg.ROOT.after(
+            500,
+            lambda: self.img_place(self.win_width, self.win_height)
+            )
 
     def img_ind(self) -> int:
         return all_src.index(src)
@@ -250,6 +256,5 @@ class ImgViewer(CWindow):
     def set_title(self):
         name = src.split(os.sep)[-1]
         collection_name = get_coll_name(src)
-
         self.title(f"{collection_name} - {name}")
 
