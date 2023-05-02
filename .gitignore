@@ -11,3 +11,5 @@ venv/
 .vscode/
 lib/
 _test_coll/
+venv310/
+lib310/

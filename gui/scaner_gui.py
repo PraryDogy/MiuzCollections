@@ -15,7 +15,8 @@ class ScanerGui(CWindow):
 
         place_center(self)
         self.deiconify()
-        self.grab_set()
+        self.wait_visibility()
+        self.grab_set_global()
 
     def load_main_widget(self):
         parent = CFrame(self)

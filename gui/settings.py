@@ -27,7 +27,8 @@ class Settings(CWindow):
 
         place_center(self)
         self.deiconify()
-        self.grab_set()
+        self.wait_visibility()
+        self.grab_set_global()
 
     def main_widget(self):
         global path_widget, checkbox_widget
@@ -93,7 +94,8 @@ class Settings(CWindow):
         save_btn.configure(width = 12)
         save_btn.pack(side = tkinter.LEFT, padx = (0, 10))
 
-        cancel_btn = CloseBtn(cancel_frame, text = 'Отмена')
+        cancel_btn = CButton(cancel_frame, text = 'Отмена')
+        cancel_btn.cmd(lambda e: self.destroy())
         cancel_btn.configure(width = 12)
         cancel_btn.pack(side = tkinter.LEFT)
 
@@ -146,9 +148,6 @@ class Settings(CWindow):
         write_cfg(cfg.config)
         self.destroy()
         cfg.ROOT.focus_force()
-
-
-
 
         if SCAN_AGAIN:
             SCAN_AGAIN = False

@@ -115,7 +115,8 @@ class AskExit(CWindow):
 
         place_center(self)
         self.deiconify()
-        self.grab_set()
+        self.wait_visibility()
+        self.grab_set_global()
 
     def close_ask(self):
         self.destroy()
@@ -125,7 +126,7 @@ class AskExit(CWindow):
         quit()
 
 
-class SmbAlert(tkinter.Toplevel):
+class SmbAlert(CWindow):
     def __init__(self):
         CWindow.__init__(self)
         self.title('Нет подключения')
@@ -148,10 +149,8 @@ class SmbAlert(tkinter.Toplevel):
         descr_lbl = CLabel(self, text=txt2, justify=tkinter.LEFT)
         descr_lbl.pack(padx=15, pady=(0, 15))
 
-        cls_btn = CloseBtn(self, text='Закрыть')
-        cls_btn.pack()
-
         cfg.ROOT.update_idletasks()
         place_center(self)
         self.deiconify()
-        self.grab_set()
+        self.wait_visibility()
+        self.grab_set_global()

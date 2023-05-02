@@ -28,7 +28,8 @@ class ScanerGui(CWindow):
 
         place_center(self)
         self.deiconify()
-        self.grab_set()
+        self.wait_visibility()
+        self.grab_set_global()
 
         self.update_livelbl()
 

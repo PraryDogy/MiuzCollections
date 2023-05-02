@@ -63,12 +63,13 @@ class ImageInfo(CWindow):
         self.geometry(f'+{xx}+{yy}')
 
         self.deiconify()
-        self.grab_set()
+        self.wait_visibility()
+        self.grab_set_global()
 
     def close_win(self):
         self.destroy()
         win.focus_force()
-        win.grab_set()
+        win.grab_set_global()
 
 
 class ContextMenu(tkinter.Menu):
@@ -141,10 +142,10 @@ class ImgViewer(CWindow):
 
         place_center(self)
         self.deiconify()
-        self.grab_set()
+        self.wait_visibility()
+        self.grab_set_global()
 
         self.bind('<ButtonRelease-1>', lambda e: self.resize_win(e))
-
         self.context = ContextMenu(self)
 
     def resize_win(self, event: tkinter.Event):
@@ -166,6 +167,11 @@ class ImgViewer(CWindow):
 
             self.thumb_place(self.win_width, self.win_height)
             cfg.ROOT.after(500, lambda: self.img_place(self.win_width, self.win_height))
+
+            self.focus_force()
+
+            print("donwe")
+
 
     def img_widget(self):
         label = CLabel(self)
