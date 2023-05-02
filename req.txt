@@ -1,13 +1,8 @@
-cffi==1.15.1
 colour==0.1.5
-greenlet==2.0.1
+greenlet==2.0.2
 icnsutil==1.1.0
-importlib-metadata==5.1.0
-numpy==1.21.6
+numpy==1.24.3
 opencv-python==4.6.0.66
 Pillow==9.3.0
-pycparser==2.21
 SQLAlchemy==1.4.45
 tkmacosx==1.0.5
-typing-extensions==4.4.0
-zipp==3.11.0
