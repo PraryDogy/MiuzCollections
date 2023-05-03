@@ -24,8 +24,8 @@ class CButton(tkinter.Label):
             bg=cfg.BUTTON, fg=cfg.FONT, width=13, height=1,
             font=("San Francisco Pro", 13, "normal"))
 
-        self.bind('<Enter>', lambda e: self.enter())
-        self.bind('<Leave>', lambda e: self.leave())
+        # self.bind('<Enter>', lambda e: self.enter())
+        # self.bind('<Leave>', lambda e: self.leave())
 
     def cmd(self, cmd):
         self.bind('<ButtonRelease-1>', cmd)

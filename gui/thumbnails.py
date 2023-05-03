@@ -205,8 +205,8 @@ class Thumbnails(CFrame):
                 thumb.image_names = img
                 thumb.cmd(partial(self.img_viewer, src, all_src))
 
-                thumb.bind('<Enter>', lambda e, a=thumb: self.enter(a))
-                thumb.bind('<Leave>', lambda e, a=thumb: self.leave(a))
+                # thumb.bind('<Enter>', lambda e, a=thumb: self.enter(a))
+                # thumb.bind('<Leave>', lambda e, a=thumb: self.leave(a))
 
                 ContextMenu(thumb, src, all_src)
 
