@@ -22,7 +22,7 @@ class MacMenu(tkinter.Menu):
         self.add_separator()
         self.add_command(label="Выход", command=cfg.ROOT.destroy)
 
-        if sys.version_info.minor < 8:
+        if sys.version_info.minor < 10:
             cfg.ROOT.createcommand('tkAboutDialog', self.about_dialog)
 
         cfg.ROOT.configure(menu=menubar)
