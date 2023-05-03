@@ -117,7 +117,7 @@ class Thumbnails(CFrame):
     def decect_resize(self, e):
         if self.resize_task:
             cfg.ROOT.after_cancel(self.resize_task)
-        self.resize_task = cfg.ROOT.after(500, self.update_gui)
+        self.resize_task = cfg.ROOT.after(250, self.update_gui)
 
     def update_gui(self):
         old_w = cfg.config['ROOT_W']
