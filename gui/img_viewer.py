@@ -4,7 +4,7 @@ from . import (Dbase, ImageTk, Thumbs, cfg, convert_to_rgb, cv2, decode_image,
 from .widgets import *
 
 __all__ = (
-    "ImgViewer"
+    "ImgViewer",
     )
 
 

@@ -1,5 +1,5 @@
 from . import (Image, cfg, datetime, get_coll_name, on_exit, os, place_center,
-               tkinter)
+               tkinter, sys)
 
 __all__ = (
     "CSep",
@@ -10,7 +10,8 @@ __all__ = (
     "CloseBtn",
     "AskExit",
     "SmbAlert",
-    "ImageInfo"
+    "ImageInfo",
+    "MacMenu",
     )
 
 
@@ -219,3 +220,23 @@ class ImageInfo(CWindow):
         self.win.focus_force()
         if self.win.winfo_class() != "Tk":
             self.win.grab_set_global()
+
+
+class MacMenu(tkinter.Menu):
+    """
+    Mac osx bar menu.
+    """
+    def __init__(self):
+        menubar = tkinter.Menu(cfg.ROOT)
+        tkinter.Menu.__init__(self, menubar)
+
+        if sys.version_info.minor < 10:
+            cfg.ROOT.createcommand('tkAboutDialog', self.about_dialog)
+
+        cfg.ROOT.configure(menu=menubar)
+
+    def about_dialog(self):
+        try:
+            cfg.ROOT.tk.call('tk::mac::standardAboutPanel')
+        except Exception:
+            print("no dialog panel")

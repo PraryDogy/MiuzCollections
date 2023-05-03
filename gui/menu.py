@@ -4,7 +4,7 @@ from .widgets import CButton, CFrame, CLabel, CSep
 from .scaner_gui import ScanerGui
 
 __all__ = (
-    "Menu"
+    "Menu",
     )
 
 menu_buttons = []

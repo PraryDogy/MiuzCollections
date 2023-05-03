@@ -9,7 +9,7 @@ checkbox_widget = tkinter.Checkbutton
 SCAN_AGAIN = False
 
 __all__ = (
-    "Settings"
+    "Settings",
     )
 
 

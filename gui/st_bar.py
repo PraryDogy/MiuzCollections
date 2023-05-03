@@ -3,7 +3,7 @@ from .settings import Settings
 from .widgets import *
 
 __all__ = (
-    "StBar"
+    "StBar",
     )
 
 

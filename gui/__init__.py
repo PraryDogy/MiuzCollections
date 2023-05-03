@@ -18,15 +18,14 @@ import tkmacosx
 from PIL import Image, ImageTk
 
 import cfg
-from database import Dbase, Thumbs
+from database import *
 from scaner import *
 from utils import *
 
-from .mac_menu import MacMenu
-from .menu import Menu
-from .st_bar import StBar
-from .thumbnails import Thumbnails
-from .widgets import AskExit, CFrame, CSep
+from .menu import *
+from .st_bar import *
+from .thumbnails import *
+from .widgets import *
 
 __all__ = (
     "Gui"

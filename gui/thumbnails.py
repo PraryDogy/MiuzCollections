@@ -6,7 +6,7 @@ from .widgets import *
 
 
 __all__ = (
-    "Gallery"
+    "Thumbnails",
     )
 
 months = {
