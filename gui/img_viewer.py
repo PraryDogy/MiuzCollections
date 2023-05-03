@@ -1,8 +1,7 @@
-from . import (Dbase, Image, ImageTk, Thumbs, cfg,
-               convert_to_rgb, cv2, datetime, decode_image, find_jpeg,
-               find_tiff, get_coll_name, os, place_center, resize_image,
-               smb_check, sqlalchemy, tkinter, textwrap)
-from .widgets import CButton, CFrame, CLabel, CWindow, SmbAlert
+from . import (Dbase, ImageTk, Thumbs, cfg, convert_to_rgb, cv2, decode_image,
+               find_jpeg, find_tiff, get_coll_name, os, place_center,
+               resize_image, smb_check, sqlalchemy, tkinter)
+from .widgets import *
 
 __all__ = (
     "ImgViewer"
@@ -15,70 +14,13 @@ img_frame = tkinter.Frame
 win = tkinter.Toplevel
 
 
-class ImageInfo(CWindow):
-    def __init__(self):
-        CWindow.__init__(self)
-        self.title("Инфо")
-        name = src.split(os.sep)[-1]
-        filemod = datetime.fromtimestamp(os.path.getmtime(src))
-        filemod = filemod.strftime("%d-%m-%Y, %H:%M:%S")
-        w, h = Image.open(src).size
-        filesize = round(os.path.getsize(src)/(1024*1024), 2)
-
-        coll = f'Коллекция: {get_coll_name(src)}'
-        name = f"Имя файла: {name}"
-        modified = f'Дата изменения: {filemod}'
-        res = f'Разрешение: {w}x{h}'
-        filesize = f"Размер: {filesize}мб"
-        path = f"Местонахождение: {src}"
-
-        ln = 50
-
-        rows = [
-            i if len(i) <= ln else i[:ln] + "..."
-            for i in (coll, name, modified, res, filesize, path)
-            ]
-        
-        text = "\n".join(rows)
-
-        lbl = CLabel(
-            self,
-            text = text,
-            justify = tkinter.LEFT,
-            anchor = tkinter.W,
-            width = 40,
-            )
-        lbl.pack()
-
-        self.protocol("WM_DELETE_WINDOW", lambda: self.close_win())
-        self.bind('<Command-w>', lambda e: self.close_win())
-        self.bind('<Escape>', lambda e: self.close_win())
-
-        cfg.ROOT.update_idletasks()
-
-        x, y = win.winfo_x(), win.winfo_y()
-        xx = x + win.winfo_width()//2 - self.winfo_width()//2
-        yy = y + win.winfo_height()//2 - self.winfo_height()//2
-
-        self.geometry(f'+{xx}+{yy}')
-
-        self.deiconify()
-        self.wait_visibility()
-        self.grab_set_global()
-
-    def close_win(self):
-        self.destroy()
-        win.focus_force()
-        win.grab_set_global()
-
-
 class ContextMenu(tkinter.Menu):
     def __init__(self, master: tkinter.Label):
         tkinter.Menu.__init__(self, master)
 
         self.add_command(
             label = "Инфо",
-            command = lambda: ImageInfo()
+            command = lambda: ImageInfo(src, win)
             )
 
         self.add_separator()

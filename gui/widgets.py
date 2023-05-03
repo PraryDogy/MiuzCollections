@@ -1,4 +1,5 @@
-from . import cfg, on_exit, place_center, tkinter
+from . import (Image, cfg, datetime, get_coll_name, on_exit, os, place_center,
+               tkinter)
 
 __all__ = (
     "CSep",
@@ -9,6 +10,7 @@ __all__ = (
     "CloseBtn",
     "AskExit",
     "SmbAlert",
+    "ImageInfo"
     )
 
 
@@ -162,3 +164,58 @@ class SmbAlert(CWindow):
         self.deiconify()
         self.wait_visibility()
         self.grab_set_global()
+
+
+class ImageInfo(CWindow):
+    def __init__(self, src: str, win: tkinter.Toplevel):
+        CWindow.__init__(self)
+        self.win = win
+
+        self.title("Инфо")
+        self.geometry("400x150")
+        self.resizable(1, 1)
+
+        name = src.split(os.sep)[-1]
+        filemod = datetime.fromtimestamp(os.path.getmtime(src))
+        filemod = filemod.strftime("%d-%m-%Y, %H:%M:%S")
+        w, h = Image.open(src).size
+        filesize = round(os.path.getsize(src)/(1024*1024), 2)
+
+        coll = f'Коллекция: {get_coll_name(src)}'
+        name = f"Имя файла: {name}"
+        modified = f'Дата изменения: {filemod}'
+        res = f'Разрешение: {w}x{h}'
+        filesize = f"Размер: {filesize}мб"
+        path = f"Местонахождение: {src}"
+
+        text = "\n".join([coll, name, modified, res, filesize, path])
+
+        lbl = CLabel(
+            self,
+            text = text,
+            justify = tkinter.LEFT,
+            anchor = tkinter.W,
+            )
+        lbl.pack()
+
+        self.protocol("WM_DELETE_WINDOW", lambda: self.close_win())
+        self.bind('<Command-w>', lambda e: self.close_win())
+        self.bind('<Escape>', lambda e: self.close_win())
+
+        cfg.ROOT.update_idletasks()
+
+        x, y = self.win.winfo_x(), self.win.winfo_y()
+        xx = x + self.win.winfo_width()//2 - self.winfo_width()//2
+        yy = y + self.win.winfo_height()//2 - self.winfo_height()//2
+
+        self.geometry(f'+{xx}+{yy}')
+
+        self.deiconify()
+        self.wait_visibility()
+        self.grab_set_global()
+
+    def close_win(self):
+        self.destroy()
+        self.win.focus_force()
+        if self.win.winfo_class() != "Tk":
+            self.win.grab_set_global()

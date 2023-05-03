@@ -1,14 +1,15 @@
 import json
 import os
+import subprocess
+import threading
 import tkinter
+from difflib import SequenceMatcher
 
 import cv2
 import numpy
 from PIL import Image
 
-import subprocess
 import cfg
-import threading
 
 __all__ = (
     "write_cfg",
@@ -47,22 +48,32 @@ def reveal_finder(list_paths: list):
 
 def find_tiff(src: str):
     path, filename = os.path.split(src)
-    filename = filename.split(".")[0]
+    src_file_no_ext = filename.split(".")[0]
+
+    for i in cfg.config["STOPWORDS"]:
+        src_file_no_ext = src_file_no_ext.replace(i, "")
+
     images = []
+
 
     for root, dirs, files in os.walk(path):
         for file in files:
+
             if file.endswith(
                 (".tiff", ".TIFF", ".psd", ".PSD", ".psb", ".PSB")
                 ):
 
-                file_temp = file.split(".")[0]
+                file_no_ext = file.split(".")[0]
+                c = SequenceMatcher(None, src_file_no_ext, file_no_ext).ratio()
 
-                if filename in file or file_temp in filename:
+                if c > 0.5:
                     images.append(os.path.join(root, file))
 
     if images:
         threading.Thread(target=reveal_finder, args=[images]).start()
+        return True
+    else:
+        return False
 
 
 def find_jpeg(src: str):

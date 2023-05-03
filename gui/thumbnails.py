@@ -2,7 +2,7 @@ from . import (Dbase, ImageTk, Thumbs, cfg, convert_to_rgb, crop_image,
                datetime, decode_image, sqlalchemy, tkinter, tkmacosx,
                traceback, find_jpeg, find_tiff, partial)
 from .img_viewer import ImgViewer
-from .widgets import CButton, CFrame, CLabel
+from .widgets import *
 
 
 __all__ = (
@@ -76,6 +76,11 @@ class ContextMenu(tkinter.Menu):
             )
 
         self.add_separator()
+
+        self.add_command(
+            label = "Инфо",
+            command = lambda: ImageInfo(src, cfg.ROOT)
+            )
 
         self.add_command(
             label = "Показать в Finder",

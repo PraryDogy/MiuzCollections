@@ -49,7 +49,9 @@ default_vars = {
         "ROOT_Y": 0,
 
         "PREVIEW_W": 700,
-        "PREVIEW_H": 500
+        "PREVIEW_H": 500,
+
+        "STOPWORDS": ["preview", "1x1", "1х1", "crop"]
         }
 
 if not os.path.exists(CFG_DIR):
