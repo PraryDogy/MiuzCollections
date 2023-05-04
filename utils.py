@@ -66,7 +66,7 @@ def find_tiff(src: str):
                 file_no_ext = file.split(".")[0]
                 c = SequenceMatcher(None, src_file_no_ext, file_no_ext).ratio()
 
-                if c > 0.5:
+                if c > 0.7:
                     images.append(os.path.join(root, file))
 
     if images:

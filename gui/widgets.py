@@ -197,7 +197,7 @@ class ImageInfo(CWindow):
             justify = tkinter.LEFT,
             anchor = tkinter.W,
             )
-        lbl.pack()
+        lbl.pack(anchor=tkinter.NW)
 
         self.protocol("WM_DELETE_WINDOW", lambda: self.close_win())
         self.bind('<Command-w>', lambda e: self.close_win())
