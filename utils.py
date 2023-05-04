@@ -1,5 +1,6 @@
 import json
 import os
+import string
 import subprocess
 import threading
 import tkinter
@@ -39,6 +40,7 @@ def reveal_finder(list_paths: list):
     args = [
         "-e", "tell application \"Finder\"",
         "-e", f"reveal {{{paths}}}",
+        "-e", "set the current view of the front Finder window to list view",
         "-e", "activate",
         "-e", "end tell",
         ]
@@ -46,27 +48,34 @@ def reveal_finder(list_paths: list):
     subprocess.call(["osascript", *args])
 
 
-def find_tiff(src: str):
-    path, filename = os.path.split(src)
-    src_file_no_ext = filename.split(".")[0]
+def normalize_name(name: str):
+    name, ext = os.path.splitext(name)
+    name = name.translate(str.maketrans("", "", string.punctuation))
 
     for i in cfg.config["STOPWORDS"]:
-        src_file_no_ext = src_file_no_ext.replace(i, "")
+        name = name.replace(i, "")
+
+    return name.replace(" ", "")
+
+
+def find_tiff(src: str):
+    path, filename = os.path.split(src)
+    src_file_no_ext = normalize_name(filename)
 
     images = []
-
 
     for root, dirs, files in os.walk(path):
         for file in files:
 
             if file.endswith(
-                (".tiff", ".TIFF", ".psd", ".PSD", ".psb", ".PSB")
-                ):
+                (".tiff", ".TIFF", ".psd", ".PSD", ".psb", ".PSB")):
 
-                file_no_ext = file.split(".")[0]
-                c = SequenceMatcher(None, src_file_no_ext, file_no_ext).ratio()
+                file_no_ext = normalize_name(file)
 
-                if c > 0.7:
+                if src_file_no_ext in file_no_ext:
+                    images.append(os.path.join(root, file))
+
+                elif normalize_name(file_no_ext) in src_file_no_ext:
                     images.append(os.path.join(root, file))
 
     if images:
