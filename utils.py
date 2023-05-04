@@ -40,7 +40,6 @@ def reveal_finder(list_paths: list):
     args = [
         "-e", "tell application \"Finder\"",
         "-e", f"reveal {{{paths}}}",
-        "-e", "set the current view of the front Finder window to list view",
         "-e", "activate",
         "-e", "end tell",
         ]
@@ -75,7 +74,7 @@ def find_tiff(src: str):
                 if src_file_no_ext in file_no_ext:
                     images.append(os.path.join(root, file))
 
-                elif normalize_name(file_no_ext) in src_file_no_ext:
+                elif file_no_ext in src_file_no_ext:
                     images.append(os.path.join(root, file))
 
     if images:
