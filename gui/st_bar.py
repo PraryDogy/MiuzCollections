@@ -11,18 +11,16 @@ class ScanerGui(CWindow):
     def __init__(self):
         CWindow.__init__(self)
         self.title("Обновление")
-
-        lbl = CLabel(self, text = "Обновляю данные:")
-        lbl.pack()
+        self.geometry("300x50")
+        self.resizable(1, 1)
 
         self.live_lbl = CLabel(
             self,
             text = cfg.LIVE_TEXT,
             anchor = tkinter.W,
             justify = tkinter.LEFT,
-            width = 30
             )
-        self.live_lbl.pack()
+        self.live_lbl.pack(anchor=tkinter.NW)
 
         cfg.ROOT.update_idletasks()
 

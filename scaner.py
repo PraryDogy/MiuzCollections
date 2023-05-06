@@ -27,6 +27,8 @@ def st_bar_btn(text: str, color: str):
 def update_collections():
     global UPDATE_THUMBNAILS
 
+    change_live_lvl("Подготовка")
+
     db_images = Dbase.conn.execute(
         sqlalchemy.select(
         Thumbs.src, Thumbs.size, Thumbs.created, Thumbs.modified

@@ -18,10 +18,13 @@ class Settings(CWindow):
         CWindow.__init__(self)
         self.title('Настройки')
 
+        self.geometry("450x250")
+        self.resizable(1, 1)
+
         self.ask_exit = tkinter.IntVar(value = cfg.config['ASK_EXIT'])
 
         self.main_wid = self.main_widget()
-        self.main_wid.pack()
+        self.main_wid.pack(anchor=tkinter.NW)
 
         cfg.ROOT.update_idletasks()
 
@@ -49,10 +52,8 @@ class Settings(CWindow):
             text = cfg.config['COLL_FOLDER'],
             anchor = tkinter.W,
             justify = tkinter.LEFT,
-            wraplength = 370,
-            width = 30,
             )
-        path_widget.pack(padx = 15, pady = (5, 0), fill=tkinter.X)
+        path_widget.pack(pady = (5, 0), fill=tkinter.X)
 
         select_path = CButton(frame, text = 'Обзор')
         select_path.pack(pady = (5, 0), padx = (5, 0))
