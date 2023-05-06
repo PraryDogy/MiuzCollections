@@ -60,14 +60,13 @@ def normalize_name(name: str):
 def find_tiff(src: str):
     path, filename = os.path.split(src)
     src_file_no_ext = normalize_name(filename)
-
+    exts = (".tiff", ".TIFF", ".psd", ".PSD", ".psb", ".PSB", ".tif", ".TIF")
     images = []
 
     for root, dirs, files in os.walk(path):
         for file in files:
 
-            if file.endswith(
-                (".tiff", ".TIFF", ".psd", ".PSD", ".psb", ".PSB")):
+            if file.endswith(exts):
 
                 file_no_ext = normalize_name(file)
 
