@@ -174,6 +174,7 @@ class ImageInfo(CWindow):
 
         self.title("Инфо")
         self.geometry("400x130")
+        self.minsize(400, 130)
         self.resizable(1, 1)
 
         name = src.split(os.sep)[-1]

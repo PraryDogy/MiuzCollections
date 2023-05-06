@@ -66,6 +66,7 @@ class ImgViewer(CWindow):
         self.win_height = cfg.config["PREVIEW_H"]
 
         self.geometry(f'{self.win_width}x{self.win_height}')
+        self.minsize(500, 300)
 
         self.configure(pady=0, padx=0)
         self.resizable(1, 1)

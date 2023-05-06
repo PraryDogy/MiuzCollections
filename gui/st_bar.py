@@ -12,6 +12,7 @@ class ScanerGui(CWindow):
         CWindow.__init__(self)
         self.title("Обновление")
         self.geometry("300x50")
+        self.minsize(300, 50)
         self.resizable(1, 1)
 
         self.live_lbl = CLabel(
@@ -20,7 +21,7 @@ class ScanerGui(CWindow):
             anchor = tkinter.W,
             justify = tkinter.LEFT,
             )
-        self.live_lbl.pack(anchor=tkinter.NW)
+        self.live_lbl.pack(anchor=tkinter.CENTER)
 
         cfg.ROOT.update_idletasks()
 

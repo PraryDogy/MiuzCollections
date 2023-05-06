@@ -19,12 +19,13 @@ class Settings(CWindow):
         self.title('Настройки')
 
         self.geometry("400x250")
+        self.minsize(400, 250)
         self.resizable(1, 1)
 
         self.ask_exit = tkinter.IntVar(value = cfg.config['ASK_EXIT'])
 
         self.main_wid = self.main_widget()
-        self.main_wid.pack(anchor=tkinter.NW)
+        self.main_wid.pack(anchor=tkinter.CENTER)
 
         cfg.ROOT.update_idletasks()
 

@@ -77,3 +77,4 @@ class Gui:
             (f"{cfg.config['ROOT_W']}x{cfg.config['ROOT_H']}"
             f"+{cfg.config['ROOT_X']}+{cfg.config['ROOT_Y']}")
             )
+        cfg.ROOT.minsize(700, 450)
