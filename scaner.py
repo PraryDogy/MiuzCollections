@@ -38,11 +38,13 @@ def update_collections():
     collections = [
         os.path.join(cfg.config["COLL_FOLDER"], i)
         for i in os.listdir(cfg.config["COLL_FOLDER"])
+        if not i.startswith(".")
         ]
+
     ln = len(collections)
 
     new_images = []
-    find_images = []
+    found_images = []
 
     for x, collection in enumerate(collections, 1):
         change_live_lvl(f"Сканирую {x} из {ln} коллекций.")
@@ -65,13 +67,15 @@ def update_collections():
                         int(os.stat(src).st_birthtime),
                         int(os.stat(src).st_mtime)
                         )
-                    find_images.append(data)
+                    found_images.append(data)
 
                     if data not in db_images:
                         new_images.append(data)
 
     if new_images:
         UPDATE_THUMBNAILS = True
+        ln = len(new_images)
+
         values = [
             {
             "b_img150": encode_image(src),
@@ -81,7 +85,7 @@ def update_collections():
             "b_modified": modified,
             "b_collection": get_coll_name(src),
             "temp": change_live_lvl(
-                f"Добавлено {x} из {len(new_images)} новых фото."
+                f"Добавлено {x} из {ln} новых фото."
                 )
                 }
             for x, (src, size, created, modified) in enumerate(new_images)
@@ -116,8 +120,7 @@ def update_collections():
         if not cfg.FLAG:
             return
 
-        if (src, size, created, modified) not in find_images:
-            path, filename = os.path.split(src)
+        if (src, size, created, modified) not in found_images:
             remove_images.append((src, size, created, modified))
 
     if remove_images:
