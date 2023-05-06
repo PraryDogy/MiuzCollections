@@ -18,7 +18,7 @@ class Settings(CWindow):
         CWindow.__init__(self)
         self.title('Настройки')
 
-        self.geometry("450x250")
+        self.geometry("400x250")
         self.resizable(1, 1)
 
         self.ask_exit = tkinter.IntVar(value = cfg.config['ASK_EXIT'])

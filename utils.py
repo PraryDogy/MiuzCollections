@@ -37,12 +37,12 @@ def reveal_finder(list_paths: list):
 
     paths = ", ".join(paths)
 
-    args = [
+    args = (
         "-e", "tell application \"Finder\"",
         "-e", f"reveal {{{paths}}}",
         "-e", "activate",
         "-e", "end tell",
-        ]
+        )
 
     subprocess.call(["osascript", *args])
 

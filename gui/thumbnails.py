@@ -210,9 +210,6 @@ class Thumbnails(CFrame):
                 thumb.image_names = img
                 thumb.cmd(partial(self.img_viewer, src, all_src))
 
-                # thumb.bind('<Enter>', lambda e, a=thumb: self.enter(a))
-                # thumb.bind('<Leave>', lambda e, a=thumb: self.leave(a))
-
                 ContextMenu(thumb, src, all_src)
 
                 if x % self.clmns == 0:
@@ -248,11 +245,3 @@ class Thumbnails(CFrame):
         """
         cfg.LIMIT += 150
         self.reload_thumbnails()
-
-    def enter(self, thumb: CButton):
-        if thumb['bg'] != cfg.SELECTED:
-            thumb['bg'] = cfg.HOVERED
-
-    def leave(self, thumb: CButton):
-        if thumb['bg'] != cfg.SELECTED:
-            thumb['bg'] = cfg.BG

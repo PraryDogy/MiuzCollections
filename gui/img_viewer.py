@@ -129,14 +129,6 @@ class ImgViewer(CWindow):
         self.bind('<Left>', lambda e: self.switch_img(self.img_ind()-1))
         self.bind('<Right>', lambda e: self.switch_img(self.img_ind()+1))
         return label
-    
-    def find_tiff_cmd(self, btn: CButton, e: tkinter.Event):
-        btn.press()
-        find_tiff(src)
-
-    def find_jpeg(self, btn: CButton, e: tkinter.Event):
-        btn.press()
-        find_jpeg(src)
 
     def switch_img(self, ind: int):
         global src

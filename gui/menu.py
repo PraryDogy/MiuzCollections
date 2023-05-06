@@ -32,17 +32,7 @@ def show_collection(src, btn):
 
 class ContextMenu(tkinter.Menu):
     def __init__(self, master, collection_name):
-        tkinter.Menu.__init__(
-            self,
-            master,
-            )
-
-        self.add_command(
-            label = "Просмотр",
-            command = lambda: show_collection(collection_name, master)
-            )
-
-        self.add_separator()
+        tkinter.Menu.__init__(self, master)
 
         self.add_command(
             label = "Показать в Finder",
