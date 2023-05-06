@@ -182,22 +182,33 @@ class ImageInfo(CWindow):
         w, h = Image.open(src).size
         filesize = round(os.path.getsize(src)/(1024*1024), 2)
 
-        coll = f'Коллекция: {get_coll_name(src)}'
-        name = f"Имя файла: {name}"
-        modified = f'Дата изменения: {filemod}'
-        res = f'Разрешение: {w}x{h}'
-        filesize = f"Размер: {filesize}мб"
-        path = f"Местонахождение: {src}"
+        frame = CFrame(self)
+        frame.pack(anchor=tkinter.CENTER)
 
-        text = "\n".join([coll, name, modified, res, filesize, path])
+        labels = {
+            "Коллекция ": get_coll_name(src),
+            "Имя файла ": name,
+            "Дата изменения ": filemod,
+            "Разрешение ": f"{w}x{h}",
+            "Размер ": f"{filesize}мб",
+            "Расположение ": src,
+            }
 
-        lbl = CLabel(
-            self,
-            text = text,
+        left_lbl = CLabel(
+            frame,
+            text = "\n".join(i for i in labels.keys()),
+            justify = tkinter.RIGHT,
+            anchor = tkinter.E,
+            )
+        left_lbl.pack(anchor=tkinter.CENTER, side=tkinter.LEFT)
+
+        right_lbl = CLabel(
+            frame,
+            text = "\n".join(i for i in labels.values()),
             justify = tkinter.LEFT,
             anchor = tkinter.W,
             )
-        lbl.pack(anchor=tkinter.NW)
+        right_lbl.pack(anchor=tkinter.CENTER, side=tkinter.LEFT)
 
         self.protocol("WM_DELETE_WINDOW", lambda: self.close_win())
         self.bind('<Command-w>', lambda e: self.close_win())
