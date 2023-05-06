@@ -73,7 +73,7 @@ def find_tiff(src: str):
                 if src_file_no_ext in file_no_ext:
                     images.append(os.path.join(root, file))
 
-                elif file_no_ext in src_file_no_ext:
+                elif file_no_ext in src_file_no_ext and len(file_no_ext) > 5:
                     images.append(os.path.join(root, file))
 
     if images:

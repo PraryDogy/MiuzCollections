@@ -33,32 +33,42 @@ def update_collections():
         )
         ).fetchall()
 
+    exts = (".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG")
+
+    collections = [
+        os.path.join(cfg.config["COLL_FOLDER"], i)
+        for i in os.listdir(cfg.config["COLL_FOLDER"])
+        ]
+    ln = len(collections)
+
     new_images = []
     find_images = []
 
-    for root, dirs, files in os.walk(cfg.config["COLL_FOLDER"]):
-        change_live_lvl(root.replace(cfg.config["COLL_FOLDER"], "Collections"))
+    for x, collection in enumerate(collections, 1):
+        change_live_lvl(f"Сканирую {x} из {ln} коллекций.")
 
-        if not cfg.FLAG:
-            return
-
-        for file in files:
+        for root, dirs, files in os.walk(collection):
 
             if not cfg.FLAG:
                 return
 
-            if file.endswith((".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG")):
-                src = os.path.join(root, file)
-                data = (
-                    src,
-                    int(os.path.getsize(src)),
-                    int(os.stat(src).st_birthtime),
-                    int(os.stat(src).st_mtime)
-                    )
-                find_images.append(data)
+            for file in files:
 
-                if data not in db_images:
-                    new_images.append(data)
+                if not cfg.FLAG:
+                    return
+
+                if file.endswith(exts):
+                    src = os.path.join(root, file)
+                    data = (
+                        src,
+                        int(os.path.getsize(src)),
+                        int(os.stat(src).st_birthtime),
+                        int(os.stat(src).st_mtime)
+                        )
+                    find_images.append(data)
+
+                    if data not in db_images:
+                        new_images.append(data)
 
     if new_images:
         UPDATE_THUMBNAILS = True
