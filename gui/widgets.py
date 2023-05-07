@@ -24,11 +24,8 @@ class CButton(tkinter.Label):
     def __init__(self, master: tkinter, **kwargs):
         tkinter.Label.__init__(self, master, **kwargs)
         self.configure(
-            bg=cfg.BUTTON, fg=cfg.FONT, width=13, height=1,
+            bg=cfg.BUTTON, fg=cfg.FONT, width=11, height=1,
             font=("San Francisco Pro", 13, "normal"))
-
-        # self.bind('<Enter>', lambda e: self.enter())
-        # self.bind('<Leave>', lambda e: self.leave())
 
     def cmd(self, cmd):
         self.bind('<ButtonRelease-1>', cmd)
@@ -36,14 +33,6 @@ class CButton(tkinter.Label):
     def press(self):
         self.configure(bg=cfg.SELECTED)
         cfg.ROOT.after(100, lambda: self.configure(bg=cfg.BUTTON))
-
-    def enter(self):
-        if self['bg'] != cfg.SELECTED:
-            self['bg'] = cfg.HOVERED
-
-    def leave(self):
-        if self['bg'] != cfg.SELECTED:
-            self['bg'] = cfg.BUTTON
 
 
 class CFrame(tkinter.Frame):

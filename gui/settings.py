@@ -1,7 +1,7 @@
 from database import *
 
 from . import (cfg, filedialog, on_exit, place_center, scaner, smb_check,
-               sqlalchemy, tkinter, write_cfg)
+               sqlalchemy, tkinter, write_cfg, os, subprocess)
 from .widgets import *
 
 path_widget = tkinter.Label
@@ -53,9 +53,19 @@ class Settings(CWindow):
         path_widget.pack(pady=(5, 0), expand=True, fill="both")
 
         select_path = CButton(frame, text='Обзор')
-        select_path.configure(width=9)
         select_path.cmd(lambda e: self.select_path_cmd())
         select_path.pack(pady=(5, 0), padx=(5, 0))
+
+        restore_frame = CFrame(frame)
+        restore_frame.pack(pady=(15, 0))
+
+        restore_btn = CButton(restore_frame, text='Сброс')
+        restore_btn.cmd(lambda e, x=restore_btn: self.default_cmd(x))
+        restore_btn.pack(padx=(0, 10), side="left")
+
+        open_cfg = CButton(restore_frame, text="Файл настроек")
+        open_cfg.cmd(lambda e: self.open_cfg_cmd())
+        open_cfg.pack(side="right")
 
         checkbox_frame = CFrame(frame)
         checkbox_frame.pack(pady=(15, 0))
@@ -75,11 +85,6 @@ class Settings(CWindow):
 
         checkbox_lbl.bind("<Button-1>", lambda e: self.checkbox_cmd(checkbox_wid))
 
-        restore_btn = CButton(frame, text='Сброс')
-        restore_btn.configure(width=9)
-        restore_btn.cmd(lambda e, x=restore_btn: self.default_cmd(x))
-        restore_btn.pack(pady=(15, 0))
-
         cancel_frame = CFrame(frame)
         cancel_frame.pack(expand=True)
 
@@ -87,15 +92,20 @@ class Settings(CWindow):
 
         save_btn = CButton(cancel_frame, text='Сохранить')
         save_btn.cmd(lambda e: self.save_cmd())
-        save_btn.configure(width=12)
         save_btn.pack(padx=(0, 10), side="left")
 
         cancel_btn = CButton(cancel_frame, text='Отмена')
         cancel_btn.cmd(lambda e: self.destroy())
-        cancel_btn.configure(width=12)
         cancel_btn.pack(side="left")
 
         return frame
+    
+    def open_cfg_cmd(self):
+        subprocess.check_output(
+            ["/usr/bin/open", os.path.join(cfg.CFG_DIR, 'cfg.json')]
+            )
+        self.destroy()
+        cfg.ROOT.focus_force()
 
     def checkbox_cmd(self, master: tkinter.Checkbutton):
         if self.ask_exit.get() == 1:

@@ -89,6 +89,13 @@ def find_jpeg(src: str):
     threading.Thread(target = task).start()
 
 
+def read_cfg():
+    """
+    Decrypts `cfg.json` from `cfg.CFG_DIR` and returns dict.
+    """
+    with open(os.path.join(cfg.CFG_DIR, 'cfg.json'), "r") as file:
+        return json.loads(file.read())
+
 
 def write_cfg(data: dict):
     """
@@ -96,16 +103,11 @@ def write_cfg(data: dict):
     Writes enctypted data to `cfg.json` in `cfg.CFG_DIR`
     *param `data`: python dict
     """
+    json_data = read_cfg()
+    cfg.config["STOPWORDS"] = json_data["STOPWORDS"]
+
     with open(os.path.join(cfg.CFG_DIR, 'cfg.json'), "w") as file:
-        file.write(json.dumps(data, indent=4, ensure_ascii=True))
-
-
-def read_cfg():
-    """
-    Decrypts `cfg.json` from `cfg.CFG_DIR` and returns dict.
-    """
-    with open(os.path.join(cfg.CFG_DIR, 'cfg.json'), "r") as file:
-        return json.loads(file.read())
+        file.write(json.dumps(data, indent=4, ensure_ascii=False))
 
 
 def get_coll_name(src: str):
