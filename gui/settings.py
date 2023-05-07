@@ -1,7 +1,7 @@
 from database import *
 
 from . import (cfg, filedialog, on_exit, place_center, scaner, smb_check,
-               sqlalchemy, tkinter, write_cfg, os, subprocess)
+               sqlalchemy, tkinter, os, subprocess)
 from .widgets import *
 
 path_widget = tkinter.Label
@@ -151,7 +151,7 @@ class Settings(CWindow):
             cfg.ROOT.createcommand("tk::mac::Quit" , on_exit)
             cfg.ROOT.protocol("WM_DELETE_WINDOW", on_exit)
 
-        write_cfg(cfg.config)
+        cfg.write_cfg(cfg.config)
         self.destroy()
         cfg.ROOT.focus_force()
 

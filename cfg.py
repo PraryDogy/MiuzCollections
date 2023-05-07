@@ -1,8 +1,8 @@
 import os
 import shutil
 import tkinter
+import json
 
-from utils import read_cfg, write_cfg
 
 # app info
 APP_NAME = 'MiuzCollections'
@@ -42,7 +42,7 @@ default_vars = {
         'COLL_FOLDER': '/Volumes/Shares/Marketing/Photo/_Collections',
 
         'CURR_COLL': 'last',
-        'ASK_EXIT': 1,
+        'ASK_EXIT': 0,
 
         "ROOT_W": 700,
         "ROOT_H": 500,
@@ -61,6 +61,23 @@ default_vars = {
         "//READ_ME5": "то программа будет искать все .tiff файлы с именем 'котик'",
         "//READ_ME6": "исключая слово 'preview'"
         }
+
+
+def read_cfg():
+    with open(os.path.join(CFG_DIR, 'cfg.json'), "r", encoding="utf8") as file:
+        return json.loads(file.read())
+
+
+def write_cfg(data: dict):
+    try:
+        json_data = read_cfg()
+        config["STOPWORDS"] = json_data["STOPWORDS"]
+    except Exception:
+        print("utils.py write cfg no cfg file in application support")
+
+    with open(os.path.join(CFG_DIR, 'cfg.json'), "w", encoding='utf8') as file:
+        json.dump(data, file, indent=4, ensure_ascii=False)
+
 
 if not os.path.exists(CFG_DIR):
     os.mkdir(CFG_DIR)

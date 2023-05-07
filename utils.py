@@ -13,8 +13,6 @@ from PIL import Image
 import cfg
 
 __all__ = (
-    "write_cfg",
-    "read_cfg",
     "get_coll_name",
     "place_center",
     "encode_image",
@@ -87,30 +85,6 @@ def find_jpeg(src: str):
     def task():
         subprocess.call(["open", "-R", src])
     threading.Thread(target = task).start()
-
-
-def read_cfg():
-    """
-    Decrypts `cfg.json` from `cfg.CFG_DIR` and returns dict.
-    """
-    with open(os.path.join(cfg.CFG_DIR, 'cfg.json'), "r") as file:
-        return json.loads(file.read())
-
-
-def write_cfg(data: dict):
-    """
-    Converts dict with json dumps and enctypt converted with fernet module.
-    Writes enctypted data to `cfg.json` in `cfg.CFG_DIR`
-    *param `data`: python dict
-    """
-    try:
-        json_data = read_cfg()
-        cfg.config["STOPWORDS"] = json_data["STOPWORDS"]
-    except Exception:
-        print("utils.py write cfg no cfg file in application support")
-
-    with open(os.path.join(cfg.CFG_DIR, 'cfg.json'), "w") as file:
-        file.write(json.dumps(data, indent=4, ensure_ascii=False))
 
 
 def get_coll_name(src: str):
@@ -216,7 +190,7 @@ def on_exit():
     cfg.config['ROOT_X'] = x
     cfg.config['ROOT_Y'] = y
 
-    write_cfg(cfg.config)
+    cfg.write_cfg(cfg.config)
 
     cfg.FLAG = False
     quit()
