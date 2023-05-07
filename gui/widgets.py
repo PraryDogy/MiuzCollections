@@ -45,7 +45,9 @@ class CLabel(tkinter.Label):
     def __init__(self, master, **kwargs):
         tkinter.Label.__init__(self, master, **kwargs)
         self.configure(
-            bg=cfg.BG, fg=cfg.FONT, font=("San Francisco Pro", 13, "normal")
+            bg=cfg.BG,
+            fg=cfg.FONT,
+            font=("San Francisco Pro", 13, "normal"),
             )
 
 

@@ -180,17 +180,20 @@ class Thumbnails(CFrame):
             thumbs_dict.setdefault(info, []).append((img, src))
 
         for (year, month, collname), img_list in thumbs_dict.items():
-            text = [
-                f"{year} {months[month]}",
-                f"{len(img_list)} фото"
-                ]
+            text = [f"{year} {months[month]}", f"{len(img_list)} фото"]
 
             if last:
-                text.append(collname)
+                coll_frame = CLabel(self.thumbnails, text=collname)
+                coll_frame.configure(font=('San Francisco Pro', 20, 'bold'))
+                coll_frame.pack(anchor="w", pady=(30, 0))
+                # coll_frame["bg"] = "red"
 
             info_frame = CLabel(self.thumbnails, text=", ".join(text))
-            info_frame.configure(font=('San Francisco Pro', 15, 'bold'))
-            info_frame.pack(anchor="w", pady=(15, 0))
+            info_frame.pack(anchor="w")
+            # info_frame["bg"] = "blue"
+            if not last:
+                info_frame.configure(font=('San Francisco Pro', 20, 'bold'))
+                info_frame.pack(pady=(30, 0))
 
             img_row = CFrame(self.thumbnails)
             img_row.pack(fill = tkinter.X, expand=1, anchor=tkinter.W)
