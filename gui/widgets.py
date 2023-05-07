@@ -173,8 +173,10 @@ class ImageInfo(CWindow):
         self.win = win
 
         self.title("Инфо")
-        self.geometry("400x130")
-        self.minsize(400, 130)
+        self.geometry("400x110")
+        self.minsize(400, 110)
+        self.maxsize(800, 150)
+        self.configure(padx=5, pady=5)
         self.resizable(1, 1)
 
         name = src.split(os.sep)[-1]
@@ -184,7 +186,7 @@ class ImageInfo(CWindow):
         filesize = round(os.path.getsize(src)/(1024*1024), 2)
 
         frame = CFrame(self)
-        frame.pack(anchor=tkinter.CENTER)
+        frame.pack(expand=True, fill="both")
 
         labels = {
             "Коллекция ": get_coll_name(src),
@@ -230,7 +232,7 @@ class ImageInfo(CWindow):
     def close_win(self):
         self.destroy()
         self.win.focus_force()
-        if self.win.winfo_class() != "Tk":
+        if self.win.winfo_class() != tkinter.Tk.__name__:
             self.win.grab_set_global()
 
 

@@ -5,7 +5,7 @@ from . import (cfg, filedialog, on_exit, place_center, scaner, smb_check,
 from .widgets import *
 
 path_widget = tkinter.Label
-checkbox_widget = tkinter.Checkbutton
+checkbox_wid = tkinter.Checkbutton
 SCAN_AGAIN = False
 
 __all__ = (
@@ -20,12 +20,13 @@ class Settings(CWindow):
 
         self.geometry("400x250")
         self.minsize(400, 250)
+        self.maxsize(800, 300)
         self.resizable(1, 1)
 
         self.ask_exit = tkinter.IntVar(value = cfg.config['ASK_EXIT'])
 
         self.main_wid = self.main_widget()
-        self.main_wid.pack(anchor=tkinter.CENTER)
+        self.main_wid.pack(expand=True, fill="both")
 
         cfg.ROOT.update_idletasks()
 
@@ -35,71 +36,64 @@ class Settings(CWindow):
         self.grab_set_global()
 
     def main_widget(self):
-        global path_widget, checkbox_widget
+        global path_widget, checkbox_wid
 
         frame = CFrame(self)
 
-        title_lbl = CLabel(
-                frame,
-                text = "Коллекции",
-                justify = tkinter.LEFT,
-                width = 30,
-                )
-        title_lbl.configure(font = ('San Francisco Pro', 22, 'bold'))
-        title_lbl.pack()
+        title_lbl = CLabel(frame, text="Коллекции")
+        title_lbl.configure(font=('San Francisco Pro', 22, 'bold'))
+        title_lbl.pack(expand=True, fill="both")
 
         path_widget = CLabel(
             frame,
-            text = cfg.config['COLL_FOLDER'],
-            anchor = tkinter.W,
-            justify = tkinter.LEFT,
+            text=cfg.config['COLL_FOLDER'],
+            anchor="w",
+            justify="left"
             )
-        path_widget.pack(pady = (5, 0), fill=tkinter.X)
+        path_widget.pack(pady=(5, 0), expand=True, fill="both")
 
-        select_path = CButton(frame, text = 'Обзор')
-        select_path.pack(pady = (5, 0), padx = (5, 0))
-        select_path.configure(width = 9)
+        select_path = CButton(frame, text='Обзор')
+        select_path.configure(width=9)
         select_path.cmd(lambda e: self.select_path_cmd())
+        select_path.pack(pady=(5, 0), padx=(5, 0))
 
         checkbox_frame = CFrame(frame)
-        checkbox_frame.pack(pady = (15, 0))
+        checkbox_frame.pack(pady=(15, 0))
 
-        checkbox_widget = tkinter.Checkbutton(
-            checkbox_frame,
-            bg = cfg.BG
-            )
-        checkbox_widget['command'] = lambda: self.checkbox_cmd(checkbox_widget)
-        [
-            checkbox_widget.select()
-            if self.ask_exit.get() == 1
-            else checkbox_widget.deselect()
-            ]
-        checkbox_widget.pack(side = tkinter.LEFT)
+        checkbox_wid = tkinter.Checkbutton(checkbox_frame, bg=cfg.BG)
+        checkbox_wid['command'] = lambda: self.checkbox_cmd(checkbox_wid)
 
-        checkbox_lbl = CLabel(checkbox_frame, text = 'Спрашивать при выходе')
-        checkbox_lbl.pack(side = tkinter.LEFT)
+        if self.ask_exit.get() == 1:
+            checkbox_wid.select()
+        else:
+            checkbox_wid.deselect()
 
-        checkbox_lbl.bind("<Button-1>", lambda e: self.checkbox_cmd(checkbox_widget))
+        checkbox_wid.pack(side="left")
 
-        restore_btn = CButton(frame, text = 'Сброс')
-        restore_btn.configure(width = 9)
-        restore_btn.cmd(lambda e, x = restore_btn: self.default_cmd(x))
-        restore_btn.pack(pady = (15, 0))
+        checkbox_lbl = CLabel(checkbox_frame, text='Спрашивать при выходе')
+        checkbox_lbl.pack(side="left")
+
+        checkbox_lbl.bind("<Button-1>", lambda e: self.checkbox_cmd(checkbox_wid))
+
+        restore_btn = CButton(frame, text='Сброс')
+        restore_btn.configure(width=9)
+        restore_btn.cmd(lambda e, x=restore_btn: self.default_cmd(x))
+        restore_btn.pack(pady=(15, 0))
 
         cancel_frame = CFrame(frame)
-        cancel_frame.pack()
+        cancel_frame.pack(expand=True)
 
-        CSep(cancel_frame).pack(pady = 15, fill = tkinter.X)
+        CSep(cancel_frame).pack(pady=15, fill=tkinter.X)
 
-        save_btn = CButton(cancel_frame, text = 'Сохранить')
+        save_btn = CButton(cancel_frame, text='Сохранить')
         save_btn.cmd(lambda e: self.save_cmd())
-        save_btn.configure(width = 12)
-        save_btn.pack(side = tkinter.LEFT, padx = (0, 10))
+        save_btn.configure(width=12)
+        save_btn.pack(padx=(0, 10), side="left")
 
-        cancel_btn = CButton(cancel_frame, text = 'Отмена')
+        cancel_btn = CButton(cancel_frame, text='Отмена')
         cancel_btn.cmd(lambda e: self.destroy())
-        cancel_btn.configure(width = 12)
-        cancel_btn.pack(side = tkinter.LEFT)
+        cancel_btn.configure(width=12)
+        cancel_btn.pack(side="left")
 
         return frame
 
@@ -127,7 +121,7 @@ class Settings(CWindow):
 
         btn.press()
         path_widget['text'] = cfg.default_vars['COLL_FOLDER']
-        checkbox_widget.select()
+        checkbox_wid.select()
 
         Dbase.conn.execute(sqlalchemy.delete(Thumbs))
         Dbase.conn.execute("VACUUM")

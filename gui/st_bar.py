@@ -13,6 +13,7 @@ class ScanerGui(CWindow):
         self.title("Обновление")
         self.geometry("300x50")
         self.minsize(300, 50)
+        self.maxsize(600, 50)
         self.resizable(1, 1)
 
         self.live_lbl = CLabel(
@@ -21,7 +22,7 @@ class ScanerGui(CWindow):
             anchor = tkinter.W,
             justify = tkinter.LEFT,
             )
-        self.live_lbl.pack(anchor=tkinter.CENTER)
+        self.live_lbl.pack(expand=True, fill="both")
 
         cfg.ROOT.update_idletasks()
 
@@ -33,16 +34,13 @@ class ScanerGui(CWindow):
         self.update_livelbl()
 
     def update_livelbl(self):
-        try:
-            self.live_lbl["text"] = cfg.LIVE_TEXT
-        except Exception:
-            print("no livelabel")
-        
         if self.winfo_exists():
-            task = cfg.ROOT.after(100, self.update_livelbl)
+            self.live_lbl["text"] = cfg.LIVE_TEXT
 
-            if not cfg.LIVE_TEXT:
-                self.destroy()
+        if not cfg.LIVE_TEXT:
+            self.destroy()
+
+        cfg.ROOT.after(100, self.update_livelbl)
 
 
 

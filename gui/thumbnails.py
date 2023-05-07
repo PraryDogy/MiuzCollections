@@ -1,6 +1,6 @@
 from . import (Dbase, ImageTk, Thumbs, cfg, convert_to_rgb, crop_image,
                datetime, decode_image, sqlalchemy, tkinter, tkmacosx,
-               traceback, find_jpeg, find_tiff, partial)
+               traceback, find_jpeg, find_tiff, partial, get_coll_name)
 from .img_viewer import ImgViewer
 from .widgets import *
 
@@ -49,26 +49,19 @@ def decode_thumbs(thumbs: tuple):
 
     return result
 
-def convert_year(thumbs: list):
-    """
-    Converts timestamp to year
-    * input: ((`img`, `src`, `date modified`), ...)
-    * returns: ((`img`, `src`, `year`), ...)
-    """
+def create_info(thumbs: list):
     result = []
     for img, src, modified in thumbs:
         year = datetime.fromtimestamp(modified).year
         month = datetime.fromtimestamp(modified).month
-        result.append((img, src, f"{months[month]} {year}"))
+        coll = get_coll_name(src)
+        result.append((img, src, (year, month, coll)))
     return result
 
 
 class ContextMenu(tkinter.Menu):
     def __init__(self, master: tkinter.Label, src: str, all_src: list):
-        tkinter.Menu.__init__(
-            self,
-            master,
-            )
+        tkinter.Menu.__init__(self, master)
 
         self.add_command(
             label = "Просмотр",
@@ -156,41 +149,48 @@ class Thumbnails(CFrame):
         title.configure(font=('San Francisco Pro', 45, 'bold'))
         title.pack()
 
-        load_last = sqlalchemy.select(
+        load_last_query = sqlalchemy.select(
             Thumbs.img150, Thumbs.src, Thumbs.modified
             ).limit(cfg.LIMIT).order_by(-Thumbs.modified)
 
+        load_coll_query = sqlalchemy.select(
+            Thumbs.img150, Thumbs.src, Thumbs.modified
+            ).filter(Thumbs.collection==cfg.config['CURR_COLL']
+            ).limit(cfg.LIMIT).order_by(-Thumbs.modified)
+
+        last = True
+
         if cfg.config['CURR_COLL'] == 'last':
             title.configure(text='Последние добавленные')
-            res = Dbase.conn.execute(load_last).fetchall()
+            res = Dbase.conn.execute(load_last_query).fetchall()
 
         else:
-            res = Dbase.conn.execute(sqlalchemy.select(
-                    Thumbs.img150, Thumbs.src, Thumbs.modified
-                    ).filter(Thumbs.collection == cfg.config['CURR_COLL']
-                    ).limit(cfg.LIMIT).order_by(-Thumbs.modified)
-                    ).fetchall()
+            res = Dbase.conn.execute(load_coll_query).fetchall()
+            last = False
 
         if len(res) == 0:
             title.configure(text='Последние добавленные')
-            res = Dbase.conn.execute(load_last).fetchall()
+            res = Dbase.conn.execute(load_last_query).fetchall()
 
         thumbs = decode_thumbs(res)
-        thumbs = convert_year(thumbs)
-        all_src = [src for img, src, year in thumbs]
-
+        thumbs = create_info(thumbs)
+        all_src = [src for _, src, _ in thumbs]
         thumbs_dict = {}
-        for img, src, year in thumbs:
-            thumbs_dict.setdefault(year, []).append((img, src))
+        for img, src, info in thumbs:
+            thumbs_dict.setdefault(info, []).append((img, src))
 
-        for year, img_list in thumbs_dict.items():
+        for (year, month, collname), img_list in thumbs_dict.items():
+            text = [
+                f"{year} {months[month]}",
+                f"{len(img_list)} фото"
+                ]
 
-            year_frame = CLabel(
-                self.thumbnails,
-                text=year,
-                )
-            year_frame.configure(font=('San Francisco Pro', 30, 'bold'))
-            year_frame.pack(pady=(35, 0))
+            if last:
+                text.append(collname)
+
+            info_frame = CLabel(self.thumbnails, text=", ".join(text))
+            info_frame.configure(font=('San Francisco Pro', 15, 'bold'))
+            info_frame.pack(anchor="w", pady=(15, 0))
 
             img_row = CFrame(self.thumbnails)
             img_row.pack(fill = tkinter.X, expand=1, anchor=tkinter.W)

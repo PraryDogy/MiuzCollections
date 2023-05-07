@@ -19,12 +19,12 @@ def open_finder(collection_name):
     subprocess.check_output(["/usr/bin/open", coll_path])
 
 
-def show_collection(src, btn):
+def show_collection(master: tkinter.Button, collection_name):
     for btn_item in menu_buttons:
         btn_item['bg'] = cfg.BUTTON
 
-    btn['bg'] = cfg.SELECTED
-    cfg.config['CURR_COLL'] = src
+    master['bg'] = cfg.SELECTED
+    cfg.config['CURR_COLL'] = collection_name
 
     cfg.THUMBNAILS.reload_scrollable()
     cfg.THUMBNAILS.reload_thumbnails()
@@ -33,6 +33,8 @@ def show_collection(src, btn):
 class ContextMenu(tkinter.Menu):
     def __init__(self, master, collection_name):
         tkinter.Menu.__init__(self, master)
+        self.btn = master
+        self.collection_name = collection_name
 
         self.add_command(
             label = "Показать в Finder",
@@ -165,4 +167,4 @@ class Menu(tkmacosx.SFrame):
             open_finder(coll)
             return
 
-        show_collection(coll, btn)
+        show_collection(btn, coll)
