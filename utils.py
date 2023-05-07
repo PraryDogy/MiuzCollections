@@ -103,8 +103,11 @@ def write_cfg(data: dict):
     Writes enctypted data to `cfg.json` in `cfg.CFG_DIR`
     *param `data`: python dict
     """
-    json_data = read_cfg()
-    cfg.config["STOPWORDS"] = json_data["STOPWORDS"]
+    try:
+        json_data = read_cfg()
+        cfg.config["STOPWORDS"] = json_data["STOPWORDS"]
+    except Exception:
+        print("utils.py write cfg no cfg file in application support")
 
     with open(os.path.join(cfg.CFG_DIR, 'cfg.json'), "w") as file:
         file.write(json.dumps(data, indent=4, ensure_ascii=False))

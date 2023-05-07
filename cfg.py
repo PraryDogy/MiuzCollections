@@ -46,29 +46,34 @@ default_vars = {
 
         "ROOT_W": 700,
         "ROOT_H": 500,
-        "ROOT_X": 0,
-        "ROOT_Y": 0,
+        "ROOT_X": 100,
+        "ROOT_Y": 100,
 
         "PREVIEW_W": 700,
         "PREVIEW_H": 500,
 
-        "STOPWORDS": ["preview", "1x1", "1х1", "crop"]
+        "STOPWORDS": ["preview", "1x1", "1х1", "crop", "копия", "copy"],
+
+        "//READ_ME1": "Вы можете изменить только параметр STOPWORDS",
+        "//READ_ME2": "Это список слов, которые исключаются при поиске .tiff файлов",
+        "//READ_ME3": "Например .jpeg называется 'котик_preview.jpeg'",
+        "//READ_ME4": "и если в списке STOPWORDS есть слово 'preview'",
+        "//READ_ME5": "то программа будет искать все .tiff файлы с именем 'котик'",
+        "//READ_ME6": "исключая слово 'preview'"
         }
 
 if not os.path.exists(CFG_DIR):
     os.mkdir(CFG_DIR)
 
-if not os.path.exists(os.path.join(CFG_DIR, DB)):
-    shutil.copyfile(
-        DB,
-        os.path.join(CFG_DIR, DB)
-        )
-
-if os.path.exists(os.path.join(CFG_DIR, 'cfg.json')):
-    config = read_cfg()
-else:
+if not os.path.exists(os.path.join(CFG_DIR, "cfg.json")):
     config = default_vars
-    write_cfg(config)
+    write_cfg(default_vars)
+
+if not os.path.exists(os.path.join(CFG_DIR, DB)):
+    shutil.copyfile(DB, os.path.join(CFG_DIR, DB))
+
+
+config = read_cfg()
 
 old_keys = {
     k:v 

@@ -163,7 +163,7 @@ class Settings(CWindow):
                 while cfg.SCANER_TASK.is_alive():
                     cfg.ROOT.update()
             except AttributeError:
-                print("no task scaner")
+                print("settings.py: no task scaner")
             if smb_check():
                 scaner()
             else:
