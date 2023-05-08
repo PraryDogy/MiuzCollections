@@ -56,17 +56,6 @@ class Settings(CWindow):
         select_path.cmd(lambda e: self.select_path_cmd())
         select_path.pack(pady=(5, 0), padx=(5, 0))
 
-        restore_frame = CFrame(frame)
-        restore_frame.pack(pady=(15, 0))
-
-        restore_btn = CButton(restore_frame, text='Сброс')
-        restore_btn.cmd(lambda e, x=restore_btn: self.default_cmd(x))
-        restore_btn.pack(padx=(0, 10), side="left")
-
-        open_cfg = CButton(restore_frame, text="Файл настроек")
-        open_cfg.cmd(lambda e: self.open_cfg_cmd())
-        open_cfg.pack(side="right")
-
         checkbox_frame = CFrame(frame)
         checkbox_frame.pack(pady=(15, 0))
 
@@ -84,6 +73,10 @@ class Settings(CWindow):
         checkbox_lbl.pack(side="left")
 
         checkbox_lbl.bind("<Button-1>", lambda e: self.checkbox_cmd(checkbox_wid))
+
+        restore_btn = CButton(frame, text='Сброс')
+        restore_btn.cmd(lambda e, x=restore_btn: self.default_cmd(x))
+        restore_btn.pack(pady=(15, 0))
 
         cancel_frame = CFrame(frame)
         cancel_frame.pack(expand=True)

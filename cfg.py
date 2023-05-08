@@ -52,14 +52,9 @@ default_vars = {
         "PREVIEW_W": 700,
         "PREVIEW_H": 500,
 
-        "STOPWORDS": ["preview", "1x1", "1х1", "crop", "копия", "copy"],
-
-        "//READ_ME1": "Вы можете изменить только параметр STOPWORDS",
-        "//READ_ME2": "Это список слов, которые исключаются при поиске .tiff файлов",
-        "//READ_ME3": "Например .jpeg называется 'котик_preview.jpeg'",
-        "//READ_ME4": "и если в списке STOPWORDS есть слово 'preview'",
-        "//READ_ME5": "то программа будет искать все .tiff файлы с именем 'котик'",
-        "//READ_ME6": "исключая слово 'preview'"
+        "STOPWORDS": [
+            "preview", "1x1", "1х1", "crop", "копия", "copy"
+            ],
         }
 
 
@@ -73,7 +68,7 @@ def write_cfg(data: dict):
         json_data = read_cfg()
         config["STOPWORDS"] = json_data["STOPWORDS"]
     except Exception:
-        print("utils.py write cfg no cfg file in application support")
+        print("cfg.py write_cfg no cfg file in application support")
 
     with open(os.path.join(CFG_DIR, 'cfg.json'), "w", encoding='utf8') as file:
         json.dump(data, file, indent=4, ensure_ascii=False)

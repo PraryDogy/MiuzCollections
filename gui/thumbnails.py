@@ -106,6 +106,7 @@ class Thumbnails(CFrame):
 
         cfg.ROOT.update_idletasks()
 
+        self.load_title()
         self.load_scrollable()
         self.load_thumbnails()
 
@@ -130,6 +131,16 @@ class Thumbnails(CFrame):
                 cfg.ROOT.update_idletasks()
                 self.reload_thumbnails()
 
+    def load_title(self):
+        if cfg.config["CURR_COLL"] == "last":
+            txt = "Последние добавленные"
+        else:
+            txt = cfg.config["CURR_COLL"]
+
+        self.title = CLabel(self, text=txt)
+        self.title.configure(font=('San Francisco Pro', 45, 'bold'))
+        self.title.pack()
+
     def load_scrollable(self):
         self.scroll_parrent = CFrame(self)
         self.scroll_parrent.pack(expand=1, fill=tkinter.BOTH)
@@ -141,13 +152,6 @@ class Thumbnails(CFrame):
     def load_thumbnails(self):
         self.thumbnails = CFrame(self.scrollable)
         self.clmns = clmns_count()
-
-        title = CLabel(
-            self.thumbnails,
-            text=cfg.config['CURR_COLL'],
-            )
-        title.configure(font=('San Francisco Pro', 45, 'bold'))
-        title.pack()
 
         load_last_query = sqlalchemy.select(
             Thumbs.img150, Thumbs.src, Thumbs.modified
@@ -161,7 +165,6 @@ class Thumbnails(CFrame):
         last = True
 
         if cfg.config['CURR_COLL'] == 'last':
-            title.configure(text='Последние добавленные')
             res = Dbase.conn.execute(load_last_query).fetchall()
 
         else:
@@ -169,7 +172,6 @@ class Thumbnails(CFrame):
             last = False
 
         if len(res) == 0:
-            title.configure(text='Последние добавленные')
             res = Dbase.conn.execute(load_last_query).fetchall()
 
         thumbs = decode_thumbs(res)
@@ -186,11 +188,9 @@ class Thumbnails(CFrame):
                 coll_frame = CLabel(self.thumbnails, text=collname)
                 coll_frame.configure(font=('San Francisco Pro', 20, 'bold'))
                 coll_frame.pack(anchor="w", pady=(30, 0))
-                # coll_frame["bg"] = "red"
 
             info_frame = CLabel(self.thumbnails, text=", ".join(text))
             info_frame.pack(anchor="w")
-            # info_frame["bg"] = "blue"
             if not last:
                 info_frame.configure(font=('San Francisco Pro', 20, 'bold'))
                 info_frame.pack(pady=(30, 0))
@@ -233,6 +233,8 @@ class Thumbnails(CFrame):
         Reloads thumbnails with scroll frame.
         """
         self.scroll_parrent.destroy()
+        self.title.destroy()
+        self.load_title()
         self.load_scrollable()
 
     def reload_thumbnails(self):
