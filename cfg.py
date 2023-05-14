@@ -55,6 +55,7 @@ default_vars = {
         "STOPWORDS": [
             "preview", "1x1", "1х1", "crop", "копия", "copy"
             ],
+        "EXCEPTIONS": ""
         }
 
 

@@ -80,7 +80,7 @@ class Menu(tkmacosx.SFrame):
     def load_menu_buttons(self):
         frame = CFrame(self)
 
-        title = CLabel(frame, text='Коллекции')
+        title = CLabel(frame, text='Меню')
         title.configure(font=('San Francisco Pro', 22, 'bold'))
         title.pack(pady=(0,15))
 
@@ -101,7 +101,7 @@ class Menu(tkmacosx.SFrame):
                 key = lambda item: item[1].casefold()
                 ))
 
-        last = CButton(frame, text='Последние')
+        last = CButton(frame, text='Все коллекции')
         last.configure(width=13, pady=5, anchor=tkinter.W, padx=10)
         last.cmd(partial(self.open_coll_folder, 'last', last))
         last.pack(pady=(0, 15))

@@ -40,7 +40,7 @@ def update_collections():
     collections = [
         os.path.join(cfg.config["COLL_FOLDER"], i)
         for i in os.listdir(cfg.config["COLL_FOLDER"])
-        if not i.startswith(".")
+        if not i.startswith((".", "_"))
         ]
 
     ln = len(collections)
@@ -90,7 +90,7 @@ def update_collections():
                 f"Добавлено {x} из {ln} новых фото."
                 )
                 }
-            for x, (src, size, created, modified) in enumerate(new_images)
+            for x, (src, size, created, modified) in enumerate(new_images, 1)
             if cfg.FLAG
             ]
 

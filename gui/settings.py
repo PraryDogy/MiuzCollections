@@ -1,7 +1,7 @@
 from database import *
 
 from . import (cfg, filedialog, on_exit, place_center, scaner, smb_check,
-               sqlalchemy, tkinter, os, subprocess)
+               sqlalchemy, tkinter, os, subprocess, re)
 from .widgets import *
 
 path_widget = tkinter.Label
@@ -12,6 +12,46 @@ __all__ = (
     "Settings",
     )
 
+settings_win = tkinter.Toplevel
+
+
+class ExceptionsWin(CWindow):
+    def __init__(self, e):
+        super().__init__()
+        self.geometry("300x300")
+
+        collections = {
+            i: re.search("[A-Za-zА-Яа-я]+.{0,11}", i).group(0)[:13]
+            for i in os.listdir(cfg.config["COLL_FOLDER"])
+            }
+
+        collections = dict(
+            sorted(
+                collections.items(),
+                key = lambda item: item[1].casefold()
+                ))
+
+        for name, true_name in collections.items():
+            lbl = CLabel(self, text=name)
+            lbl.pack()
+
+
+        self.protocol("WM_DELETE_WINDOW", lambda: self.close_win())
+        self.bind('<Command-w>', lambda e: self.close_win())
+        self.bind('<Escape>', lambda e: self.close_win())
+
+        cfg.ROOT.update_idletasks()
+
+        place_center(self)
+        self.deiconify()
+        self.wait_visibility()
+        self.grab_set_global()
+
+    def close_win(self):
+        self.destroy()
+        if self.win.winfo_class() != tkinter.Tk.__name__:
+            self.win.grab_set_global()
+
 
 class Settings(CWindow):
     def __init__(self):
@@ -21,7 +61,6 @@ class Settings(CWindow):
         self.geometry("400x250")
         self.minsize(400, 250)
         self.maxsize(800, 300)
-        self.resizable(1, 1)
 
         self.ask_exit = tkinter.IntVar(value = cfg.config['ASK_EXIT'])
 
@@ -40,7 +79,7 @@ class Settings(CWindow):
 
         frame = CFrame(self)
 
-        title_lbl = CLabel(frame, text="Коллекции")
+        title_lbl = CLabel(frame, text="Все коллекции")
         title_lbl.configure(font=('San Francisco Pro', 22, 'bold'))
         title_lbl.pack(expand=True, fill="both")
 
@@ -52,9 +91,16 @@ class Settings(CWindow):
             )
         path_widget.pack(pady=(5, 0), expand=True, fill="both")
 
-        select_path = CButton(frame, text='Обзор')
+        select_frame = CFrame(frame)
+        select_frame.pack(pady=(5, 0))
+
+        select_path = CButton(select_frame, text='Обзор')
         select_path.cmd(lambda e: self.select_path_cmd())
-        select_path.pack(pady=(5, 0), padx=(5, 0))
+        select_path.pack(side="left", padx=(0, 10))
+
+        exceptions_btn = CButton(select_frame, text="Исключения")
+        # exceptions_btn.cmd(lambda e: ExceptionsWin(e))
+        exceptions_btn.pack(side="left")
 
         checkbox_frame = CFrame(frame)
         checkbox_frame.pack(pady=(15, 0))
@@ -98,7 +144,6 @@ class Settings(CWindow):
             ["/usr/bin/open", os.path.join(cfg.CFG_DIR, 'cfg.json')]
             )
         self.destroy()
-        cfg.ROOT.focus_force()
 
     def checkbox_cmd(self, master: tkinter.Checkbutton):
         if self.ask_exit.get() == 1:
@@ -146,7 +191,6 @@ class Settings(CWindow):
 
         cfg.write_cfg(cfg.config)
         self.destroy()
-        cfg.ROOT.focus_force()
 
         if SCAN_AGAIN:
             SCAN_AGAIN = False

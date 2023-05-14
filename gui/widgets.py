@@ -53,13 +53,6 @@ class CLabel(tkinter.Label):
 
 class CWindow(tkinter.Toplevel):
     def __init__(self):
-        """
-        bg=cfg.BGCOLOR, padx=15, pady=15
-        resizable 0
-        center screen
-        cmd+w, escape and X button bind to close window
-        withdraw = true
-        """
         tkinter.Toplevel.__init__(self)
         cfg.ROOT.eval(f'tk::PlaceWindow {self} center')
         self.withdraw()
@@ -76,10 +69,8 @@ class CWindow(tkinter.Toplevel):
         self.resizable(0,0)
         self.configure(bg=cfg.BG, padx=15, pady=15)
 
-
     def close_win(self):
         self.destroy()
-        cfg.ROOT.focus_force()
 
 
 class CloseBtn(CButton):
@@ -118,7 +109,6 @@ class AskExit(CWindow):
 
     def close_ask(self):
         self.destroy()
-        cfg.ROOT.focus_force()
 
     def exit_task(self):
         quit()
@@ -222,9 +212,9 @@ class ImageInfo(CWindow):
 
     def close_win(self):
         self.destroy()
-        self.win.focus_force()
         if self.win.winfo_class() != tkinter.Tk.__name__:
             self.win.grab_set_global()
+        self.win.focus_force()
 
 
 class MacMenu(tkinter.Menu):

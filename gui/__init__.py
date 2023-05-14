@@ -10,7 +10,7 @@ import tkinter
 import traceback
 from datetime import datetime
 from functools import partial
-from tkinter import filedialog
+from tkinter import filedialog, ttk
 
 import cv2
 import sqlalchemy

@@ -49,12 +49,6 @@ class ImgViewer(CWindow):
         global src, all_src, win
         CWindow.__init__(self)
 
-        if not smb_check():
-            self.destroy()
-            cfg.ROOT.focus_force()
-            SmbAlert()
-            return
-
         win = self
         src = img_src
         all_src = src_list
@@ -120,8 +114,6 @@ class ImgViewer(CWindow):
                 500,
                 lambda: self.img_place(self.win_width, self.win_height)
                 )
-
-            self.focus_force()
 
     def img_widget(self):
         label = CLabel(self)
