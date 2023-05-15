@@ -4,7 +4,6 @@ from . import (Dbase, ImageTk, Thumbs, calendar, cfg, convert_to_rgb,
                tkmacosx, traceback)
 from .img_viewer import ImgViewer
 from .widgets import *
-from tkcalendar import Calendar
 
 __all__ = (
     "Thumbnails",
