@@ -23,15 +23,6 @@ class FilterWin(tkinter.Toplevel):
         one = CCalendar(left, d)
         one.pack()
 
-        right = CFrame(self)
-        right.pack(side="left")
-
-        second = CLabel(right, text="Конец")
-        second.pack()
-
-        two = CCalendar(right, d)
-        two.pack()
-
 
 FilterWin()
 root.mainloop()

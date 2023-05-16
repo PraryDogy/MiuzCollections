@@ -22,15 +22,18 @@ months = {
 
 class CCalendar(CFrame):
     def __init__(self, master, my_date: datetime):
-        self.my_date = my_date
 
         super().__init__(master)
         self["bg"] = cfg.BUTTON
 
+        self.my_date = my_date
         self.today = datetime.today().date()
 
+        if not self.my_date:
+            self.my_date = self.today
+
         self.calendar = self.load_calendar()
-        self.calendar.pack()
+        self.calendar.pack(pady=(15, 0))
 
     def load_calendar(self):
         parrent = CFrame(self)
@@ -51,9 +54,13 @@ class CCalendar(CFrame):
         prev.pack(side="left")
         prev.cmd(lambda e: self.switch_month(prev["text"], e))
 
-        m = CLabel(month_frame, text=months[self.my_date.month], name=str(self.my_date.month))
-        m.configure(bg=cfg.BUTTON, width=7, font=f)
-        m.pack(side="left")
+        self.m_title = CLabel(
+            month_frame,
+            text=months[self.my_date.month],
+            name=str(self.my_date.month)
+            )
+        self.m_title.configure(bg=cfg.BUTTON, width=7, font=f)
+        self.m_title.pack(side="left")
 
         next = CButton(month_frame, text=">")
         next.configure(width=2, font=f)
@@ -73,9 +80,13 @@ class CCalendar(CFrame):
         prev.pack(side="left")
         prev.cmd(lambda e: self.switch_year(prev["text"], e))
 
-        y = CLabel(year_frame, text=self.my_date.year, name=str(self.my_date.month))
-        y.configure(bg=cfg.BUTTON, width=7, font=f)
-        y.pack(side="left")
+        self.y_title = CLabel(
+            year_frame,
+            text=self.my_date.year,
+            name=str(self.my_date.month)
+            )
+        self.y_title.configure(bg=cfg.BUTTON, width=7, font=f)
+        self.y_title.pack(side="left")
 
         next = CButton(year_frame, text=">")
         next.configure(width=2, font=f)
@@ -90,41 +101,62 @@ class CCalendar(CFrame):
             lbl.configure(width=4, height=2)
             lbl.pack(side="left")
 
-        first_weekday = datetime.weekday(datetime(self.my_date.year, self.my_date.month, 1))
-        month_len = monthrange(self.my_date.year, self.my_date.month)[1]
-        days = [None for i in range(1, first_weekday + 1)]
-        days.extend([i for i in range(1, month_len)])
-
         row = CFrame(parrent)
         row.pack()
 
-        btns = []
+        self.btns = []
 
-        for x, day in enumerate(days, 1):
-            if not day:
-                lbl = CButton(row, text = "")
-            lbl = CButton(row, text = day)
+        for i in range(1, 42):
+            lbl = CButton(row)
             lbl.configure(width=4, height=2)
             lbl.pack(side="left")
-            lbl.cmd(partial(self.select_day, btns, lbl))
+            lbl.cmd(partial(self.select_day, lbl))
 
-            if day == self.my_date.day:
-                lbl.configure(bg=cfg.SELECTED)
-
-            if x % 7 == 0:
+            if i % 7 == 0:
                 row = CFrame(parrent)
                 row.pack(anchor="w")
 
-            btns.append(lbl)
+            self.btns.append(lbl)
+
+        self.fill_days()
 
         return parrent
 
-    def select_day(self, btns, btn, e):
-        for i in btns:
-            i["bg"] = cfg.BUTTON
-        btn["bg"] = cfg.SELECTED
+    def create_days(self):
+        first_weekday = datetime.weekday(
+            datetime(self.my_date.year, self.my_date.month, 1)
+            )
+        month_len = monthrange(self.my_date.year, self.my_date.month)[1] + 1
 
-        self.my_date = datetime(self.my_date.year, self.my_date.month, int(btn["text"]))
+        days = [None for i in range(first_weekday)]
+        days.extend([i for i in range(1, month_len)])
+        days.extend([None for i in range(42 - (len(days)))])
+
+        return days
+
+    def fill_days(self):
+        days = self.create_days()
+
+        for day, btn in zip(days, self.btns):
+            if day:
+                btn["text"] = day
+            else:
+                btn["text"] = ""
+            btn["bg"] = cfg.BUTTON
+            if btn["text"] == self.my_date.day:
+                btn["bg"] = cfg.SELECTED
+
+    def select_day(self, btn, e):
+        if btn["text"]:
+            for i in self.btns:
+                i["bg"] = cfg.BUTTON
+            btn["bg"] = cfg.SELECTED
+
+            self.my_date = datetime(
+                self.my_date.year,
+                self.my_date.month,
+                int(btn["text"])
+                )
 
     def switch_month(self, txt, e):
         if txt != "<":
@@ -136,10 +168,8 @@ class CCalendar(CFrame):
         m = 12 if m < 1 else m
 
         self.my_date = datetime(self.my_date.year, m, self.my_date.day)
-
-        self.calendar.destroy()
-        self.calendar = self.load_calendar()
-        self.calendar.pack()
+        self.m_title["text"] = months[m]
+        self.fill_days()
 
     def switch_year(self, txt, e):
         if txt != "<":
@@ -155,6 +185,12 @@ class CCalendar(CFrame):
 
         self.my_date = datetime(y, self.my_date.month, self.my_date.day)
 
-        self.calendar.destroy()
-        self.calendar = self.load_calendar()
-        self.calendar.pack()
+        self.y_title["text"] = y
+        self.fill_days()
+
+
+import tkinter
+root = tkinter.Tk()
+CCalendar(root, datetime(2023, 1, 1)).pack()
+
+root.mainloop()
