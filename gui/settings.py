@@ -58,7 +58,7 @@ class Settings(CWindow):
         CWindow.__init__(self)
         self.title('Настройки')
 
-        self.geometry("400x250")
+        self.geometry("400x350")
         self.minsize(400, 250)
         self.maxsize(800, 300)
 
@@ -123,6 +123,13 @@ class Settings(CWindow):
         restore_btn = CButton(frame, text='Сброс')
         restore_btn.cmd(lambda e, x=restore_btn: self.default_cmd(x))
         restore_btn.pack(pady=(15, 0))
+
+        t = (
+            "*Программа игнорирует папки внутри коллекций, имя"
+            "\nкоторых начинается с точки или нижнего подчеркивания."
+            )
+        subtitle = CLabel(frame, text=t, anchor="w", justify="left")
+        subtitle.pack(expand=True, fill="both", pady=(15, 0))
 
         cancel_frame = CFrame(frame)
         cancel_frame.pack(expand=True)
