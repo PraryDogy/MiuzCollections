@@ -100,7 +100,7 @@ class Settings(CWindow):
 
         exceptions_btn = CButton(select_frame, text="Исключения")
         # exceptions_btn.cmd(lambda e: ExceptionsWin(e))
-        exceptions_btn.pack(side="left")
+        # exceptions_btn.pack(side="left")
 
         checkbox_frame = CFrame(frame)
         checkbox_frame.pack(pady=(15, 0))
@@ -134,16 +134,14 @@ class Settings(CWindow):
         save_btn.pack(padx=(0, 10), side="left")
 
         cancel_btn = CButton(cancel_frame, text='Отмена')
-        cancel_btn.cmd(lambda e: self.destroy())
+        cancel_btn.cmd(lambda e: self.cancel_cmd())
         cancel_btn.pack(side="left")
 
         return frame
-    
-    def open_cfg_cmd(self):
-        subprocess.check_output(
-            ["/usr/bin/open", os.path.join(cfg.CFG_DIR, 'cfg.json')]
-            )
+
+    def cancel_cmd(self):
         self.destroy()
+        focus_last()
 
     def checkbox_cmd(self, master: tkinter.Checkbutton):
         if self.ask_exit.get() == 1:
@@ -191,6 +189,7 @@ class Settings(CWindow):
 
         cfg.write_cfg(cfg.config)
         self.destroy()
+        focus_last()
 
         if SCAN_AGAIN:
             SCAN_AGAIN = False

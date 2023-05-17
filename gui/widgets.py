@@ -12,8 +12,17 @@ __all__ = (
     "SmbAlert",
     "ImageInfo",
     "MacMenu",
+    "focus_last"
     )
 
+
+def focus_last():
+    for k, v in cfg.ROOT.children.items():
+        if isinstance(v, CWindow):
+            v.focus_force()
+            return
+
+    cfg.ROOT.focus_force()
 
 class CSep(tkinter.Frame):
     def __init__(self, master: tkinter):
@@ -71,6 +80,7 @@ class CWindow(tkinter.Toplevel):
 
     def close_win(self):
         self.destroy()
+        focus_last()
 
 
 class CloseBtn(CButton):
@@ -138,7 +148,7 @@ class SmbAlert(CWindow):
         descr_lbl.pack(padx=15, pady=(0, 5))
 
         btn = CButton(self, text = "Закрыть")
-        btn.cmd(lambda e: self.destroy())
+        btn.cmd(lambda e: self.btn_cmd())
         btn.pack()
 
         cfg.ROOT.update_idletasks()
@@ -146,6 +156,10 @@ class SmbAlert(CWindow):
         self.deiconify()
         self.wait_visibility()
         self.grab_set_global()
+
+    def btn_cmd(self):
+        self.destroy()
+        focus_last()
 
 
 class ImageInfo(CWindow):
@@ -212,15 +226,10 @@ class ImageInfo(CWindow):
 
     def close_win(self):
         self.destroy()
-        if self.win.winfo_class() != tkinter.Tk.__name__:
-            self.win.grab_set_global()
-        self.win.focus_force()
+        focus_last()
 
 
 class MacMenu(tkinter.Menu):
-    """
-    Mac osx bar menu.
-    """
     def __init__(self):
         menubar = tkinter.Menu(cfg.ROOT)
         tkinter.Menu.__init__(self, menubar)

@@ -14,7 +14,6 @@ class ScanerGui(CWindow):
         self.geometry("300x50")
         self.minsize(300, 50)
         self.maxsize(600, 50)
-        self.resizable(1, 1)
 
         self.live_lbl = CLabel(
             self,

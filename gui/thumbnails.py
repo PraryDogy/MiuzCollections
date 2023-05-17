@@ -332,9 +332,10 @@ class Thumbnails(CFrame):
         self.clmns = clmns_count()
         load_db = Dbase.conn.execute(create_query()).fetchall()
         thumbs = decode_thumbs(load_db)
-        all_src = [src for _, src, _ in thumbs]
+        # all_src = [src for _, src, _ in thumbs]
         thumbs: dict = create_thumbs_dict(thumbs)
         summary = len(load_db)
+        all_src = []
 
         if any((day_value, month_value)):
             if day_value:
@@ -368,6 +369,8 @@ class Thumbnails(CFrame):
             img_row.pack(fill = tkinter.X, expand=1, anchor=tkinter.W)
 
             for x, (img, src) in enumerate(img_list, 1):
+
+                all_src.append(src)
 
                 thumb = CButton(img_row)
                 thumb.configure(
