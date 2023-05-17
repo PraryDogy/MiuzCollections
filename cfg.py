@@ -1,8 +1,7 @@
+import json
 import os
 import shutil
 import tkinter
-import json
-
 
 # app info
 APP_NAME = 'MiuzCollections'
@@ -28,15 +27,11 @@ LIMIT = 150
 # flags
 FLAG = False
 SCANER_TASK = None
-
 LIVE_TEXT = ""
 
 # gui objects for global access
 ROOT = tkinter.Tk()
 ROOT.withdraw()
-THUMBNAILS: tkinter.Frame = None
-MENU: tkinter.Frame = None
-ST_BAR: tkinter.Frame = None
 
 default_vars = {
         'COLL_FOLDER': '/Volumes/Shares/Marketing/Photo/_Collections',

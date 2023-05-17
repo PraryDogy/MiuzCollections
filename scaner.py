@@ -19,7 +19,8 @@ def change_live_lvl(text):
 
 
 def st_bar_btn(text: str, color: str):
-    btn = cfg.ST_BAR.winfo_children()[2]
+    from gui_start import gui_start
+    btn = gui_start.st_bar.winfo_children()[2]
     btn["text"] = text
     btn["bg"] = color
 
@@ -176,8 +177,9 @@ def scaner():
     cfg.LIVE_TEXT = ""
 
     if UPDATE_THUMBNAILS:
-        cfg.THUMBNAILS.reload_thumbnails()
-        cfg.MENU.reload()
+        from gui_start import gui_start
+        gui_start.thumbnails.reload_without_scroll()
+        gui_start.menu.reload()
         UPDATE_THUMBNAILS = False
 
     cfg.FLAG = False

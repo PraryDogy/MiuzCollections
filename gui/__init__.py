@@ -52,19 +52,19 @@ class Gui:
 
         CSep(cfg.ROOT).pack(fill=tkinter.X, pady=15, padx=(15, 5))
 
-        menu_widget = Menu(cfg.ROOT)
-        menu_widget.pack(side=tkinter.LEFT, fill=tkinter.Y, pady=(0, 15))
+        self.menu = Menu(cfg.ROOT)
+        self.menu.pack(side=tkinter.LEFT, fill=tkinter.Y, pady=(0, 15))
 
         right_frame = CFrame(cfg.ROOT)
         right_frame.pack(fill=tkinter.BOTH, expand=1)
     
-        gallery_widget = Thumbnails(right_frame)
-        gallery_widget.pack(fill=tkinter.BOTH, expand=1, padx=(15, 5))
+        self.thumbnails = Thumbnails(right_frame)
+        self.thumbnails.pack(fill=tkinter.BOTH, expand=1, padx=(15, 5))
 
         CSep(right_frame).pack(fill=tkinter.X, pady=10, padx=15)
 
-        stbar_widget = StBar(right_frame)
-        stbar_widget.pack(pady=(0, 10))
+        self.st_bar = StBar(right_frame)
+        self.st_bar.pack(pady=(0, 10))
 
         MacMenu()
 

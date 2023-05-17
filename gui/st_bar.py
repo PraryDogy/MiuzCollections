@@ -42,12 +42,8 @@ class ScanerGui(CWindow):
 
 
 class StBar(CFrame):
-    """
-    Tkinter frame for all status bar gui items.
-    """
     def __init__(self, master):
         CFrame.__init__(self, master)
-        cfg.ST_BAR = self
         self.normal_mode()
 
     def normal_mode(self):
@@ -67,18 +63,10 @@ class StBar(CFrame):
         upd_btn.pack(side=tkinter.LEFT)
 
     def settings_cmd(self, btn: CButton):
-        """
-        Opens settings gui.
-        * param `btn`: tkinter button
-        """
         btn.press()
         Settings()
 
     def update_cmd(self, btn: CButton):
-        """
-        Run Updater from utils with Splashscreen gui from 
-        * param `btn`: tkinter button
-        """
         if not cfg.FLAG:
             if smb_check():
                 scaner()

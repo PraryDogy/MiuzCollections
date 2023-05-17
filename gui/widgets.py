@@ -142,7 +142,6 @@ class AskExit(CWindow):
 class SmbAlert(CWindow):
     def __init__(self):
         CWindow.__init__(self)
-        self.title('Нет подключения')
 
         txt = 'Нет подключения к сетевому диску Miuz.'
         title_lbl = CLabel(

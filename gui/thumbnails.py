@@ -41,51 +41,6 @@ date_start: datetime = None
 date_end: datetime = None
 
 
-def clmns_count():
-    clmns = (cfg.config['ROOT_W'] - 180) // cfg.THUMB_SIZE
-    return 1 if clmns == 0 else clmns
-
-
-def decode_thumbs(thumbs: tuple):
-    result = []
-    for blob, src, modified in thumbs:
-        try:
-            decoded = decode_image(blob)
-            cropped = crop_image(decoded)
-            rgb = convert_to_rgb(cropped)
-            img = ImageTk.PhotoImage(rgb)
-            result.append((img, src, modified))
-
-        except Exception:
-            print(traceback.format_exc())
-
-    return result
-
-
-def create_thumbs_dict(thumbs: list):
-    thumbs_dict = {}
-    for img, src, modified in thumbs:
-        coll = get_coll_name(src)
-        t = datetime.fromtimestamp(modified).date()
-
-        if not date_start and not date_end:
-            t = f"{months[t.month]} {t.year}"
-
-        elif date_start and not date_end:
-            print("date start")
-            t = f"{t.day} {months_day[t.month]} {t.year}"
-
-        elif all((date_start, date_end)):
-            print("all dates")
-            start = f"{date_start.day} {months_day[date_start.month]} {date_start.year}"
-            end = f"{date_end.day} {months_day[date_end.month]} {date_end.year}"
-            t = f"{start} - {end}"
-
-        thumbs_dict.setdefault((coll, t), []).append((img, src))
-
-    return thumbs_dict
-
-
 def stamp_range():
     start = datetime.combine(date_start, datetime.min.time())
     end = datetime.combine(
@@ -270,7 +225,8 @@ class FilterWin(CWindow):
 
         self.destroy()
         focus_last()
-        cfg.THUMBNAILS.reload_thumbnails()
+        from gui_start import gui_start
+        gui_start.thumbnails.reload_without_scroll()
 
     def cancel(self):
         self.destroy()
@@ -280,7 +236,6 @@ class FilterWin(CWindow):
 class Thumbnails(CFrame):
     def __init__(self, master):
         super().__init__(master)
-        cfg.THUMBNAILS = self
         self.clmns = 1
 
         cfg.ROOT.update_idletasks()
@@ -290,24 +245,6 @@ class Thumbnails(CFrame):
 
         cfg.ROOT.bind('<Configure>', self.decect_resize)
         self.resize_task = None
-
-    def decect_resize(self, e):
-        if self.resize_task:
-            cfg.ROOT.after_cancel(self.resize_task)
-        self.resize_task = cfg.ROOT.after(250, self.update_gui)
-
-    def update_gui(self):
-        old_w = cfg.config['ROOT_W']
-        new_w = cfg.ROOT.winfo_width()
-
-        if new_w != old_w:
-            cfg.config['ROOT_W'] = new_w
-
-            if self.clmns != clmns_count():
-                w, h = cfg.ROOT.winfo_width(), cfg.ROOT.winfo_height()
-                cfg.config['ROOT_W'], cfg.config['ROOT_H'] = w, h
-                cfg.ROOT.update_idletasks()
-                self.reload_thumbnails()
 
     def load_scrollable(self):
         self.scroll_parrent = CFrame(self)
@@ -355,10 +292,10 @@ class Thumbnails(CFrame):
         btn_sort.pack(side="left")
         btn_sort.cmd(lambda e: self.sort_btn_cmd(btn_sort))
 
-        self.clmns = clmns_count()
+        self.clmns = self.clmns_count()
         load_db = Dbase.conn.execute(create_query()).fetchall()
-        thumbs = decode_thumbs(load_db)
-        thumbs: dict = create_thumbs_dict(thumbs)
+        thumbs = self.decode_thumbs(load_db)
+        thumbs: dict = self.create_thumbs_dict(thumbs)
         summary = len(load_db)
         all_src = []
 
@@ -427,7 +364,7 @@ class Thumbnails(CFrame):
 
         if summary >= 150:
             more_btn = CButton(self.thumbnails, text="Показать еще")
-            more_btn.cmd(lambda e: self.show_more(e))
+            more_btn.cmd(lambda e: self.show_more())
             more_btn.pack(pady=(15, 0))
 
         self.thumbnails.pack(expand=1, fill=tkinter.BOTH)
@@ -436,16 +373,34 @@ class Thumbnails(CFrame):
         if cfg.config["SORT_MODIFIED"]:
             cfg.config["SORT_MODIFIED"] = False
             btn["text"] = "Дата создания"
-            cfg.THUMBNAILS.reload_thumbnails()
+            self.reload_without_scroll()
         else:
             cfg.config["SORT_MODIFIED"] = True
             btn["text"] = "Дата изменения"
-            cfg.THUMBNAILS.reload_thumbnails()
+            self.reload_without_scroll()
 
     def img_viewer(self, src, all_src, e):
         ImgViewer(src, all_src)
 
-    def reload_scrollable(self):
+    def decect_resize(self, e):
+        if self.resize_task:
+            cfg.ROOT.after_cancel(self.resize_task)
+        self.resize_task = cfg.ROOT.after(250, self.update_gui)
+
+    def update_gui(self):
+        old_w = cfg.config['ROOT_W']
+        new_w = cfg.ROOT.winfo_width()
+
+        if new_w != old_w:
+            cfg.config['ROOT_W'] = new_w
+
+            if self.clmns != self.clmns_count():
+                w, h = cfg.ROOT.winfo_width(), cfg.ROOT.winfo_height()
+                cfg.config['ROOT_W'], cfg.config['ROOT_H'] = w, h
+                cfg.ROOT.update_idletasks()
+                self.reload_without_scroll()
+
+    def reload_with_scroll(self):
         global date_start, date_end
 
         date_start = None
@@ -453,19 +408,61 @@ class Thumbnails(CFrame):
 
         self.scroll_parrent.destroy()
         self.load_scrollable()
-
-    def reload_thumbnails(self):
         self.thumbnails.destroy()
         self.load_thumbnails()
 
-    def show_more(self, e: tkinter.Event):
-        cfg.LIMIT += 150
-        self.reload_thumbnails()
+    def reload_without_scroll(self):
+        self.thumbnails.destroy()
+        self.load_thumbnails()
 
-    def reset_filter_cmd(e):
+    def show_more(self):
+        cfg.LIMIT += 150
+        self.reload_without_scroll()
+
+    def reset_filter_cmd(self):
         global date_start, date_end
 
         date_start = None
         date_end = None
 
-        cfg.THUMBNAILS.reload_thumbnails()
+        self.reload_without_scroll()
+
+    def clmns_count(self):
+        clmns = (cfg.config['ROOT_W'] - 180) // cfg.THUMB_SIZE
+        return 1 if clmns == 0 else clmns
+
+    def decode_thumbs(self, thumbs: tuple):
+        result = []
+        for blob, src, modified in thumbs:
+            try:
+                decoded = decode_image(blob)
+                cropped = crop_image(decoded)
+                rgb = convert_to_rgb(cropped)
+                img = ImageTk.PhotoImage(rgb)
+                result.append((img, src, modified))
+
+            except Exception:
+                print(traceback.format_exc())
+
+        return result
+
+    def create_thumbs_dict(self, thumbs: list):
+        thumbs_dict = {}
+        for img, src, modified in thumbs:
+            coll = get_coll_name(src)
+            t = datetime.fromtimestamp(modified).date()
+
+            if not date_start and not date_end:
+                t = f"{months[t.month]} {t.year}"
+
+            elif date_start and not date_end:
+                t = f"{t.day} {months_day[t.month]} {t.year}"
+
+            elif all((date_start, date_end)):
+                start = f"{date_start.day} {months_day[date_start.month]} {date_start.year}"
+                end = f"{date_end.day} {months_day[date_end.month]} {date_end.year}"
+                t = f"{start} - {end}"
+
+            thumbs_dict.setdefault((coll, t), []).append((img, src))
+
+        return thumbs_dict
