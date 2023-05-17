@@ -1,8 +1,7 @@
 from . import (Dbase, ImageTk, Thumbs, calendar, cfg, convert_to_rgb,
                crop_image, datetime, decode_image, find_jpeg, find_tiff,
-               get_coll_name, partial, sqlalchemy, tkinter,
+               get_coll_name, partial, place_center, sqlalchemy, tkinter,
                tkmacosx, traceback)
-from .calendar_gui import CCalendar
 from .img_viewer import ImgViewer
 from .widgets import *
 
@@ -38,9 +37,8 @@ months_day = {
     11: "ноября",
     12: "декабря"}
 
-day_value: datetime = None
-month_value: datetime = None
-sel_btn = None
+date_start: datetime = None
+date_end: datetime = None
 
 
 def clmns_count():
@@ -70,53 +68,62 @@ def create_thumbs_dict(thumbs: list):
         coll = get_coll_name(src)
         t = datetime.fromtimestamp(modified).date()
 
-        if day_value:
-            t = f"{t.day} {months_day[t.month]} {t.year}"
-        else:
+        if not date_start and not date_end:
             t = f"{months[t.month]} {t.year}"
+
+        elif date_start and not date_end:
+            print("date start")
+            t = f"{t.day} {months_day[t.month]} {t.year}"
+
+        elif all((date_start, date_end)):
+            print("all dates")
+            start = f"{date_start.day} {months_day[date_start.month]} {date_start.year}"
+            end = f"{date_end.day} {months_day[date_end.month]} {date_end.year}"
+            t = f"{start} - {end}"
 
         thumbs_dict.setdefault((coll, t), []).append((img, src))
 
     return thumbs_dict
 
 
-def stamp_month():
-    _, t_end = calendar.monthrange(
-        int(month_value.year), int(month_value.month)
+def stamp_range():
+    start = datetime.combine(date_start, datetime.min.time())
+    end = datetime.combine(
+        date_end, datetime.max.time().replace(microsecond=0)
         )
-
-    start = f"{1}-{month_value.month}-{month_value.year}"
-    start = datetime.strptime(start, "%d-%m-%Y")
-
-    end = f"{t_end}-{month_value.month}-{month_value.year}"
-    end = datetime.strptime(end, "%d-%m-%Y")
 
     return (datetime.timestamp(start), datetime.timestamp(end))
 
 
 def stamp_day():
-    start = datetime.combine(day_value.date(), datetime.min.time())
+    start = datetime.combine(date_start, datetime.min.time())
     end = datetime.combine(
-        day_value.date(), datetime.max.time().replace(microsecond=0)
+        date_start, datetime.max.time().replace(microsecond=0)
         )
     return int(start.timestamp()), int(end.timestamp())
 
 
 def create_query():
-    q = sqlalchemy.select(
-        Thumbs.img150, Thumbs.src, Thumbs.modified
-        ).limit(cfg.LIMIT).order_by(-Thumbs.modified)
+    q = sqlalchemy.select(Thumbs.img150, Thumbs.src, Thumbs.modified)
+
+    if cfg.config["SORT_MODIFIED"]:
+        q = q.order_by(-Thumbs.modified)
+    else:
+        q = q.order_by(-Thumbs.created)
 
     if cfg.config["CURR_COLL"] != "last":
         q = q.filter(Thumbs.collection == cfg.config["CURR_COLL"])
 
-    if day_value:
+    if not date_start and not date_end:
+        q = q.limit(cfg.LIMIT)
+
+    if date_start and not date_end:
         t = stamp_day()
         q = q.filter(Thumbs.modified > t[0])
         q = q.filter(Thumbs.modified < t[1])
     
-    elif month_value:
-        t = stamp_month()
+    elif all((date_start, date_end)):
+        t = stamp_range()
         q = q.filter(Thumbs.modified > t[0])
         q = q.filter(Thumbs.modified < t[1])
 
@@ -156,6 +163,7 @@ class ContextMenu(tkinter.Menu):
 class FilterWin(CWindow):
     def __init__(self):
         super().__init__()
+        self.title("Фильтр")
         f = ("San Francisco Pro", 17, "bold")
 
         cal_frames = CFrame(self)
@@ -168,8 +176,8 @@ class FilterWin(CWindow):
         first["font"] = f
         first.pack()
 
-        one = CCalendar(left, day_value)
-        one.pack()
+        self.one = CCalendar(left, date_start)
+        self.one.pack(pady=(15, 0))
 
         right = CFrame(cal_frames)
         right.pack(side="left")
@@ -178,13 +186,13 @@ class FilterWin(CWindow):
         second["font"] = f
         second.pack()
 
-        self.two = CCalendar(right, day_value)
-        self.two.pack()
+        self.two = CCalendar(right, date_end)
+        self.two.pack(pady=(15, 0))
 
         self.oneday_btn = CButton(self, text="За один день")
         self.oneday_btn.pack(pady=(15, 0))
         self.oneday_btn.cmd(lambda e: self.oneday_cmd())
-        self.oneday_value = False
+        self.oneday = False
 
         btns_frame = CFrame(self)
         btns_frame.pack(pady=(15, 0))
@@ -197,20 +205,41 @@ class FilterWin(CWindow):
         cancel_btn.pack(side="left")
         cancel_btn.cmd(lambda e: self.cancel())
 
+        if date_start and not date_end:
+            self.oneday = True
+            self.oneday_btn["bg"] = cfg.SELECTED
+            self.two.disable_calendar()
+
+        cfg.ROOT.update_idletasks()
+
+        place_center(self)
+        self.deiconify()
+        self.wait_visibility()
+        self.grab_set_global()
+
     def oneday_cmd(self):
-        if not self.oneday_value:
-            self.oneday_value = True
+        if not self.oneday:
+            self.oneday = True
             self.oneday_btn["bg"] = cfg.SELECTED
             self.two.disable_calendar()
 
         else:
-            self.oneday_value = False
+            self.oneday = False
             self.oneday_btn["bg"] = cfg.BUTTON
             self.two.enable_calendar()
 
     def ok_cmd(self):
+        global date_start, date_end
+
+        date_start = self.one.my_date
+        if not self.oneday:
+            date_end = self.two.my_date
+        else:
+            date_end = None
+
         self.destroy()
         focus_last()
+        cfg.THUMBNAILS.reload_thumbnails()
 
     def cancel(self):
         self.destroy()
@@ -259,8 +288,6 @@ class Thumbnails(CFrame):
         self.scrollable.pack(expand=1, fill=tkinter.BOTH)
 
     def load_thumbnails(self):
-        global btn_day, btn_month
-
         self.thumbnails = CFrame(self.scrollable)
 
         if cfg.config["CURR_COLL"] == "last":
@@ -279,41 +306,48 @@ class Thumbnails(CFrame):
         btns_frame = CFrame(self.thumbnails)
         btns_frame.pack()
 
-        btn_day = CButton(btns_frame, text = "Фильтр за день")
+        btn_day = CButton(btns_frame, text = "Фильтр")
         btn_day["width"] = 13
         btn_day.pack(side="left")
-        if day_value:
+        if any((date_start, date_end)):
             btn_day["bg"] = cfg.SELECTED
-
-        CSep(btns_frame).pack(fill="y", side="left", padx=15)
-
-        btn_month = CButton(btns_frame, text = "Фильтр за месяц")
-        btn_month["width"] = 13
-        btn_month.pack(side="left")
-        if month_value:
-            btn_month["bg"] = cfg.SELECTED
-
         btn_day.cmd(lambda e: FilterWin())
-        btn_month.cmd(lambda e: FilterWin(is_day=False))
+
+        CSep(btns_frame).pack(fill="y", side="left", padx=(15, 15))
+
+        if cfg.config["SORT_MODIFIED"]:
+            sort_btn_t = "Дата изменения"
+        else:
+            sort_btn_t = "Дата создания"
+
+        btn_sort = CButton(btns_frame, text=sort_btn_t)
+        btn_sort["width"] = 13
+        btn_sort.pack(side="left")
+        btn_sort.cmd(lambda e: self.sort_btn_cmd(btn_sort))
 
         self.clmns = clmns_count()
         load_db = Dbase.conn.execute(create_query()).fetchall()
         thumbs = decode_thumbs(load_db)
-        # all_src = [src for _, src, _ in thumbs]
         thumbs: dict = create_thumbs_dict(thumbs)
         summary = len(load_db)
         all_src = []
 
-        if any((day_value, month_value)):
-            if day_value:
-                t = f"{day_value.day} {months_day[day_value.month]} {day_value.year}"
-            elif month_value:
-                t = f"{months[month_value.month]} {month_value.year}"
+        t = None
 
+        if date_start and not date_end:
+            t = f"{date_start.day} {months_day[date_start.month]} {date_start.year}"
+
+        elif all((date_start, date_end)):
+            start = f"{date_start.day} {months_day[date_start.month]} {date_start.year}"
+            end = f"{date_end.day} {months_day[date_end.month]} {date_end.year}"
+            t = f"{start} - {end}"
+
+        if t:
             subtitle["text"] = f"{t}, всего: {summary}"
             reset = CButton(self.thumbnails, text="Сброс")
             reset.pack(pady=(15, 0))
             reset.cmd(lambda e: self.reset_filter_cmd())
+
         else:
             subtitle["text"] = f"Всего: {summary}"
 
@@ -365,14 +399,24 @@ class Thumbnails(CFrame):
 
         self.thumbnails.pack(expand=1, fill=tkinter.BOTH)
 
+    def sort_btn_cmd(self, btn: CButton):
+        if cfg.config["SORT_MODIFIED"]:
+            cfg.config["SORT_MODIFIED"] = False
+            btn["text"] = "Дата создания"
+            cfg.THUMBNAILS.reload_thumbnails()
+        else:
+            cfg.config["SORT_MODIFIED"] = True
+            btn["text"] = "Дата изменения"
+            cfg.THUMBNAILS.reload_thumbnails()
+
     def img_viewer(self, src, all_src, e):
         ImgViewer(src, all_src)
 
     def reload_scrollable(self):
-        global day_value, month_value
+        global date_start, date_end
 
-        day_value = None
-        month_value = None
+        date_start = None
+        date_end = None
 
         self.scroll_parrent.destroy()
         self.load_scrollable()
@@ -386,9 +430,9 @@ class Thumbnails(CFrame):
         self.reload_thumbnails()
 
     def reset_filter_cmd(e):
-        global day_value, month_value
+        global date_start, date_end
 
-        day_value = None
-        month_value = None
+        date_start = None
+        date_end = None
 
         cfg.THUMBNAILS.reload_thumbnails()

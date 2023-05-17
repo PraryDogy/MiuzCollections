@@ -42,6 +42,7 @@ default_vars = {
         'COLL_FOLDER': '/Volumes/Shares/Marketing/Photo/_Collections',
 
         'CURR_COLL': 'last',
+        'SORT_MODIFIED': True,
         'ASK_EXIT': 0,
 
         "ROOT_W": 700,

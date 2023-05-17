@@ -1,6 +1,6 @@
 from . import (Dbase, ImageTk, Thumbs, cfg, convert_to_rgb, cv2, decode_image,
                find_jpeg, find_tiff, get_coll_name, os, place_center,
-               resize_image, smb_check, sqlalchemy, tkinter)
+               resize_image, replace_bg, sqlalchemy, tkinter)
 from .widgets import *
 
 __all__ = (
@@ -175,7 +175,11 @@ class ImgViewer(CWindow):
         self.img_set(rgb_thumb)
 
     def img_place(self, width, height):
-        img_read = cv2.imread(src)
+        img_read = cv2.imread(src, cv2.IMREAD_UNCHANGED)
+        
+        if src.endswith(("png", "PNG")):
+            img_read = replace_bg(img_read)
+
         resized = resize_image(img_read, width, height, False)
         img_rgb = convert_to_rgb(resized)
         try:
