@@ -14,6 +14,7 @@ __all__ = (
     "MacMenu",
     "CCalendar",
     "focus_last",
+    "months",
     )
 
 months = {

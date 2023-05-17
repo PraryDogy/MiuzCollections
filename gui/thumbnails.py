@@ -1,27 +1,12 @@
-from . import (Dbase, ImageTk, Thumbs, calendar, cfg, convert_to_rgb,
-               crop_image, datetime, decode_image, find_jpeg, find_tiff,
-               get_coll_name, partial, place_center, sqlalchemy, tkinter,
-               tkmacosx, traceback)
+from . import (Dbase, ImageTk, Thumbs, cfg, convert_to_rgb, crop_image,
+               datetime, decode_image, find_jpeg, find_tiff, get_coll_name,
+               partial, place_center, sqlalchemy, tkinter, tkmacosx, traceback)
 from .img_viewer import ImgViewer
 from .widgets import *
 
 __all__ = (
     "Thumbnails",
     )
-
-months = {
-    1: "Январь",
-    2: "Февраль",
-    3: "Март",
-    4: "Апрель",
-    5: "Май",
-    6: "Июнь",
-    7: "Июль",
-    8: "Август",
-    9: "Сентябрь",
-    10: "Октябрь",
-    11: "Ноябрь",
-    12: "Декабрь"}
 
 months_day = {
     1: "января",
@@ -255,6 +240,16 @@ class Thumbnails(CFrame):
         self.scrollable.pack(expand=1, fill=tkinter.BOTH)
 
     def load_thumbnails(self):
+        self.clmns = self.clmns_count()
+        load_db = Dbase.conn.execute(create_query()).fetchall()
+        thumbs = self.decode_thumbs(load_db)
+        thumbs: dict = self.create_thumbs_dict(thumbs)
+        summary = len(load_db)
+        all_src = []
+
+        if summary == 1000 and any((date_start, date_end)):
+            LimitWin()
+
         self.thumbnails = CFrame(self.scrollable)
 
         if cfg.config["CURR_COLL"] == "last":
@@ -266,14 +261,69 @@ class Thumbnails(CFrame):
         title.configure(font=('San Francisco Pro', 45, 'bold'))
         title.pack()
 
-        subtitle = CLabel(self.thumbnails)
-        subtitle.configure(font=('San Francisco Pro', 13, 'normal'))
-        subtitle.pack(pady=(0, 15))
+        sub_frame = CFrame(self.thumbnails)
+        sub_frame.pack(pady=(0, 15))
+
+        sub_l = CFrame(sub_frame)
+        sub_l.pack(side="left", padx=5)
+
+        sub_r = CFrame(sub_frame)
+        sub_r.pack(side="right", padx=5)
+
+        sub_font=('San Francisco Pro', 13, 'normal')
+
+        first_l = CLabel(sub_l, text="Всего")
+        first_l.configure(font=sub_font, justify="right", anchor="e", width=30)
+        first_l.pack(anchor="e")
+
+        sec_l = CLabel(sub_l, text="Даты")
+        sec_l.configure(font=sub_font, justify="right", anchor="e", width=30)
+        sec_l.pack(anchor="e")
+
+        third_l = CLabel(sub_l, text="Сортировка")
+        third_l.configure(font=sub_font, justify="right", anchor="e", width=30)
+        third_l.pack(anchor="e")
+
+        first_r = CLabel(sub_r, text=f"{summary} фото")
+        first_r.configure(font=sub_font, justify="left", anchor="w", width=30)
+        first_r.pack(anchor="w")
+
+        if date_start and not date_end:
+            dates = (
+                f"{date_start.day} {months_day[date_start.month]} "
+                f"{date_start.year}"
+                )
+
+        elif all((date_start, date_end)):
+            start = (
+                f"{date_start.day} {months_day[date_start.month]} "
+                f"{date_start.year}"
+                )
+            end = (f"{date_end.day} {months_day[date_end.month]} "
+                   f"{date_end.year}"
+                   )
+            dates = f"{start} - {end}"
+
+        else:
+            dates = "За все время"
+
+        sec_r = CLabel(sub_r, text=dates)
+        sec_r.configure(font=sub_font, justify="left", anchor="w", width=30)
+        sec_r.pack(anchor="w")
+
+        if cfg.config["SORT_MODIFIED"]:
+            sort_text = "По дате изменения"
+        else:
+            sort_text = "По дате создания"
+
+        third_r = CLabel(sub_r, text=sort_text)
+        third_r.configure(font=sub_font, justify="left", anchor="w", width=30)
+        third_r.pack(anchor="w")
 
         btns_frame = CFrame(self.thumbnails)
         btns_frame.pack()
 
-        btn_day = CButton(btns_frame, text = "Фильтр")
+        btn_day = CButton(btns_frame, text="Фильтр")
         btn_day["width"] = 13
         btn_day.pack(side="left")
         if any((date_start, date_end)):
@@ -292,49 +342,27 @@ class Thumbnails(CFrame):
         btn_sort.pack(side="left")
         btn_sort.cmd(lambda e: self.sort_btn_cmd(btn_sort))
 
-        self.clmns = self.clmns_count()
-        load_db = Dbase.conn.execute(create_query()).fetchall()
-        thumbs = self.decode_thumbs(load_db)
-        thumbs: dict = self.create_thumbs_dict(thumbs)
-        summary = len(load_db)
-        all_src = []
-
-        if summary == 1000 and any((date_start, date_end)):
-            LimitWin()
-
-        t = None
-
-        if date_start and not date_end:
-            t = f"{date_start.day} {months_day[date_start.month]} {date_start.year}"
-
-        elif all((date_start, date_end)):
-            start = f"{date_start.day} {months_day[date_start.month]} {date_start.year}"
-            end = f"{date_end.day} {months_day[date_end.month]} {date_end.year}"
-            t = f"{start} - {end}"
-
-        if t:
-            subtitle["text"] = f"{t}, всего: {summary}"
+        if any((date_start, date_end)):
             reset = CButton(self.thumbnails, text="Сброс")
             reset.pack(pady=(15, 0))
             reset.cmd(lambda e: self.reset_filter_cmd())
 
-        else:
-            subtitle["text"] = f"Всего: {summary}"
-
-        for (coll, t), img_list in thumbs.items():
+        for (coll, dates), img_list in thumbs.items():
 
             if cfg.config["CURR_COLL"] == "last":
                 title = CLabel(self.thumbnails, text=coll)
                 title["font"] = ('San Francisco Pro', 26, 'bold')
                 title.pack(anchor="w", pady=(30, 0))
 
-            subtitle = CLabel(self.thumbnails, text=f"{t}, всего: {len(img_list)}")
-            subtitle.configure(
+            coll_sub = CLabel(
+                self.thumbnails, text=f"{dates}, всего: {len(img_list)}"
+                )
+            coll_sub.configure(
                 font=('San Francisco Pro', 13, 'normal'),
                 )
-            subtitle.pack(anchor="w")
+            coll_sub.pack(anchor="w")
             if cfg.config["CURR_COLL"] != "last":
-                subtitle.pack(pady=(30, 0))
+                coll_sub.pack(pady=(30, 0))
 
             img_row = CFrame(self.thumbnails)
             img_row.pack(fill = tkinter.X, expand=1, anchor=tkinter.W)
@@ -354,7 +382,7 @@ class Thumbnails(CFrame):
                 thumb.pack(side=tkinter.LEFT)
 
                 thumb.image_names = img
-                thumb.cmd(partial(self.img_viewer, src, all_src))
+                thumb.cmd(partial(self.img_viewer_cmd, src, all_src))
 
                 ContextMenu(thumb, src, all_src)
 
@@ -364,7 +392,7 @@ class Thumbnails(CFrame):
 
         if summary >= 150:
             more_btn = CButton(self.thumbnails, text="Показать еще")
-            more_btn.cmd(lambda e: self.show_more())
+            more_btn.cmd(lambda e: self.show_more_cmd())
             more_btn.pack(pady=(15, 0))
 
         self.thumbnails.pack(expand=1, fill=tkinter.BOTH)
@@ -379,15 +407,27 @@ class Thumbnails(CFrame):
             btn["text"] = "Дата изменения"
             self.reload_without_scroll()
 
-    def img_viewer(self, src, all_src, e):
+    def img_viewer_cmd(self, src, all_src, e):
         ImgViewer(src, all_src)
+
+    def show_more_cmd(self):
+        cfg.LIMIT += 150
+        self.reload_without_scroll()
+
+    def reset_filter_cmd(self):
+        global date_start, date_end
+
+        date_start = None
+        date_end = None
+
+        self.reload_without_scroll()
 
     def decect_resize(self, e):
         if self.resize_task:
             cfg.ROOT.after_cancel(self.resize_task)
-        self.resize_task = cfg.ROOT.after(250, self.update_gui)
+        self.resize_task = cfg.ROOT.after(250, self.update_thumbnails)
 
-    def update_gui(self):
+    def update_thumbnails(self):
         old_w = cfg.config['ROOT_W']
         new_w = cfg.ROOT.winfo_width()
 
@@ -414,18 +454,6 @@ class Thumbnails(CFrame):
     def reload_without_scroll(self):
         self.thumbnails.destroy()
         self.load_thumbnails()
-
-    def show_more(self):
-        cfg.LIMIT += 150
-        self.reload_without_scroll()
-
-    def reset_filter_cmd(self):
-        global date_start, date_end
-
-        date_start = None
-        date_end = None
-
-        self.reload_without_scroll()
 
     def clmns_count(self):
         clmns = (cfg.config['ROOT_W'] - 180) // cfg.THUMB_SIZE
@@ -459,8 +487,14 @@ class Thumbnails(CFrame):
                 t = f"{t.day} {months_day[t.month]} {t.year}"
 
             elif all((date_start, date_end)):
-                start = f"{date_start.day} {months_day[date_start.month]} {date_start.year}"
-                end = f"{date_end.day} {months_day[date_end.month]} {date_end.year}"
+                start = (
+                    f"{date_start.day} {months_day[date_start.month]} "
+                    f"{date_start.year}"
+                    )
+                end = (
+                    f"{date_end.day} {months_day[date_end.month]} "
+                    f"{date_end.year}"
+                    )
                 t = f"{start} - {end}"
 
             thumbs_dict.setdefault((coll, t), []).append((img, src))

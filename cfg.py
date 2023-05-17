@@ -10,7 +10,7 @@ APP_VER = '3.6.0'
 
 CFG_DIR = os.path.join(
     os.path.expanduser("~"),
-    f"Library/Application Support/{APP_NAME}"
+    f"Library", "Application Support", APP_NAME
     )
 
 # gui settings
