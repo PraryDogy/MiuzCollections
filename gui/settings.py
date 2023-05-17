@@ -58,9 +58,7 @@ class Settings(CWindow):
         CWindow.__init__(self)
         self.title('Настройки')
 
-        self.geometry("400x350")
-        self.minsize(400, 250)
-        self.maxsize(800, 300)
+        self.geometry("400x360")
 
         self.ask_exit = tkinter.IntVar(value = cfg.config['ASK_EXIT'])
 

@@ -12,8 +12,6 @@ class ScanerGui(CWindow):
         CWindow.__init__(self)
         self.title("Обновление")
         self.geometry("300x50")
-        self.minsize(300, 50)
-        self.maxsize(600, 50)
 
         self.live_lbl = CLabel(
             self,
