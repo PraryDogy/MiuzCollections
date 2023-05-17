@@ -116,6 +116,8 @@ def create_query():
 
     if not date_start and not date_end:
         q = q.limit(cfg.LIMIT)
+    else:
+        q = q.limit(1000)
 
     if date_start and not date_end:
         t = stamp_day()
@@ -158,6 +160,35 @@ class ContextMenu(tkinter.Menu):
             self.tk_popup(event.x_root, event.y_root)
         finally:
             self.grab_release()
+
+
+class LimitWin(CWindow):
+    def __init__(self):
+        super().__init__()
+        self.title("Лимит")
+
+        t = (
+            "Достигнут лимит отображения в 1000 фото."
+            "\nУменьшите диапазон дат для просмотра или"
+            "\nпримените фильтр в нужной коллекции."
+            )
+        lbl = CLabel(self, text=t, justify="left")
+        lbl.pack()
+
+        btn = CButton(self, text="Закрыть")
+        btn.pack(pady=(15, 0))
+        btn.cmd(lambda e: self.cmd())
+
+        cfg.ROOT.update_idletasks()
+
+        place_center(self)
+        self.deiconify()
+        self.wait_visibility()
+        self.grab_set_global()
+
+    def cmd(self):
+        self.destroy()
+        focus_last()
 
 
 class FilterWin(CWindow):
@@ -278,7 +309,6 @@ class Thumbnails(CFrame):
                 cfg.ROOT.update_idletasks()
                 self.reload_thumbnails()
 
-
     def load_scrollable(self):
         self.scroll_parrent = CFrame(self)
         self.scroll_parrent.pack(expand=1, fill=tkinter.BOTH)
@@ -331,6 +361,9 @@ class Thumbnails(CFrame):
         thumbs: dict = create_thumbs_dict(thumbs)
         summary = len(load_db)
         all_src = []
+
+        if summary == 1000 and any((date_start, date_end)):
+            LimitWin()
 
         t = None
 
