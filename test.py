@@ -167,7 +167,11 @@ class CCalendar(CFrame):
         m = 1 if m > 12 else m
         m = 12 if m < 1 else m
 
-        self.my_date = datetime(self.my_date.year, m, self.my_date.day)
+        try:
+            self.my_date = datetime(self.my_date.year, m, self.my_date.day)
+        except ValueError:
+            day = monthrange(self.my_date.year, m)[1]
+            self.my_date = datetime(self.my_date.year, m, day)
         self.m_title["text"] = months[m]
         self.fill_days()
 
@@ -183,7 +187,11 @@ class CCalendar(CFrame):
         elif y < 2015:
             y = self.today.year
 
-        self.my_date = datetime(y, self.my_date.month, self.my_date.day)
+        try:
+            self.my_date = datetime(y, self.my_date.month, self.my_date.day)
+        except ValueError:
+            day = monthrange(y, self.my_date.month)[1]
+            self.my_date = datetime(y, self.my_date.month, day)
 
         self.y_title["text"] = y
         self.fill_days()
