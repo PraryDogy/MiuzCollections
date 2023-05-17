@@ -1,7 +1,8 @@
 from . import (Dbase, ImageTk, Thumbs, calendar, cfg, convert_to_rgb,
                crop_image, datetime, decode_image, find_jpeg, find_tiff,
-               get_coll_name, partial, place_center, sqlalchemy, tkinter,
+               get_coll_name, partial, sqlalchemy, tkinter,
                tkmacosx, traceback)
+from .calendar_gui import CCalendar
 from .img_viewer import ImgViewer
 from .widgets import *
 
@@ -61,6 +62,7 @@ def decode_thumbs(thumbs: tuple):
             print(traceback.format_exc())
 
     return result
+
 
 def create_thumbs_dict(thumbs: list):
     thumbs_dict = {}
@@ -151,103 +153,68 @@ class ContextMenu(tkinter.Menu):
             self.grab_release()
 
 
-class CComboBox(tkmacosx.SFrame):
-    def __init__(self, master, items_list):
-        super().__init__(
-            master,
-            bg=cfg.BG,
-            scrollbarwidth=5,
-            width=100
-            )
-
-        for i in items_list:
-            d = CLabel(
-                self, text=str(i), anchor="w", width=10, bg=cfg.BUTTON,
-                padx=5
-                )
-            d["bg"] = cfg.BUTTON
-
-            d.pack(anchor="w", padx=(5, 0))
-            d.bind("<ButtonRelease-1>", partial(self.cmd, d))
-
-        self.btns = self.winfo_children()
-        self.var = None
-
-    def cmd(self, btn, e):
-        global sel_btn
-        for i in self.btns:
-            i["bg"] = cfg.BUTTON
-        btn['bg'] = cfg.SELECTED
-        self.var = btn["text"]
-
-
-class SelectDay(CWindow):
-    def __init__(self, is_day = True):
+class FilterWin(CWindow):
+    def __init__(self):
         super().__init__()
-        self.is_day = is_day
-        self.title("Фильтр по дате")
+        f = ("San Francisco Pro", 17, "bold")
 
-        combo_frame = CFrame(self)
-        combo_frame.pack()
+        cal_frames = CFrame(self)
+        cal_frames.pack()
 
-        if self.is_day:
-            self.d = CComboBox(combo_frame, [i for i in range(1, 32)])
-            self.d.pack(side="left")
+        left = CFrame(cal_frames)
+        left.pack(side="left", padx=(0, 15))
 
-        self.m = CComboBox(combo_frame, months.values())
-        self.m.pack(side="left")
+        first = CLabel(left, text="Начало")
+        first["font"] = f
+        first.pack()
 
-        self.y = CComboBox(
-            combo_frame,
-            [i for i in range(2015, datetime.today().year + 1)]
-            )
-        self.y.pack(side="left")
+        one = CCalendar(left, day_value)
+        one.pack()
 
-        CSep(self).pack(fill="x", pady=15)
+        right = CFrame(cal_frames)
+        right.pack(side="left")
 
-        btn_frame = CFrame(self)
-        btn_frame.pack()
+        second = CLabel(right, text="Конец")
+        second["font"] = f
+        second.pack()
 
-        btn_ok = CButton(btn_frame, text="Ок")
-        btn_ok.cmd(lambda e: self.ok_cmd())
-        btn_ok.pack(side="left", padx=(0, 15))
+        self.two = CCalendar(right, day_value)
+        self.two.pack()
 
-        btn_cancel = CButton(btn_frame, text="Отмена")
-        btn_cancel.cmd(lambda e: self.cancel_cmd())
-        btn_cancel.pack(side="left")
+        self.oneday_btn = CButton(self, text="За один день")
+        self.oneday_btn.pack(pady=(15, 0))
+        self.oneday_btn.cmd(lambda e: self.oneday_cmd())
+        self.oneday_value = False
 
-        cfg.ROOT.update_idletasks()
+        btns_frame = CFrame(self)
+        btns_frame.pack(pady=(15, 0))
 
-        place_center(self)
-        self.deiconify()
-        self.wait_visibility()
-        self.grab_set_global()
+        ok_btn = CButton(btns_frame, text="Ок")
+        ok_btn.pack(side="left", padx=15)
+        ok_btn.cmd(lambda e: self.ok_cmd())
 
-    def cancel_cmd(self):
-        self.destroy()
-        cfg.ROOT.focus_force()
+        cancel_btn = CButton(btns_frame, text="Отмена")
+        cancel_btn.pack(side="left")
+        cancel_btn.cmd(lambda e: self.cancel())
+
+    def oneday_cmd(self):
+        if not self.oneday_value:
+            self.oneday_value = True
+            self.oneday_btn["bg"] = cfg.SELECTED
+            self.two.disable_calendar()
+
+        else:
+            self.oneday_value = False
+            self.oneday_btn["bg"] = cfg.BUTTON
+            self.two.enable_calendar()
 
     def ok_cmd(self):
-        global day_value, month_value, d_btn, m_btn, y_btn
+        self.destroy()
+        focus_last()
 
-        btns = [self.m.var, self.y.var]
-        if self.is_day:
-            btns.insert(0, self.d.var)
-
-        if all(i for i in btns):
-
-            month = {v: k for k, v in months.items()}[self.m.var]
-
-            if self.is_day:
-                day_value = datetime(int(self.y.var), month, int(self.d.var))
-                month_value = None
-            else:
-                month_value = datetime(int(self.y.var), month, 1)
-                day_value = None
-
-            cfg.THUMBNAILS.reload_thumbnails()
-            self.destroy()
-            cfg.ROOT.focus_force()
+    def cancel(self):
+        self.destroy()
+        focus_last()
 
 
 class Thumbnails(CFrame):
@@ -326,8 +293,8 @@ class Thumbnails(CFrame):
         if month_value:
             btn_month["bg"] = cfg.SELECTED
 
-        btn_day.cmd(lambda e: SelectDay())
-        btn_month.cmd(lambda e: SelectDay(is_day=False))
+        btn_day.cmd(lambda e: FilterWin())
+        btn_month.cmd(lambda e: FilterWin(is_day=False))
 
         self.clmns = clmns_count()
         load_db = Dbase.conn.execute(create_query()).fetchall()

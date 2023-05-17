@@ -212,10 +212,3 @@ class CCalendar(CFrame):
 
         self.y_title["text"] = y
         self.fill_days()
-
-
-# import tkinter
-# root = tkinter.Tk()
-# CCalendar(root, datetime(2023, 1, 1)).pack()
-
-# root.mainloop()
