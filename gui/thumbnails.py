@@ -305,7 +305,7 @@ class Thumbnails(CFrame):
         btns_frame = CFrame(self.thumbnails)
         btns_frame.pack()
 
-        btn_day = CButton(btns_frame, text="Фильтр")
+        btn_day = CButton(btns_frame, text="Фильтр по дате")
         btn_day["width"] = 13
         btn_day.pack(side="left")
         if any((date_start, date_end)):
