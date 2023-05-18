@@ -57,10 +57,10 @@ class StBar(CFrame):
 
         CSep(self).pack(fill=tkinter.Y, side=tkinter.LEFT, padx=(15, 15))
 
-        upd_btn = CButton(self, text='Обновить', padx=5)
-        upd_btn['width'] = 10
-        upd_btn.cmd(lambda e: self.update_cmd(btn))
-        upd_btn.pack(side=tkinter.LEFT)
+        self.upd_btn = CButton(self, text='Обновить', padx=5)
+        self.upd_btn['width'] = 10
+        self.upd_btn.cmd(lambda e: self.update_cmd(btn))
+        self.upd_btn.pack(side=tkinter.LEFT)
 
     def settings_cmd(self, btn: CButton):
         btn.press()
@@ -75,3 +75,6 @@ class StBar(CFrame):
                 return
         else:
             ScanerGui()
+
+    def upd_btn_change(self):
+        return self.upd_btn

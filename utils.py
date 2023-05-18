@@ -12,6 +12,7 @@ from PIL import Image
 
 import cfg
 
+
 __all__ = (
     "get_coll_name",
     "place_center",

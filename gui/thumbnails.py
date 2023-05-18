@@ -213,8 +213,8 @@ class FilterWin(CWindow):
 
         self.destroy()
         focus_last()
-        from gui_start import gui_start
-        gui_start.thumbnails.reload_without_scroll()
+        from . import app
+        app.thumbnails.reload_without_scroll()
 
     def cancel(self):
         self.destroy()
@@ -260,39 +260,8 @@ class Thumbnails(CFrame):
         else:
             txt = cfg.config["CURR_COLL"]
 
-        title = CLabel(self.thumbnails, text=txt)
-        title.configure(font=('San Francisco Pro', 45, 'bold'))
-        title.pack()
-
-        sub_frame = CFrame(self.thumbnails)
-        sub_frame.pack(pady=(0, 15))
-
-        sub_l = CFrame(sub_frame)
-        sub_l.pack(side="left", padx=5)
-
-        sub_r = CFrame(sub_frame)
-        sub_r.pack(side="right", padx=5)
-
-        sub_font=('San Francisco Pro', 13, 'normal')
-
-        first_l = CLabel(sub_l, text="Всего")
-        first_l.configure(font=sub_font, justify="right", anchor="e", width=30)
-        first_l.pack(anchor="e")
-
-        sec_l = CLabel(sub_l, text="Даты")
-        sec_l.configure(font=sub_font, justify="right", anchor="e", width=30)
-        sec_l.pack(anchor="e")
-
-        third_l = CLabel(sub_l, text="Сортировка")
-        third_l.configure(font=sub_font, justify="right", anchor="e", width=30)
-        third_l.pack(anchor="e")
-
-        first_r = CLabel(sub_r, text=f"{summary} фото")
-        first_r.configure(font=sub_font, justify="left", anchor="w", width=30)
-        first_r.pack(anchor="w")
-
         if date_start and not date_end:
-            dates = (
+            title_dates = (
                 f"{date_start.day} {months_day[date_start.month]} "
                 f"{date_start.year}"
                 )
@@ -305,23 +274,33 @@ class Thumbnails(CFrame):
             end = (f"{date_end.day} {months_day[date_end.month]} "
                    f"{date_end.year}"
                    )
-            dates = f"{start} - {end}"
+            title_dates = f"{start} - {end}"
 
         else:
-            dates = "За все время"
-
-        sec_r = CLabel(sub_r, text=dates)
-        sec_r.configure(font=sub_font, justify="left", anchor="w", width=30)
-        sec_r.pack(anchor="w")
+            title_dates = "За все время"
 
         if cfg.config["SORT_MODIFIED"]:
             sort_text = "По дате изменения"
         else:
             sort_text = "По дате создания"
 
-        third_r = CLabel(sub_r, text=sort_text)
-        third_r.configure(font=sub_font, justify="left", anchor="w", width=30)
-        third_r.pack(anchor="w")
+        title = CLabel(self.thumbnails, text=txt)
+        title.configure(font=('San Francisco Pro', 45, 'bold'))
+        title.pack()
+
+        sub_frame = CFrame(self.thumbnails)
+        sub_frame.pack(pady=(0, 15))
+
+        sub_font=('San Francisco Pro', 13, 'normal')
+
+        l_subtitle = CLabel(sub_frame, text="Всего\nФильтр\nСортировка")
+        l_subtitle.configure(font=sub_font, justify="right", anchor="e", width=30)
+        l_subtitle.pack(anchor="e", side="left", padx=5)
+
+        r_text = f"{summary} фото\n{title_dates}\n{sort_text}"
+        r_subtitle = CLabel(sub_frame, text=r_text)
+        r_subtitle.configure(font=sub_font, justify="left", anchor="w", width=30)
+        r_subtitle.pack(anchor="w", side="right", padx=5)
 
         btns_frame = CFrame(self.thumbnails)
         btns_frame.pack()

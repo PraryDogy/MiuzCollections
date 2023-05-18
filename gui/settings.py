@@ -58,7 +58,7 @@ class Settings(CWindow):
         CWindow.__init__(self)
         self.title('Настройки')
 
-        self.geometry("400x360")
+        self.geometry("400x320")
 
         self.ask_exit = tkinter.IntVar(value = cfg.config['ASK_EXIT'])
 
@@ -94,7 +94,7 @@ class Settings(CWindow):
 
         select_path = CButton(select_frame, text='Обзор')
         select_path.cmd(lambda e: self.select_path_cmd())
-        select_path.pack(side="left", padx=(0, 10))
+        select_path.pack(side="left")
 
         exceptions_btn = CButton(select_frame, text="Исключения")
         # exceptions_btn.cmd(lambda e: ExceptionsWin(e))
@@ -134,7 +134,7 @@ class Settings(CWindow):
 
         CSep(cancel_frame).pack(pady=15, fill=tkinter.X)
 
-        save_btn = CButton(cancel_frame, text='Сохранить')
+        save_btn = CButton(cancel_frame, text='Ок')
         save_btn.cmd(lambda e: self.save_cmd())
         save_btn.pack(padx=(0, 10), side="left")
 

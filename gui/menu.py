@@ -26,9 +26,8 @@ def show_collection(master: tkinter.Button, collection_name):
     master['bg'] = cfg.SELECTED
     cfg.config['CURR_COLL'] = collection_name
 
-    from gui_start import gui_start
-
-    gui_start.thumbnails.reload_with_scroll()
+    from . import app
+    app.thumbnails.reload_with_scroll()
 
 
 class ContextMenu(tkinter.Menu):

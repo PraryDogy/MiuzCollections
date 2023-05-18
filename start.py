@@ -6,10 +6,9 @@ try:
     from gui.widgets import SmbAlert
     from scaner import scaner
     from utils import smb_check
-    from gui_start import gui_start
 
-    gui_start
     cfg.ROOT.deiconify()
+
     if smb_check():
         scaner()
     else:

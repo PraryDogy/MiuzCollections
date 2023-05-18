@@ -27,12 +27,13 @@ from .st_bar import *
 from .thumbnails import *
 from .widgets import *
 
+
 __all__ = (
-    "Gui"
+    "app"
     )
 
 
-class Gui:
+class Application:
     def __init__(self):
         cfg.ROOT.title(cfg.APP_NAME)
         cfg.ROOT.configure(bg=cfg.BG)
@@ -78,3 +79,6 @@ class Gui:
             f"+{cfg.config['ROOT_X']}+{cfg.config['ROOT_Y']}")
             )
         cfg.ROOT.minsize(800, 500)
+
+
+app = Application()
