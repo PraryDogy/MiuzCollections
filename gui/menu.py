@@ -78,6 +78,13 @@ class Menu(tkmacosx.SFrame):
 
         return frame
 
+    def re_collname(self, coll: str):
+        try:
+            coll = re.search("[A-Za-zА-Яа-я]+.{0,11}", coll).group(0)[:13]
+            return coll
+        except AttributeError:
+            return coll[:13]
+
     def load_menu_buttons(self):
         frame = CFrame(self)
 
@@ -92,7 +99,7 @@ class Menu(tkmacosx.SFrame):
         colls_list = (i[0] for i in colls_list)
 
         menus = {
-            coll: re.search("[A-Za-zА-Яа-я]+.{0,11}", coll).group(0)[:13]
+            coll: self.re_collname(coll)
             for coll in colls_list
             }
 
