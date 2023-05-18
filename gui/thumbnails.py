@@ -8,6 +8,9 @@ __all__ = (
     "Thumbnails",
     )
 
+show_limit = 9000
+
+
 months_day = {
     1: "января",
     2: "февраля",
@@ -57,7 +60,7 @@ def create_query():
     if not date_start and not date_end:
         q = q.limit(cfg.LIMIT)
     else:
-        q = q.limit(1000)
+        q = q.limit(show_limit)
 
     if date_start and not date_end:
         t = stamp_day()
@@ -108,7 +111,7 @@ class LimitWin(CWindow):
         self.title("Лимит")
 
         t = (
-            "Достигнут лимит отображения в 1000 фото."
+            f"Достигнут лимит отображения в {show_limit} фото."
             "\nУменьшите диапазон дат для просмотра или"
             "\nпримените фильтр в нужной коллекции."
             )
@@ -247,7 +250,7 @@ class Thumbnails(CFrame):
         summary = len(load_db)
         all_src = []
 
-        if summary == 1000 and any((date_start, date_end)):
+        if summary == show_limit and any((date_start, date_end)):
             LimitWin()
 
         self.thumbnails = CFrame(self.scrollable)
