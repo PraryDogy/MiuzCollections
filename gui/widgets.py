@@ -263,10 +263,10 @@ class MacMenu(tkinter.Menu):
 
 class CCalendar(CFrame):
     def __init__(self, master, my_date: datetime):
-
         super().__init__(master)
         self["bg"] = cfg.BUTTON
 
+        self.enabled = True
         self.my_date = my_date
         self.today = datetime.today().date()
 
@@ -369,12 +369,19 @@ class CCalendar(CFrame):
         return parrent
 
     def disable_calendar(self):
+        self.enabled = False
+
         for i in self.all_btns:
-            i["fg"] = cfg.HOVERED
+            i.config(fg=cfg.HOVERED, bg=cfg.BUTTON)
 
     def enable_calendar(self):
+       self.enabled = True
+
        for i in self.all_btns:
             i["fg"] = cfg.FONT
+
+            if self.my_date.day == i["text"]:
+                i.configure(bg=cfg.SELECTED)
 
     def create_days(self):
         first_weekday = datetime.weekday(
@@ -402,6 +409,9 @@ class CCalendar(CFrame):
                 btn["bg"] = cfg.SELECTED
 
     def select_day(self, btn, e):
+        if not self.enabled:
+            return
+
         if btn["text"]:
             for i in self.btns:
                 i["bg"] = cfg.BUTTON
@@ -414,6 +424,9 @@ class CCalendar(CFrame):
                 )
 
     def switch_month(self, txt, e):
+        if not self.enabled:
+            return
+
         if txt != "<":
             m = self.my_date.month + 1
         else:
@@ -431,6 +444,9 @@ class CCalendar(CFrame):
         self.fill_days()
 
     def switch_year(self, txt, e):
+        if not self.enabled:
+            return
+
         if txt != "<":
             y = self.my_date.year + 1
         else:
