@@ -1,31 +1,57 @@
 import tkinter as tk
-# Uses Python Imaging Library.
-from PIL import Image as ImagePIL, ImageTk
+from PIL import Image as Image, ImageTk
+from database import Dbase, Thumbs
+import sqlalchemy
+from utils import *
+import numpy
+from random import randint
+import cfg
+import tkmacosx
 
-root = tk.Tk()
-canvas = tk.Canvas(root, height=500, width=500, highlightthickness=0)
-canvas.pack()
-images = dict()
-for name in ['up', 'down']:
-    im = ImagePIL.open('im_{}.png'.format(name))
-    # Resize the image to 10 pixels square.
-    im = im.resize((30, 30), ImagePIL.Resampling.LANCZOS)
-    images[name] = ImageTk.PhotoImage(im, name=name)
+q = sqlalchemy.select(Thumbs.img150, Thumbs.src, Thumbs.modified).limit(20)
+res = Dbase.conn.execute(q).fetchall()
 
-def set_cell_image(coord, image):
-    # Get position of centre of cell.
-    x, y = ((p + 0.5) * 30 for p in coord)
-    canvas.create_image(x, y, image=image)
+root = cfg.ROOT
+root.deiconify()
 
-for i in range(10):
-    for j in range(10):
-        set_cell_image((i, j), images['up'])
+scrollable = tkmacosx.SFrame(root)
+scrollable.pack(expand=True, fill="both")
 
-def click(event):
-    coord = tuple(getattr(event, p)/10 for p in ['x', 'y'])
-    set_cell_image(coord, images['down'])
-    print(coord)
+images = []
+
+for blob, src, modified in res:
+    decoded = decode_image(blob)
+    cropped = crop_image(decoded)
+    rgb = convert_to_rgb(cropped)
+    images.append(rgb)
 
 
-canvas.bind('<Button-1>', click)
+clmns = 5
+row, clmn = 0, 0
+new = Image.new("RGBA", (150*4,150*5), color=cfg.BG)
+
+for num, im in enumerate(images, 1):
+
+    new.paste(im, (row, clmn))
+
+    clmn += 150 + 2
+    if num % clmns == 0:
+        row += 150 + 2
+        clmn = 0
+
+
+img = ImageTk.PhotoImage(new)
+lbl = tk.Label(scrollable, image=img)
+lbl.pack()
+lbl.image_names = img
+
+
+def click(event: tk.Event):
+    x, y = event.x, event.y
+    row = (y//150) + 1
+    clmn = (x//150) + 1
+
+    print(row, clmn)
+
+lbl.bind('<Button-1>', click)
 root.mainloop()
