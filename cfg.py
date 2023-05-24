@@ -6,7 +6,7 @@ import tkinter
 # app info
 APP_NAME = 'MiuzCollections'
 DB = "db.db"
-APP_VER = '3.6.0'
+APP_VER = '3.6.1'
 
 CFG_DIR = os.path.join(
     os.path.expanduser("~"),
