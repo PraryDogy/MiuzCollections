@@ -3,13 +3,12 @@ from . import (Dbase, ImageTk, Thumbs, cfg, convert_to_rgb, crop_image,
                partial, place_center, sqlalchemy, tkinter, tkmacosx, traceback)
 from .img_viewer import ImgViewer
 from .widgets import *
+from PIL import Image
+import math
 
 __all__ = (
     "Thumbnails",
     )
-
-show_limit = 9000
-
 
 months_day = {
     1: "января",
@@ -59,8 +58,6 @@ def create_query():
 
     if not date_start and not date_end:
         q = q.limit(cfg.LIMIT)
-    else:
-        q = q.limit(show_limit)
 
     if date_start and not date_end:
         t = stamp_day()
@@ -76,8 +73,8 @@ def create_query():
 
 
 class ContextMenu(tkinter.Menu):
-    def __init__(self, master: tkinter.Label, src: str, all_src: list):
-        tkinter.Menu.__init__(self, master)
+    def __init__(self, src: str, all_src: list, e: tkinter.Event):
+        tkinter.Menu.__init__(self)
 
         self.add_command(
             label = "Просмотр",
@@ -96,42 +93,14 @@ class ContextMenu(tkinter.Menu):
             label = "Показать tiff",
             command = lambda: find_tiff(src)
             )
-        master.bind("<Button-2>", self.do_popup)
+
+        self.do_popup(e)
 
     def do_popup(self, event):
         try:
             self.tk_popup(event.x_root, event.y_root)
         finally:
             self.grab_release()
-
-
-class LimitWin(CWindow):
-    def __init__(self):
-        super().__init__()
-        self.title("Лимит")
-
-        t = (
-            f"Достигнут лимит отображения в {show_limit} фото."
-            "\nУменьшите диапазон дат для просмотра или"
-            "\nпримените фильтр в нужной коллекции."
-            )
-        lbl = CLabel(self, text=t, justify="left")
-        lbl.pack()
-
-        btn = CButton(self, text="Закрыть")
-        btn.pack(pady=(15, 0))
-        btn.cmd(lambda e: self.cmd())
-
-        cfg.ROOT.update_idletasks()
-
-        place_center(self)
-        self.deiconify()
-        self.wait_visibility()
-        self.grab_set_global()
-
-    def cmd(self):
-        self.destroy()
-        focus_last()
 
 
 class FilterWin(CWindow):
@@ -246,12 +215,11 @@ class Thumbnails(CFrame):
         self.clmns = self.clmns_count()
         load_db = Dbase.conn.execute(create_query()).fetchall()
         thumbs = self.decode_thumbs(load_db)
-        thumbs: dict = self.create_thumbs_dict(thumbs)
         summary = len(load_db)
+        thumbs: dict = self.create_thumbs_dict(thumbs)
         all_src = []
-
-        if summary == show_limit and any((date_start, date_end)):
-            LimitWin()
+        pad = 4
+        self.size = cfg.THUMB_SIZE + pad
 
         self.thumbnails = CFrame(self.scrollable)
 
@@ -331,46 +299,46 @@ class Thumbnails(CFrame):
 
         for (coll, dates), img_list in thumbs.items():
 
+            thumbs_text = []
             if cfg.config["CURR_COLL"] == "last":
-                title = CLabel(self.thumbnails, text=coll)
-                title["font"] = ('San Francisco Pro', 26, 'bold')
-                title.pack(anchor="w", pady=(30, 0))
+                thumbs_text.append(coll)
+            thumbs_text.append(f"{dates}, всего: {len(img_list)}")
 
-            coll_sub = CLabel(
-                self.thumbnails, text=f"{dates}, всего: {len(img_list)}"
+            thumbs_title = CLabel(
+                self.thumbnails,
+                text="\n".join(thumbs_text),
+                anchor="w",
+                justify="left",
                 )
-            coll_sub.configure(
-                font=('San Francisco Pro', 13, 'normal'),
-                )
-            coll_sub.pack(anchor="w")
-            if cfg.config["CURR_COLL"] != "last":
-                coll_sub.pack(pady=(30, 0))
+            thumbs_title["font"] = ('San Francisco Pro', 18, 'bold')
+            thumbs_title.pack(anchor="w", pady=(30, 0), padx=2)
 
-            img_row = CFrame(self.thumbnails)
-            img_row.pack(fill = tkinter.X, expand=1, anchor=tkinter.W)
+            w = self.size * self.clmns
+            h = self.size * (math.ceil(len(img_list) / self.clmns))
+            empty = Image.new("RGBA", (w, h), color=cfg.BG)
+
+            row, clmn = 0, 0
+            grid_list = dict()
 
             for x, (img, src) in enumerate(img_list, 1):
 
                 all_src.append(src)
+                grid_list[(clmn//self.size, row//self.size)] = src
 
-                thumb = CButton(img_row)
-                thumb.configure(
-                    width = cfg.THUMB_SIZE,
-                    height = cfg.THUMB_SIZE,
-                    bg=cfg.BG,
-                    image = img,
-                    text = src
-                    )
-                thumb.pack(side=tkinter.LEFT)
+                empty.paste(img, (clmn, row))
 
-                thumb.image_names = img
-                thumb.cmd(partial(self.img_viewer_cmd, src, all_src))
-
-                ContextMenu(thumb, src, all_src)
-
+                clmn += self.size
                 if x % self.clmns == 0:
-                    img_row = CFrame(self.thumbnails)
-                    img_row.pack(fill=tkinter.Y, expand=1, anchor=tkinter.W)
+                    row += self.size
+                    clmn = 0
+
+            img = ImageTk.PhotoImage(empty)
+            img_lbl = CLabel(self.thumbnails, image=img)
+            img_lbl.pack(anchor="w")
+            img_lbl.image_names = img
+            img_lbl.bind('<Button-1>', partial(self.click, grid_list, all_src))
+            img_lbl.bind("<Button-2>", partial(self.r_click, grid_list, all_src))
+
 
         if summary >= 150:
             more_btn = CButton(self.thumbnails, text="Показать еще")
@@ -447,8 +415,7 @@ class Thumbnails(CFrame):
             try:
                 decoded = decode_image(blob)
                 cropped = crop_image(decoded)
-                rgb = convert_to_rgb(cropped)
-                img = ImageTk.PhotoImage(rgb)
+                img = convert_to_rgb(cropped)
                 result.append((img, src, modified))
 
             except Exception:
@@ -482,3 +449,27 @@ class Thumbnails(CFrame):
             thumbs_dict.setdefault((coll, t), []).append((img, src))
 
         return thumbs_dict
+
+    def click(self, grid_list, all_src, e: tkinter.Event):
+        x, y = e.x, e.y
+        row = (y//self.size)
+        clmn = (x//self.size)
+
+        try:
+            src = grid_list[(clmn, row)]
+        except KeyError:
+            return
+
+        ImgViewer(src, all_src)
+
+    def r_click(self, grid_list, all_src, e: tkinter.Event):
+        x, y = e.x, e.y
+        row = (y//self.size)
+        clmn = (x//self.size)
+
+        try:
+            src = grid_list[(clmn, row)]
+        except KeyError:
+            return
+
+        ContextMenu(src, all_src, e)
