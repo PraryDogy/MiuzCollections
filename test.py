@@ -25,18 +25,20 @@ for blob, src, modified in res:
     rgb = convert_to_rgb(cropped)
     images.append(rgb)
 
-
 clmns = 5
-row, clmn = 0, 0
-new = Image.new("RGBA", (150*4,150*5), color=cfg.BG)
+pad = 2
+size = cfg.THUMB_SIZE + pad
 
+new = Image.new("RGBA", (size * 4, size * 5), color=cfg.BG)
+
+row, clmn = 0, 0
 for num, im in enumerate(images, 1):
 
     new.paste(im, (row, clmn))
 
-    clmn += 150 + 2
+    clmn += size
     if num % clmns == 0:
-        row += 150 + 2
+        row += size
         clmn = 0
 
 
@@ -48,8 +50,8 @@ lbl.image_names = img
 
 def click(event: tk.Event):
     x, y = event.x, event.y
-    row = (y//150) + 1
-    clmn = (x//150) + 1
+    row = (y//size) + 1
+    clmn = (x//size) + 1
 
     print(row, clmn)
 
