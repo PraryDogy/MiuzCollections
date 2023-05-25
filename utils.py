@@ -127,10 +127,10 @@ def resize_image(img, widget_w, widget_h, thumbnail: bool):
     return cv2.resize(img, (new_w, new_h), interpolation=cv2.INTER_AREA)
 
 
-def replace_bg(image):
+def replace_bg(image, color: str):
     try:
         trans_mask = image[:,:,3 ] == 0
-        color = cfg.BG.replace("#", "")
+        color = color.replace("#", "")
         bg_color = tuple(int(color[i:i+2], 16) for i in (0, 2, 4))
         image[trans_mask] = [*bg_color, 255]
     except IndexError:
@@ -142,7 +142,7 @@ def encode_image(src):
     image = cv2.imread(src, cv2.IMREAD_UNCHANGED)
 
     if src.endswith((".png", ".PNG")):
-        image = replace_bg(image)
+        image = replace_bg(image, cfg.bg)
 
     resized = resize_image(image, cfg.THUMB_SIZE, cfg.THUMB_SIZE, True)
 

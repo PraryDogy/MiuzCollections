@@ -178,7 +178,7 @@ class ImgViewer(CWindow):
         img_read = cv2.imread(src, cv2.IMREAD_UNCHANGED)
         
         if src.endswith(("png", "PNG")):
-            img_read = replace_bg(img_read)
+            img_read = replace_bg(img_read, "#000000")
 
         resized = resize_image(img_read, width, height, False)
         img_rgb = convert_to_rgb(resized)

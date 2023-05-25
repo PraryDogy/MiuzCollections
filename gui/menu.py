@@ -57,7 +57,7 @@ class Menu(tkmacosx.SFrame):
             master,
             bg = cfg.BG,
             scrollbarwidth = 7,
-            width = 180
+            width = cfg.MENU_W
             )
 
         cfg.MENU = self

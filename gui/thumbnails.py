@@ -59,7 +59,7 @@ def create_query():
     if not date_start and not date_end:
         q = q.limit(cfg.LIMIT)
 
-    if date_start and not date_end:
+    elif date_start and not date_end:
         t = stamp_day()
         q = q.filter(Thumbs.modified > t[0])
         q = q.filter(Thumbs.modified < t[1])
@@ -212,16 +212,15 @@ class Thumbnails(CFrame):
         self.scrollable.pack(expand=1, fill=tkinter.BOTH)
 
     def load_thumbnails(self):
+        self.all_src = []
+        self.all_thumbs = dict()
         self.clmns = self.clmns_count()
         load_db = Dbase.conn.execute(create_query()).fetchall()
+        padding = 4
         thumbs = self.decode_thumbs(load_db)
-        summary = len(load_db)
         thumbs: dict = self.create_thumbs_dict(thumbs)
-        all_src = []
-        pad = 4
-        self.size = cfg.THUMB_SIZE + pad
-
-        self.thumbnails = CFrame(self.scrollable)
+        self.size = cfg.THUMB_SIZE + padding
+        summary = len(load_db)
 
         if cfg.config["CURR_COLL"] == "last":
             txt = "Все коллекции"
@@ -251,6 +250,8 @@ class Thumbnails(CFrame):
             sort_text = "По дате изменения"
         else:
             sort_text = "По дате создания"
+
+        self.thumbnails = CFrame(self.scrollable)
 
         title = CLabel(self.thumbnails, text=txt)
         title.configure(font=('San Francisco Pro', 45, 'bold'))
@@ -318,12 +319,12 @@ class Thumbnails(CFrame):
             empty = Image.new("RGBA", (w, h), color=cfg.BG)
 
             row, clmn = 0, 0
-            grid_list = dict()
-
             for x, (img, src) in enumerate(img_list, 1):
 
-                all_src.append(src)
-                grid_list[(clmn//self.size, row//self.size)] = src
+                self.all_src.append(src)
+                self.all_thumbs.setdefault(
+                    f"{coll},{dates}", dict()
+                    )[(clmn//self.size, row//self.size)] = src
 
                 empty.paste(img, (clmn, row))
 
@@ -333,12 +334,11 @@ class Thumbnails(CFrame):
                     clmn = 0
 
             img = ImageTk.PhotoImage(empty)
-            img_lbl = CLabel(self.thumbnails, image=img)
+            img_lbl = CLabel(self.thumbnails, image=img, text=f"{coll},{dates}")
             img_lbl.pack(anchor="w")
             img_lbl.image_names = img
-            img_lbl.bind('<Button-1>', partial(self.click, grid_list, all_src))
-            img_lbl.bind("<Button-2>", partial(self.r_click, grid_list, all_src))
-
+            img_lbl.bind('<Button-1>', partial(self.click))
+            img_lbl.bind("<Button-2>", partial(self.r_click))
 
         if summary >= 150:
             more_btn = CButton(self.thumbnails, text="Показать еще")
@@ -406,7 +406,7 @@ class Thumbnails(CFrame):
         self.load_thumbnails()
 
     def clmns_count(self):
-        clmns = (cfg.config['ROOT_W'] - 180) // cfg.THUMB_SIZE
+        clmns = (cfg.config['ROOT_W'] - cfg.MENU_W) // cfg.THUMB_SIZE
         return 1 if clmns == 0 else clmns
 
     def decode_thumbs(self, thumbs: tuple):
@@ -450,26 +450,20 @@ class Thumbnails(CFrame):
 
         return thumbs_dict
 
-    def click(self, grid_list, all_src, e: tkinter.Event):
-        x, y = e.x, e.y
-        row = (y//self.size)
-        clmn = (x//self.size)
-
+    def click(self, e: tkinter.Event):
         try:
-            src = grid_list[(clmn, row)]
+            clmn, row = e.x//self.size, e.y//self.size
+            src = self.all_thumbs[e.widget.cget("text")][(clmn, row)]
         except KeyError:
             return
 
-        ImgViewer(src, all_src)
+        ImgViewer(src, self.all_src)
 
-    def r_click(self, grid_list, all_src, e: tkinter.Event):
-        x, y = e.x, e.y
-        row = (y//self.size)
-        clmn = (x//self.size)
-
+    def r_click(self, e: tkinter.Event):
         try:
-            src = grid_list[(clmn, row)]
+            clmn, row = e.x//self.size, e.y//self.size
+            src = self.all_thumbs[e.widget.cget("text")][(clmn, row)]
         except KeyError:
             return
 
-        ContextMenu(src, all_src, e)
+        ContextMenu(src, self.all_src, e)
