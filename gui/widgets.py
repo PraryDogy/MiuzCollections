@@ -42,7 +42,7 @@ def focus_last():
 
 class CSep(tkinter.Frame):
     def __init__(self, master: tkinter):
-        tkinter.Frame.__init__(self, master, bg=cfg.BUTTON, height=1)
+        super().__init__(master, bg=cfg.BUTTON, height=1)
 
 
 class CButton(tkinter.Label):
@@ -264,7 +264,6 @@ class MacMenu(tkinter.Menu):
 class CCalendar(CFrame):
     def __init__(self, master, my_date: datetime):
         super().__init__(master)
-        self["bg"] = cfg.BUTTON
 
         self.enabled = True
         self.my_date = my_date
@@ -285,7 +284,7 @@ class CCalendar(CFrame):
 
         titles = CFrame(parrent)
         titles["bg"] = cfg.BUTTON
-        titles.pack()
+        titles.pack(pady=(5, 0))
 
         month_frame = CFrame(titles)
         month_frame["bg"] = cfg.BUTTON
@@ -337,6 +336,10 @@ class CCalendar(CFrame):
         next.cmd(lambda e: self.switch_year(next["text"], e))
         self.all_btns.append(next)
 
+        sep = CSep(parrent)
+        sep.configure(bg=cfg.BG)
+        sep.pack(fill="x")
+
         row = CFrame(parrent)
         row.pack()
 
@@ -346,12 +349,16 @@ class CCalendar(CFrame):
             lbl.pack(side="left")
             self.all_btns.append(lbl)
 
+        sep = CSep(parrent)
+        sep.configure(bg=cfg.BG)
+        sep.pack(fill="x")
+
         row = CFrame(parrent)
         row.pack()
 
         self.btns = []
 
-        for i in range(1, 42):
+        for i in range(1, 43):
             lbl = CButton(row)
             lbl.configure(width=4, height=2)
             lbl.pack(side="left")
@@ -372,7 +379,8 @@ class CCalendar(CFrame):
         self.enabled = False
 
         for i in self.all_btns:
-            i.config(fg=cfg.HOVERED, bg=cfg.BUTTON)
+            if i["bg"] in (cfg.BUTTON, cfg.SELECTED):
+                i.config(fg=cfg.HOVERED, bg=cfg.BUTTON)
 
     def enable_calendar(self):
        self.enabled = True
@@ -392,7 +400,7 @@ class CCalendar(CFrame):
 
         days = [None for i in range(first_weekday)]
         days.extend([i for i in range(1, month_len)])
-        days.extend([None for i in range(42 - (len(days)))])
+        days.extend([None for i in range(42 - len(days))])
 
         return days
 
@@ -401,10 +409,9 @@ class CCalendar(CFrame):
 
         for day, btn in zip(days, self.btns):
             if day:
-                btn["text"] = day
+                btn.configure(text=day, bg=cfg.BUTTON)
             else:
-                btn["text"] = ""
-            btn["bg"] = cfg.BUTTON
+                btn.configure(text="", bg=cfg.BG)
             if btn["text"] == self.my_date.day:
                 btn["bg"] = cfg.SELECTED
 
@@ -414,7 +421,8 @@ class CCalendar(CFrame):
 
         if btn["text"]:
             for i in self.btns:
-                i["bg"] = cfg.BUTTON
+                if i["bg"] == cfg.SELECTED:
+                    i["bg"] = cfg.BUTTON
             btn["bg"] = cfg.SELECTED
 
             self.my_date = datetime(

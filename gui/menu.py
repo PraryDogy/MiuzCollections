@@ -151,9 +151,6 @@ class Menu(tkmacosx.SFrame):
         ScanerGui()
 
     def reload(self):
-        """
-        External use
-        """
         menu_buttons.clear()
         self.menu_buttons.destroy()
         self.menu_buttons = self.load_menu_buttons()
@@ -162,16 +159,4 @@ class Menu(tkmacosx.SFrame):
     
     def open_coll_folder(self, coll: str, btn: CButton, e):
         cfg.LIMIT = 150
-
-        if btn['bg'] == cfg.SELECTED:
-            btn['bg'] = cfg.HOVERED
-
-            cfg.ROOT.after(
-                200,
-                lambda: btn.configure(bg=cfg.SELECTED)
-                )
-
-            open_finder(coll)
-            return
-
         show_collection(btn, coll)

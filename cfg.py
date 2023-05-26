@@ -38,7 +38,6 @@ default_vars = {
         'COLL_FOLDER': '/Volumes/Shares/Marketing/Photo/_Collections',
 
         'CURR_COLL': 'last',
-        'SORT_MODIFIED': True,
         'ASK_EXIT': 0,
 
         "ROOT_W": 700,
@@ -48,6 +47,12 @@ default_vars = {
 
         "PREVIEW_W": 700,
         "PREVIEW_H": 500,
+
+        'SORT_MODIFIED': True,
+
+        "CATALOG": True,
+        "MARKETING": True,
+        "CATALOG_NAME": "Обтравка",
 
         "STOPWORDS": [
             "preview", "1x1", "1х1", "crop", "копия", "copy"

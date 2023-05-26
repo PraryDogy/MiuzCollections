@@ -1,10 +1,12 @@
+import math
+
+from PIL import Image
+
 from . import (Dbase, ImageTk, Thumbs, cfg, convert_to_rgb, crop_image,
-               datetime, decode_image, find_jpeg, find_tiff, get_coll_name,
-               partial, place_center, sqlalchemy, tkinter, tkmacosx, traceback)
+               datetime, decode_image, find_jpeg, find_tiff, os, partial,
+               place_center, sqlalchemy, tkinter, tkmacosx, traceback)
 from .img_viewer import ImgViewer
 from .widgets import *
-from PIL import Image
-import math
 
 __all__ = (
     "Thumbnails",
@@ -55,6 +57,23 @@ def create_query():
 
     if cfg.config["CURR_COLL"] != "last":
         q = q.filter(Thumbs.collection == cfg.config["CURR_COLL"])
+
+    # только имиджи - маркетинг труе, каталог фалсе
+    # только каталожка - маркетинг фалсе, каталог труе
+    # показать все- маркетинг и каталог фалсе
+
+    if cfg.config["MARKETING"]:
+        q = q.filter(
+            sqlalchemy.not_(
+            Thumbs.src.contains(
+            cfg.config["CATALOG_NAME"]
+            )))
+
+    elif cfg.config["CATALOG"]:
+        q = q.filter(
+            Thumbs.src.contains(
+            cfg.config["CATALOG_NAME"]
+            ))
 
     if not date_start and not date_end:
         q = q.limit(cfg.LIMIT)
@@ -298,16 +317,10 @@ class Thumbnails(CFrame):
             reset.pack(pady=(15, 0))
             reset.cmd(lambda e: self.reset_filter_cmd())
 
-        for (coll, dates), img_list in thumbs.items():
-
-            thumbs_text = []
-            if cfg.config["CURR_COLL"] == "last":
-                thumbs_text.append(coll)
-            thumbs_text.append(f"{dates}, всего: {len(img_list)}")
-
+        for dates, img_list in thumbs.items():
             thumbs_title = CLabel(
                 self.thumbnails,
-                text="\n".join(thumbs_text),
+                text=f"{dates}, всего: {len(img_list)}",
                 anchor="w",
                 justify="left",
                 )
@@ -323,7 +336,7 @@ class Thumbnails(CFrame):
 
                 self.all_src.append(src)
                 self.all_thumbs.setdefault(
-                    f"{coll},{dates}", dict()
+                    dates, dict()
                     )[(clmn//self.size, row//self.size)] = src
 
                 empty.paste(img, (clmn, row))
@@ -334,7 +347,7 @@ class Thumbnails(CFrame):
                     clmn = 0
 
             img = ImageTk.PhotoImage(empty)
-            img_lbl = CLabel(self.thumbnails, image=img, text=f"{coll},{dates}")
+            img_lbl = CLabel(self.thumbnails, image=img, text=dates)
             img_lbl.pack(anchor="w")
             img_lbl.image_names = img
             img_lbl.bind('<Button-1>', partial(self.click))
@@ -426,7 +439,6 @@ class Thumbnails(CFrame):
     def create_thumbs_dict(self, thumbs: list):
         thumbs_dict = {}
         for img, src, modified in thumbs:
-            coll = get_coll_name(src)
             t = datetime.fromtimestamp(modified).date()
 
             if not date_start and not date_end:
@@ -446,7 +458,7 @@ class Thumbnails(CFrame):
                     )
                 t = f"{start} - {end}"
 
-            thumbs_dict.setdefault((coll, t), []).append((img, src))
+            thumbs_dict.setdefault(t, []).append((img, src))
 
         return thumbs_dict
 
