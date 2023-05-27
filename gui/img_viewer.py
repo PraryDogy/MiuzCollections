@@ -75,7 +75,7 @@ class ImgViewer(CWindow):
 
         self.thumb_place(self.win_width, self.win_height)
         self.task = conf.root.after(
-            250, lambda: self.img_place(self.win_width, self.win_height))
+            500, lambda: self.img_place(self.win_width, self.win_height))
 
         place_center(self)
         self.deiconify()

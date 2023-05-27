@@ -41,8 +41,11 @@ def focus_last():
     conf.root.focus_force()
 
 class CSep(tkinter.Frame):
-    def __init__(self, master: tkinter):
-        super().__init__(master, bg=conf.btn_color, height=1)
+    def __init__(self, master: tkinter, **kw):
+        super().__init__(master, **kw)
+
+        if not kw:
+            self.configure(bg=conf.btn_color, height=1)
 
 
 class CButton(tkinter.Label):

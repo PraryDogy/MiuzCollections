@@ -117,28 +117,28 @@ class FilterWin(CWindow):
         self.title("Фильтр")
         f = ("San Francisco Pro", 17, "bold")
 
-        cal_frames = CFrame(self)
-        cal_frames.pack()
+        calendar_frames = CFrame(self)
+        calendar_frames.pack()
 
-        left = CFrame(cal_frames)
-        left.pack(side="left", padx=(0, 15))
+        left_frame = CFrame(calendar_frames)
+        left_frame.pack(side="left", padx=(0, 15))
 
-        first = CLabel(left, text="Начало")
-        first["font"] = f
-        first.pack()
+        left_title = CLabel(left_frame, text="Начало")
+        left_title["font"] = f
+        left_title.pack()
 
-        self.one = CCalendar(left, date_start)
-        self.one.pack()
+        self.left_calendar = CCalendar(left_frame, date_start)
+        self.left_calendar.pack()
 
-        right = CFrame(cal_frames)
-        right.pack(side="left")
+        right_frame = CFrame(calendar_frames)
+        right_frame.pack(side="left")
 
-        second = CLabel(right, text="Конец")
-        second["font"] = f
-        second.pack()
+        right_title = CLabel(right_frame, text="Конец")
+        right_title["font"] = f
+        right_title.pack()
 
-        self.two = CCalendar(right, date_end)
-        self.two.pack()
+        self.right_calendar = CCalendar(right_frame, date_end)
+        self.right_calendar.pack()
 
         self.oneday_btn = CButton(self, text="За один день")
         self.oneday_btn.pack()
@@ -205,7 +205,7 @@ class FilterWin(CWindow):
         if date_start and not date_end:
             self.oneday = True
             self.oneday_btn["bg"] = conf.sel_color
-            self.two.disable_calendar()
+            self.right_calendar.disable_calendar()
 
         conf.root.update_idletasks()
 
@@ -250,20 +250,20 @@ class FilterWin(CWindow):
         if not self.oneday:
             self.oneday = True
             self.oneday_btn["bg"] = conf.sel_color
-            self.two.disable_calendar()
+            self.right_calendar.disable_calendar()
 
         else:
             self.oneday = False
             self.oneday_btn["bg"] = conf.btn_color
-            self.two.enable_calendar()
+            self.right_calendar.enable_calendar()
 
     def ok_cmd(self):
         global date_start, date_end
 
-        if any((self.one.clicked, self.two.clicked)):
-            date_start = self.one.my_date
+        if any((self.left_calendar.clicked, self.right_calendar.clicked)):
+            date_start = self.left_calendar.my_date
             if not self.oneday:
-                date_end = self.two.my_date
+                date_end = self.right_calendar.my_date
             else:
                 date_end = None
 
@@ -280,7 +280,7 @@ class FilterWin(CWindow):
 class Thumbnails(CFrame):
     def __init__(self, master):
         super().__init__(master)
-        self.clmns = 1
+        self.clmns_count = 1
 
         conf.root.update_idletasks()
 
@@ -291,23 +291,25 @@ class Thumbnails(CFrame):
         self.resize_task = None
 
     def load_scrollable(self):
-        self.scroll_parrent = CFrame(self)
-        self.scroll_parrent.pack(expand=1, fill=tkinter.BOTH)
+        self.scroll_frame = CFrame(self)
+        self.scroll_frame.pack(expand=1, fill=tkinter.BOTH)
 
-        self.scrollable = tkmacosx.SFrame(
-            self.scroll_parrent, bg=conf.bg_color, scrollbarwidth=7)
-        self.scrollable.pack(expand=1, fill=tkinter.BOTH)
+        self.sframe = tkmacosx.SFrame(
+            self.scroll_frame, bg=conf.bg_color, scrollbarwidth=7)
+        self.sframe.pack(expand=1, fill=tkinter.BOTH)
 
     def load_thumbnails(self):
         self.all_src = []
-        self.all_thumbs = dict()
-        self.clmns = self.clmns_count()
-        load_db = Dbase.conn.execute(create_query()).fetchall()
-        padding = 4
-        thumbs = self.decode_thumbs(load_db)
-        thumbs: dict = self.create_thumbs_dict(thumbs)
-        self.size = conf.thumb_size + padding
-        summary = len(load_db)
+        self.thumbs_coords = dict()
+        self.clmns_count = self.get_clmns_count()
+
+        self.thumbs = Dbase.conn.execute(create_query()).fetchall()
+        summary = len(self.thumbs)
+
+        self.thumbs = self.decode_thumbs()
+        self.thumbs: dict = self.create_thumbs_dict()
+
+        self.size = conf.thumb_size + conf.thumb_pad
 
         if conf.curr_coll == "last":
             txt = "Все коллекции"
@@ -347,44 +349,44 @@ class Thumbnails(CFrame):
         else:
             sort_text = "По дате создания"
 
-        self.thumbnails = CFrame(self.scrollable)
+        self.thumbs_frame = CFrame(self.sframe)
 
-        title = CLabel(self.thumbnails, text=txt)
-        title.configure(font=('San Francisco Pro', 45, 'bold'))
-        title.pack()
+        main_title = CLabel(self.thumbs_frame, text=txt)
+        main_title.configure(font=('San Francisco Pro', 45, 'bold'))
+        main_title.pack()
 
-        sub_frame = CFrame(self.thumbnails)
-        sub_frame.pack(pady=(0, 15))
+        main_sub_frame = CFrame(self.thumbs_frame)
+        main_sub_frame.pack(pady=(0, 15))
 
         sub_font=('San Francisco Pro', 13, 'normal')
 
-        l_subtitle = CLabel(sub_frame, text="Всего\nФильтр\nСортировка")
+        l_subtitle = CLabel(main_sub_frame, text="Всего\nФильтр\nСортировка")
         l_subtitle.configure(font=sub_font, justify="right", anchor="e", width=30)
         l_subtitle.pack(anchor="e", side="left", padx=5)
 
         r_text = f"{summary} фото\n{filter_row}\n{sort_text}"
-        r_subtitle = CLabel(sub_frame, text=r_text)
+        r_subtitle = CLabel(main_sub_frame, text=r_text)
         r_subtitle.configure(font=sub_font, justify="left", anchor="w", width=30)
         r_subtitle.pack(anchor="w", side="right", padx=5)
 
-        btns_frame = CFrame(self.thumbnails)
+        btns_frame = CFrame(self.thumbs_frame)
         btns_frame.pack()
 
-        btn_day = CButton(btns_frame, text="Фильтры")
-        btn_day["width"] = 13
-        btn_day.pack(side="left")
+        btn_filter = CButton(btns_frame, text="Фильтры")
+        btn_filter["width"] = 13
+        btn_filter.pack(side="left")
         if any((date_start, date_end)):
-            btn_day["bg"] = conf.sel_color
-        btn_day.cmd(lambda e: FilterWin())
+            btn_filter.configure(bg=conf.sel_color)
+        btn_filter.cmd(lambda e: FilterWin())
 
         if any((date_start, date_end)):
-            reset = CButton(self.thumbnails, text="Сброс даты")
+            reset = CButton(self.thumbs_frame, text="Сброс даты")
             reset.pack(pady=(15, 0))
             reset.cmd(lambda e: self.reset_filter_cmd())
 
-        for dates, img_list in thumbs.items():
+        for dates, img_list in self.thumbs.items():
             thumbs_title = CLabel(
-                self.thumbnails,
+                self.thumbs_frame,
                 text=f"{dates}, всего: {len(img_list)}",
                 anchor="w",
                 justify="left",
@@ -392,41 +394,38 @@ class Thumbnails(CFrame):
             thumbs_title["font"] = ('San Francisco Pro', 18, 'bold')
             thumbs_title.pack(anchor="w", pady=(30, 0), padx=2)
 
-            w = self.size * self.clmns
-            h = self.size * (math.ceil(len(img_list) / self.clmns))
+            w = self.size * self.clmns_count
+            h = self.size * (math.ceil(len(img_list) / self.clmns_count))
             empty = Image.new("RGBA", (w, h), color=conf.bg_color)
 
             row, clmn = 0, 0
             for x, (img, src) in enumerate(img_list, 1):
 
                 self.all_src.append(src)
-                self.all_thumbs.setdefault(
+                self.thumbs_coords.setdefault(
                     dates, dict()
                     )[(clmn//self.size, row//self.size)] = src
 
                 empty.paste(img, (clmn, row))
 
                 clmn += self.size
-                if x % self.clmns == 0:
+                if x % self.clmns_count == 0:
                     row += self.size
                     clmn = 0
 
             img = ImageTk.PhotoImage(empty)
-            img_lbl = CLabel(self.thumbnails, image=img, text=dates)
+            img_lbl = CLabel(self.thumbs_frame, image=img, text=dates)
             img_lbl.pack(anchor="w")
             img_lbl.image_names = img
             img_lbl.bind('<Button-1>', partial(self.click))
             img_lbl.bind("<Button-2>", partial(self.r_click))
 
         if summary >= 150:
-            more_btn = CButton(self.thumbnails, text="Показать еще")
+            more_btn = CButton(self.thumbs_frame, text="Показать еще")
             more_btn.cmd(lambda e: self.show_more_cmd())
             more_btn.pack(pady=(15, 0))
 
-        self.thumbnails.pack(expand=1, fill=tkinter.BOTH)
-
-    def img_viewer_cmd(self, src, all_src, e):
-        ImgViewer(src, all_src)
+        self.thumbs_frame.pack(expand=1, fill=tkinter.BOTH)
 
     def show_more_cmd(self):
         conf.limit += 150
@@ -443,7 +442,7 @@ class Thumbnails(CFrame):
     def decect_resize(self, e):
         if self.resize_task:
             conf.root.after_cancel(self.resize_task)
-        self.resize_task = conf.root.after(250, self.update_thumbnails)
+        self.resize_task = conf.root.after(500, self.update_thumbnails)
 
     def update_thumbnails(self):
         old_w = conf.root_w
@@ -452,7 +451,7 @@ class Thumbnails(CFrame):
         if new_w != old_w:
             conf.root_w = new_w
 
-            if self.clmns != self.clmns_count():
+            if self.clmns_count != self.get_clmns_count():
                 w, h = conf.root.winfo_width(), conf.root.winfo_height()
                 conf.root_w, conf.root_h = w, h
                 conf.root.update_idletasks()
@@ -464,22 +463,22 @@ class Thumbnails(CFrame):
         date_start = None
         date_end = None
 
-        self.scroll_parrent.destroy()
+        self.scroll_frame.destroy()
         self.load_scrollable()
-        self.thumbnails.destroy()
+        self.thumbs_frame.destroy()
         self.load_thumbnails()
 
     def reload_without_scroll(self):
-        self.thumbnails.destroy()
+        self.thumbs_frame.destroy()
         self.load_thumbnails()
 
-    def clmns_count(self):
+    def get_clmns_count(self):
         clmns = (conf.root_w - conf.menu_w) // conf.thumb_size
         return 1 if clmns == 0 else clmns
 
-    def decode_thumbs(self, thumbs: tuple):
+    def decode_thumbs(self):
         result = []
-        for blob, src, modified in thumbs:
+        for blob, src, modified in self.thumbs:
             try:
                 decoded = decode_image(blob)
                 cropped = crop_image(decoded)
@@ -491,9 +490,9 @@ class Thumbnails(CFrame):
 
         return result
 
-    def create_thumbs_dict(self, thumbs: list):
+    def create_thumbs_dict(self):
         thumbs_dict = {}
-        for img, src, modified in thumbs:
+        for img, src, modified in self.thumbs:
             t = datetime.fromtimestamp(modified).date()
 
             if not date_start and not date_end:
@@ -520,7 +519,7 @@ class Thumbnails(CFrame):
     def click(self, e: tkinter.Event):
         try:
             clmn, row = e.x//self.size, e.y//self.size
-            src = self.all_thumbs[e.widget.cget("text")][(clmn, row)]
+            src = self.thumbs_coords[e.widget.cget("text")][(clmn, row)]
         except KeyError:
             return
 
@@ -529,7 +528,7 @@ class Thumbnails(CFrame):
     def r_click(self, e: tkinter.Event):
         try:
             clmn, row = e.x//self.size, e.y//self.size
-            src = self.all_thumbs[e.widget.cget("text")][(clmn, row)]
+            src = self.thumbs_coords[e.widget.cget("text")][(clmn, row)]
         except KeyError:
             return
 

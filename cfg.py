@@ -34,6 +34,7 @@ class Config:
         self.thumb_size = 150
         self.menu_w = 180
         self.limit = 150
+        self.thumb_pad = 3
 
         # dynamic variables for gui
         self.flag = False
@@ -44,6 +45,7 @@ class Config:
         self.root = tkinter.Tk()
         self.root.withdraw()
 
+        # user settings for json
         self.coll_folder = '/Volumes/Shares/Marketing/Photo/_Collections'
 
         self.curr_coll = 'last'
@@ -58,8 +60,8 @@ class Config:
         self.preview_h = 500
 
         self.sort_modified = True
-        self.catalog = True
-        self.marketing = True
+        self.catalog = False
+        self.marketing = False
         self.catalog_name = "Обтравка"
 
         self.stopwords = [
