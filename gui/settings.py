@@ -1,7 +1,7 @@
 from database import *
 
-from . import (cfg, filedialog, on_exit, place_center, scaner, smb_check,
-               sqlalchemy, tkinter, os, subprocess, re)
+from . import (conf, filedialog, on_exit, os, place_center, re, scaner,
+               smb_check, sqlalchemy, tkinter)
 from .widgets import *
 
 path_widget = tkinter.Label
@@ -22,7 +22,7 @@ class ExceptionsWin(CWindow):
 
         collections = {
             i: re.search("[A-Za-zА-Яа-я]+.{0,11}", i).group(0)[:13]
-            for i in os.listdir(cfg.config["COLL_FOLDER"])
+            for i in os.listdir(conf.coll_folder)
             }
 
         collections = dict(
@@ -40,7 +40,7 @@ class ExceptionsWin(CWindow):
         self.bind('<Command-w>', lambda e: self.close_win())
         self.bind('<Escape>', lambda e: self.close_win())
 
-        cfg.ROOT.update_idletasks()
+        conf.root.update_idletasks()
 
         place_center(self)
         self.deiconify()
@@ -55,17 +55,17 @@ class ExceptionsWin(CWindow):
 
 class Settings(CWindow):
     def __init__(self):
-        CWindow.__init__(self)
+        super().__init__()
         self.title('Настройки')
 
         self.geometry("400x320")
 
-        self.ask_exit = tkinter.IntVar(value = cfg.config['ASK_EXIT'])
+        self.ask_exit = tkinter.IntVar(value=conf.ask_exit)
 
         self.main_wid = self.main_widget()
         self.main_wid.pack(expand=True, fill="both")
 
-        cfg.ROOT.update_idletasks()
+        conf.root.update_idletasks()
 
         place_center(self)
         self.deiconify()
@@ -83,7 +83,7 @@ class Settings(CWindow):
 
         path_widget = CLabel(
             frame,
-            text=cfg.config['COLL_FOLDER'],
+            text=conf.coll_folder,
             anchor="w",
             justify="left"
             )
@@ -96,14 +96,10 @@ class Settings(CWindow):
         select_path.cmd(lambda e: self.select_path_cmd())
         select_path.pack(side="left")
 
-        exceptions_btn = CButton(select_frame, text="Исключения")
-        # exceptions_btn.cmd(lambda e: ExceptionsWin(e))
-        # exceptions_btn.pack(side="left")
-
         checkbox_frame = CFrame(frame)
         checkbox_frame.pack(pady=(15, 0))
 
-        checkbox_wid = tkinter.Checkbutton(checkbox_frame, bg=cfg.BG)
+        checkbox_wid = tkinter.Checkbutton(checkbox_frame, bg=conf.bg_color)
         checkbox_wid['command'] = lambda: self.checkbox_cmd(checkbox_wid)
 
         if self.ask_exit.get() == 1:
@@ -158,7 +154,7 @@ class Settings(CWindow):
 
     def select_path_cmd(self):
         global path_widget, SCAN_AGAIN
-        path = filedialog.askdirectory(initialdir = cfg.config["COLL_FOLDER"])
+        path = filedialog.askdirectory(initialdir = conf.coll_folder)
 
         if len(path) == 0:
             return
@@ -171,7 +167,8 @@ class Settings(CWindow):
         global SCAN_AGAIN
 
         btn.press()
-        path_widget['text'] = cfg.default_vars['COLL_FOLDER']
+        default = conf.get_defaults()
+        path_widget['text'] = default.coll_folder
         checkbox_wid.select()
 
         Dbase.conn.execute(sqlalchemy.delete(Thumbs))
@@ -182,27 +179,27 @@ class Settings(CWindow):
     def save_cmd(self):
         global SCAN_AGAIN, SCANER_PERMISSION
 
-        cfg.config['COLL_FOLDER'] = path_widget['text']
-        cfg.config['ASK_EXIT'] = self.ask_exit.get()
+        conf.coll_folder = path_widget['text']
+        conf.ask_exit = self.ask_exit.get()
 
-        if cfg.config["ASK_EXIT"] == 1:
-            cfg.ROOT.protocol("WM_DELETE_WINDOW", AskExit)
-            cfg.ROOT.createcommand("tk::mac::Quit" , AskExit)
+        if conf.ask_exit == 1:
+            conf.root.protocol("WM_DELETE_WINDOW", AskExit)
+            conf.root.createcommand("tk::mac::Quit" , AskExit)
         else:
-            cfg.ROOT.createcommand("tk::mac::Quit" , on_exit)
-            cfg.ROOT.protocol("WM_DELETE_WINDOW", on_exit)
+            conf.root.createcommand("tk::mac::Quit" , on_exit)
+            conf.root.protocol("WM_DELETE_WINDOW", on_exit)
 
-        cfg.write_cfg(cfg.config)
+        conf.write_cfg()
         self.destroy()
         focus_last()
 
         if SCAN_AGAIN:
             SCAN_AGAIN = False
-            cfg.FLAG = False
+            conf.flag = False
 
             try:
-                while cfg.SCANER_TASK.is_alive():
-                    cfg.ROOT.update()
+                while conf.scaner_task.is_alive():
+                    conf.root.update()
             except AttributeError:
                 print("settings.py: no task scaner")
             if smb_check():

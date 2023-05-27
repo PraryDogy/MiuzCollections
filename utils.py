@@ -10,8 +10,7 @@ import cv2
 import numpy
 from PIL import Image
 
-import cfg
-
+from cfg import conf
 
 __all__ = (
     "get_coll_name",
@@ -51,7 +50,7 @@ def normalize_name(name: str):
     name, ext = os.path.splitext(name)
     name = name.translate(str.maketrans("", "", string.punctuation))
 
-    for i in cfg.config["STOPWORDS"]:
+    for i in conf.stopwords:
         name = name.replace(i, "")
 
     return name.replace(" ", "")
@@ -90,7 +89,7 @@ def find_jpeg(src: str):
 
 
 def get_coll_name(src: str):
-    coll = src.replace(cfg.config["COLL_FOLDER"], "")
+    coll = src.replace(conf.coll_folder, "")
     coll = coll.strip(os.sep)
     return coll.split(os.sep)[0]
 
@@ -100,9 +99,9 @@ def place_center(top_level: tkinter.Toplevel):
     Place new tkinter window to center relavive main window.
     * param `top_level`: tkinter.TopLevel
     """
-    x, y = cfg.ROOT.winfo_x(), cfg.ROOT.winfo_y()
-    xx = x + cfg.ROOT.winfo_width()//2 - top_level.winfo_width()//2
-    yy = y + cfg.ROOT.winfo_height()//2 - top_level.winfo_height()//2
+    x, y = conf.root.winfo_x(), conf.root.winfo_y()
+    xx = x + conf.root.winfo_width()//2 - top_level.winfo_width()//2
+    yy = y + conf.root.winfo_height()//2 - top_level.winfo_height()//2
 
     top_level.geometry(f'+{xx}+{yy}')
 
@@ -142,9 +141,9 @@ def encode_image(src):
     image = cv2.imread(src, cv2.IMREAD_UNCHANGED)
 
     if src.endswith((".png", ".PNG")):
-        image = replace_bg(image, cfg.bg)
+        image = replace_bg(image, conf.bg_color)
 
-    resized = resize_image(image, cfg.THUMB_SIZE, cfg.THUMB_SIZE, True)
+    resized = resize_image(image, conf.thumb_size, conf.thumb_size, True)
 
     try:
         return cv2.imencode('.jpg', resized)[1].tobytes()
@@ -173,7 +172,7 @@ def crop_image(img):
     else:
         delta = (width-height)//2
         cropped = img[0:height, delta:width-delta]
-    return cropped[0:cfg.THUMB_SIZE, 0:cfg.THUMB_SIZE]
+    return cropped[0:conf.thumb_size, 0:conf.thumb_size]
 
 
 def smb_check():
@@ -181,21 +180,21 @@ def smb_check():
     Check smb disk avability with os path exists.
     Return bool.
     """
-    if not os.path.exists(cfg.config['COLL_FOLDER']):
+    if not os.path.exists(conf.coll_folder):
         return False
     return True
 
 
 def on_exit():
-    w, h = cfg.ROOT.winfo_width(), cfg.ROOT.winfo_height()
-    x, y = cfg.ROOT.winfo_x(), cfg.ROOT.winfo_y()
+    w, h = conf.root.winfo_width(), conf.root.winfo_height()
+    x, y = conf.root.winfo_x(), conf.root.winfo_y()
 
-    cfg.config['ROOT_W'] = w
-    cfg.config['ROOT_H'] = h
-    cfg.config['ROOT_X'] = x
-    cfg.config['ROOT_Y'] = y
+    conf.root_w = w
+    conf.root_h = h
+    conf.root_x = x
+    conf.root_y = y
 
-    cfg.write_cfg(cfg.config)
+    conf.write_cfg()
 
-    cfg.FLAG = False
+    conf.flag = False
     quit()

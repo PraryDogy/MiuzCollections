@@ -3,7 +3,7 @@ import threading
 
 import sqlalchemy
 
-import cfg
+from cfg import conf
 from database import Dbase, Thumbs
 from utils import encode_image, get_coll_name
 
@@ -15,7 +15,7 @@ UPDATE_THUMBNAILS = False
 
 
 def change_live_lvl(text):
-    cfg.LIVE_TEXT = text
+    conf.live_text = text
 
 
 def st_bar_btn(text: str, color: str):
@@ -39,8 +39,8 @@ def update_collections():
     exts = (".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG")
 
     collections = [
-        os.path.join(cfg.config["COLL_FOLDER"], i)
-        for i in os.listdir(cfg.config["COLL_FOLDER"])
+        os.path.join(conf.coll_folder, i)
+        for i in os.listdir(conf.coll_folder)
         if not i.startswith((".", "_"))
         ]
 
@@ -54,12 +54,12 @@ def update_collections():
 
         for root, dirs, files in os.walk(collection):
 
-            if not cfg.FLAG:
+            if not conf.flag:
                 return
 
             for file in files:
 
-                if not cfg.FLAG:
+                if not conf.flag:
                     return
 
                 if file.endswith(exts):
@@ -92,7 +92,7 @@ def update_collections():
                 )
                 }
             for x, (src, size, created, modified) in enumerate(new_images, 1)
-            if cfg.FLAG
+            if conf.flag
             ]
 
         limit = 300
@@ -103,7 +103,7 @@ def update_collections():
 
         for vals in values:
             
-            if not cfg.FLAG:
+            if not conf.flag:
                 return
 
             q = sqlalchemy.insert(Thumbs).values(
@@ -120,7 +120,7 @@ def update_collections():
     remove_images = []
 
     for src, size, created, modified in db_images:
-        if not cfg.FLAG:
+        if not conf.flag:
             return
 
         if (src, size, created, modified) not in found_images:
@@ -139,7 +139,7 @@ def update_collections():
             "b_modified": modified,
             }
             for src, size, created, modified in remove_images
-            if cfg.FLAG
+            if conf.flag
             ]
 
         limit = 300
@@ -150,7 +150,7 @@ def update_collections():
 
         for vals in values:
 
-            if not cfg.FLAG:
+            if not conf.flag:
                 return
 
             q = sqlalchemy.delete(Thumbs).filter(
@@ -165,16 +165,16 @@ def update_collections():
 def scaner():
     global UPDATE_THUMBNAILS
 
-    cfg.FLAG = True
-    st_bar_btn("Обновление", cfg.SELECTED)
+    conf.flag = True
+    st_bar_btn("Обновление", conf.sel_color)
 
-    cfg.SCANER_TASK = threading.Thread(target = update_collections, daemon = True)
-    cfg.SCANER_TASK.start()
+    conf.scaner_task = threading.Thread(target = update_collections, daemon = True)
+    conf.scaner_task.start()
 
-    while cfg.SCANER_TASK.is_alive():
-        cfg.ROOT.update()
+    while conf.scaner_task.is_alive():
+        conf.root.update()
 
-    cfg.LIVE_TEXT = ""
+    conf.live_text = ""
 
     if UPDATE_THUMBNAILS:
         from gui import app
@@ -182,5 +182,5 @@ def scaner():
         app.menu.reload()
         UPDATE_THUMBNAILS = False
 
-    cfg.FLAG = False
-    st_bar_btn("Обновить", cfg.BUTTON)
+    conf.flag = False
+    st_bar_btn("Обновить", conf.btn_color)

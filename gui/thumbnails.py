@@ -2,8 +2,8 @@ import math
 
 from PIL import Image
 
-from . import (Dbase, ImageTk, Thumbs, cfg, convert_to_rgb, crop_image,
-               datetime, decode_image, find_jpeg, find_tiff, os, partial,
+from . import (Dbase, ImageTk, Thumbs, conf, convert_to_rgb, crop_image,
+               datetime, decode_image, find_jpeg, find_tiff, partial,
                place_center, sqlalchemy, tkinter, tkmacosx, traceback)
 from .img_viewer import ImgViewer
 from .widgets import *
@@ -50,33 +50,26 @@ def stamp_day():
 def create_query():
     q = sqlalchemy.select(Thumbs.img150, Thumbs.src, Thumbs.modified)
 
-    if cfg.config["SORT_MODIFIED"]:
+    if conf.sort_modified:
         q = q.order_by(-Thumbs.modified)
     else:
         q = q.order_by(-Thumbs.created)
 
-    if cfg.config["CURR_COLL"] != "last":
-        q = q.filter(Thumbs.collection == cfg.config["CURR_COLL"])
+    if conf.curr_coll != "last":
+        q = q.filter(Thumbs.collection == conf.curr_coll)
 
     # только имиджи - маркетинг труе, каталог фалсе
     # только каталожка - маркетинг фалсе, каталог труе
     # показать все- маркетинг и каталог фалсе
 
-    if cfg.config["MARKETING"]:
-        q = q.filter(
-            sqlalchemy.not_(
-            Thumbs.src.contains(
-            cfg.config["CATALOG_NAME"]
-            )))
+    if conf.marketing:
+        q = q.filter(sqlalchemy.not_(Thumbs.src.contains(conf.catalog_name)))
 
-    elif cfg.config["CATALOG"]:
-        q = q.filter(
-            Thumbs.src.contains(
-            cfg.config["CATALOG_NAME"]
-            ))
+    elif conf.catalog:
+        q = q.filter(Thumbs.src.contains(conf.catalog_name))
 
     if not date_start and not date_end:
-        q = q.limit(cfg.LIMIT)
+        q = q.limit(conf.limit)
 
     elif date_start and not date_end:
         t = stamp_day()
@@ -93,7 +86,7 @@ def create_query():
 
 class ContextMenu(tkinter.Menu):
     def __init__(self, src: str, all_src: list, e: tkinter.Event):
-        tkinter.Menu.__init__(self)
+        super().__init__()
 
         self.add_command(
             label = "Просмотр",
@@ -102,7 +95,7 @@ class ContextMenu(tkinter.Menu):
         self.add_separator()
         self.add_command(
             label = "Инфо",
-            command = lambda: ImageInfo(src, cfg.ROOT)
+            command = lambda: ImageInfo(src)
             )
         self.add_command(
             label = "Показать в Finder",
@@ -169,10 +162,10 @@ class FilterWin(CWindow):
 
         if date_start and not date_end:
             self.oneday = True
-            self.oneday_btn["bg"] = cfg.SELECTED
+            self.oneday_btn["bg"] = conf.sel_color
             self.two.disable_calendar()
 
-        cfg.ROOT.update_idletasks()
+        conf.root.update_idletasks()
 
         place_center(self)
         self.deiconify()
@@ -182,12 +175,12 @@ class FilterWin(CWindow):
     def oneday_cmd(self):
         if not self.oneday:
             self.oneday = True
-            self.oneday_btn["bg"] = cfg.SELECTED
+            self.oneday_btn["bg"] = conf.sel_color
             self.two.disable_calendar()
 
         else:
             self.oneday = False
-            self.oneday_btn["bg"] = cfg.BUTTON
+            self.oneday_btn["bg"] = conf.btn_color
             self.two.enable_calendar()
 
     def ok_cmd(self):
@@ -214,12 +207,12 @@ class Thumbnails(CFrame):
         super().__init__(master)
         self.clmns = 1
 
-        cfg.ROOT.update_idletasks()
+        conf.root.update_idletasks()
 
         self.load_scrollable()
         self.load_thumbnails()
 
-        cfg.ROOT.bind('<Configure>', self.decect_resize)
+        conf.root.bind('<Configure>', self.decect_resize)
         self.resize_task = None
 
     def load_scrollable(self):
@@ -227,7 +220,7 @@ class Thumbnails(CFrame):
         self.scroll_parrent.pack(expand=1, fill=tkinter.BOTH)
 
         self.scrollable = tkmacosx.SFrame(
-            self.scroll_parrent, bg=cfg.BG, scrollbarwidth=7)
+            self.scroll_parrent, bg=conf.bg_color, scrollbarwidth=7)
         self.scrollable.pack(expand=1, fill=tkinter.BOTH)
 
     def load_thumbnails(self):
@@ -238,13 +231,13 @@ class Thumbnails(CFrame):
         padding = 4
         thumbs = self.decode_thumbs(load_db)
         thumbs: dict = self.create_thumbs_dict(thumbs)
-        self.size = cfg.THUMB_SIZE + padding
+        self.size = conf.thumb_size + padding
         summary = len(load_db)
 
-        if cfg.config["CURR_COLL"] == "last":
+        if conf.curr_coll == "last":
             txt = "Все коллекции"
         else:
-            txt = cfg.config["CURR_COLL"]
+            txt = conf.curr_coll
 
         if date_start and not date_end:
             title_dates = (
@@ -265,7 +258,7 @@ class Thumbnails(CFrame):
         else:
             title_dates = "За все время"
 
-        if cfg.config["SORT_MODIFIED"]:
+        if conf.sort_modified:
             sort_text = "По дате изменения"
         else:
             sort_text = "По дате создания"
@@ -297,12 +290,12 @@ class Thumbnails(CFrame):
         btn_day["width"] = 13
         btn_day.pack(side="left")
         if any((date_start, date_end)):
-            btn_day["bg"] = cfg.SELECTED
+            btn_day["bg"] = conf.sel_color
         btn_day.cmd(lambda e: FilterWin())
 
         CSep(btns_frame).pack(fill="y", side="left", padx=(15, 15))
 
-        if cfg.config["SORT_MODIFIED"]:
+        if conf.sort_modified:
             sort_btn_t = "Дата изменения"
         else:
             sort_btn_t = "Дата создания"
@@ -329,7 +322,7 @@ class Thumbnails(CFrame):
 
             w = self.size * self.clmns
             h = self.size * (math.ceil(len(img_list) / self.clmns))
-            empty = Image.new("RGBA", (w, h), color=cfg.BG)
+            empty = Image.new("RGBA", (w, h), color=conf.bg_color)
 
             row, clmn = 0, 0
             for x, (img, src) in enumerate(img_list, 1):
@@ -361,12 +354,12 @@ class Thumbnails(CFrame):
         self.thumbnails.pack(expand=1, fill=tkinter.BOTH)
 
     def sort_btn_cmd(self, btn: CButton):
-        if cfg.config["SORT_MODIFIED"]:
-            cfg.config["SORT_MODIFIED"] = False
+        if conf.sort_modified:
+            conf.sort_modified = False
             btn["text"] = "Дата создания"
             self.reload_without_scroll()
         else:
-            cfg.config["SORT_MODIFIED"] = True
+            conf.sort_modified = True
             btn["text"] = "Дата изменения"
             self.reload_without_scroll()
 
@@ -374,7 +367,7 @@ class Thumbnails(CFrame):
         ImgViewer(src, all_src)
 
     def show_more_cmd(self):
-        cfg.LIMIT += 150
+        conf.limit += 150
         self.reload_without_scroll()
 
     def reset_filter_cmd(self):
@@ -387,20 +380,20 @@ class Thumbnails(CFrame):
 
     def decect_resize(self, e):
         if self.resize_task:
-            cfg.ROOT.after_cancel(self.resize_task)
-        self.resize_task = cfg.ROOT.after(250, self.update_thumbnails)
+            conf.root.after_cancel(self.resize_task)
+        self.resize_task = conf.root.after(250, self.update_thumbnails)
 
     def update_thumbnails(self):
-        old_w = cfg.config['ROOT_W']
-        new_w = cfg.ROOT.winfo_width()
+        old_w = conf.root_w
+        new_w = conf.root.winfo_width()
 
         if new_w != old_w:
-            cfg.config['ROOT_W'] = new_w
+            conf.root_w = new_w
 
             if self.clmns != self.clmns_count():
-                w, h = cfg.ROOT.winfo_width(), cfg.ROOT.winfo_height()
-                cfg.config['ROOT_W'], cfg.config['ROOT_H'] = w, h
-                cfg.ROOT.update_idletasks()
+                w, h = conf.root.winfo_width(), conf.root.winfo_height()
+                conf.root_w, conf.root_h = w, h
+                conf.root.update_idletasks()
                 self.reload_without_scroll()
 
     def reload_with_scroll(self):
@@ -419,7 +412,7 @@ class Thumbnails(CFrame):
         self.load_thumbnails()
 
     def clmns_count(self):
-        clmns = (cfg.config['ROOT_W'] - cfg.MENU_W) // cfg.THUMB_SIZE
+        clmns = (conf.root_w - conf.menu_w) // conf.thumb_size
         return 1 if clmns == 0 else clmns
 
     def decode_thumbs(self, thumbs: tuple):

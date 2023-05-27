@@ -2,19 +2,19 @@ try:
     import sys
     import traceback
 
-    import cfg
+    from cfg import conf
     from gui.widgets import SmbAlert
     from scaner import scaner
     from utils import smb_check
 
-    cfg.ROOT.deiconify()
+    conf.root.deiconify()
 
     if smb_check():
         scaner()
     else:
         SmbAlert()
 
-    cfg.ROOT.mainloop()
+    conf.root.mainloop()
 
 except Exception as e:
     import os

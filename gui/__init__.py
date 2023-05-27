@@ -17,7 +17,7 @@ import sqlalchemy
 import tkmacosx
 from PIL import Image, ImageTk
 
-import cfg
+from cfg import conf
 from database import *
 from scaner import *
 from utils import *
@@ -35,28 +35,28 @@ __all__ = (
 
 class Application:
     def __init__(self):
-        cfg.ROOT.title(cfg.APP_NAME)
-        cfg.ROOT.configure(bg=cfg.BG)
+        conf.root.title(conf.app_name)
+        conf.root.configure(bg=conf.bg_color)
 
-        cfg.ROOT.createcommand(
-            'tk::mac::ReopenApplication', lambda: cfg.ROOT.deiconify())
+        conf.root.createcommand(
+            'tk::mac::ReopenApplication', lambda: conf.root.deiconify())
 
-        cfg.ROOT.bind('<Command-w>', lambda e: cfg.ROOT.iconify())
+        conf.root.bind('<Command-w>', lambda e: conf.root.iconify())
 
-        if cfg.config["ASK_EXIT"] == 1:
-            cfg.ROOT.protocol("WM_DELETE_WINDOW", AskExit)
-            cfg.ROOT.createcommand("tk::mac::Quit" , AskExit)
+        if conf.ask_exit == 1:
+            conf.root.protocol("WM_DELETE_WINDOW", AskExit)
+            conf.root.createcommand("tk::mac::Quit" , AskExit)
         else:
-            cfg.ROOT.createcommand("tk::mac::Quit" , on_exit)
-            cfg.ROOT.protocol("WM_DELETE_WINDOW", on_exit)
+            conf.root.createcommand("tk::mac::Quit" , on_exit)
+            conf.root.protocol("WM_DELETE_WINDOW", on_exit)
         
 
-        CSep(cfg.ROOT).pack(fill=tkinter.X, pady=15, padx=(15, 5))
+        CSep(conf.root).pack(fill=tkinter.X, pady=15, padx=(15, 5))
 
-        self.menu = Menu(cfg.ROOT)
+        self.menu = Menu(conf.root)
         self.menu.pack(side=tkinter.LEFT, fill=tkinter.Y, pady=(0, 15))
 
-        right_frame = CFrame(cfg.ROOT)
+        right_frame = CFrame(conf.root)
         right_frame.pack(fill=tkinter.BOTH, expand=1)
     
         self.thumbnails = Thumbnails(right_frame)
@@ -69,16 +69,16 @@ class Application:
 
         MacMenu()
 
-        cfg.ROOT.eval(f'tk::PlaceWindow {cfg.ROOT} center')
+        conf.root.eval(f'tk::PlaceWindow {conf.root} center')
 
-        if cfg.config['ROOT_W'] < 50 or cfg.config['ROOT_H'] < 50:
-            cfg.config['ROOT_W'], cfg.config['ROOT_H'] = 700, 500
+        if conf.root_w < 50 or conf.root_h < 50:
+            conf.root_w, conf.root_h = 700, 500
 
-        cfg.ROOT.geometry(
-            (f"{cfg.config['ROOT_W']}x{cfg.config['ROOT_H']}"
-            f"+{cfg.config['ROOT_X']}+{cfg.config['ROOT_Y']}")
+        conf.root.geometry(
+            (f"{conf.root_w}x{conf.root_h}"
+            f"+{conf.root_x}+{conf.root_y}")
             )
-        cfg.ROOT.minsize(800, 500)
+        conf.root.minsize(800, 500)
 
 
 app = Application()

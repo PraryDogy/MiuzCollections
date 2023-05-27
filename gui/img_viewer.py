@@ -1,4 +1,4 @@
-from . import (Dbase, ImageTk, Thumbs, cfg, convert_to_rgb, cv2, decode_image,
+from . import (Dbase, ImageTk, Thumbs, conf, convert_to_rgb, cv2, decode_image,
                find_jpeg, find_tiff, get_coll_name, os, place_center,
                resize_image, replace_bg, sqlalchemy, tkinter)
 from .widgets import *
@@ -47,7 +47,7 @@ class ContextMenu(tkinter.Menu):
 class ImgViewer(CWindow):
     def __init__(self, img_src: str, src_list: list):
         global src, all_src, win
-        CWindow.__init__(self)
+        super().__init__()
 
         win = self
         src = img_src
@@ -56,8 +56,8 @@ class ImgViewer(CWindow):
         self.set_title()
         self["bg"] = "black"
 
-        self.win_width = cfg.config["PREVIEW_W"]
-        self.win_height = cfg.config["PREVIEW_H"]
+        self.win_width = conf.preview_w
+        self.win_height = conf.preview_h
 
         self.geometry(f'{self.win_width}x{self.win_height}')
         self.minsize(500, 300)
@@ -68,13 +68,13 @@ class ImgViewer(CWindow):
         self.img_frame = self.img_widget()
         self.img_frame.pack()
 
-        cfg.ROOT.update_idletasks()
+        conf.root.update_idletasks()
 
         self.img_frame['width'] = self.win_width
         self.img_frame['height'] = self.win_height
 
         self.thumb_place(self.win_width, self.win_height)
-        self.task = cfg.ROOT.after(
+        self.task = conf.root.after(
             250, lambda: self.img_place(self.win_width, self.win_height))
 
         place_center(self)
@@ -89,8 +89,8 @@ class ImgViewer(CWindow):
 
     def decect_resize(self, e):
         if self.resize_task:
-            cfg.ROOT.after_cancel(self.resize_task)
-        self.resize_task = cfg.ROOT.after(500, lambda: self.resize_win())
+            conf.root.after_cancel(self.resize_task)
+        self.resize_task = conf.root.after(500, lambda: self.resize_win())
 
     def resize_win(self):
         try:
@@ -106,11 +106,11 @@ class ImgViewer(CWindow):
             self.img_frame['width'] = self.win_width
             self.img_frame['height'] = self.win_height
 
-            cfg.config['PREVIEW_W'] = self.win_width
-            cfg.config['PREVIEW_H'] = self.win_height
+            conf.preview_w = self.win_width
+            conf.preview_h = self.win_height
 
             self.thumb_place(self.win_width, self.win_height)
-            cfg.ROOT.after(
+            conf.root.after(
                 500,
                 lambda: self.img_place(self.win_width, self.win_height)
                 )
@@ -126,7 +126,7 @@ class ImgViewer(CWindow):
     def switch_img(self, ind: int):
         global src
 
-        cfg.ROOT.after_cancel(self.task)
+        conf.root.after_cancel(self.task)
         try:
             src = all_src[ind]
             self.context.destroy()
@@ -137,7 +137,7 @@ class ImgViewer(CWindow):
             self.set_title()
 
         self.thumb_place(self.win_width, self.win_height)
-        self.task = cfg.ROOT.after(
+        self.task = conf.root.after(
             500,
             lambda: self.img_place(self.win_width, self.win_height)
             )
@@ -178,7 +178,7 @@ class ImgViewer(CWindow):
         img_read = cv2.imread(src, cv2.IMREAD_UNCHANGED)
         
         if src.endswith(("png", "PNG")):
-            img_read = replace_bg(img_read, cfg.BG)
+            img_read = replace_bg(img_read, conf.bg_color)
 
         resized = resize_image(img_read, width, height, False)
         img_rgb = convert_to_rgb(resized)

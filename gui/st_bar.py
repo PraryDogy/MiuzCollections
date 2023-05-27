@@ -1,4 +1,4 @@
-from . import cfg, place_center, scaner, smb_check, tkinter
+from . import conf, place_center, scaner, smb_check, tkinter
 from .settings import Settings
 from .widgets import *
 
@@ -9,19 +9,19 @@ __all__ = (
 
 class ScanerGui(CWindow):
     def __init__(self):
-        CWindow.__init__(self)
+        super().__init__()
         self.title("Обновление")
         self.geometry("300x50")
 
         self.live_lbl = CLabel(
             self,
-            text = cfg.LIVE_TEXT,
+            text = conf.live_text,
             anchor = tkinter.W,
             justify = tkinter.LEFT,
             )
         self.live_lbl.pack(expand=True, fill="both")
 
-        cfg.ROOT.update_idletasks()
+        conf.root.update_idletasks()
 
         place_center(self)
         self.deiconify()
@@ -32,18 +32,17 @@ class ScanerGui(CWindow):
 
     def update_livelbl(self):
         if self.winfo_exists():
-            self.live_lbl["text"] = cfg.LIVE_TEXT
+            self.live_lbl["text"] = conf.live_text
 
-        if not cfg.LIVE_TEXT:
+        if not conf.live_text:
             self.destroy()
 
-        cfg.ROOT.after(100, self.update_livelbl)
-
+        conf.root.after(100, self.update_livelbl)
 
 
 class StBar(CFrame):
     def __init__(self, master):
-        CFrame.__init__(self, master)
+        super().__init__(master)
         self.normal_mode()
 
     def normal_mode(self):
@@ -67,7 +66,7 @@ class StBar(CFrame):
         Settings()
 
     def update_cmd(self, btn: CButton):
-        if not cfg.FLAG:
+        if not conf.flag:
             if smb_check():
                 scaner()
             else:

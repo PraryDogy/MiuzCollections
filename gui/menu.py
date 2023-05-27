@@ -1,7 +1,6 @@
-from . import (Dbase, ImageTk, Thumbs, cfg, convert_to_rgb, crop_image, os,
-               partial, re, sqlalchemy, subprocess, tkinter, tkmacosx)
+from . import (Dbase, ImageTk, Thumbs, conf, os, partial, re, sqlalchemy,
+               subprocess, tkinter, tkmacosx)
 from .widgets import CButton, CFrame, CLabel, CSep
-from .scaner_gui import ScanerGui
 
 __all__ = (
     "Menu",
@@ -12,19 +11,19 @@ menu_buttons = []
 
 def open_finder(collection_name):
     if collection_name != "last":
-        coll_path = os.path.join(cfg.config['COLL_FOLDER'], collection_name)
+        coll_path = os.path.join(conf.coll_folder, collection_name)
     else:
-        coll_path = cfg.config['COLL_FOLDER']
+        coll_path = conf.coll_folder
 
     subprocess.check_output(["/usr/bin/open", coll_path])
 
 
 def show_collection(master: tkinter.Button, collection_name):
     for btn_item in menu_buttons:
-        btn_item['bg'] = cfg.BUTTON
+        btn_item['bg'] = conf.btn_color
 
-    master['bg'] = cfg.SELECTED
-    cfg.config['CURR_COLL'] = collection_name
+    master['bg'] = conf.sel_color
+    conf.curr_coll = collection_name
 
     from . import app
     app.thumbnails.reload_with_scroll()
@@ -32,7 +31,7 @@ def show_collection(master: tkinter.Button, collection_name):
 
 class ContextMenu(tkinter.Menu):
     def __init__(self, master, collection_name):
-        tkinter.Menu.__init__(self, master)
+        super().__init__(master)
         self.btn = master
         self.collection_name = collection_name
 
@@ -52,15 +51,12 @@ class ContextMenu(tkinter.Menu):
 
 class Menu(tkmacosx.SFrame):
     def __init__(self, master: tkinter):
-        tkmacosx.SFrame.__init__(
-            self,
+        super().__init__(
             master,
-            bg = cfg.BG,
+            bg = conf.bg_color,
             scrollbarwidth = 7,
-            width = cfg.MENU_W
+            width = conf.menu_w
             )
-
-        cfg.MENU = self
 
         self.menu_parrent = self.load_menu_parent()
         self.menu_parrent.pack()
@@ -119,12 +115,6 @@ class Menu(tkmacosx.SFrame):
         sep = CSep(frame)
         sep['bg'] = '#272727'
         sep.pack(fill=tkinter.X)
-        
-        scaner = CButton(frame, text = "Сканер")
-        scaner.configure(width=13, pady=5, anchor=tkinter.W, padx=10)
-        # scaner.pack(pady=(0, 15))
-        scaner.cmd(lambda e: self.scaner_cmd())
-        menu_buttons.append(scaner)
 
         for collection_name, menu_name in menus.items():
             btn = CButton(frame, text = menu_name)
@@ -135,20 +125,17 @@ class Menu(tkmacosx.SFrame):
 
             ContextMenu(btn, collection_name)
 
-            if collection_name == cfg.config['CURR_COLL']:
-                btn.configure(bg=cfg.SELECTED)
+            if collection_name == conf.curr_coll:
+                btn.configure(bg=conf.sel_color)
 
             sep = CSep(frame)
             sep['bg'] = '#272727'
             sep.pack(fill=tkinter.X)
     
-        if cfg.config['CURR_COLL'] == 'last':
-            last.configure(bg=cfg.SELECTED)
+        if conf.curr_coll == 'last':
+            last.configure(bg=conf.sel_color)
 
         return frame
-
-    def scaner_cmd(self):
-        ScanerGui()
 
     def reload(self):
         menu_buttons.clear()
@@ -158,5 +145,5 @@ class Menu(tkmacosx.SFrame):
         return
     
     def open_coll_folder(self, coll: str, btn: CButton, e):
-        cfg.LIMIT = 150
+        conf.limit = 150
         show_collection(btn, coll)

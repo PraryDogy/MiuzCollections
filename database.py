@@ -3,8 +3,7 @@ import os
 import sqlalchemy
 import sqlalchemy.ext.declarative
 
-import cfg
-
+from cfg import conf
 
 __all__ = (
     "Dbase",
@@ -13,14 +12,8 @@ __all__ = (
 
 
 class Dbase():
-    """
-    Checks database exists with DbChecker.
-
-    *var conn: database connection
-    *var base: declatative_base for models and actions
-    """
     __engine = sqlalchemy.create_engine(
-        'sqlite:////' + os.path.join(cfg.CFG_DIR, cfg.DB),
+        'sqlite:////' + conf.db_dir,
         connect_args = {'check_same_thread': False},
         echo = False
         )
@@ -29,12 +22,6 @@ class Dbase():
 
 
 class Thumbs(Dbase.base):
-    """
-    Sqlalchemy model.
-
-    *columns: img150, src, size, created, modified, collection
-    """
-
     __tablename__ = 'thumbs'
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
     img150 = sqlalchemy.Column(sqlalchemy.LargeBinary)

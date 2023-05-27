@@ -2,108 +2,103 @@ import json
 import os
 import shutil
 import tkinter
+import threading
 
-# app info
-APP_NAME = 'MiuzCollections'
-DB = "db.db"
-APP_VER = '3.6.1'
 
-CFG_DIR = os.path.join(
-    os.path.expanduser("~"),
-    f"Library", "Application Support", APP_NAME
+__all__ = (
+    "conf",
     )
 
-# gui settings
-FONT = "#E2E2E2"
-BG = "#19191B"
-BUTTON = "#2A2A2D"
-# SELECTED = '#0056D9'
-SELECTED = "#4B4B4B"
-HOVERED = '#3A3A3E'
 
-THUMB_SIZE = 150
-MENU_W = 180
-LIMIT = 150
+class Config:
+    def __init__(self):
+        self.app_name = 'MiuzCollections'
+        self.app_ver = '3.6.1'
+        self.db_name = "db.db"
 
-# flags
-FLAG = False
-SCANER_TASK = None
-LIVE_TEXT = ""
+        self.cfg_dir = os.path.join(
+            os.path.expanduser("~"),
+            f"Library", "Application Support", self.app_name
+            )
+        self.json_dir = os.path.join(self.cfg_dir, "cfg.json")
+        self.db_dir = os.path.join(self.cfg_dir, self.db_name)
 
-# gui objects for global access
-ROOT = tkinter.Tk()
-ROOT.withdraw()
+        # gui settings
 
-default_vars = {
-        'COLL_FOLDER': '/Volumes/Shares/Marketing/Photo/_Collections',
+        self.fg_color = "#E2E2E2"
+        self.bg_color = "#19191B"
+        self.btn_color = "#2A2A2D"
+        # self.sel_color = '#0056D9'
+        self.sel_color = "#4B4B4B"
+        self.hov_color = '#3A3A3E'
 
-        'CURR_COLL': 'last',
-        'ASK_EXIT': 0,
+        self.thumb_size = 150
+        self.menu_w = 180
+        self.limit = 150
 
-        "ROOT_W": 700,
-        "ROOT_H": 500,
-        "ROOT_X": 100,
-        "ROOT_Y": 100,
+        # dynamic variables for gui
+        self.flag = False
+        self.live_text = ""
+        self.scaner_task: threading.Thread = None
 
-        "PREVIEW_W": 700,
-        "PREVIEW_H": 500,
+        # root
+        self.root = tkinter.Tk()
+        self.root.withdraw()
 
-        'SORT_MODIFIED': True,
+        self.coll_folder = '/Volumes/Shares/Marketing/Photo/_Collections'
 
-        "CATALOG": True,
-        "MARKETING": True,
-        "CATALOG_NAME": "Обтравка",
+        self.curr_coll = 'last'
+        self.ask_exit = 0
 
-        "STOPWORDS": [
+        self.root_w = 700
+        self.root_h = 500
+        self.root_x = 100
+        self.root_y = 100
+
+        self.preview_w = 700
+        self.preview_h = 500
+
+        self.sort_modified = True
+        self.catalog = True
+        self.marketing = True
+        self.catalog_name = "Обтравка"
+
+        self.stopwords = [
             "preview", "1x1", "1х1", "crop", "копия", "copy"
-            ],
-        "EXCEPTIONS": ""
-        }
+            ]
+
+    def load_cfg(self):
+        with open(file=self.json_dir, encoding="utf8", mode="r") as file:
+            data = json.loads(file.read())
+
+        for key in data:
+            if key in self.__dict__:
+                setattr(self, key, data[key])
+
+    def write_cfg(self):
+        slice_keys = list(self.__dict__)
+        start = slice_keys.index("coll_folder")
+        slice_keys = slice_keys[start:]
+
+        data = {i: self.__dict__[i] for i in slice_keys}
+
+        with open(file=self.json_dir, encoding='utf8', mode="w") as file:
+            json.dump(data, file, indent=4, ensure_ascii=False)
+
+    def check_dir(self):
+        if not os.path.exists(self.cfg_dir):
+            os.mkdir(self.cfg_dir)
+
+        if not os.path.exists(self.json_dir):
+            self.write_cfg()
+
+        if not os.path.exists(self.db_dir):
+            shutil.copyfile(self.db_dir)
+
+    def get_defaults(self):
+        return self.__class__()
 
 
-def read_cfg():
-    with open(os.path.join(CFG_DIR, 'cfg.json'), "r", encoding="utf8") as file:
-        return json.loads(file.read())
-
-
-def write_cfg(data: dict):
-    try:
-        json_data = read_cfg()
-        config["STOPWORDS"] = json_data["STOPWORDS"]
-    except Exception:
-        print("cfg.py write_cfg no cfg file in application support")
-
-    with open(os.path.join(CFG_DIR, 'cfg.json'), "w", encoding='utf8') as file:
-        json.dump(data, file, indent=4, ensure_ascii=False)
-
-
-if not os.path.exists(CFG_DIR):
-    os.mkdir(CFG_DIR)
-
-if not os.path.exists(os.path.join(CFG_DIR, "cfg.json")):
-    config = default_vars
-    write_cfg(default_vars)
-
-if not os.path.exists(os.path.join(CFG_DIR, DB)):
-    shutil.copyfile(DB, os.path.join(CFG_DIR, DB))
-
-
-config = read_cfg()
-
-old_keys = {
-    k:v 
-    for k, v in config.items()
-    if k in default_vars.keys()
-    }
-
-new_keys = {
-    k:v for
-    k, v in default_vars.items()
-    if k not in config.keys()
-    }
-
-new_config = {**old_keys, **new_keys}
-
-if new_config.keys() != config.keys():
-    write_cfg(new_config)
-    config = new_config
+conf = Config()
+conf.check_dir()
+conf.load_cfg()

@@ -1,5 +1,5 @@
-from . import (Image, cfg, datetime, get_coll_name, on_exit, os, place_center,
-               tkinter, sys, calendar, partial)
+from . import (Image, calendar, conf, datetime, get_coll_name, on_exit, os,
+               partial, place_center, sys, tkinter)
 
 __all__ = (
     "CSep",
@@ -33,66 +33,66 @@ months = {
 
 
 def focus_last():
-    for k, v in cfg.ROOT.children.items():
+    for k, v in conf.root.children.items():
         if isinstance(v, CWindow):
             v.focus_force()
             return
 
-    cfg.ROOT.focus_force()
+    conf.root.focus_force()
 
 class CSep(tkinter.Frame):
     def __init__(self, master: tkinter):
-        super().__init__(master, bg=cfg.BUTTON, height=1)
+        super().__init__(master, bg=conf.btn_color, height=1)
 
 
 class CButton(tkinter.Label):
     def __init__(self, master: tkinter, **kwargs):
-        tkinter.Label.__init__(self, master, **kwargs)
+        super().__init__(master, **kwargs)
         self.configure(
-            bg=cfg.BUTTON, fg=cfg.FONT, width=11, height=1,
+            bg=conf.btn_color, fg=conf.fg_color, width=11, height=1,
             font=("San Francisco Pro", 13, "normal"))
 
     def cmd(self, cmd):
         self.bind('<ButtonRelease-1>', cmd)
 
     def press(self):
-        self.configure(bg=cfg.SELECTED)
-        cfg.ROOT.after(100, lambda: self.configure(bg=cfg.BUTTON))
+        self.configure(bg=conf.sel_color)
+        conf.root.after(100, lambda: self.configure(bg=conf.btn_color))
 
 
 class CFrame(tkinter.Frame):
     def __init__(self, master: tkinter, **kwargs):
-        tkinter.Frame.__init__(self, master, **kwargs)
-        self.configure(bg=cfg.BG)
+        super().__init__(master, **kwargs)
+        self.configure(bg=conf.bg_color)
 
 
 class CLabel(tkinter.Label):
     def __init__(self, master, **kwargs):
-        tkinter.Label.__init__(self, master, **kwargs)
+        super().__init__(master, **kwargs)
         self.configure(
-            bg=cfg.BG,
-            fg=cfg.FONT,
+            bg=conf.bg_color,
+            fg=conf.fg_color,
             font=("San Francisco Pro", 13, "normal"),
             )
 
 
 class CWindow(tkinter.Toplevel):
     def __init__(self):
-        tkinter.Toplevel.__init__(self)
-        cfg.ROOT.eval(f'tk::PlaceWindow {self} center')
+        super().__init__()
+        conf.root.eval(f'tk::PlaceWindow {self} center')
         self.withdraw()
 
         self.protocol("WM_DELETE_WINDOW", lambda: self.close_win())
         self.bind('<Command-w>', lambda e: self.close_win())
         self.bind('<Escape>', lambda e: self.close_win())
 
-        if cfg.config["ASK_EXIT"] == 1:
+        if conf.ask_exit == 1:
             self.bind('<Command-q>', lambda e: AskExit())
         else:
             self.bind('<Command-q>', lambda e: on_exit())
 
         self.resizable(0,0)
-        self.configure(bg=cfg.BG, padx=15, pady=15)
+        self.configure(bg=conf.bg_color, padx=15, pady=15)
 
     def close_win(self):
         self.destroy()
@@ -101,13 +101,13 @@ class CWindow(tkinter.Toplevel):
 
 class CloseBtn(CButton):
     def __init__(self, master: tkinter.Widget, **kwargs):
-        CButton.__init__(self, master, **kwargs)
+        super().__init__(master, **kwargs)
         self.cmd(lambda e: self.destroy())
 
 
 class AskExit(CWindow):
     def __init__(self):
-        CWindow.__init__(self)
+        super().__init__()
         self.bind('<Return>', lambda e: on_exit())
         self.protocol("WM_DELETE_WINDOW", lambda: self.close_ask())
         self.bind('<Command-w>', lambda e: self.close_ask())
@@ -142,7 +142,7 @@ class AskExit(CWindow):
 
 class SmbAlert(CWindow):
     def __init__(self):
-        CWindow.__init__(self)
+        super().__init__()
 
         txt = 'Нет подключения к сетевому диску Miuz.'
         title_lbl = CLabel(
@@ -166,7 +166,7 @@ class SmbAlert(CWindow):
         btn.cmd(lambda e: self.btn_cmd())
         btn.pack()
 
-        cfg.ROOT.update_idletasks()
+        conf.root.update_idletasks()
         place_center(self)
         self.deiconify()
         self.wait_visibility()
@@ -178,9 +178,8 @@ class SmbAlert(CWindow):
 
 
 class ImageInfo(CWindow):
-    def __init__(self, src: str, win: tkinter.Toplevel):
-        CWindow.__init__(self)
-        self.win = win
+    def __init__(self, src: str):
+        super().__init__()
 
         self.title("Инфо")
         self.geometry("400x110")
@@ -227,7 +226,7 @@ class ImageInfo(CWindow):
         self.bind('<Command-w>', lambda e: self.close_win())
         self.bind('<Escape>', lambda e: self.close_win())
 
-        cfg.ROOT.update_idletasks()
+        conf.root.update_idletasks()
 
         x, y = self.win.winfo_x(), self.win.winfo_y()
         xx = x + self.win.winfo_width()//2 - self.winfo_width()//2
@@ -246,17 +245,17 @@ class ImageInfo(CWindow):
 
 class MacMenu(tkinter.Menu):
     def __init__(self):
-        menubar = tkinter.Menu(cfg.ROOT)
+        menubar = tkinter.Menu(conf.root)
         tkinter.Menu.__init__(self, menubar)
 
         if sys.version_info.minor < 10:
-            cfg.ROOT.createcommand('tkAboutDialog', self.about_dialog)
+            conf.root.createcommand('tkAboutDialog', self.about_dialog)
 
-        cfg.ROOT.configure(menu=menubar)
+        conf.root.configure(menu=menubar)
 
     def about_dialog(self):
         try:
-            cfg.ROOT.tk.call('tk::mac::standardAboutPanel')
+            conf.root.tk.call('tk::mac::standardAboutPanel')
         except Exception:
             print("no dialog panel")
 
@@ -277,17 +276,17 @@ class CCalendar(CFrame):
 
     def load_calendar(self):
         parrent = CFrame(self)
-        parrent["bg"] = cfg.BUTTON
+        parrent["bg"] = conf.btn_color
 
         self.all_btns = []
         f = ("San Francisco Pro", 15, "bold")
 
         titles = CFrame(parrent)
-        titles["bg"] = cfg.BUTTON
+        titles["bg"] = conf.btn_color
         titles.pack(pady=(5, 0))
 
         month_frame = CFrame(titles)
-        month_frame["bg"] = cfg.BUTTON
+        month_frame["bg"] = conf.btn_color
         month_frame.pack(side="left", padx=(0, 15))
 
         prev = CButton(month_frame, text="<")
@@ -301,7 +300,7 @@ class CCalendar(CFrame):
             text=months[self.my_date.month],
             name=str(self.my_date.month)
             )
-        self.m_title.configure(bg=cfg.BUTTON, width=6, font=f)
+        self.m_title.configure(bg=conf.btn_color, width=6, font=f)
         self.m_title.pack(side="left")
         self.all_btns.append(self.m_title)
 
@@ -312,7 +311,7 @@ class CCalendar(CFrame):
         self.all_btns.append(next)
 
         year_frame = CFrame(titles)
-        year_frame["bg"] = cfg.BUTTON
+        year_frame["bg"] = conf.btn_color
         year_frame.pack(side="left")
 
         prev = CButton(year_frame, text="<")
@@ -326,7 +325,7 @@ class CCalendar(CFrame):
             text=self.my_date.year,
             name=str(self.my_date.month)
             )
-        self.y_title.configure(bg=cfg.BUTTON, width=3, font=f)
+        self.y_title.configure(bg=conf.btn_color, width=3, font=f)
         self.y_title.pack(side="left")
         self.all_btns.append(self.y_title)
 
@@ -337,7 +336,7 @@ class CCalendar(CFrame):
         self.all_btns.append(next)
 
         sep = CSep(parrent)
-        sep.configure(bg=cfg.BG)
+        sep.configure(bg=conf.bg_color)
         sep.pack(fill="x")
 
         row = CFrame(parrent)
@@ -350,7 +349,7 @@ class CCalendar(CFrame):
             self.all_btns.append(lbl)
 
         sep = CSep(parrent)
-        sep.configure(bg=cfg.BG)
+        sep.configure(bg=conf.bg_color)
         sep.pack(fill="x")
 
         row = CFrame(parrent)
@@ -379,17 +378,17 @@ class CCalendar(CFrame):
         self.enabled = False
 
         for i in self.all_btns:
-            if i["bg"] in (cfg.BUTTON, cfg.SELECTED):
-                i.config(fg=cfg.HOVERED, bg=cfg.BUTTON)
+            if i["bg"] in (conf.btn_color, conf.sel_color):
+                i.config(fg=conf.hov_color, bg=conf.btn_color)
 
     def enable_calendar(self):
        self.enabled = True
 
        for i in self.all_btns:
-            i["fg"] = cfg.FONT
+            i["fg"] = conf.fg_color
 
             if self.my_date.day == i["text"]:
-                i.configure(bg=cfg.SELECTED)
+                i.configure(bg=conf.sel_color)
 
     def create_days(self):
         first_weekday = datetime.weekday(
@@ -409,11 +408,11 @@ class CCalendar(CFrame):
 
         for day, btn in zip(days, self.btns):
             if day:
-                btn.configure(text=day, bg=cfg.BUTTON)
+                btn.configure(text=day, bg=conf.btn_color)
             else:
-                btn.configure(text="", bg=cfg.BG)
+                btn.configure(text="", bg=conf.bg_color)
             if btn["text"] == self.my_date.day:
-                btn["bg"] = cfg.SELECTED
+                btn["bg"] = conf.sel_color
 
     def select_day(self, btn, e):
         if not self.enabled:
@@ -421,9 +420,9 @@ class CCalendar(CFrame):
 
         if btn["text"]:
             for i in self.btns:
-                if i["bg"] == cfg.SELECTED:
-                    i["bg"] = cfg.BUTTON
-            btn["bg"] = cfg.SELECTED
+                if i["bg"] == conf.sel_color:
+                    i["bg"] = conf.btn_color
+            btn["bg"] = conf.sel_color
 
             self.my_date = datetime(
                 self.my_date.year,

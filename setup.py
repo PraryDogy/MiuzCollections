@@ -8,7 +8,7 @@ import os
 import shutil
 
 from setuptools import setup
-import cfg
+from cfg import conf
 import icnsutil
 
 
@@ -36,16 +36,16 @@ img.write(f'icon.icns')
 APP = ['start.py']
 
 DATA_FILES = [
-    cfg.DB,
+    conf.db_name,
     ]
 
 OPTIONS = {
     'iconfile': 'icon.icns',
     'plist': {
-        'CFBundleName': cfg.APP_NAME,
-        'CFBundleShortVersionString':cfg.APP_VER,
-        'CFBundleVersion': cfg.APP_VER,
-        'CFBundleIdentifier':f'com.evlosh.{cfg.APP_NAME}',
+        'CFBundleName': conf.app_name,
+        'CFBundleShortVersionString': conf.app_ver,
+        'CFBundleVersion': conf.app_ver,
+        'CFBundleIdentifier':f'com.evlosh.{conf.app_name}',
         'NSHumanReadableCopyright': (
             'Created by Evgeny Loshkarev'
             '\nCopyright © 2023 MIUZ Diamonds.'
@@ -56,7 +56,7 @@ OPTIONS = {
 
 setup(
     app = APP,
-    name = cfg.APP_NAME,
+    name = conf.app_name,
     data_files = DATA_FILES,
     options = {'py2app': OPTIONS},
     setup_requires = ['py2app'],
@@ -65,12 +65,12 @@ setup(
 
 shutil.copytree(
     "lib",
-    f"dist/{cfg.APP_NAME}.app/Contents/lib"
+    f"dist/{conf.app_name}.app/Contents/lib"
     )
 
 shutil.move(
-    f"dist/{cfg.APP_NAME}.app",
-    os.path.expanduser(f"~/Desktop/{cfg.APP_NAME}.app")
+    f"dist/{conf.app_name}.app",
+    os.path.expanduser(f"~/Desktop/{conf.app_name}.app")
     )
 
 shutil.rmtree('build')
