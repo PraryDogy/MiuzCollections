@@ -1,9 +1,8 @@
 import json
 import os
 import shutil
-import tkinter
 import threading
-
+import tkinter
 
 __all__ = (
     "conf",

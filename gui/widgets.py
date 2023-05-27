@@ -265,6 +265,7 @@ class CCalendar(CFrame):
         super().__init__(master)
 
         self.enabled = True
+        self.clicked = False
         self.my_date = my_date
         self.today = datetime.today().date()
 
@@ -272,25 +273,22 @@ class CCalendar(CFrame):
             self.my_date = self.today
 
         self.calendar = self.load_calendar()
-        self.calendar.pack(pady=(15, 0))
+        self.calendar.pack()
 
     def load_calendar(self):
         parrent = CFrame(self)
-        parrent["bg"] = conf.btn_color
 
         self.all_btns = []
         f = ("San Francisco Pro", 15, "bold")
 
         titles = CFrame(parrent)
-        titles["bg"] = conf.btn_color
-        titles.pack(pady=(5, 0))
+        titles.pack(pady=5)
 
         month_frame = CFrame(titles)
-        month_frame["bg"] = conf.btn_color
         month_frame.pack(side="left", padx=(0, 15))
 
         prev = CButton(month_frame, text="<")
-        prev.configure(width=2, font=f)
+        prev.configure(width=2, font=f, bg=conf.bg_color)
         prev.pack(side="left")
         prev.cmd(lambda e: self.switch_month(prev["text"], e))
         self.all_btns.append(prev)
@@ -300,22 +298,21 @@ class CCalendar(CFrame):
             text=months[self.my_date.month],
             name=str(self.my_date.month)
             )
-        self.m_title.configure(bg=conf.btn_color, width=6, font=f)
+        self.m_title.configure(width=6, font=f)
         self.m_title.pack(side="left")
         self.all_btns.append(self.m_title)
 
         next = CButton(month_frame, text=">")
-        next.configure(width=2, font=f)
+        next.configure(width=2, font=f, bg=conf.bg_color)
         next.pack(side="left")
         next.cmd(lambda e: self.switch_month(next["text"], e))
         self.all_btns.append(next)
 
         year_frame = CFrame(titles)
-        year_frame["bg"] = conf.btn_color
         year_frame.pack(side="left")
 
         prev = CButton(year_frame, text="<")
-        prev.configure(width=2, font=f)
+        prev.configure(width=2, font=f, bg=conf.bg_color)
         prev.pack(side="left")
         prev.cmd(lambda e: self.switch_year(prev["text"], e))
         self.all_btns.append(prev)
@@ -325,19 +322,15 @@ class CCalendar(CFrame):
             text=self.my_date.year,
             name=str(self.my_date.month)
             )
-        self.y_title.configure(bg=conf.btn_color, width=3, font=f)
+        self.y_title.configure(width=3, font=f)
         self.y_title.pack(side="left")
         self.all_btns.append(self.y_title)
 
         next = CButton(year_frame, text=">")
-        next.configure(width=2, font=f)
+        next.configure(width=2, font=f, bg=conf.bg_color)
         next.pack(side="left")
         next.cmd(lambda e: self.switch_year(next["text"], e))
         self.all_btns.append(next)
-
-        sep = CSep(parrent)
-        sep.configure(bg=conf.bg_color)
-        sep.pack(fill="x")
 
         row = CFrame(parrent)
         row.pack()
@@ -349,7 +342,7 @@ class CCalendar(CFrame):
             self.all_btns.append(lbl)
 
         sep = CSep(parrent)
-        sep.configure(bg=conf.bg_color)
+        sep.configure(bg=conf.bg_color, height=2)
         sep.pack(fill="x")
 
         row = CFrame(parrent)
@@ -418,6 +411,8 @@ class CCalendar(CFrame):
         if not self.enabled:
             return
 
+        self.clicked = True
+
         if btn["text"]:
             for i in self.btns:
                 if i["bg"] == conf.sel_color:
@@ -433,6 +428,8 @@ class CCalendar(CFrame):
     def switch_month(self, txt, e):
         if not self.enabled:
             return
+
+        self.clicked = True
 
         if txt != "<":
             m = self.my_date.month + 1
@@ -453,6 +450,8 @@ class CCalendar(CFrame):
     def switch_year(self, txt, e):
         if not self.enabled:
             return
+
+        self.clicked = True
 
         if txt != "<":
             y = self.my_date.year + 1

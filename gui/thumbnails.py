@@ -132,7 +132,7 @@ class FilterWin(CWindow):
         first.pack()
 
         self.one = CCalendar(left, date_start)
-        self.one.pack(pady=(15, 0))
+        self.one.pack()
 
         right = CFrame(cal_frames)
         right.pack(side="left")
@@ -142,12 +142,58 @@ class FilterWin(CWindow):
         second.pack()
 
         self.two = CCalendar(right, date_end)
-        self.two.pack(pady=(15, 0))
+        self.two.pack()
 
         self.oneday_btn = CButton(self, text="За один день")
-        self.oneday_btn.pack(pady=(15, 0))
+        self.oneday_btn.pack()
         self.oneday_btn.cmd(lambda e: self.oneday_cmd())
         self.oneday = False
+
+        CSep(self).pack(fill="x", padx=15, pady=15)
+
+        grop_frame = CFrame(self)
+        grop_frame.pack()
+
+        self.marketing = CButton(grop_frame, text="Имиджи")
+        if conf.marketing:
+            self.marketing.configure(bg=conf.sel_color)
+        self.marketing.pack(side="left")
+        self.marketing.cmd(self.marketing_cmd)
+
+        self.catalog = CButton(grop_frame, text="Каталог")
+        if conf.catalog:
+            self.catalog.configure(bg=conf.sel_color)
+        self.catalog.pack(side="left", padx=15)
+        self.catalog.cmd(self.catalog_cmd)
+
+        self.show_all = CButton(grop_frame, text="Все фото")
+        if not any((conf.marketing, conf.catalog)):
+            self.show_all.configure(bg=conf.sel_color)
+        self.show_all.pack(side="left")
+        self.show_all.cmd(self.show_all_cmd)
+
+        if conf.sort_modified:
+            sort_btn_t = "Дата изменения"
+        else:
+            sort_btn_t = "Дата создания"
+
+        self.sort_modified = conf.sort_modified
+
+        self.btn_sort = CButton(self, text=sort_btn_t)
+        self.btn_sort.configure(width=13)
+        self.btn_sort.pack(pady=(20, 0))
+        self.btn_sort.cmd(self.sort_btn_cmd)
+
+        marketing_t = (
+            "Имиджи - показывать только рекламные фото.",
+            "Каталог - показывать только каталожные фото.",
+            "Сортировка - по дате изменения или по дате создания."
+            )
+        marketing_lbl = CLabel(
+            self, text="\n".join(marketing_t), anchor="w", justify="left")
+        marketing_lbl.pack(anchor="w", pady=(15, 0))
+
+        CSep(self).pack(fill="x", padx=150, pady=15)
 
         btns_frame = CFrame(self)
         btns_frame.pack(pady=(15, 0))
@@ -172,6 +218,38 @@ class FilterWin(CWindow):
         self.wait_visibility()
         self.grab_set_global()
 
+    def sort_btn_cmd(self, e):
+        if conf.sort_modified:
+            conf.sort_modified = False
+            self.btn_sort.configure(text="Дата создания")
+        else:
+            conf.sort_modified = True
+            self.btn_sort.configure(text="Дата изменения")
+
+    def marketing_cmd(self, e):
+        if not conf.marketing:
+            conf.marketing = True
+            conf.catalog = False
+            self.marketing.configure(bg=conf.sel_color)
+            self.catalog.configure(bg=conf.btn_color)
+            self.show_all.configure(bg=conf.btn_color)
+
+    def catalog_cmd(self, e):
+        if not conf.catalog:
+            conf.marketing = False
+            conf.catalog = True
+            self.marketing.configure(bg=conf.btn_color)
+            self.catalog.configure(bg=conf.sel_color)
+            self.show_all.configure(bg=conf.btn_color)
+
+    def show_all_cmd(self, e):
+        if any((conf.marketing, conf.catalog)):
+            conf.marketing = False
+            conf.catalog = False
+            self.marketing.configure(bg=conf.btn_color)
+            self.catalog.configure(bg=conf.btn_color)
+            self.show_all.configure(bg=conf.sel_color)
+
     def oneday_cmd(self):
         if not self.oneday:
             self.oneday = True
@@ -186,11 +264,12 @@ class FilterWin(CWindow):
     def ok_cmd(self):
         global date_start, date_end
 
-        date_start = self.one.my_date
-        if not self.oneday:
-            date_end = self.two.my_date
-        else:
-            date_end = None
+        if any((self.one.clicked, self.two.clicked)):
+            date_start = self.one.my_date
+            if not self.oneday:
+                date_end = self.two.my_date
+            else:
+                date_end = None
 
         self.destroy()
         focus_last()
@@ -239,12 +318,20 @@ class Thumbnails(CFrame):
         else:
             txt = conf.curr_coll
 
+        filter_row = []
+
+        if conf.marketing:
+            filter_row.append("Только имиджи")
+        elif conf.catalog:
+            filter_row.append("Только каталог")
+        elif not any((conf.marketing, conf.catalog)):
+            filter_row.append("Все фото")
+
         if date_start and not date_end:
-            title_dates = (
+            filter_row.append(
                 f"{date_start.day} {months_day[date_start.month]} "
                 f"{date_start.year}"
                 )
-
         elif all((date_start, date_end)):
             start = (
                 f"{date_start.day} {months_day[date_start.month]} "
@@ -253,10 +340,11 @@ class Thumbnails(CFrame):
             end = (f"{date_end.day} {months_day[date_end.month]} "
                    f"{date_end.year}"
                    )
-            title_dates = f"{start} - {end}"
-
+            filter_row.append(f"{start} - {end}")
         else:
-            title_dates = "За все время"
+            filter_row.append("за все время")
+
+        filter_row = ", ".join(filter_row)
 
         if conf.sort_modified:
             sort_text = "По дате изменения"
@@ -278,7 +366,7 @@ class Thumbnails(CFrame):
         l_subtitle.configure(font=sub_font, justify="right", anchor="e", width=30)
         l_subtitle.pack(anchor="e", side="left", padx=5)
 
-        r_text = f"{summary} фото\n{title_dates}\n{sort_text}"
+        r_text = f"{summary} фото\n{filter_row}\n{sort_text}"
         r_subtitle = CLabel(sub_frame, text=r_text)
         r_subtitle.configure(font=sub_font, justify="left", anchor="w", width=30)
         r_subtitle.pack(anchor="w", side="right", padx=5)
@@ -286,24 +374,12 @@ class Thumbnails(CFrame):
         btns_frame = CFrame(self.thumbnails)
         btns_frame.pack()
 
-        btn_day = CButton(btns_frame, text="Фильтр по дате")
+        btn_day = CButton(btns_frame, text="Фильтры")
         btn_day["width"] = 13
         btn_day.pack(side="left")
         if any((date_start, date_end)):
             btn_day["bg"] = conf.sel_color
         btn_day.cmd(lambda e: FilterWin())
-
-        CSep(btns_frame).pack(fill="y", side="left", padx=(15, 15))
-
-        if conf.sort_modified:
-            sort_btn_t = "Дата изменения"
-        else:
-            sort_btn_t = "Дата создания"
-
-        btn_sort = CButton(btns_frame, text=sort_btn_t)
-        btn_sort["width"] = 13
-        btn_sort.pack(side="left")
-        btn_sort.cmd(lambda e: self.sort_btn_cmd(btn_sort))
 
         if any((date_start, date_end)):
             reset = CButton(self.thumbnails, text="Сброс")
@@ -352,16 +428,6 @@ class Thumbnails(CFrame):
             more_btn.pack(pady=(15, 0))
 
         self.thumbnails.pack(expand=1, fill=tkinter.BOTH)
-
-    def sort_btn_cmd(self, btn: CButton):
-        if conf.sort_modified:
-            conf.sort_modified = False
-            btn["text"] = "Дата создания"
-            self.reload_without_scroll()
-        else:
-            conf.sort_modified = True
-            btn["text"] = "Дата изменения"
-            self.reload_without_scroll()
 
     def img_viewer_cmd(self, src, all_src, e):
         ImgViewer(src, all_src)
