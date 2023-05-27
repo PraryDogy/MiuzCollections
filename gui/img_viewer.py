@@ -19,19 +19,19 @@ class ContextMenu(tkinter.Menu):
         tkinter.Menu.__init__(self, master)
 
         self.add_command(
-            label = "Инфо",
-            command = lambda: ImageInfo(src, win)
+            label=conf.lang.info,
+            command = lambda: ImageInfo(src)
             )
 
         self.add_separator()
 
         self.add_command(
-            label = "Показать в Finder",
+            label = conf.lang.show_finder,
             command = lambda: find_jpeg(src)
             )
 
         self.add_command(
-            label = "Показать tiff",
+            label = conf.lang.show_tiff,
             command = lambda: find_tiff(src)
             )
 
@@ -155,9 +155,6 @@ class ImgViewer(CWindow):
             self.switch_img(index)
 
     def thumb_load(self):
-        """
-        Returns decoded non resized thumbnail from database
-        """
         thumb = Dbase.conn.execute(sqlalchemy.select(Thumbs.img150).where(
             Thumbs.src==src)).first()[0]
         return decode_image(thumb)

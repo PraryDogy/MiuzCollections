@@ -3,6 +3,7 @@ import os
 import shutil
 import threading
 import tkinter
+from lang import Rus, Eng
 
 __all__ = (
     "conf",
@@ -24,6 +25,8 @@ class Config:
 
         # gui settings
 
+        self.lang = Rus()
+
         self.fg_color = "#E2E2E2"
         self.bg_color = "#19191B"
         self.btn_color = "#2A2A2D"
@@ -35,6 +38,7 @@ class Config:
         self.menu_w = 180
         self.limit = 150
         self.thumb_pad = 3
+        self.all_colls = "all"
 
         # dynamic variables for gui
         self.flag = False
@@ -48,7 +52,7 @@ class Config:
         # user settings for json
         self.coll_folder = '/Volumes/Shares/Marketing/Photo/_Collections'
 
-        self.curr_coll = 'last'
+        self.curr_coll = self.all_colls
         self.ask_exit = 0
 
         self.root_w = 700
@@ -63,6 +67,7 @@ class Config:
         self.catalog = False
         self.marketing = False
         self.catalog_name = "Обтравка"
+        self.set_lang = "rus"
 
         self.stopwords = [
             "preview", "1x1", "1х1", "crop", "копия", "copy"
@@ -75,6 +80,9 @@ class Config:
         for key in data:
             if key in self.__dict__:
                 setattr(self, key, data[key])
+
+        if self.lang != "rus":
+            self.lang = Eng()
 
     def write_cfg(self):
         slice_keys = list(self.__dict__)
@@ -94,7 +102,7 @@ class Config:
             self.write_cfg()
 
         if not os.path.exists(self.db_dir):
-            shutil.copyfile(self.db_dir)
+            shutil.copyfile(self.db_name, self.db_dir)
 
     def get_defaults(self):
         return self.__class__()

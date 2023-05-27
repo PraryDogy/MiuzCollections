@@ -50,3 +50,6 @@ class Application:
             f"+{conf.root_x}+{conf.root_y}")
             )
         conf.root.minsize(800, 500)
+
+
+app = Application()

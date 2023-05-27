@@ -10,7 +10,7 @@ menu_buttons = []
 
 
 def open_finder(collection_name):
-    if collection_name != "last":
+    if collection_name != conf.all_colls:
         coll_path = os.path.join(conf.coll_folder, collection_name)
     else:
         coll_path = conf.coll_folder
@@ -36,7 +36,7 @@ class ContextMenu(tkinter.Menu):
         self.collection_name = collection_name
 
         self.add_command(
-            label = "Показать в Finder",
+            label = conf.lang.show_finder,
             command = lambda: open_finder(collection_name)
             )
 
@@ -83,7 +83,7 @@ class Menu(tkmacosx.SFrame):
     def load_menu_buttons(self):
         frame = CFrame(self)
 
-        title = CLabel(frame, text='Меню')
+        title = CLabel(frame, text=conf.lang.menu_title)
         title.configure(font=('San Francisco Pro', 22, 'bold'))
         title.pack(pady=(0,15))
 
@@ -104,13 +104,13 @@ class Menu(tkmacosx.SFrame):
                 key = lambda item: item[1].casefold()
                 ))
 
-        last = CButton(frame, text='Все коллекции')
+        last = CButton(frame, text=conf.lang.all_collections)
         last.configure(width=13, pady=5, anchor=tkinter.W, padx=10)
-        last.cmd(partial(self.open_coll_folder, 'last', last))
+        last.cmd(partial(self.open_coll_folder, conf.all_colls, last))
         last.pack(pady=(0, 15))
         menu_buttons.append(last)
 
-        ContextMenu(last, "last")
+        ContextMenu(last, conf.all_colls)
 
         sep = CSep(frame)
         sep['bg'] = '#272727'
@@ -132,7 +132,7 @@ class Menu(tkmacosx.SFrame):
             sep['bg'] = '#272727'
             sep.pack(fill=tkinter.X)
     
-        if conf.curr_coll == 'last':
+        if conf.curr_coll == conf.all_colls:
             last.configure(bg=conf.sel_color)
 
         return frame

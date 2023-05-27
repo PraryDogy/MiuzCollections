@@ -10,51 +10,11 @@ __all__ = (
     "Settings",
     )
 
-settings_win = tkinter.Toplevel
-
-
-class ExceptionsWin(CWindow):
-    def __init__(self, e):
-        super().__init__()
-        self.geometry("300x300")
-
-        collections = {
-            i: re.search("[A-Za-zА-Яа-я]+.{0,11}", i).group(0)[:13]
-            for i in os.listdir(conf.coll_folder)
-            }
-
-        collections = dict(
-            sorted(
-                collections.items(),
-                key = lambda item: item[1].casefold()
-                ))
-
-        for name, true_name in collections.items():
-            lbl = CLabel(self, text=name)
-            lbl.pack()
-
-
-        self.protocol("WM_DELETE_WINDOW", lambda: self.close_win())
-        self.bind('<Command-w>', lambda e: self.close_win())
-        self.bind('<Escape>', lambda e: self.close_win())
-
-        conf.root.update_idletasks()
-
-        place_center(self)
-        self.deiconify()
-        self.wait_visibility()
-        self.grab_set_global()
-
-    def close_win(self):
-        self.destroy()
-        if self.win.winfo_class() != tkinter.Tk.__name__:
-            self.win.grab_set_global()
-
 
 class Settings(CWindow):
     def __init__(self):
         super().__init__()
-        self.title('Настройки')
+        self.title(conf.lang.settings_title)
 
         self.geometry("400x320")
 
@@ -75,7 +35,7 @@ class Settings(CWindow):
 
         frame = CFrame(self)
 
-        title_lbl = CLabel(frame, text="Все коллекции")
+        title_lbl = CLabel(frame, text=conf.lang.all_collections)
         title_lbl.configure(font=('San Francisco Pro', 22, 'bold'))
         title_lbl.pack(expand=True, fill="both")
 
@@ -90,7 +50,7 @@ class Settings(CWindow):
         select_frame = CFrame(frame)
         select_frame.pack(pady=(5, 0))
 
-        select_path = CButton(select_frame, text='Обзор')
+        select_path = CButton(select_frame, text=conf.lang.settings_browse)
         select_path.cmd(lambda e: self.select_path_cmd())
         select_path.pack(side="left")
 
@@ -107,7 +67,7 @@ class Settings(CWindow):
 
         checkbox_wid.pack(side="left")
 
-        checkbox_lbl = CLabel(checkbox_frame, text='Спрашивать при выходе')
+        checkbox_lbl = CLabel(checkbox_frame, text=conf.lang.settings_askexit)
         checkbox_lbl.pack(side="left")
 
         checkbox_lbl.bind("<Button-1>", lambda e: self.checkbox_cmd(checkbox_wid))
@@ -116,10 +76,7 @@ class Settings(CWindow):
         restore_btn.cmd(lambda e, x=restore_btn: self.default_cmd(x))
         restore_btn.pack(pady=(15, 0))
 
-        t = (
-            "*Программа игнорирует папки внутри коллекций, имя"
-            "\nкоторых начинается с точки или нижнего подчеркивания."
-            )
+        t = conf.lang.settings_descr
         subtitle = CLabel(frame, text=t, anchor="w", justify="left")
         subtitle.pack(expand=True, fill="both", pady=(15, 0))
 
@@ -128,11 +85,11 @@ class Settings(CWindow):
 
         CSep(cancel_frame).pack(pady=15, fill=tkinter.X)
 
-        save_btn = CButton(cancel_frame, text='Ок')
+        save_btn = CButton(cancel_frame, text=conf.lang.ok)
         save_btn.cmd(lambda e: self.save_cmd())
         save_btn.pack(padx=(0, 10), side="left")
 
-        cancel_btn = CButton(cancel_frame, text='Отмена')
+        cancel_btn = CButton(cancel_frame, text=conf.lang.cancel)
         cancel_btn.cmd(lambda e: self.cancel_cmd())
         cancel_btn.pack(side="left")
 

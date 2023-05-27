@@ -14,22 +14,9 @@ __all__ = (
     "MacMenu",
     "CCalendar",
     "focus_last",
-    "months",
     )
 
-months = {
-    1: "Январь",
-    2: "Февраль",
-    3: "Март",
-    4: "Апрель",
-    5: "Май",
-    6: "Июнь",
-    7: "Июль",
-    8: "Август",
-    9: "Сентябрь",
-    10: "Октябрь",
-    11: "Ноябрь",
-    12: "Декабрь"}
+
 
 
 def focus_last():
@@ -122,10 +109,10 @@ class AskExit(CWindow):
         btns_frame = CFrame(self)
         btns_frame.pack()
 
-        exit = CButton(self, text='Выйти')
+        exit = CButton(self, text=conf.lang.askexit_exit)
         exit.cmd(lambda e: on_exit())
 
-        cancel = CButton(self, text='Отмена')
+        cancel = CButton(self, text=conf.lang.cancel)
         cancel.cmd(lambda e: self.close_ask())
 
         [i.configure(height=1, width=11) for i in (exit, cancel)]
@@ -147,25 +134,16 @@ class SmbAlert(CWindow):
     def __init__(self):
         super().__init__()
 
-        txt = 'Нет подключения к сетевому диску Miuz.'
+        txt = conf.lang.smb_title
         title_lbl = CLabel(
             self, text=txt, font=('San Francisco Pro', 22, 'bold'))
         title_lbl.pack(pady=(0, 5), padx=20)
 
-        txt2 =(
-            'Рекомендации:'
-            '\n- Проверьте подключение к интернету.'
-            '\n- Откройте любую папку на сетевом диске,'
-            '\n- Укажите правильный путь к коллекциям в настройках'
-            '\n- Перезапустите приложение.'
-
-            '\n\nПоддержка: loshkarev@miuz.ru'
-            '\nTelegram: evlosh'
-            )
+        txt2 = conf.lang.smb_descr
         descr_lbl = CLabel(self, text=txt2, justify=tkinter.LEFT, )
         descr_lbl.pack(padx=15, pady=(0, 5))
 
-        btn = CButton(self, text = "Закрыть")
+        btn = CButton(self, text=conf.lang.close)
         btn.cmd(lambda e: self.btn_cmd())
         btn.pack()
 
@@ -182,9 +160,18 @@ class SmbAlert(CWindow):
 
 class ImageInfo(CWindow):
     def __init__(self, src: str):
+        under_win = None
+
+        for k, v in conf.root.children.items():
+            if isinstance(v, CWindow):
+                under_win = v
+
+        if not under_win:
+            under_win = conf.root
+
         super().__init__()
 
-        self.title("Инфо")
+        self.title(conf.lang.info)
         self.geometry("400x110")
         self.minsize(400, 110)
         self.maxsize(800, 150)
@@ -201,12 +188,12 @@ class ImageInfo(CWindow):
         frame.pack(expand=True, fill="both")
 
         labels = {
-            "Коллекция ": get_coll_name(src),
-            "Имя файла ": name,
-            "Дата изменения ": filemod,
-            "Разрешение ": f"{w}x{h}",
-            "Размер ": f"{filesize}мб",
-            "Расположение ": src,
+            conf.lang.info_collection: get_coll_name(src),
+            conf.lang.info_filename: name,
+            conf.lang.info_chanded: filemod,
+            conf.lang.info_resolution: f"{w}x{h}",
+            conf.lang.info_size: f"{filesize}мб",
+            conf.lang.info_path: src,
             }
 
         left_lbl = CLabel(
@@ -231,9 +218,9 @@ class ImageInfo(CWindow):
 
         conf.root.update_idletasks()
 
-        x, y = self.win.winfo_x(), self.win.winfo_y()
-        xx = x + self.win.winfo_width()//2 - self.winfo_width()//2
-        yy = y + self.win.winfo_height()//2 - self.winfo_height()//2
+        x, y = under_win.winfo_x(), under_win.winfo_y()
+        xx = x + under_win.winfo_width()//2 - self.winfo_width()//2
+        yy = y + under_win.winfo_height()//2 - self.winfo_height()//2
 
         self.geometry(f'+{xx}+{yy}')
 
@@ -298,10 +285,10 @@ class CCalendar(CFrame):
 
         self.m_title = CLabel(
             month_frame,
-            text=months[self.my_date.month],
+            text=conf.lang.months[self.my_date.month],
             name=str(self.my_date.month)
             )
-        self.m_title.configure(width=6, font=f)
+        self.m_title.configure(width=7, font=f)
         self.m_title.pack(side="left")
         self.all_btns.append(self.m_title)
 
@@ -338,7 +325,7 @@ class CCalendar(CFrame):
         row = CFrame(parrent)
         row.pack()
 
-        for i in ("Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"):
+        for i in conf.lang.calendar_days:
             lbl = CButton(row, text = i)
             lbl.configure(width=4, height=2)
             lbl.pack(side="left")
@@ -447,7 +434,7 @@ class CCalendar(CFrame):
         except ValueError:
             day = calendar.monthrange(self.my_date.year, m)[1]
             self.my_date = datetime(self.my_date.year, m, day)
-        self.m_title["text"] = months[m]
+        self.m_title["text"] = conf.lang.months[m]
         self.fill_days()
 
     def switch_year(self, txt, e):

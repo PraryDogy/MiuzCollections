@@ -10,7 +10,7 @@ __all__ = (
 class ScanerGui(CWindow):
     def __init__(self):
         super().__init__()
-        self.title("Обновление")
+        self.title(conf.lang.scaner_title)
         self.geometry("300x50")
 
         self.live_lbl = CLabel(
@@ -49,14 +49,14 @@ class StBar(CFrame):
         widgets = tuple(v for k, v in self.children.items())
         [i.destroy() for i in widgets]
 
-        btn = CButton(self, text='Настройки', padx=5)
+        btn = CButton(self, text=conf.lang.settings_title, padx=5)
         btn['width'] = 10
         btn.cmd(lambda e: self.settings_cmd(btn))
         btn.pack(side=tkinter.LEFT)
 
         CSep(self).pack(fill=tkinter.Y, side=tkinter.LEFT, padx=(15, 15))
 
-        self.upd_btn = CButton(self, text='Обновить', padx=5)
+        self.upd_btn = CButton(self, text=conf.lang.upd_btn, padx=5)
         self.upd_btn['width'] = 10
         self.upd_btn.cmd(lambda e: self.update_cmd(btn))
         self.upd_btn.pack(side=tkinter.LEFT)

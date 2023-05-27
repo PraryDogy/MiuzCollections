@@ -28,7 +28,7 @@ def st_bar_btn(text: str, color: str):
 def update_collections():
     global UPDATE_THUMBNAILS
 
-    change_live_lvl("Подготовка")
+    change_live_lvl(conf.lang.scaner_prepare)
 
     db_images = Dbase.conn.execute(
         sqlalchemy.select(
@@ -50,7 +50,9 @@ def update_collections():
     found_images = []
 
     for x, collection in enumerate(collections, 1):
-        change_live_lvl(f"Сканирую {x} из {ln} коллекций.")
+        change_live_lvl(
+            f"{conf.lang.live_scan} {x} {conf.lang.live_from} {ln} {conf.lang.live_collections}."
+            )
 
         for root, dirs, files in os.walk(collection):
 
@@ -88,7 +90,7 @@ def update_collections():
             "b_modified": modified,
             "b_collection": get_coll_name(src),
             "temp": change_live_lvl(
-                f"Добавлено {x} из {ln} новых фото."
+                f"{conf.lang.live_added} {x} {conf.lang.live_from} {ln} {conf.lang.live_newphoto}."
                 )
                 }
             for x, (src, size, created, modified) in enumerate(new_images, 1)
@@ -128,7 +130,7 @@ def update_collections():
 
     if remove_images:
 
-        change_live_lvl("Завершаю")
+        change_live_lvl(conf.lang.live_finish)
         UPDATE_THUMBNAILS = True
 
         values = [
@@ -166,7 +168,7 @@ def scaner():
     global UPDATE_THUMBNAILS
 
     conf.flag = True
-    st_bar_btn("Обновление", conf.sel_color)
+    st_bar_btn(conf.lang.live_updating, conf.sel_color)
 
     conf.scaner_task = threading.Thread(target = update_collections, daemon = True)
     conf.scaner_task.start()
@@ -183,4 +185,4 @@ def scaner():
         UPDATE_THUMBNAILS = False
 
     conf.flag = False
-    st_bar_btn("Обновить", conf.btn_color)
+    st_bar_btn(conf.lang.upd_btn, conf.btn_color)

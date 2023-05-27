@@ -8,19 +8,6 @@ __all__ = (
     "Thumbnails",
     )
 
-months_day = {
-    1: "января",
-    2: "февраля",
-    3: "марта",
-    4: "апреля",
-    5: "мая",
-    6: "июня",
-    7: "июля",
-    8: "августа",
-    9: "сентября",
-    10: "октября",
-    11: "ноября",
-    12: "декабря"}
 
 date_start: datetime = None
 date_end: datetime = None
@@ -51,12 +38,8 @@ def create_query():
     else:
         q = q.order_by(-Thumbs.created)
 
-    if conf.curr_coll != "last":
+    if conf.curr_coll != conf.all_colls:
         q = q.filter(Thumbs.collection == conf.curr_coll)
-
-    # только имиджи - маркетинг труе, каталог фалсе
-    # только каталожка - маркетинг фалсе, каталог труе
-    # показать все- маркетинг и каталог фалсе
 
     if conf.marketing:
         q = q.filter(sqlalchemy.not_(Thumbs.src.contains(conf.catalog_name)))
@@ -64,7 +47,7 @@ def create_query():
     elif conf.catalog:
         q = q.filter(Thumbs.src.contains(conf.catalog_name))
 
-    if not date_start and not date_end:
+    if not any((date_start, date_end)):
         q = q.limit(conf.limit)
 
     elif date_start and not date_end:
@@ -85,20 +68,20 @@ class ContextMenu(tkinter.Menu):
         super().__init__()
 
         self.add_command(
-            label = "Просмотр",
-            command = lambda: ImgViewer(src, all_src)
+            label=conf.lang.preview,
+            command=lambda: ImgViewer(src, all_src)
             )
         self.add_separator()
         self.add_command(
-            label = "Инфо",
-            command = lambda: ImageInfo(src)
+            label=conf.lang.info,
+            command=lambda: ImageInfo(src)
             )
         self.add_command(
-            label = "Показать в Finder",
+            label=conf.lang.show_finder,
             command = lambda: find_jpeg(src)
             )
         self.add_command(
-            label = "Показать tiff",
+            label=conf.lang.show_tiff,
             command = lambda: find_tiff(src)
             )
 
@@ -114,7 +97,7 @@ class ContextMenu(tkinter.Menu):
 class FilterWin(CWindow):
     def __init__(self):
         super().__init__()
-        self.title("Фильтр")
+        self.title(conf.lang.filter_title)
         f = ("San Francisco Pro", 17, "bold")
 
         calendar_frames = CFrame(self)
@@ -123,7 +106,7 @@ class FilterWin(CWindow):
         left_frame = CFrame(calendar_frames)
         left_frame.pack(side="left", padx=(0, 15))
 
-        left_title = CLabel(left_frame, text="Начало")
+        left_title = CLabel(left_frame, text=conf.lang.filter_start)
         left_title["font"] = f
         left_title.pack()
 
@@ -133,16 +116,17 @@ class FilterWin(CWindow):
         right_frame = CFrame(calendar_frames)
         right_frame.pack(side="left")
 
-        right_title = CLabel(right_frame, text="Конец")
+        right_title = CLabel(right_frame, text=conf.lang.filter_end)
         right_title["font"] = f
         right_title.pack()
 
         self.right_calendar = CCalendar(right_frame, date_end)
         self.right_calendar.pack()
 
-        self.oneday_btn = CButton(self, text="За один день")
+        self.oneday_btn = CButton(self, text=conf.lang.filter_oneday)
         self.oneday_btn.pack()
         self.oneday_btn.cmd(lambda e: self.oneday_cmd())
+
         self.oneday = False
 
         CSep(self).pack(fill="x", padx=15, pady=15)
@@ -150,43 +134,52 @@ class FilterWin(CWindow):
         grop_frame = CFrame(self)
         grop_frame.pack()
 
-        self.marketing = CButton(grop_frame, text="Имиджи")
+        self.marketing = CButton(grop_frame, text=conf.lang.filter_marketing)
         if conf.marketing:
             self.marketing.configure(bg=conf.sel_color)
         self.marketing.pack(side="left")
         self.marketing.cmd(self.marketing_cmd)
 
-        self.catalog = CButton(grop_frame, text="Каталог")
+        self.catalog = CButton(grop_frame, text=conf.lang.filter_catalog)
         if conf.catalog:
             self.catalog.configure(bg=conf.sel_color)
         self.catalog.pack(side="left", padx=15)
         self.catalog.cmd(self.catalog_cmd)
 
-        self.show_all = CButton(grop_frame, text="Все фото")
+        self.show_all = CButton(grop_frame, text=conf.lang.filter_showall)
         if not any((conf.marketing, conf.catalog)):
             self.show_all.configure(bg=conf.sel_color)
         self.show_all.pack(side="left")
         self.show_all.cmd(self.show_all_cmd)
 
         if conf.sort_modified:
-            sort_btn_t = "Дата изменения"
+            sort_btn_t = conf.lang.filter_changed
         else:
-            sort_btn_t = "Дата создания"
+            sort_btn_t = conf.lang.filter_created
 
         self.sort_modified = conf.sort_modified
 
-        self.btn_sort = CButton(self, text=sort_btn_t)
+        sort_frame = CFrame(self)
+        sort_frame.pack(pady = (20, 0))
+
+        self.btn_sort = CButton(sort_frame, text=sort_btn_t)
         self.btn_sort.configure(width=13)
-        self.btn_sort.pack(pady=(20, 0))
+        self.btn_sort.pack(side="left")
         self.btn_sort.cmd(self.sort_btn_cmd)
 
-        marketing_t = (
-            "Имиджи - показывать только рекламные фото.",
-            "Каталог - показывать только каталожные фото.",
-            "Сортировка - по дате изменения или по дате создания."
-            )
+        self.btn_lang = CButton(sort_frame)
+        self.btn_lang.configure(width=13)
+        self.btn_lang.pack(padx=(15, 0), side="left")
+        self.btn_lang.cmd(self.lang_cmd)
+
+        if conf.set_lang == "rus":
+            self.btn_lang.configure(text="Russian")
+        else:
+           self.btn_lang.configure(text="English")
+
         marketing_lbl = CLabel(
-            self, text="\n".join(marketing_t), anchor="w", justify="left")
+            self, text="\n".join(conf.lang.filter_descr),
+            anchor="w", justify="left")
         marketing_lbl.pack(anchor="w", pady=(15, 0))
 
         CSep(self).pack(fill="x", padx=150, pady=15)
@@ -194,11 +187,11 @@ class FilterWin(CWindow):
         btns_frame = CFrame(self)
         btns_frame.pack(pady=(15, 0))
 
-        ok_btn = CButton(btns_frame, text="Ок")
+        ok_btn = CButton(btns_frame, text=conf.lang.ok)
         ok_btn.pack(side="left", padx=15)
         ok_btn.cmd(lambda e: self.ok_cmd())
 
-        cancel_btn = CButton(btns_frame, text="Отмена")
+        cancel_btn = CButton(btns_frame, text=conf.lang.cancel)
         cancel_btn.pack(side="left")
         cancel_btn.cmd(lambda e: self.cancel())
 
@@ -214,13 +207,19 @@ class FilterWin(CWindow):
         self.wait_visibility()
         self.grab_set_global()
 
+    def lang_cmd(self, e):
+        if self.btn_lang["text"] == "Russian":
+            self.btn_lang.configure(text="English")
+        else:
+            self.btn_lang.configure(text="Russian")
+
     def sort_btn_cmd(self, e):
         if conf.sort_modified:
             conf.sort_modified = False
-            self.btn_sort.configure(text="Дата создания")
+            self.btn_sort.configure(text=conf.lang.filter_created)
         else:
             conf.sort_modified = True
-            self.btn_sort.configure(text="Дата изменения")
+            self.btn_sort.configure(text=conf.lang.filter_changed)
 
     def marketing_cmd(self, e):
         if not conf.marketing:
@@ -247,6 +246,8 @@ class FilterWin(CWindow):
             self.show_all.configure(bg=conf.sel_color)
 
     def oneday_cmd(self):
+        self.left_calendar.clicked = True
+
         if not self.oneday:
             self.oneday = True
             self.oneday_btn["bg"] = conf.sel_color
@@ -307,47 +308,47 @@ class Thumbnails(CFrame):
         summary = len(self.thumbs)
 
         self.thumbs = self.decode_thumbs()
-        self.thumbs: dict = self.create_thumbs_dict()
+        self.thumbs = self.create_thumbs_dict()
 
         self.size = conf.thumb_size + conf.thumb_pad
 
-        if conf.curr_coll == "last":
-            txt = "Все коллекции"
+        if conf.curr_coll == conf.all_colls:
+            txt = conf.lang.all_collections
         else:
             txt = conf.curr_coll
 
         filter_row = []
 
         if conf.marketing:
-            filter_row.append("Только имиджи")
+            filter_row.append(conf.lang.thumbs_marketing)
         elif conf.catalog:
-            filter_row.append("Только каталог")
+            filter_row.append(conf.lang.thumbs_catalog)
         elif not any((conf.marketing, conf.catalog)):
-            filter_row.append("Все фото")
+            filter_row.append(conf.lang.thumbs_showall)
 
         if date_start and not date_end:
             filter_row.append(
-                f"{date_start.day} {months_day[date_start.month]} "
+                f"{date_start.day} {conf.lang.months_parental[date_start.month]} "
                 f"{date_start.year}"
                 )
         elif all((date_start, date_end)):
             start = (
-                f"{date_start.day} {months_day[date_start.month]} "
+                f"{date_start.day} {conf.lang.months_parental[date_start.month]} "
                 f"{date_start.year}"
                 )
-            end = (f"{date_end.day} {months_day[date_end.month]} "
+            end = (f"{date_end.day} {conf.lang.months_parental[date_end.month]} "
                    f"{date_end.year}"
                    )
             filter_row.append(f"{start} - {end}")
         else:
-            filter_row.append("за все время")
+            filter_row.append(conf.lang.thumbs_alltime.lower())
 
         filter_row = ", ".join(filter_row)
 
         if conf.sort_modified:
-            sort_text = "По дате изменения"
+            sort_text = conf.lang.thumbs_changed
         else:
-            sort_text = "По дате создания"
+            sort_text = conf.lang.thumbs_created
 
         self.thumbs_frame = CFrame(self.sframe)
 
@@ -360,11 +361,14 @@ class Thumbnails(CFrame):
 
         sub_font=('San Francisco Pro', 13, 'normal')
 
-        l_subtitle = CLabel(main_sub_frame, text="Всего\nФильтр\nСортировка")
+        l_subtitle = CLabel(
+            main_sub_frame,
+            text=f"{conf.lang.thumbs_summary}\n{conf.lang.thumbs_filter}\n{conf.lang.thumbs_sort}"
+            )
         l_subtitle.configure(font=sub_font, justify="right", anchor="e", width=30)
         l_subtitle.pack(anchor="e", side="left", padx=5)
 
-        r_text = f"{summary} фото\n{filter_row}\n{sort_text}"
+        r_text = f"{summary} {conf.lang.thumbs_photo.lower()}\n{filter_row}\n{sort_text}"
         r_subtitle = CLabel(main_sub_frame, text=r_text)
         r_subtitle.configure(font=sub_font, justify="left", anchor="w", width=30)
         r_subtitle.pack(anchor="w", side="right", padx=5)
@@ -372,22 +376,23 @@ class Thumbnails(CFrame):
         btns_frame = CFrame(self.thumbs_frame)
         btns_frame.pack()
 
-        btn_filter = CButton(btns_frame, text="Фильтры")
-        btn_filter["width"] = 13
+        btn_filter = CButton(btns_frame, text=conf.lang.thumbs_filters)
+        # btn_filter["width"] = 13
         btn_filter.pack(side="left")
         if any((date_start, date_end)):
             btn_filter.configure(bg=conf.sel_color)
         btn_filter.cmd(lambda e: FilterWin())
 
         if any((date_start, date_end)):
-            reset = CButton(self.thumbs_frame, text="Сброс даты")
+            reset = CButton(self.thumbs_frame, text=conf.lang.thumbs_reset)
+            reset.configure(width=13)
             reset.pack(pady=(15, 0))
             reset.cmd(lambda e: self.reset_filter_cmd())
 
         for dates, img_list in self.thumbs.items():
             thumbs_title = CLabel(
                 self.thumbs_frame,
-                text=f"{dates}, всего: {len(img_list)}",
+                text=f"{dates}, {conf.lang.thumbs_summary.lower()}: {len(img_list)}",
                 anchor="w",
                 justify="left",
                 )
@@ -421,7 +426,7 @@ class Thumbnails(CFrame):
             img_lbl.bind("<Button-2>", partial(self.r_click))
 
         if summary >= 150:
-            more_btn = CButton(self.thumbs_frame, text="Показать еще")
+            more_btn = CButton(self.thumbs_frame, text=conf.lang.thumbs_showmore)
             more_btn.cmd(lambda e: self.show_more_cmd())
             more_btn.pack(pady=(15, 0))
 
@@ -496,18 +501,18 @@ class Thumbnails(CFrame):
             t = datetime.fromtimestamp(modified).date()
 
             if not date_start and not date_end:
-                t = f"{months[t.month]} {t.year}"
+                t = f"{conf.lang.months[t.month]} {t.year}"
 
             elif date_start and not date_end:
-                t = f"{t.day} {months_day[t.month]} {t.year}"
+                t = f"{t.day} {conf.lang.months_parental[t.month]} {t.year}"
 
             elif all((date_start, date_end)):
                 start = (
-                    f"{date_start.day} {months_day[date_start.month]} "
+                    f"{date_start.day} {conf.lang.months_parental[date_start.month]} "
                     f"{date_start.year}"
                     )
                 end = (
-                    f"{date_end.day} {months_day[date_end.month]} "
+                    f"{date_end.day} {conf.lang.months_parental[date_end.month]} "
                     f"{date_end.year}"
                     )
                 t = f"{start} - {end}"
