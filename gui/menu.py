@@ -1,6 +1,6 @@
-from . import (Dbase, ImageTk, Thumbs, conf, os, partial, re, sqlalchemy,
-               subprocess, tkinter, tkmacosx)
-from .widgets import CButton, CFrame, CLabel, CSep
+from . import (Dbase, Thumbs, conf, os, partial, re, sqlalchemy, subprocess,
+               tkinter, tkmacosx)
+from .widgets import *
 
 __all__ = (
     "Menu",

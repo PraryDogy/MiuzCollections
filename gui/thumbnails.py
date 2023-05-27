@@ -1,9 +1,5 @@
-import math
-
-from PIL import Image
-
-from . import (Dbase, ImageTk, Thumbs, conf, convert_to_rgb, crop_image,
-               datetime, decode_image, find_jpeg, find_tiff, partial,
+from . import (Dbase, Image, ImageTk, Thumbs, conf, convert_to_rgb, crop_image,
+               datetime, decode_image, find_jpeg, find_tiff, math, partial,
                place_center, sqlalchemy, tkinter, tkmacosx, traceback)
 from .img_viewer import ImgViewer
 from .widgets import *

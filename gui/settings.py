@@ -1,7 +1,5 @@
-from database import *
-
-from . import (conf, filedialog, on_exit, os, place_center, re, scaner,
-               smb_check, sqlalchemy, tkinter)
+from . import (Dbase, Thumbs, conf, filedialog, on_exit, os, place_center, re,
+               scaner, smb_check, sqlalchemy, tkinter)
 from .widgets import *
 
 path_widget = tkinter.Label
