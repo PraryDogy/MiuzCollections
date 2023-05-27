@@ -56,10 +56,7 @@ class ImgViewer(CWindow):
         self.set_title()
         self["bg"] = "black"
 
-        self.win_width = conf.preview_w
-        self.win_height = conf.preview_h
-
-        self.geometry(f'{self.win_width}x{self.win_height}')
+        self.geometry(f'{conf.preview_w}x{conf.preview_h}')
         self.minsize(500, 300)
 
         self.configure(pady=0, padx=0)
@@ -70,12 +67,12 @@ class ImgViewer(CWindow):
 
         conf.root.update_idletasks()
 
-        self.img_frame['width'] = self.win_width
-        self.img_frame['height'] = self.win_height
+        self.img_frame['width'] = conf.preview_w
+        self.img_frame['height'] = conf.preview_h
 
-        self.thumb_place(self.win_width, self.win_height)
+        self.thumb_place(conf.preview_w, conf.preview_h)
         self.task = conf.root.after(
-            500, lambda: self.img_place(self.win_width, self.win_height))
+            500, lambda: self.img_place(conf.preview_w, conf.preview_h))
 
         place_center(self)
         self.deiconify()
@@ -99,20 +96,17 @@ class ImgViewer(CWindow):
             print("no win")
             return
 
-        if new_w != self.win_width or new_h != self.win_height:
-            self.win_height = new_h
-            self.win_width = new_w
+        if new_w != conf.preview_w or new_h != conf.preview_h:
+            conf.preview_h = new_h
+            conf.preview_w = new_w
 
-            self.img_frame['width'] = self.win_width
-            self.img_frame['height'] = self.win_height
+            self.img_frame['width'] = conf.preview_w
+            self.img_frame['height'] = conf.preview_h
 
-            conf.preview_w = self.win_width
-            conf.preview_h = self.win_height
-
-            self.thumb_place(self.win_width, self.win_height)
+            self.thumb_place(conf.preview_w, conf.preview_h)
             conf.root.after(
                 500,
-                lambda: self.img_place(self.win_width, self.win_height)
+                lambda: self.img_place(conf.preview_w, conf.preview_h)
                 )
 
     def img_widget(self):
@@ -136,13 +130,13 @@ class ImgViewer(CWindow):
             src = all_src[0]
             self.set_title()
 
-        self.thumb_place(self.win_width, self.win_height)
+        self.thumb_place(conf.preview_w, conf.preview_h)
         self.task = conf.root.after(
             500,
-            lambda: self.img_place(self.win_width, self.win_height)
+            lambda: self.img_place(conf.preview_w, conf.preview_h)
             )
 
-    def img_ind(self) -> int:
+    def img_ind(self):
         return all_src.index(src)
 
     def img_set(self, img):
@@ -151,9 +145,9 @@ class ImgViewer(CWindow):
         self.img_frame.image_names = img_tk
 
     def img_click(self, e: tkinter.Event):
-        if self.win_width == self.winfo_width():
+        if conf.preview_w == self.winfo_width():
 
-            if e.x <= self.win_width//2:
+            if e.x <= conf.preview_w//2:
                 index = self.img_ind() - 1
             else:
                 index = self.img_ind() + 1
