@@ -382,7 +382,7 @@ class Thumbnails(CFrame):
         btn_day.cmd(lambda e: FilterWin())
 
         if any((date_start, date_end)):
-            reset = CButton(self.thumbnails, text="Сброс")
+            reset = CButton(self.thumbnails, text="Сброс даты")
             reset.pack(pady=(15, 0))
             reset.cmd(lambda e: self.reset_filter_cmd())
 
