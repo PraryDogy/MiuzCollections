@@ -3,7 +3,6 @@ from . import (Dbase, Thumbs, conf, filedialog, on_exit, os, place_center, re,
 from .widgets import *
 
 path_widget = tkinter.Label
-checkbox_wid = tkinter.Checkbutton
 SCAN_AGAIN = False
 
 __all__ = (
@@ -18,8 +17,6 @@ class Settings(CWindow):
 
         self.geometry("400x320")
 
-        self.ask_exit = tkinter.IntVar(value=conf.ask_exit)
-
         self.main_wid = self.main_widget()
         self.main_wid.pack(expand=True, fill="both")
 
@@ -31,17 +28,13 @@ class Settings(CWindow):
         self.grab_set_global()
 
     def main_widget(self):
-        global path_widget, checkbox_wid
+        global path_widget
 
         frame = CFrame(self)
 
-        title_lbl = CLabel(frame, text=conf.lang.all_collections)
-        title_lbl.configure(font=('San Francisco Pro', 22, 'bold'))
-        title_lbl.pack(expand=True, fill="both")
-
         path_widget = CLabel(
             frame,
-            text=conf.coll_folder,
+            text=f"{conf.coll_folder}",
             anchor="w",
             justify="left"
             )
@@ -54,31 +47,34 @@ class Settings(CWindow):
         select_path.cmd(lambda e: self.select_path_cmd())
         select_path.pack(side="left")
 
-        checkbox_frame = CFrame(frame)
-        checkbox_frame.pack(pady=(15, 0))
+        asklang_frame = CFrame(frame)
+        asklang_frame.pack(pady=(15, 0))
 
-        checkbox_wid = tkinter.Checkbutton(checkbox_frame, bg=conf.bg_color)
-        checkbox_wid['command'] = lambda: self.checkbox_cmd(checkbox_wid)
+        self.ask_btn = CButton(asklang_frame, text=conf.lang.settings_askexit)
+        self.ask_btn.configure(width=15)
+        self.ask_btn.pack(side="left")
+        self.ask_btn.cmd(self.ask_exit_cmd)
 
-        if self.ask_exit.get() == 1:
-            checkbox_wid.select()
+        if conf.ask_exit:
+            self.ask_btn.configure(bg=conf.sel_color)
+
+        self.lang_btn = CButton(asklang_frame)
+        self.lang_btn.configure(width=15)
+        self.lang_btn.pack(side="left", padx=(15, 0))
+        self.lang_btn.cmd(self.lang_cmd)
+
+        if conf.json_lang == "Russian":
+            self.lang_btn.configure(text="Русский")
         else:
-            checkbox_wid.deselect()
+            self.lang_btn.configure(text="English")
 
-        checkbox_wid.pack(side="left")
-
-        checkbox_lbl = CLabel(checkbox_frame, text=conf.lang.settings_askexit)
-        checkbox_lbl.pack(side="left")
-
-        checkbox_lbl.bind("<Button-1>", lambda e: self.checkbox_cmd(checkbox_wid))
-
-        restore_btn = CButton(frame, text='Сброс')
+        restore_btn = CButton(frame, text=conf.lang.settings_reset)
         restore_btn.cmd(lambda e, x=restore_btn: self.default_cmd(x))
         restore_btn.pack(pady=(15, 0))
 
         t = conf.lang.settings_descr
-        subtitle = CLabel(frame, text=t, anchor="w", justify="left")
-        subtitle.pack(expand=True, fill="both", pady=(15, 0))
+        self.sett_desc = CLabel(frame, text=t, anchor="w", justify="left")
+        self.sett_desc.pack(expand=True, fill="both", pady=(15, 0))
 
         cancel_frame = CFrame(frame)
         cancel_frame.pack(expand=True)
@@ -95,17 +91,33 @@ class Settings(CWindow):
 
         return frame
 
+    def lang_cmd(self, e):
+        if self.lang_btn["text"] == "English":
+            self.lang_btn["text"] = "Русский"
+            t = self.sett_desc["text"]
+            t = t.split("\n")
+            t[-1] = ("Перезапустите приложение для смены языка.")
+            t = "\n".join(t)
+            self.sett_desc["text"] = t
+
+        else:
+            self.lang_btn["text"] = "English"
+            t = self.sett_desc["text"]
+            t = t.split("\n")
+            t[-1] = ("Restart app for change language.")
+            t = "\n".join(t)
+            self.sett_desc["text"] = t
+
+
+    def ask_exit_cmd(self, e):
+        if self.ask_btn["bg"] == conf.btn_color:
+            self.ask_btn.configure(bg=conf.sel_color)
+        else:
+            self.ask_btn.configure(bg=conf.btn_color)
+
     def cancel_cmd(self):
         self.destroy()
         focus_last()
-
-    def checkbox_cmd(self, master: tkinter.Checkbutton):
-        if self.ask_exit.get() == 1:
-            self.ask_exit.set(0)
-            master.deselect()
-        elif self.ask_exit.get() == 0:
-            self.ask_exit.set(1)
-            master.select()
 
     def select_path_cmd(self):
         global path_widget, SCAN_AGAIN
@@ -124,7 +136,6 @@ class Settings(CWindow):
         btn.press()
         default = conf.get_defaults()
         path_widget['text'] = default.coll_folder
-        checkbox_wid.select()
 
         Dbase.conn.execute(sqlalchemy.delete(Thumbs))
         Dbase.conn.execute("VACUUM")
@@ -135,14 +146,20 @@ class Settings(CWindow):
         global SCAN_AGAIN, SCANER_PERMISSION
 
         conf.coll_folder = path_widget['text']
-        conf.ask_exit = self.ask_exit.get()
 
-        if conf.ask_exit == 1:
+        if self.ask_btn["bg"] == conf.sel_color:
+            conf.ask_exit = True
             conf.root.protocol("WM_DELETE_WINDOW", AskExit)
             conf.root.createcommand("tk::mac::Quit" , AskExit)
         else:
+            conf.ask_exit = False
             conf.root.createcommand("tk::mac::Quit" , on_exit)
             conf.root.protocol("WM_DELETE_WINDOW", on_exit)
+
+        if self.lang_btn["text"] == "English":
+            conf.json_lang = "English"
+        else:
+            conf.json_lang = "Russian"
 
         conf.write_cfg()
         self.destroy()

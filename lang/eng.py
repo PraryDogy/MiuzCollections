@@ -17,11 +17,14 @@ class Eng:
 
         # settings
         self.settings_title = "Settings"
+        self.settings_label = "Collections location"
         self.settings_browse = "Browse"
         self.settings_askexit = "Ask on exit"
+        self.settings_reset = "Reset"
         self.settings_descr = (
             "If the collection name starts with _ or ."
             "\nMiuzCollections app will ignore it."
+            "\nRestart app for change language."
             )
 
         # status bar
@@ -57,7 +60,6 @@ class Eng:
             "Marketing - show photos created by marketing department only.",
             "Catalog - show photos for website.",
             "Sort - by date mofidied or date created.",
-            "Language - restart app to change language."
             )
         
         # ask exit

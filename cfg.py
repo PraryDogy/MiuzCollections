@@ -53,7 +53,7 @@ class Config:
         self.coll_folder = '/Volumes/Shares/Marketing/Photo/_Collections'
 
         self.curr_coll = self.all_colls
-        self.ask_exit = 0
+        self.ask_exit = False
 
         self.root_w = 700
         self.root_h = 500
@@ -67,7 +67,7 @@ class Config:
         self.catalog = False
         self.marketing = False
         self.catalog_name = "Обтравка"
-        self.set_lang = "rus"
+        self.json_lang = "Russian"
 
         self.stopwords = [
             "preview", "1x1", "1х1", "crop", "копия", "copy"
@@ -81,8 +81,10 @@ class Config:
             if key in self.__dict__:
                 setattr(self, key, data[key])
 
-        if self.lang != "rus":
+        if self.json_lang == "English":
             self.lang = Eng()
+        else:
+            self.lang = Rus()
 
     def write_cfg(self):
         slice_keys = list(self.__dict__)

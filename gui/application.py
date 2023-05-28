@@ -15,7 +15,7 @@ class Application:
 
         conf.root.bind('<Command-w>', lambda e: conf.root.iconify())
 
-        if conf.ask_exit == 1:
+        if conf.ask_exit:
             conf.root.protocol("WM_DELETE_WINDOW", AskExit)
             conf.root.createcommand("tk::mac::Quit" , AskExit)
         else:
@@ -49,7 +49,7 @@ class Application:
             (f"{conf.root_w}x{conf.root_h}"
             f"+{conf.root_x}+{conf.root_y}")
             )
-        conf.root.minsize(800, 500)
+        conf.root.minsize(870, 500)
 
 
 app = Application()

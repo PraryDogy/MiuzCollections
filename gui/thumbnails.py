@@ -159,23 +159,10 @@ class FilterWin(CWindow):
 
         self.sort_modified = conf.sort_modified
 
-        sort_frame = CFrame(self)
-        sort_frame.pack(pady = (20, 0))
-
-        self.btn_sort = CButton(sort_frame, text=sort_btn_t)
+        self.btn_sort = CButton(self, text=sort_btn_t)
         self.btn_sort.configure(width=13)
-        self.btn_sort.pack(side="left")
+        self.btn_sort.pack(pady=(15, 0))
         self.btn_sort.cmd(self.sort_btn_cmd)
-
-        self.btn_lang = CButton(sort_frame)
-        self.btn_lang.configure(width=13)
-        self.btn_lang.pack(padx=(15, 0), side="left")
-        self.btn_lang.cmd(self.lang_cmd)
-
-        if conf.set_lang == "rus":
-            self.btn_lang.configure(text="Russian")
-        else:
-           self.btn_lang.configure(text="English")
 
         marketing_lbl = CLabel(
             self, text="\n".join(conf.lang.filter_descr),
@@ -207,40 +194,26 @@ class FilterWin(CWindow):
         self.wait_visibility()
         self.grab_set_global()
 
-    def lang_cmd(self, e):
-        if self.btn_lang["text"] == "Russian":
-            self.btn_lang.configure(text="English")
-        else:
-            self.btn_lang.configure(text="Russian")
-
     def sort_btn_cmd(self, e):
         if conf.sort_modified:
-            conf.sort_modified = False
             self.btn_sort.configure(text=conf.lang.filter_created)
         else:
-            conf.sort_modified = True
             self.btn_sort.configure(text=conf.lang.filter_changed)
 
     def marketing_cmd(self, e):
         if not conf.marketing:
-            conf.marketing = True
-            conf.catalog = False
             self.marketing.configure(bg=conf.sel_color)
             self.catalog.configure(bg=conf.btn_color)
             self.show_all.configure(bg=conf.btn_color)
 
     def catalog_cmd(self, e):
         if not conf.catalog:
-            conf.marketing = False
-            conf.catalog = True
             self.marketing.configure(bg=conf.btn_color)
             self.catalog.configure(bg=conf.sel_color)
             self.show_all.configure(bg=conf.btn_color)
 
     def show_all_cmd(self, e):
         if any((conf.marketing, conf.catalog)):
-            conf.marketing = False
-            conf.catalog = False
             self.marketing.configure(bg=conf.btn_color)
             self.catalog.configure(bg=conf.btn_color)
             self.show_all.configure(bg=conf.sel_color)
@@ -263,10 +236,28 @@ class FilterWin(CWindow):
 
         if any((self.left_calendar.clicked, self.right_calendar.clicked)):
             date_start = self.left_calendar.my_date
+
             if not self.oneday:
                 date_end = self.right_calendar.my_date
             else:
                 date_end = None
+
+        if self.marketing["bg"] == conf.sel_color:
+            conf.marketing = True
+            conf.catalog = False
+
+        elif self.catalog["bg"] == conf.sel_color:
+            conf.marketing = False
+            conf.catalog = True
+
+        elif self.show_all["bg"] == conf.sel_color:
+            conf.marketing = False
+            conf.catalog = False
+        
+        if self.btn_sort["text"] == conf.lang.filter_created:
+            conf.sort_modified = False
+        else:
+            conf.sort_modified = True
 
         self.destroy()
         focus_last()
@@ -352,11 +343,14 @@ class Thumbnails(CFrame):
 
         self.thumbs_frame = CFrame(self.sframe)
 
-        main_title = CLabel(self.thumbs_frame, text=txt)
-        main_title.configure(font=('San Francisco Pro', 45, 'bold'))
-        main_title.pack()
+        title_frame = CFrame(self.thumbs_frame)
+        title_frame.pack()
 
-        main_sub_frame = CFrame(self.thumbs_frame)
+        main_title = CLabel(title_frame, text=txt, width=30)
+        main_title.configure(font=('San Francisco Pro', 45, 'bold'))
+        main_title.pack(anchor="center")
+
+        main_sub_frame = CFrame(title_frame)
         main_sub_frame.pack(pady=(0, 15))
 
         sub_font=('San Francisco Pro', 13, 'normal')
@@ -366,25 +360,21 @@ class Thumbnails(CFrame):
             text=f"{conf.lang.thumbs_summary}\n{conf.lang.thumbs_filter}\n{conf.lang.thumbs_sort}"
             )
         l_subtitle.configure(font=sub_font, justify="right", anchor="e", width=30)
-        l_subtitle.pack(anchor="e", side="left", padx=5)
+        l_subtitle.pack(anchor="e", side="left", padx=(0, 10))
 
         r_text = f"{summary} {conf.lang.thumbs_photo.lower()}\n{filter_row}\n{sort_text}"
         r_subtitle = CLabel(main_sub_frame, text=r_text)
-        r_subtitle.configure(font=sub_font, justify="left", anchor="w", width=30)
-        r_subtitle.pack(anchor="w", side="right", padx=5)
+        r_subtitle.configure(font=sub_font, justify="left", anchor="w", width=40)
+        r_subtitle.pack(anchor="w", side="right")
 
-        btns_frame = CFrame(self.thumbs_frame)
-        btns_frame.pack()
-
-        btn_filter = CButton(btns_frame, text=conf.lang.thumbs_filters)
-        # btn_filter["width"] = 13
-        btn_filter.pack(side="left")
+        btn_filter = CButton(title_frame, text=conf.lang.thumbs_filters)
+        btn_filter.pack()
         if any((date_start, date_end)):
             btn_filter.configure(bg=conf.sel_color)
         btn_filter.cmd(lambda e: FilterWin())
 
         if any((date_start, date_end)):
-            reset = CButton(self.thumbs_frame, text=conf.lang.thumbs_reset)
+            reset = CButton(title_frame, text=conf.lang.thumbs_reset)
             reset.configure(width=13)
             reset.pack(pady=(15, 0))
             reset.cmd(lambda e: self.reset_filter_cmd())

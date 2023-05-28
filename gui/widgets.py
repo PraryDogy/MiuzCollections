@@ -76,7 +76,7 @@ class CWindow(tkinter.Toplevel):
         self.bind('<Command-w>', lambda e: self.close_win())
         self.bind('<Escape>', lambda e: self.close_win())
 
-        if conf.ask_exit == 1:
+        if conf.ask_exit:
             self.bind('<Command-q>', lambda e: AskExit())
         else:
             self.bind('<Command-q>', lambda e: on_exit())
