@@ -4,6 +4,8 @@ import shutil
 import threading
 import tkinter
 from lang import Rus, Eng
+import locale
+import subprocess
 
 __all__ = (
     "conf",
@@ -23,9 +25,13 @@ class Config:
         self.json_dir = os.path.join(self.cfg_dir, "cfg.json")
         self.db_dir = os.path.join(self.cfg_dir, self.db_name)
 
-        # gui settings
-
-        self.lang = Rus()
+        cmd = "return user locale of (get system info)"
+        l = subprocess.check_output(["osascript", "-e", cmd], text=True)
+        l = l.split("\n")[0]
+        if "ru_RU" == l:
+            self.lang = Rus()
+        else:
+            self.lang = Eng()
 
         self.fg_color = "#E2E2E2"
         self.bg_color = "#19191B"
