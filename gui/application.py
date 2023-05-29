@@ -11,7 +11,7 @@ class Application:
         conf.root.configure(bg=conf.bg_color)
 
         conf.root.createcommand(
-            'tk::mac::ReopenApplication', lambda: conf.root.deiconify())
+            'tk::mac::ReopenApplication', conf.root.deiconify)
 
         conf.root.bind('<Command-w>', lambda e: conf.root.iconify())
 

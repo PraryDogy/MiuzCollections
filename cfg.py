@@ -14,6 +14,8 @@ __all__ = (
 
 class Config:
     def __init__(self):
+        self.lang = None
+
         self.app_name = 'MiuzCollections'
         self.app_ver = '3.7.0'
         self.db_name = "db.db"
@@ -24,14 +26,6 @@ class Config:
             )
         self.json_dir = os.path.join(self.cfg_dir, "cfg.json")
         self.db_dir = os.path.join(self.cfg_dir, self.db_name)
-
-        cmd = "return user locale of (get system info)"
-        l = subprocess.check_output(["osascript", "-e", cmd], text=True)
-        l = l.split("\n")[0]
-        if "ru_RU" == l:
-            self.lang = Rus()
-        else:
-            self.lang = Eng()
 
         self.fg_color = "#E2E2E2"
         self.bg_color = "#19191B"
@@ -73,7 +67,7 @@ class Config:
         self.catalog = False
         self.marketing = False
         self.catalog_name = "Обтравка"
-        self.json_lang = "Russian"
+        self.json_lang = "English"
 
         self.stopwords = [
             "preview", "1x1", "1х1", "crop", "копия", "copy"
@@ -107,6 +101,15 @@ class Config:
             os.mkdir(self.cfg_dir)
 
         if not os.path.exists(self.json_dir):
+
+            cmd = "return user locale of (get system info)"
+            l = subprocess.check_output(["osascript", "-e", cmd], text=True)
+            l = l.split("\n")[0]
+            if "ru_RU" == l:
+                self.json_lang = "Russian"
+            else:
+                self.json_lang = "English"
+
             self.write_cfg()
 
         if not os.path.exists(self.db_dir):
