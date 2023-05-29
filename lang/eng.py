@@ -3,7 +3,7 @@ class Eng:
         # main
         self.ok = "Ok"
         self.cancel = "Cancel"
-        self.all_collections = "All collections"
+        self.all_colls = "All collections"
         self.close = "Close"
 
         # context menu

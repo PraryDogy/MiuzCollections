@@ -3,7 +3,7 @@ class Rus:
         # main
         self.ok = "Ок"
         self.cancel = "Отмена"
-        self.all_collections = "Все коллекции"
+        self.all_colls = "Все коллекции"
         self.close = "Закрыть"
 
         # context menu

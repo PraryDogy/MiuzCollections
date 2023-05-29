@@ -304,7 +304,7 @@ class Thumbnails(CFrame):
         self.size = conf.thumb_size + conf.thumb_pad
 
         if conf.curr_coll == conf.all_colls:
-            txt = conf.lang.all_collections
+            txt = conf.lang.all_colls
         else:
             txt = conf.curr_coll
 

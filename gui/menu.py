@@ -104,7 +104,7 @@ class Menu(tkmacosx.SFrame):
                 key = lambda item: item[1].casefold()
                 ))
 
-        last = CButton(frame, text=conf.lang.all_collections)
+        last = CButton(frame, text=conf.lang.all_colls)
         last.configure(width=13, pady=5, anchor=tkinter.W, padx=10)
         last.cmd(partial(self.open_coll_folder, conf.all_colls, last))
         last.pack(pady=(0, 15))
