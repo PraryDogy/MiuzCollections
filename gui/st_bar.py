@@ -53,6 +53,7 @@ class StBar(CFrame):
         btn['width'] = 10
         btn.cmd(lambda e: self.settings_cmd(btn))
         btn.pack(side=tkinter.LEFT)
+        conf.lang_wids.append(btn)
 
         CSep(self).pack(fill=tkinter.Y, side=tkinter.LEFT, padx=(15, 15))
 
@@ -60,6 +61,7 @@ class StBar(CFrame):
         self.upd_btn['width'] = 10
         self.upd_btn.cmd(lambda e: self.update_cmd(btn))
         self.upd_btn.pack(side=tkinter.LEFT)
+        conf.lang_wids.append(self.upd_btn)
 
     def settings_cmd(self, btn: CButton):
         btn.press()

@@ -41,6 +41,7 @@ class Config:
         self.all_colls = "all"
 
         # dynamic variables for gui
+        self.lang_wids = []
         self.flag = False
         self.live_text = ""
         self.scaner_task: threading.Thread = None

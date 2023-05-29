@@ -86,6 +86,7 @@ class Menu(tkmacosx.SFrame):
         title = CLabel(frame, text=conf.lang.menu_title)
         title.configure(font=('San Francisco Pro', 22, 'bold'))
         title.pack(pady=(0,15))
+        conf.lang_wids.append(title)
 
         colls_list = Dbase.conn.execute(
             sqlalchemy.select(Thumbs.collection)
@@ -109,6 +110,7 @@ class Menu(tkmacosx.SFrame):
         last.cmd(partial(self.open_coll_folder, conf.all_colls, last))
         last.pack(pady=(0, 15))
         menu_buttons.append(last)
+        conf.lang_wids.append(last)
 
         ContextMenu(last, conf.all_colls)
 
