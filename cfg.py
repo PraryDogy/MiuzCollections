@@ -14,8 +14,6 @@ __all__ = (
 
 class Config:
     def __init__(self):
-        self.lang = None
-
         self.app_name = 'MiuzCollections'
         self.app_ver = '3.7.0'
         self.db_name = "db.db"
@@ -41,7 +39,11 @@ class Config:
         self.all_colls = "all"
 
         # dynamic variables for gui
-        self.lang_wids = []
+        self.lang = None
+        self.lang_menu = []
+        self.lang_st_bar = []
+        self.lang_thumbs = []
+        self.lang_sett = []
         self.flag = False
         self.live_text = ""
         self.scaner_task: threading.Thread = None

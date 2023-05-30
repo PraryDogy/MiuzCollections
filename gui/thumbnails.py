@@ -349,7 +349,7 @@ class Thumbnails(CFrame):
         main_title = CLabel(title_frame, text=txt, width=30)
         main_title.configure(font=('San Francisco Pro', 45, 'bold'))
         main_title.pack(anchor="center")
-        conf.lang_wids.append(main_title)
+        conf.lang_thumbs.append(main_title)
 
         main_sub_frame = CFrame(title_frame)
         main_sub_frame.pack(pady=(0, 15))

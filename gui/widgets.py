@@ -85,6 +85,7 @@ class CWindow(tkinter.Toplevel):
         self.configure(bg=conf.bg_color, padx=15, pady=15)
 
     def close_win(self):
+        conf.lang_sett.clear()
         self.destroy()
         focus_last()
 

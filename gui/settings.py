@@ -14,7 +14,7 @@ class Settings(CWindow):
     def __init__(self):
         super().__init__()
         self.title(conf.lang.settings_title)
-        conf.lang_wids.append(self)
+        conf.lang_sett.append(self)
 
         self.geometry("400x320")
 
@@ -27,6 +27,8 @@ class Settings(CWindow):
         self.deiconify()
         self.wait_visibility()
         self.grab_set_global()
+
+        self.changed_lang = False
 
     def main_widget(self):
         global path_widget
@@ -47,7 +49,7 @@ class Settings(CWindow):
         select_path = CButton(select_frame, text=conf.lang.settings_browse)
         select_path.cmd(lambda e: self.select_path_cmd())
         select_path.pack(side="left")
-        conf.lang_wids.append(select_path)
+        conf.lang_sett.append(select_path)
 
         asklang_frame = CFrame(frame)
         asklang_frame.pack(pady=(15, 0))
@@ -56,7 +58,7 @@ class Settings(CWindow):
         self.ask_btn.configure(width=15)
         self.ask_btn.pack(side="left")
         self.ask_btn.cmd(self.ask_exit_cmd)
-        conf.lang_wids.append(self.ask_btn)
+        conf.lang_sett.append(self.ask_btn)
 
         if conf.ask_exit:
             self.ask_btn.configure(bg=conf.sel_color)
@@ -74,12 +76,12 @@ class Settings(CWindow):
         restore_btn = CButton(frame, text=conf.lang.settings_reset)
         restore_btn.cmd(lambda e, x=restore_btn: self.default_cmd(x))
         restore_btn.pack(pady=(15, 0))
-        conf.lang_wids.append(restore_btn)
+        conf.lang_sett.append(restore_btn)
 
         t = conf.lang.settings_descr
         self.sett_desc = CLabel(frame, text=t, anchor="w", justify="left")
         self.sett_desc.pack(expand=True, fill="both", pady=(15, 0))
-        conf.lang_wids.append(self.sett_desc)
+        conf.lang_sett.append(self.sett_desc)
 
         cancel_frame = CFrame(frame)
         cancel_frame.pack(expand=True)
@@ -89,38 +91,44 @@ class Settings(CWindow):
         save_btn = CButton(cancel_frame, text=conf.lang.ok)
         save_btn.cmd(lambda e: self.save_cmd())
         save_btn.pack(padx=(0, 10), side="left")
-        conf.lang_wids.append(save_btn)
+        conf.lang_sett.append(save_btn)
 
         cancel_btn = CButton(cancel_frame, text=conf.lang.cancel)
         cancel_btn.cmd(lambda e: self.cancel_cmd())
         cancel_btn.pack(side="left")
-        conf.lang_wids.append(cancel_btn)
+        conf.lang_sett.append(cancel_btn)
 
         return frame
 
     def lang_cmd(self, e):
         from lang import Rus, Eng
 
+        self.changed_lang = True
+
         if self.lang_btn["text"] == "English":
             self.lang_btn["text"] = "Русский"
+            self.title("Настройки")
             conf.lang = Rus()
 
-            for wid in conf.lang_wids:
+            for wid in (
+                *conf.lang_menu, *conf.lang_sett,*conf.lang_st_bar, 
+                *conf.lang_thumbs
+                ):
                 for k, v in Eng().__dict__.items():
                     if wid.widgetName == "label" and wid["text"] == v:
                         wid["text"] = conf.lang.__dict__[k]
-                    # elif wid.title() == v:
-                        # wid.title(v)
         else:
             self.lang_btn["text"] = "English"
+            self.title("Settings")
             conf.lang = Eng()
 
-            for wid in conf.lang_wids:
-                for k, v in Rus().__dict__.items():
+            for wid in (
+                *conf.lang_menu, *conf.lang_sett,*conf.lang_st_bar, 
+                *conf.lang_thumbs
+                ):
+                 for k, v in Rus().__dict__.items():
                     if wid.widgetName == "label" and wid["text"] == v:
                         wid["text"] = conf.lang.__dict__[k]
-                    # elif wid.title() == v:
-                        # wid.title(v)
 
     def ask_exit_cmd(self, e):
         if self.ask_btn["bg"] == conf.btn_color:
@@ -129,12 +137,10 @@ class Settings(CWindow):
             self.ask_btn.configure(bg=conf.btn_color)
 
     def cancel_cmd(self):
-        save_wids = []
-        for i in conf.lang_wids:
-            if "settings" not in str(i):
-                save_wids.append(conf.lang_wids.index(i))
-        conf.lang_wids = [conf.lang_wids[x] for x in save_wids]
+        if self.changed_lang:
+            self.lang_cmd("")
 
+        conf.lang_sett.clear()
         self.destroy()
         focus_last()
 
@@ -164,13 +170,8 @@ class Settings(CWindow):
     def save_cmd(self):
         global SCAN_AGAIN, SCANER_PERMISSION
 
-        save_wids = []
-        for i in conf.lang_wids:
-            if "settings" not in str(i):
-                save_wids.append(conf.lang_wids.index(i))
-            elif "thumbnails" not in str(i):
-                save_wids.append(conf.lang_wids.index(i))
-        conf.lang_wids = [conf.lang_wids[x] for x in save_wids]
+        conf.lang_sett.clear()
+        conf.lang_thumbs.clear()
 
         conf.coll_folder = path_widget['text']
 
