@@ -79,15 +79,15 @@ class Settings(CWindow):
         else:
             self.lang_btn.configure(text="English")
 
-        restore_btn = CButton(frame, text=conf.lang.settings_reset)
-        restore_btn.cmd(lambda e, x=restore_btn: self.default_cmd(x))
-        restore_btn.pack(pady=(15, 0))
-        conf.lang_sett.append(restore_btn)
-
         t = conf.lang.settings_descr
         self.sett_desc = CLabel(frame, text=t, anchor="w", justify="left")
         self.sett_desc.pack(expand=True, fill="both", pady=(15, 0))
         conf.lang_sett.append(self.sett_desc)
+
+        restore_btn = CButton(frame, text=conf.lang.settings_reset)
+        restore_btn.cmd(lambda e, x=restore_btn: self.default_cmd(x))
+        restore_btn.pack(pady=(15, 0))
+        conf.lang_sett.append(restore_btn)
 
         cancel_frame = CFrame(frame)
         cancel_frame.pack(expand=True)
