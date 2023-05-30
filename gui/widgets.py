@@ -72,9 +72,9 @@ class CWindow(tkinter.Toplevel):
         conf.root.eval(f'tk::PlaceWindow {self} center')
         self.withdraw()
 
-        self.protocol("WM_DELETE_WINDOW", lambda: self.close_win())
-        self.bind('<Command-w>', lambda e: self.close_win())
-        self.bind('<Escape>', lambda e: self.close_win())
+        self.protocol("WM_DELETE_WINDOW", self.close_win)
+        self.bind('<Command-w>', self.close_win)
+        self.bind('<Escape>', self.close_win)
 
         if conf.ask_exit:
             self.bind('<Command-q>', lambda e: AskExit())
@@ -84,8 +84,7 @@ class CWindow(tkinter.Toplevel):
         self.resizable(0,0)
         self.configure(bg=conf.bg_color, padx=15, pady=15)
 
-    def close_win(self):
-        conf.lang_sett.clear()
+    def close_win(self, e=None):
         self.destroy()
         focus_last()
 

@@ -24,7 +24,8 @@ class Eng:
         self.settings_descr = (
             "If the collection name starts with _ or ."
             "\nMiuzCollections app will ignore it."
-            "\nRestart app for change language."
+            "\nLangs: eng, rus."
+            "\n"
             )
 
         # status bar

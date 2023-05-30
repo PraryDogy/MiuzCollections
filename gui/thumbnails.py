@@ -458,6 +458,7 @@ class Thumbnails(CFrame):
 
         date_start = None
         date_end = None
+        conf.lang_thumbs.clear()
 
         self.scroll_frame.destroy()
         self.load_scrollable()

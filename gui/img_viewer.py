@@ -72,7 +72,7 @@ class ImgViewer(CWindow):
 
         self.thumb_place(conf.preview_w, conf.preview_h)
         self.task = conf.root.after(
-            500, lambda: self.img_place(conf.preview_w, conf.preview_h))
+            250, lambda: self.img_place(conf.preview_w, conf.preview_h))
 
         place_center(self)
         self.deiconify()
@@ -87,7 +87,7 @@ class ImgViewer(CWindow):
     def decect_resize(self, e):
         if self.resize_task:
             conf.root.after_cancel(self.resize_task)
-        self.resize_task = conf.root.after(500, lambda: self.resize_win())
+        self.resize_task = conf.root.after(250, lambda: self.resize_win())
 
     def resize_win(self):
         try:

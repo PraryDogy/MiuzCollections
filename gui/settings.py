@@ -13,6 +13,10 @@ __all__ = (
 class Settings(CWindow):
     def __init__(self):
         super().__init__()
+        self.protocol("WM_DELETE_WINDOW", self.cancel_cmd)
+        self.bind('<Command-w>', self.cancel_cmd)
+        self.bind('<Escape>', self.cancel_cmd)
+
         self.title(conf.lang.settings_title)
         conf.lang_sett.append(self)
 
@@ -35,13 +39,17 @@ class Settings(CWindow):
 
         frame = CFrame(self)
 
+        path_name = CLabel(frame, text=conf.lang.settings_label)
+        path_name.pack(anchor="w")
+        conf.lang_sett.append(path_name)
+
         path_widget = CLabel(
             frame,
             text=f"{conf.coll_folder}",
             anchor="w",
             justify="left"
             )
-        path_widget.pack(pady=(5, 0), expand=True, fill="both")
+        path_widget.pack(expand=True, fill="both")
 
         select_frame = CFrame(frame)
         select_frame.pack(pady=(5, 0))
@@ -55,7 +63,6 @@ class Settings(CWindow):
         asklang_frame.pack(pady=(15, 0))
 
         self.ask_btn = CButton(asklang_frame, text=conf.lang.settings_askexit)
-        self.ask_btn.configure(width=15)
         self.ask_btn.pack(side="left")
         self.ask_btn.cmd(self.ask_exit_cmd)
         conf.lang_sett.append(self.ask_btn)
@@ -64,7 +71,6 @@ class Settings(CWindow):
             self.ask_btn.configure(bg=conf.sel_color)
 
         self.lang_btn = CButton(asklang_frame)
-        self.lang_btn.configure(width=15)
         self.lang_btn.pack(side="left", padx=(15, 0))
         self.lang_btn.cmd(self.lang_cmd)
 
@@ -94,13 +100,13 @@ class Settings(CWindow):
         conf.lang_sett.append(save_btn)
 
         cancel_btn = CButton(cancel_frame, text=conf.lang.cancel)
-        cancel_btn.cmd(lambda e: self.cancel_cmd())
+        cancel_btn.cmd(self.cancel_cmd)
         cancel_btn.pack(side="left")
         conf.lang_sett.append(cancel_btn)
 
         return frame
 
-    def lang_cmd(self, e):
+    def lang_cmd(self, e=None):
         from lang import Rus, Eng
 
         self.changed_lang = True
@@ -136,14 +142,6 @@ class Settings(CWindow):
         else:
             self.ask_btn.configure(bg=conf.btn_color)
 
-    def cancel_cmd(self):
-        if self.changed_lang:
-            self.lang_cmd("")
-
-        conf.lang_sett.clear()
-        self.destroy()
-        focus_last()
-
     def select_path_cmd(self):
         global path_widget, SCAN_AGAIN
         path = filedialog.askdirectory(initialdir = conf.coll_folder)
@@ -167,11 +165,18 @@ class Settings(CWindow):
 
         SCAN_AGAIN = True
 
+    def cancel_cmd(self, e=None):
+        if self.changed_lang:
+            self.lang_cmd()
+
+        conf.lang_sett.clear()
+        self.destroy()
+        focus_last()
+
     def save_cmd(self):
         global SCAN_AGAIN, SCANER_PERMISSION
 
         conf.lang_sett.clear()
-        conf.lang_thumbs.clear()
 
         conf.coll_folder = path_widget['text']
 
@@ -206,6 +211,6 @@ class Settings(CWindow):
                 scaner()
             else:
                 SmbAlert()
-        else:
+        elif self.changed_lang:
             from .application import app
             app.thumbnails.reload_with_scroll()

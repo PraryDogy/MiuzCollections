@@ -19,12 +19,13 @@ class Rus:
         self.settings_title = "Настройки"
         self.settings_label = "Расположение коллекций"
         self.settings_browse = "Обзор"
-        self.settings_askexit = "Запрос при выходе"
+        self.settings_askexit = "Выход"
         self.settings_reset = "Сброс"
         self.settings_descr = (
             "Если имя коллекции начинается с _ или ."
             "\nпрограмма проигнорирует ее."
-            "\nПерезапустите приложение для смены языка."
+            "\nДоступные языки: русский, английский."
+            "\nВыход - спрашивать при выходе."
             )
         
         # status bar

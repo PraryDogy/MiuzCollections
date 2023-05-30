@@ -25,8 +25,6 @@ def show_collection(master: tkinter.Button, collection_name):
     master['bg'] = conf.sel_color
     conf.curr_coll = collection_name
 
-    conf.lang_thumbs.clear()
-
     from . import app
     app.thumbnails.reload_with_scroll()
 
