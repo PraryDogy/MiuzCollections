@@ -2,17 +2,15 @@ import tkinter as tk
 
 root= tk.Tk()
 
-title_f = tk.Frame(root)
-title_f.pack()
 cal_f = tk.Frame(root)
 cal_f.pack()
 
-month = tk.Label(title_f, text="Month", bg="yellow")
-year = tk.Label(title_f, text="Year", bg="yellow")
+month = tk.Label(root, text="Month", bg="yellow")
+year = tk.Label(root, text="Year", bg="yellow")
 
 for x, i in enumerate(("<", "Month", ">", "<", "Year", ">")):
-    arrow = tk.Label(title_f, text=i)
-    arrow.grid(row=0, column=x)
+    arrow = tk.Label(root, text=i)
+    arrow.pack(side="left")
 
 r = 0
 c = 0
