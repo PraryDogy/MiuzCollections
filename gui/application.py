@@ -15,27 +15,28 @@ class Application:
 
         conf.root.bind('<Command-w>', lambda e: conf.root.iconify())
 
-        conf.root.createcommand("tk::mac::Quit" , on_exit)
-        conf.root.protocol("WM_DELETE_WINDOW", on_exit)
+        if conf.ask_exit:
+            conf.root.protocol("WM_DELETE_WINDOW", AskExit)
+            conf.root.createcommand("tk::mac::Quit" , AskExit)
+        else:
+            conf.root.createcommand("tk::mac::Quit" , on_exit)
+            conf.root.protocol("WM_DELETE_WINDOW", on_exit)
 
-        # grid.columnconfigure(tuple(range(60)), weight=1)
-        # grid.rowconfigure(tuple(range(30)), weight=1)
+        CSep(conf.root).pack(fill=tkinter.X, pady=15, padx=(15, 5))
 
-        sep = CSep(conf.root)
         self.menu = Menu(conf.root)
-        self.thumbnails = Thumbnails(conf.root)
-        self.st_bar = StBar(conf.root)
+        self.menu.pack(side=tkinter.LEFT, fill=tkinter.Y, pady=(0, 15))
 
-        sep.grid(row=0, column=0, pady=15, padx=(15, 5))
+        right_frame = CFrame(conf.root)
+        right_frame.pack(fill=tkinter.BOTH, expand=1)
+    
+        self.thumbnails = Thumbnails(right_frame)
+        self.thumbnails.pack(fill=tkinter.BOTH, expand=1, padx=(15, 5))
 
-        self.menu.grid(row=1, column=0, pady=(0, 15))
+        CSep(right_frame).pack(fill=tkinter.X, pady=10, padx=15)
 
-        self.thumbnails.grid(row=1, column=1, padx=(15, 5), sticky="nesw")
-        sep.grid(row=2, column=1, pady=10, padx=15)
-        self.st_bar.grid(row=3, column=1, pady=(0, 10))
-
-        conf.root.rowconfigure((0, 100), weight=100)
-        conf.root.columnconfigure((0, 100), weight=100)
+        self.st_bar = StBar(right_frame)
+        self.st_bar.pack(pady=(0, 10))
 
         MacMenu()
 
@@ -49,6 +50,5 @@ class Application:
             f"+{conf.root_x}+{conf.root_y}")
             )
         conf.root.minsize(870, 500)
-
 
 app = Application()

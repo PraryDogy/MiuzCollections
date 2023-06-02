@@ -4,13 +4,13 @@ try:
 
     from cfg import conf
     from gui.widgets import SmbAlert
-    from scaner import scaner
+    from scaner import auto_scan
     from utils import smb_check
 
     conf.root.deiconify()
 
     if smb_check():
-        scaner()
+        auto_scan()
     else:
         SmbAlert()
 

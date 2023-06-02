@@ -5,7 +5,7 @@ import sqlalchemy
 
 from cfg import conf
 from database import Dbase, Thumbs
-from utils import encode_image, get_coll_name
+from utils import encode_image, get_coll_name, smb_check
 
 __all__ = (
     "scaner",
@@ -186,3 +186,12 @@ def scaner():
 
     conf.flag = False
     st_bar_btn(conf.lang.upd_btn, conf.btn_color)
+
+
+def auto_scan():
+    print("run")
+
+    if smb_check():
+        scaner()
+    
+    conf.root.after(300000, auto_scan)
