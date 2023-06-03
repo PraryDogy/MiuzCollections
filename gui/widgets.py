@@ -7,7 +7,6 @@ __all__ = (
     "CFrame",
     "CLabel",
     "CWindow",
-    "CloseBtn",
     "SmbAlert",
     "ImageInfo",
     "MacMenu",
@@ -75,7 +74,7 @@ class CWindow(tkinter.Toplevel):
         self.bind('<Command-w>', self.close_win)
         self.bind('<Escape>', self.close_win)
 
-        self.bind('<Command-q>', lambda e: on_exit())
+        self.bind('<Command-q>', on_exit)
 
         self.resizable(0,0)
         self.configure(bg=conf.bg_color, padx=15, pady=15)
@@ -83,12 +82,6 @@ class CWindow(tkinter.Toplevel):
     def close_win(self, e=None):
         self.destroy()
         focus_last()
-
-
-class CloseBtn(CButton):
-    def __init__(self, master: tkinter.Widget, **kwargs):
-        super().__init__(master, **kwargs)
-        self.cmd(lambda e: self.destroy())
 
 class SmbAlert(CWindow):
     def __init__(self):
@@ -104,7 +97,7 @@ class SmbAlert(CWindow):
         descr_lbl.pack(padx=15, pady=(0, 5))
 
         btn = CButton(self, text=conf.lang.close)
-        btn.cmd(lambda e: self.btn_cmd())
+        btn.cmd(self.btn_cmd)
         btn.pack()
 
         conf.root.update_idletasks()
@@ -113,7 +106,7 @@ class SmbAlert(CWindow):
         self.wait_visibility()
         self.grab_set_global()
 
-    def btn_cmd(self):
+    def btn_cmd(self, e=None):
         self.destroy()
         focus_last()
 
@@ -172,9 +165,9 @@ class ImageInfo(CWindow):
             )
         right_lbl.pack(anchor=tkinter.CENTER, side=tkinter.LEFT)
 
-        self.protocol("WM_DELETE_WINDOW", lambda: self.close_win())
-        self.bind('<Command-w>', lambda e: self.close_win())
-        self.bind('<Escape>', lambda e: self.close_win())
+        self.protocol("WM_DELETE_WINDOW", self.close_win)
+        self.bind('<Command-w>', self.close_win)
+        self.bind('<Escape>', self.close_win)
 
         conf.root.update_idletasks()
 
@@ -188,7 +181,7 @@ class ImageInfo(CWindow):
         self.wait_visibility()
         self.grab_set_global()
 
-    def close_win(self):
+    def close_win(self, e=None):
         self.destroy()
         focus_last()
 
@@ -234,53 +227,39 @@ class CCalendar(CFrame):
         titles = CFrame(parrent)
         titles.pack(pady=5)
 
-        month_frame = CFrame(titles)
-        month_frame.pack(side="left", padx=(0, 15))
+        prev_y = CButton(titles, text="<<")
+        prev_y.configure(width=2, font=f, bg=conf.bg_color)
+        prev_y.pack(side="left")
+        prev_y.cmd(self.switch_year)
+        self.all_btns.append(prev_y)
 
-        prev = CButton(month_frame, text="<")
-        prev.configure(width=2, font=f, bg=conf.bg_color)
-        prev.pack(side="left")
-        prev.cmd(lambda e: self.switch_month(prev["text"], e))
-        self.all_btns.append(prev)
+        prev_m = CButton(titles, text="<")
+        prev_m.configure(width=2, font=f, bg=conf.bg_color)
+        prev_m.pack(side="left")
+        prev_m.cmd(self.switch_month)
+        self.all_btns.append(prev_m)
 
+        mtitle_t = f"{conf.lang.months[self.my_date.month]} {self.my_date.year}"
         self.m_title = CLabel(
-            month_frame,
-            text=conf.lang.months[self.my_date.month],
+            titles,
+            text=mtitle_t,
             name=str(self.my_date.month)
             )
-        self.m_title.configure(width=7, font=f)
+        self.m_title.configure(width=13, font=f)
         self.m_title.pack(side="left")
         self.all_btns.append(self.m_title)
 
-        next = CButton(month_frame, text=">")
-        next.configure(width=2, font=f, bg=conf.bg_color)
-        next.pack(side="left")
-        next.cmd(lambda e: self.switch_month(next["text"], e))
-        self.all_btns.append(next)
+        next_m = CButton(titles, text=">")
+        next_m.configure(width=2, font=f, bg=conf.bg_color)
+        next_m.pack(side="left")
+        next_m.cmd(self.switch_month)
+        self.all_btns.append(next_m)
 
-        year_frame = CFrame(titles)
-        year_frame.pack(side="left")
-
-        prev = CButton(year_frame, text="<")
-        prev.configure(width=2, font=f, bg=conf.bg_color)
-        prev.pack(side="left")
-        prev.cmd(lambda e: self.switch_year(prev["text"], e))
-        self.all_btns.append(prev)
-
-        self.y_title = CLabel(
-            year_frame,
-            text=self.my_date.year,
-            name=str(self.my_date.month)
-            )
-        self.y_title.configure(width=3, font=f)
-        self.y_title.pack(side="left")
-        self.all_btns.append(self.y_title)
-
-        next = CButton(year_frame, text=">")
-        next.configure(width=2, font=f, bg=conf.bg_color)
-        next.pack(side="left")
-        next.cmd(lambda e: self.switch_year(next["text"], e))
-        self.all_btns.append(next)
+        next_y = CButton(titles, text=">>")
+        next_y.configure(width=2, font=f, bg=conf.bg_color)
+        next_y.pack(side="left")
+        next_y.cmd(self.switch_year)
+        self.all_btns.append(next_y)
 
         row = CFrame(parrent)
         row.pack()
@@ -375,13 +354,13 @@ class CCalendar(CFrame):
                 int(btn["text"])
                 )
 
-    def switch_month(self, txt, e):
+    def switch_month(self, e=None):
         if not self.enabled:
             return
 
         self.clicked = True
 
-        if txt != "<":
+        if e.widget["text"] != "<":
             m = self.my_date.month + 1
         else:
             m = self.my_date.month - 1
@@ -394,16 +373,17 @@ class CCalendar(CFrame):
         except ValueError:
             day = calendar.monthrange(self.my_date.year, m)[1]
             self.my_date = datetime(self.my_date.year, m, day)
-        self.m_title["text"] = conf.lang.months[m]
+
+        self.m_title["text"] = f"{conf.lang.months[m]} {self.my_date.year}"
         self.fill_days()
 
-    def switch_year(self, txt, e):
+    def switch_year(self, e=None):
         if not self.enabled:
             return
 
         self.clicked = True
 
-        if txt != "<":
+        if e.widget["text"] != "<":
             y = self.my_date.year + 1
         else:
             y = self.my_date.year - 1
@@ -420,5 +400,5 @@ class CCalendar(CFrame):
             day = calendar.monthrange(y, self.my_date.month)[1]
             self.my_date = datetime(y, self.my_date.month, day)
 
-        self.y_title["text"] = y
+        self.m_title["text"] = f"{conf.lang.months[self.my_date.month]} {y}"
         self.fill_days()

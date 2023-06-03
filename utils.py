@@ -185,7 +185,7 @@ def smb_check():
     return True
 
 
-def on_exit():
+def on_exit(e=None):
     w, h = conf.root.winfo_width(), conf.root.winfo_height()
     x, y = conf.root.winfo_x(), conf.root.winfo_y()
 
