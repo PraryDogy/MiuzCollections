@@ -20,19 +20,19 @@ class ContextMenu(tkinter.Menu):
 
         self.add_command(
             label=conf.lang.info,
-            command = lambda: ImageInfo(src)
+            command=lambda: ImageInfo(src)
             )
 
         self.add_separator()
 
         self.add_command(
-            label = conf.lang.show_finder,
-            command = lambda: find_jpeg(src)
+            label=conf.lang.show_finder,
+            command=lambda: find_jpeg(src)
             )
 
         self.add_command(
-            label = conf.lang.show_tiff,
-            command = lambda: find_tiff(src)
+            label=conf.lang.show_tiff,
+            command=lambda: find_tiff(src)
             )
 
         master.bind("<Button-2>", self.do_popup)

@@ -8,7 +8,6 @@ __all__ = (
     "CLabel",
     "CWindow",
     "CloseBtn",
-    "AskExit",
     "SmbAlert",
     "ImageInfo",
     "MacMenu",
@@ -76,10 +75,7 @@ class CWindow(tkinter.Toplevel):
         self.bind('<Command-w>', self.close_win)
         self.bind('<Escape>', self.close_win)
 
-        if conf.ask_exit:
-            self.bind('<Command-q>', lambda e: AskExit())
-        else:
-            self.bind('<Command-q>', lambda e: on_exit())
+        self.bind('<Command-q>', lambda e: on_exit())
 
         self.resizable(0,0)
         self.configure(bg=conf.bg_color, padx=15, pady=15)
@@ -93,42 +89,6 @@ class CloseBtn(CButton):
     def __init__(self, master: tkinter.Widget, **kwargs):
         super().__init__(master, **kwargs)
         self.cmd(lambda e: self.destroy())
-
-
-class AskExit(CWindow):
-    def __init__(self):
-        super().__init__()
-        self.bind('<Return>', lambda e: on_exit())
-        self.protocol("WM_DELETE_WINDOW", lambda: self.close_ask())
-        self.bind('<Command-w>', lambda e: self.close_ask())
-        self.bind('<Escape>', lambda e: self.close_ask())
-
-        lbl = CLabel(self, text='Выйти?')
-        lbl.pack()
-
-        btns_frame = CFrame(self)
-        btns_frame.pack()
-
-        exit = CButton(self, text=conf.lang.askexit_exit)
-        exit.cmd(lambda e: on_exit())
-
-        cancel = CButton(self, text=conf.lang.cancel)
-        cancel.cmd(lambda e: self.close_ask())
-
-        [i.configure(height=1, width=11) for i in (exit, cancel)]
-        [i.pack(side=tkinter.LEFT, padx=5) for i in (exit, cancel)]
-
-        place_center(self)
-        self.deiconify()
-        self.wait_visibility()
-        self.grab_set_global()
-
-    def close_ask(self):
-        self.destroy()
-
-    def exit_task(self):
-        quit()
-
 
 class SmbAlert(CWindow):
     def __init__(self):

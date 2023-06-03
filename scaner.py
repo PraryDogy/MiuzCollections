@@ -9,6 +9,8 @@ from utils import encode_image, get_coll_name, smb_check
 
 __all__ = (
     "scaner",
+    "auto_scan",
+    "cancel_scan",
     )
 
 UPDATE_THUMBNAILS = False
@@ -170,7 +172,7 @@ def scaner():
     conf.flag = True
     st_bar_btn(conf.lang.live_updating, conf.sel_color)
 
-    conf.scaner_task = threading.Thread(target = update_collections, daemon = True)
+    conf.scaner_task = threading.Thread(target=update_collections, daemon=True)
     conf.scaner_task.start()
 
     while conf.scaner_task.is_alive():
@@ -188,10 +190,16 @@ def scaner():
     st_bar_btn(conf.lang.upd_btn, conf.btn_color)
 
 
-def auto_scan():
-    print("run")
+def cancel_scan():
+    conf.flag = False
+    if conf.scaner_task:
+        while conf.scaner_task.is_alive():
+            conf.root.update()
+    return True
 
+
+def auto_scan():
+    cancel_scan()
     if smb_check():
         scaner()
-    
-    conf.root.after(300000, auto_scan)
+    conf.root.after(conf.autoscan_time, auto_scan)

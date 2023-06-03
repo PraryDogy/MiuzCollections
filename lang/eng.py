@@ -25,7 +25,6 @@ class Eng:
             "If the collection name starts with _ or ."
             "\nMiuzCollections app will ignore it."
             "\nLangs: eng, rus."
-            "\n"
             )
 
         # status bar

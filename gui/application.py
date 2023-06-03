@@ -13,14 +13,10 @@ class Application:
         conf.root.createcommand(
             'tk::mac::ReopenApplication', conf.root.deiconify)
 
-        conf.root.bind('<Command-w>', lambda e: conf.root.iconify())
+        conf.root.bind('<Command-w>', self.minim)
 
-        if conf.ask_exit:
-            conf.root.protocol("WM_DELETE_WINDOW", AskExit)
-            conf.root.createcommand("tk::mac::Quit" , AskExit)
-        else:
-            conf.root.createcommand("tk::mac::Quit" , on_exit)
-            conf.root.protocol("WM_DELETE_WINDOW", on_exit)
+        conf.root.createcommand("tk::mac::Quit" , on_exit)
+        conf.root.protocol("WM_DELETE_WINDOW", on_exit)
 
         CSep(conf.root).pack(fill=tkinter.X, pady=15, padx=(15, 5))
 
@@ -50,5 +46,8 @@ class Application:
             f"+{conf.root_x}+{conf.root_y}")
             )
         conf.root.minsize(870, 500)
+
+    def minim(self, e=None):
+        conf.root.iconify()
 
 app = Application()
