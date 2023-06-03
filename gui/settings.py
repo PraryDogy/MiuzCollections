@@ -79,7 +79,7 @@ class Settings(CWindow):
         self.autoscan_min.pack(side="left", pady=(0, 2))
         self.autoscan_min.cmd(self.change_mins_cmd)
 
-        conf.lang.autoscan_mins = conf.autoscan_time
+        conf.lang.autoscan_time = conf.autoscan_time
         self.temp_mins = conf.autoscan_time
         conf.lang.update_autoscan()
 
@@ -120,33 +120,31 @@ class Settings(CWindow):
 
     def change_mins_cmd(self, e=None):
         t = e.widget["text"]
-        times = [5, 10, 30, 60]
+        times = {1: 5, 2: 10, 3: 30, 4: 60}
+        key = [k for k, v in times.items() if v == conf.autoscan_time][0]
 
         if t == "<":
-            for x, i in enumerate(times):
-                if i == conf.autoscan_time:
-                    conf.autoscan_time = times[x-1]
-                    break
-        
+            try:
+                conf.autoscan_time = times[key-1]
+            except KeyError:
+                conf.autoscan_time = times[4]
         else:
-            for x, i in enumerate(times):
-                if i == conf.autoscan_time:
-                    try:
-                        conf.autoscan_time = times[x+1]
-                    except IndexError:
-                        conf.autoscan_time = times[0]
-                    break
+            try:
+                conf.autoscan_time = times[key+1]
+            except KeyError:
+                conf.autoscan_time = times[1]
 
-        conf.lang.autoscan_mins = conf.autoscan_time
+        conf.lang.autoscan_time = conf.autoscan_time
         conf.lang.update_autoscan()
         self.autoupd_wid.configure(text=conf.lang.sett_autoscan)
 
     def change_lang(self):
-        conf.lang.autoscan_mins = conf.autoscan_time
+        conf.lang.autoscan_time = conf.autoscan_time
         conf.lang.update_autoscan()
-        self.autoupd_wid["text"] = conf.lang.sett_autoscan
+        self.autoupd_wid.configure(text=conf.lang.sett_autoscan)
 
-        wids = conf.lang_menu + conf.lang_sett + conf.lang_st_bar + conf.lang_thumbs
+        wids = conf.lang_menu + conf.lang_sett
+        wids = wids + conf.lang_st_bar + conf.lang_thumbs
 
         for wid in (wids):
             for k, v in self.old_lang.__dict__.items():

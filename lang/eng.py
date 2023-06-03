@@ -24,11 +24,10 @@ class Eng:
         self.settings_descr = (
             "If the collection name starts with _ or ."
             "\nMiuzCollections app will ignore it."
-            "\nLangs: eng, rus."
             )
         
-        self.autoscan_mins = "X"
-        self.sett_autoscan = f"Update collections every {self.autoscan_mins} mins"
+        self.autoscan_time = "X"
+        self.sett_autoscan = f"Update collections every {self.autoscan_time} mins"
 
         # status bar
         self.scaner_title = "Updating"
@@ -123,4 +122,4 @@ class Eng:
             }
 
     def update_autoscan(self):
-        self.sett_autoscan = f"Update collections every {self.autoscan_mins} mins"
+        self.sett_autoscan = f"Update collections every {self.autoscan_time} mins"

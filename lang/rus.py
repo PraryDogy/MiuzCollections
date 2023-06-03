@@ -24,10 +24,9 @@ class Rus:
         self.settings_descr = (
             "Если имя коллекции начинается с _ или ."
             "\nпрограмма проигнорирует ее."
-            "\nДоступные языки: русский, английский."
             )
-        self.autoscan_mins = "X"
-        self.sett_autoscan = f"Обновлять коллекции каждые {self.autoscan_mins} мин."
+        self.autoscan_time = "X"
+        self.sett_autoscan = f"Обновлять коллекции каждые {self.autoscan_time} мин."
 
         # status bar
         self.scaner_title = "Обновление"
@@ -131,4 +130,4 @@ class Rus:
             12: "Декабрь"}
         
     def update_autoscan(self):
-        self.sett_autoscan = f"Обновлять коллекции каждые {self.autoscan_mins} мин."
+        self.sett_autoscan = f"Обновлять коллекции каждые {self.autoscan_time} мин."
