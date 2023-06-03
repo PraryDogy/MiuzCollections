@@ -26,6 +26,9 @@ class Eng:
             "\nMiuzCollections app will ignore it."
             "\nLangs: eng, rus."
             )
+        
+        self.autoscan_mins = "X"
+        self.sett_autoscan = f"Update collections every {self.autoscan_mins} mins"
 
         # status bar
         self.scaner_title = "Updating"
@@ -118,3 +121,6 @@ class Eng:
             k: v.capitalize()
             for k, v in self.months_parental.items()
             }
+
+    def update_autoscan(self):
+        self.sett_autoscan = f"Update collections every {self.autoscan_mins} mins"

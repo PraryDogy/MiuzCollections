@@ -202,4 +202,5 @@ def auto_scan():
     cancel_scan()
     if smb_check():
         scaner()
-    conf.root.after(conf.autoscan_time, auto_scan)
+    ms = conf.autoscan_time*60000
+    conf.root.after(ms, auto_scan)

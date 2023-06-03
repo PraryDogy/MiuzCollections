@@ -26,7 +26,9 @@ class Rus:
             "\nпрограмма проигнорирует ее."
             "\nДоступные языки: русский, английский."
             )
-        
+        self.autoscan_mins = "X"
+        self.sett_autoscan = f"Обновлять коллекции каждые {self.autoscan_mins} мин."
+
         # status bar
         self.scaner_title = "Обновление"
         self.upd_btn = "Обновить"
@@ -127,3 +129,6 @@ class Rus:
             10: "Октябрь",
             11: "Ноябрь",
             12: "Декабрь"}
+        
+    def update_autoscan(self):
+        self.sett_autoscan = f"Обновлять коллекции каждые {self.autoscan_mins} мин."

@@ -14,7 +14,10 @@ class Settings(CWindow):
         self.bind('<Command-w>', self.cancel_cmd)
         self.bind('<Escape>', self.cancel_cmd)
         self.title(conf.lang.settings_title)
-        self.geometry("400x270")
+        self.geometry("400x310")
+
+        self.changed_lang = False
+        self.scan_again = False
 
         self.main_wid = self.main_widget()
         self.main_wid.pack(expand=True, fill="both")
@@ -25,9 +28,6 @@ class Settings(CWindow):
         self.deiconify()
         self.wait_visibility()
         self.grab_set_global()
-
-        self.changed_lang = False
-        self.scan_again = False
 
     def main_widget(self):
         frame = CFrame(self)
@@ -71,6 +71,31 @@ class Settings(CWindow):
         self.reset_btn.pack(side="left")
         conf.lang_sett.append(self.reset_btn)
 
+        autoscan_frame = CFrame(frame)
+        autoscan_frame.pack(pady=(15, 0))
+
+        self.autoscan_min = CButton(autoscan_frame, text="<")
+        self.autoscan_min.configure(width=1, bg=conf.bg_color)
+        self.autoscan_min.pack(side="left", pady=(0, 2))
+        self.autoscan_min.cmd(self.change_mins_cmd)
+
+        conf.lang.autoscan_mins = conf.autoscan_time
+        self.temp_mins = conf.autoscan_time
+        conf.lang.update_autoscan()
+
+        self.autoupd_wid = CLabel(
+            autoscan_frame,
+            text=conf.lang.sett_autoscan,
+            width=30
+            )
+        self.autoupd_wid.pack(side="left")
+        conf.lang_sett.append(self.autoupd_wid)
+
+        self.autoscan_max = CButton(autoscan_frame, text=">")
+        self.autoscan_max.configure(width=1, bg=conf.bg_color)
+        self.autoscan_max.pack(side="left", pady=(0, 2))
+        self.autoscan_max.cmd(self.change_mins_cmd)
+
         t = conf.lang.settings_descr
         self.sett_desc = CLabel(frame, text=t, anchor="w", justify="left")
         self.sett_desc.pack(anchor="w", pady=(15, 0))
@@ -93,7 +118,34 @@ class Settings(CWindow):
 
         return frame
 
+    def change_mins_cmd(self, e=None):
+        t = e.widget["text"]
+        times = [5, 10, 30, 60]
+
+        if t == "<":
+            for x, i in enumerate(times):
+                if i == conf.autoscan_time:
+                    conf.autoscan_time = times[x-1]
+                    break
+        
+        else:
+            for x, i in enumerate(times):
+                if i == conf.autoscan_time:
+                    try:
+                        conf.autoscan_time = times[x+1]
+                    except IndexError:
+                        conf.autoscan_time = times[0]
+                    break
+
+        conf.lang.autoscan_mins = conf.autoscan_time
+        conf.lang.update_autoscan()
+        self.autoupd_wid.configure(text=conf.lang.sett_autoscan)
+
     def change_lang(self):
+        conf.lang.autoscan_mins = conf.autoscan_time
+        conf.lang.update_autoscan()
+        self.autoupd_wid["text"] = conf.lang.sett_autoscan
+
         wids = conf.lang_menu + conf.lang_sett + conf.lang_st_bar + conf.lang_thumbs
 
         for wid in (wids):
@@ -127,7 +179,7 @@ class Settings(CWindow):
 
             self.change_lang()
 
-    def select_path_cmd(self):
+    def select_path_cmd(self, e=None):
         path = filedialog.askdirectory(initialdir=conf.coll_folder)
 
         if len(path) == 0:
@@ -148,6 +200,8 @@ class Settings(CWindow):
             self.lang_cmd()
 
         conf.lang_sett.clear()
+        conf.autoscan_time = self.temp_mins
+
         self.destroy()
         focus_last()
 

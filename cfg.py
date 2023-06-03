@@ -47,7 +47,6 @@ class Config:
         self.flag = False
         self.live_text = ""
         self.scaner_task: threading.Thread = None
-        self.autoscan_task = None
 
         # root
         self.root = tkinter.Tk()
@@ -66,7 +65,7 @@ class Config:
         self.preview_w = 700
         self.preview_h = 500
 
-        self.autoscan_time = 300000
+        self.autoscan_time = 10
 
         self.sort_modified = True
         self.catalog = False
