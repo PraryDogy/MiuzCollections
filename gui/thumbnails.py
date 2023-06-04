@@ -108,6 +108,7 @@ class ContextMenu(tkinter.Menu):
 class FilterWin(CWindow):
     def __init__(self):
         super().__init__()
+        self.bind("<Return>", self.ok_cmd)
         self.title(conf.lang.filter_title)
         f = ("San Francisco Pro", 17, "bold")
 
@@ -187,7 +188,7 @@ class FilterWin(CWindow):
 
         ok_btn = CButton(btns_frame, text=conf.lang.ok)
         ok_btn.pack(side="left", padx=15)
-        ok_btn.cmd(lambda e: self.ok_cmd())
+        ok_btn.cmd(self.ok_cmd)
 
         cancel_btn = CButton(btns_frame, text=conf.lang.cancel)
         cancel_btn.pack(side="left")
@@ -206,7 +207,7 @@ class FilterWin(CWindow):
         self.grab_set_global()
 
     def sort_btn_cmd(self, e):
-        if conf.sort_modified:
+        if self.btn_sort["text"] == conf.lang.filter_changed:
             self.btn_sort.configure(text=conf.lang.filter_created)
         else:
             self.btn_sort.configure(text=conf.lang.filter_changed)
@@ -242,7 +243,7 @@ class FilterWin(CWindow):
             self.oneday_btn["bg"] = conf.btn_color
             self.right_calendar.enable_calendar()
 
-    def ok_cmd(self):
+    def ok_cmd(self, e=None):
         global date_start, date_end
 
         if any((self.left_calendar.clicked, self.right_calendar.clicked)):
@@ -380,12 +381,12 @@ class Thumbnails(CFrame):
             main_sub_frame,
             text=f"{conf.lang.thumbs_summary}\n{conf.lang.thumbs_filter}\n{conf.lang.thumbs_sort}"
             )
-        l_subtitle.configure(font=sub_font, justify="right", anchor="e", width=30)
+        l_subtitle.configure(font=sub_font, justify="right", anchor="e", width=35)
         l_subtitle.pack(anchor="e", side="left", padx=(0, 10))
 
         r_text = f"{summary} {conf.lang.thumbs_photo.lower()}\n{filter_row}\n{sort_text}"
         r_subtitle = CLabel(main_sub_frame, text=r_text)
-        r_subtitle.configure(font=sub_font, justify="left", anchor="w", width=40)
+        r_subtitle.configure(font=sub_font, justify="left", anchor="w", width=45)
         r_subtitle.pack(anchor="w", side="right")
 
         btn_filter = CButton(title_frame, text=conf.lang.thumbs_filters)

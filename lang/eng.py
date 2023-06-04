@@ -67,7 +67,11 @@ class Eng:
             "Catalog - show photos for website.",
             "Sort - by date mofidied or date created.",
             )
-        
+
+        # custom date
+        self.cust_title = "Enter the date"
+        self.cust_l = "day.month.year"
+
         # ask exit
         self.askexit_exit = "Exit"
 

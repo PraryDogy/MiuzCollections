@@ -248,7 +248,7 @@ class CCalendar(CFrame):
         self.title.configure(width=13, font=f)
         self.change_title()
         self.title.pack(side="left")
-        self.title.bind("<ButtonRelease-1>", self.custom_date)
+        self.title.bind("<ButtonRelease-1>", self.cust_date_win)
         self.all_btns.append(self.title)
 
         next_m = CButton(titles, text=">")
@@ -308,7 +308,7 @@ class CCalendar(CFrame):
 
     def enable_calendar(self):
        self.enabled = True
-       self.title.bind("<ButtonRelease-1>", self.custom_date)
+       self.title.bind("<ButtonRelease-1>", self.cust_date_win)
 
        for i in self.all_btns:
             i["fg"] = conf.fg_color
@@ -344,11 +344,6 @@ class CCalendar(CFrame):
         self.title.configure(text=mtitle_t)
 
     def set_my_date(self):
-        if self.yy < 2015:
-            self.yy = 2015
-        elif self.yy > self.my_date.year:
-            self.yy = self.my_date.year
-
         try:
             self.my_date = datetime(self.yy, self.mm, self.dd)
         except ValueError:
@@ -396,7 +391,7 @@ class CCalendar(CFrame):
 
         self.clicked = True
 
-        if e.widget["text"] != "<":
+        if e.widget["text"] == ">>":
             self.yy += 1
         else:
             self.yy -= 1
@@ -411,18 +406,22 @@ class CCalendar(CFrame):
         self.fill_days()
 
 
-    def custom_date(self, e=None):
-        self.win = CWindow()
-        conf.root.eval(f'tk::PlaceWindow {self.win} center')
-        self.win.protocol("WM_DELETE_WINDOW", self.can_cmd)
-        self.win.bind('<Command-w>', self.can_cmd)
-        self.win.bind('<Escape>', self.can_cmd)
-
+    def cust_date_win(self, e=None):
+        self.win_cust = CWindow()
+        self.win_cust.title(conf.lang.cust_title)
+        self.win_cust.protocol("WM_DELETE_WINDOW", self.cust_can_cmd)
+        self.win_cust.bind('<Command-w>', self.cust_can_cmd)
+        self.win_cust.bind('<Escape>', self.cust_can_cmd)
         self.bind('<Command-q>', on_exit)
 
-        var = tkinter.StringVar(value="dd.mm.yyyy")
+
+        cust_l = CLabel(self.win_cust, text=conf.lang.cust_l)
+        cust_l.pack(pady=(0, 5))
+
+        var_t = f"{self.dd}.{self.mm}.{self.yy}"
+        var = tkinter.StringVar(value=var_t)
         ent = tkinter.Entry(
-            self.win,
+            self.win_cust,
             width=15,
             textvariable=var,
             bg=conf.bg_color,
@@ -437,7 +436,7 @@ class CCalendar(CFrame):
         ent.icursor(10)
         ent.selection_range(0, "end")
 
-        btns = CFrame(self.win)
+        btns = CFrame(self.win_cust)
         btns.pack(pady=(15, 0))
 
         self.ok = CButton(btns, text=conf.lang.ok)
@@ -446,40 +445,59 @@ class CCalendar(CFrame):
 
         self.cancel = CButton(btns, text=conf.lang.cancel)
         self.cancel.pack(side="left")
-        self.cancel.bind("<ButtonRelease-1>", self.can_cmd)
+        self.cancel.bind("<ButtonRelease-1>", self.cust_can_cmd)
 
-        self.win.deiconify()
-        self.win.wait_visibility()
-        self.win.grab_set_global()
+
+        conf.root.update_idletasks()
+
+        under_win = self.winfo_toplevel()
+        x, y = under_win.winfo_x(), under_win.winfo_y()
+        xx = x + under_win.winfo_width()//2 - self.win_cust.winfo_width()//2
+        yy = y + under_win.winfo_height()//2 - self.win_cust.winfo_height()//2
+        self.win_cust.geometry(f'+{xx}+{yy}')
+
+        self.win_cust.deiconify()
+        self.win_cust.wait_visibility()
+        self.win_cust.grab_set_global()
         ent.focus_force()
 
     def character_limit(self, entry_text:tkinter.StringVar):
         try:
             self.cust_date = datetime.strptime(entry_text.get(), '%d.%m.%Y')
             self.ok.configure(fg=conf.fg_color)
-            self.ok.bind("<ButtonRelease-1>", self.ok_cmd)
-            self.win.bind_all("<Return>", self.ok_cmd)
+            self.ok.bind("<ButtonRelease-1>", self.cust_ok_cmd)
+            self.win_cust.bind("<Return>", self.cust_ok_cmd)
         except ValueError:
             self.ok.configure(fg=conf.hov_color)
             self.ok.unbind("<ButtonRelease-1>")
-            self.win.unbind_all("<Return>")
+            self.win_cust.unbind("<Return>")
 
         if len(entry_text.get()) > 10:
             entry_text.set(entry_text.get()[:10])
 
-    def ok_cmd(self, e=None):
+    def cust_ok_cmd(self, e=None):
         self.clicked = True
 
         self.yy, self.mm, self.dd = tuple(self.cust_date.timetuple())[:3]
-        self.set_my_date()
-        self.change_title()
-        self.fill_days()
 
-        self.win.destroy()
+        if self.yy > self.today.year:
+            self.yy = self.today.year
+        elif self.yy < 2015:
+            self.yy = 2015
+
+        try:
+            self.change_title()
+            self.set_my_date()
+            self.fill_days()
+        except tkinter.TclError:
+            print("enter custom date widgets calendar error title change")
+
+
+        self.win_cust.destroy()
         self.winfo_toplevel().grab_set_global()
         self.winfo_toplevel().focus_force()
 
-    def can_cmd(self, e=None):
-        self.win.destroy()
+    def cust_can_cmd(self, e=None):
+        self.win_cust.destroy()
         self.winfo_toplevel().grab_set_global()
         self.winfo_toplevel().focus_force()
