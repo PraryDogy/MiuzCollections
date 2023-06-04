@@ -1,9 +1,8 @@
-times = {1: 5, 2: 10, 3: 30, 4: 60}
+from datetime import datetime
+from calendar import monthrange
 
-t = 60
+d = datetime(2022, 2, 22)
+day = monthrange(2022, 2)[1]
 
 
-key = [k for k, v in times.items() if v == t][0]
-key = times[key+1]
-
-print(key)
+print(day)

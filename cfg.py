@@ -69,8 +69,10 @@ class Config:
 
         self.sort_modified = True
         self.catalog = False
-        self.marketing = False
+        self.product = True
+        self.models = True
         self.catalog_name = "Обтравка"
+        self.models_name = "Model IMG"
         self.json_lang = "English"
 
         self.stopwords = [

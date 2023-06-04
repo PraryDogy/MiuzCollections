@@ -34,9 +34,10 @@ class Eng:
         self.upd_btn = "Update"
 
         # thumbnails
-        self.thumbs_marketing = "Marketing only"
-        self.thumbs_catalog = "Catalog only"
-        self.thumbs_showall = "All photos"
+        self.thumbs_product = "Procuct"
+        self.thumbs_models = "Models"
+        self.thumbs_catalog = "Catalog"
+
         self.thumbs_alltime = "All time"
         self.thumbs_changed = "By date modified"
         self.thumbs_created = "By date created"
@@ -53,13 +54,16 @@ class Eng:
         self.filter_start = "Start"
         self.filter_end = "End"
         self.filter_oneday = "From one day"
-        self.filter_marketing = "Marketing"
+
+        self.filter_product = "Product"
+        self.filter_models = "Models"
         self.filter_catalog = "Catalog"
-        self.filter_showall = "All photos"
+
         self.filter_changed = "Date modified"
         self.filter_created = "Date created"
         self.filter_descr = (
-            "Marketing - show photos created by marketing department only.",
+            "Product - show procuct photos created by marketing department.",
+            "Models - show model photos created by marketing department.",
             "Catalog - show photos for website.",
             "Sort - by date mofidied or date created.",
             )

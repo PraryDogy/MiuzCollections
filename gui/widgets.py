@@ -15,15 +15,13 @@ __all__ = (
     )
 
 
-
-
 def focus_last():
     for k, v in conf.root.children.items():
         if isinstance(v, CWindow):
             v.focus_force()
             return
-
     conf.root.focus_force()
+
 
 class CSep(tkinter.Frame):
     def __init__(self, master: tkinter, **kw):
@@ -82,6 +80,7 @@ class CWindow(tkinter.Toplevel):
     def close_win(self, e=None):
         self.destroy()
         focus_last()
+
 
 class SmbAlert(CWindow):
     def __init__(self):
@@ -207,13 +206,16 @@ class CCalendar(CFrame):
     def __init__(self, master, my_date: datetime):
         super().__init__(master)
 
-        self.enabled = True
-        self.clicked = False
         self.my_date = my_date
         self.today = datetime.today().date()
 
         if not self.my_date:
             self.my_date = self.today
+
+        self.yy, self.mm, self.dd = tuple(self.my_date.timetuple())[:3]
+        self.enabled = True
+        self.clicked = False
+        self.selected = tkinter.Label
 
         self.calendar = self.load_calendar()
         self.calendar.pack()
@@ -239,15 +241,14 @@ class CCalendar(CFrame):
         prev_m.cmd(self.switch_month)
         self.all_btns.append(prev_m)
 
-        mtitle_t = f"{conf.lang.months[self.my_date.month]} {self.my_date.year}"
-        self.m_title = CLabel(
+        self.title = CLabel(
             titles,
-            text=mtitle_t,
             name=str(self.my_date.month)
             )
-        self.m_title.configure(width=13, font=f)
-        self.m_title.pack(side="left")
-        self.all_btns.append(self.m_title)
+        self.title.configure(width=13, font=f)
+        self.change_title()
+        self.title.pack(side="left")
+        self.all_btns.append(self.title)
 
         next_m = CButton(titles, text=">")
         next_m.configure(width=2, font=f, bg=conf.bg_color)
@@ -283,7 +284,7 @@ class CCalendar(CFrame):
             lbl = CButton(row)
             lbl.configure(width=4, height=2)
             lbl.pack(side="left")
-            lbl.cmd(partial(self.select_day, lbl))
+            lbl.cmd(partial(self.switch_day, lbl))
 
             if i % 7 == 0:
                 row = CFrame(parrent)
@@ -308,16 +309,12 @@ class CCalendar(CFrame):
 
        for i in self.all_btns:
             i["fg"] = conf.fg_color
-
-            if self.my_date.day == i["text"]:
+            if self.dd == i["text"]:
                 i.configure(bg=conf.sel_color)
 
     def create_days(self):
-        first_weekday = datetime.weekday(
-            datetime(self.my_date.year, self.my_date.month, 1)
-            )
-        month_len = calendar.monthrange(
-            self.my_date.year, self.my_date.month)[1] + 1
+        first_weekday = datetime.weekday(datetime(self.yy, self.mm, 1))
+        month_len = calendar.monthrange(self.yy, self.mm)[1] + 1
 
         days = [None for i in range(first_weekday)]
         days.extend([i for i in range(1, month_len)])
@@ -326,55 +323,63 @@ class CCalendar(CFrame):
         return days
 
     def fill_days(self):
-        days = self.create_days()
-
-        for day, btn in zip(days, self.btns):
+        for day, btn in zip(self.create_days(), self.btns):
             if day:
                 btn.configure(text=day, bg=conf.btn_color)
             else:
                 btn.configure(text="", bg=conf.bg_color)
-            if btn["text"] == self.my_date.day:
+            if btn["text"] == self.dd:
                 btn["bg"] = conf.sel_color
+                self.selected = btn
 
-    def select_day(self, btn, e):
+    def change_title(self):
+        mtitle_t = (
+            f"{self.dd} "
+            f"{conf.lang.months_parental[self.mm]} "
+            f"{self.yy}"
+            )
+        self.title.configure(text=mtitle_t)
+
+    def set_my_date(self):
+        try:
+            self.my_date = datetime(self.yy, self.mm, self.dd)
+        except ValueError:
+            max_day = calendar.monthrange(self.yy, self.mm)[1]
+            self.my_date = datetime(self.yy, self.mm, max_day)
+
+        self.yy, self.mm, self.dd = tuple(self.my_date.timetuple())[:3]
+
+    def switch_day(self, btn, e=None):
         if not self.enabled:
             return
 
         self.clicked = True
-
         if btn["text"]:
-            for i in self.btns:
-                if i["bg"] == conf.sel_color:
-                    i["bg"] = conf.btn_color
-            btn["bg"] = conf.sel_color
+            self.selected.configure(bg=conf.btn_color)
+            self.selected = btn
+            self.selected.configure(bg=conf.sel_color)
+            self.dd = int(btn["text"])
 
-            self.my_date = datetime(
-                self.my_date.year,
-                self.my_date.month,
-                int(btn["text"])
-                )
+        self.set_my_date()
+        self.change_title()
 
     def switch_month(self, e=None):
         if not self.enabled:
             return
 
         self.clicked = True
-
         if e.widget["text"] != "<":
-            m = self.my_date.month + 1
+            self.mm += 1
         else:
-            m = self.my_date.month - 1
+            self.mm -= 1
 
-        m = 1 if m > 12 else m
-        m = 12 if m < 1 else m
+        if self.mm > 12:
+            self.mm = 1
+        elif self.mm <1:
+            self.mm = 12
 
-        try:
-            self.my_date = datetime(self.my_date.year, m, self.my_date.day)
-        except ValueError:
-            day = calendar.monthrange(self.my_date.year, m)[1]
-            self.my_date = datetime(self.my_date.year, m, day)
-
-        self.m_title["text"] = f"{conf.lang.months[m]} {self.my_date.year}"
+        self.set_my_date()
+        self.change_title()
         self.fill_days()
 
     def switch_year(self, e=None):
@@ -384,21 +389,15 @@ class CCalendar(CFrame):
         self.clicked = True
 
         if e.widget["text"] != "<":
-            y = self.my_date.year + 1
+            self.yy += 1
         else:
-            y = self.my_date.year - 1
+            self.yy -= 1
 
-        if y > self.today.year:
-            y = 2015
+        if self.yy > self.today.year:
+            self.yy = 2015
+        elif self.yy < 2015:
+            self.yy = self.today.year
 
-        elif y < 2015:
-            y = self.today.year
-
-        try:
-            self.my_date = datetime(y, self.my_date.month, self.my_date.day)
-        except ValueError:
-            day = calendar.monthrange(y, self.my_date.month)[1]
-            self.my_date = datetime(y, self.my_date.month, day)
-
-        self.m_title["text"] = f"{conf.lang.months[self.my_date.month]} {y}"
+        self.set_my_date()
+        self.change_title()
         self.fill_days()

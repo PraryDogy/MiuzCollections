@@ -41,11 +41,22 @@ def create_query():
     if conf.curr_coll != conf.all_colls:
         q = q.filter(Thumbs.collection == conf.curr_coll)
 
-    if conf.marketing:
-        q = q.filter(sqlalchemy.not_(Thumbs.src.contains(conf.catalog_name)))
+    filters = []
 
-    elif conf.catalog:
-        q = q.filter(Thumbs.src.contains(conf.catalog_name))
+    if conf.models:
+        filters.append(Thumbs.src.like("%" + conf.models_name + "%"))
+
+    if conf.catalog:
+        filters.append(Thumbs.src.like("%" + conf.catalog_name + "%"))
+
+    if conf.product:
+        tmp = sqlalchemy.and_(
+            Thumbs.src.not_like("%" + conf.catalog_name + "%"),
+            Thumbs.src.not_like("%" + conf.models_name + "%")
+            )
+        filters.append(tmp)
+
+    q = q.filter(sqlalchemy.or_(*filters))
 
     if not any((date_start, date_end)):
         q = q.limit(conf.limit)
@@ -134,23 +145,23 @@ class FilterWin(CWindow):
         grop_frame = CFrame(self)
         grop_frame.pack()
 
-        self.marketing = CButton(grop_frame, text=conf.lang.filter_marketing)
-        if conf.marketing:
-            self.marketing.configure(bg=conf.sel_color)
-        self.marketing.pack(side="left")
-        self.marketing.cmd(self.marketing_cmd)
+        self.product = CButton(grop_frame, text=conf.lang.filter_product)
+        if conf.product:
+            self.product.configure(bg=conf.sel_color)
+        self.product.pack(side="left")
+        self.product.cmd(self.product_cmd)
+
+        self.models = CButton(grop_frame, text=conf.lang.filter_models)
+        if conf.models:
+            self.models.configure(bg=conf.sel_color)
+        self.models.pack(side="left", padx=15)
+        self.models.cmd(self.models_cmd)
 
         self.catalog = CButton(grop_frame, text=conf.lang.filter_catalog)
         if conf.catalog:
             self.catalog.configure(bg=conf.sel_color)
-        self.catalog.pack(side="left", padx=15)
+        self.catalog.pack(side="left")
         self.catalog.cmd(self.catalog_cmd)
-
-        self.show_all = CButton(grop_frame, text=conf.lang.filter_showall)
-        if not any((conf.marketing, conf.catalog)):
-            self.show_all.configure(bg=conf.sel_color)
-        self.show_all.pack(side="left")
-        self.show_all.cmd(self.show_all_cmd)
 
         if conf.sort_modified:
             sort_btn_t = conf.lang.filter_changed
@@ -200,23 +211,23 @@ class FilterWin(CWindow):
         else:
             self.btn_sort.configure(text=conf.lang.filter_changed)
 
-    def marketing_cmd(self, e):
-        if not conf.marketing:
-            self.marketing.configure(bg=conf.sel_color)
-            self.catalog.configure(bg=conf.btn_color)
-            self.show_all.configure(bg=conf.btn_color)
+    def product_cmd(self, e=None):
+        if self.product["bg"] == conf.sel_color:
+            self.product.configure(bg=conf.btn_color)
+        else:
+            self.product.configure(bg=conf.sel_color)
 
-    def catalog_cmd(self, e):
-        if not conf.catalog:
-            self.marketing.configure(bg=conf.btn_color)
+    def catalog_cmd(self, e=None):
+        if self.catalog["bg"] == conf.sel_color:
+            self.catalog.configure(bg=conf.btn_color)
+        else:
             self.catalog.configure(bg=conf.sel_color)
-            self.show_all.configure(bg=conf.btn_color)
 
-    def show_all_cmd(self, e):
-        if any((conf.marketing, conf.catalog)):
-            self.marketing.configure(bg=conf.btn_color)
-            self.catalog.configure(bg=conf.btn_color)
-            self.show_all.configure(bg=conf.sel_color)
+    def models_cmd(self, e=None):
+        if self.models["bg"] == conf.sel_color:
+            self.models.configure(bg=conf.btn_color)
+        else:
+            self.models.configure(bg=conf.sel_color)
 
     def oneday_cmd(self):
         self.left_calendar.clicked = True
@@ -242,18 +253,26 @@ class FilterWin(CWindow):
             else:
                 date_end = None
 
-        if self.marketing["bg"] == conf.sel_color:
-            conf.marketing = True
+        if self.product["bg"] == conf.sel_color:
+            conf.product = True
+        else:
+            conf.product = False
+
+        if self.models["bg"] == conf.sel_color:
+            conf.models = True
+        else:
+            conf.models = False
+
+        if self.catalog["bg"] == conf.sel_color:
+            conf.catalog = True
+        else:
             conf.catalog = False
 
-        elif self.catalog["bg"] == conf.sel_color:
-            conf.marketing = False
+        if not any((conf.product, conf.models, conf.catalog)):
+            conf.product = True
+            conf.models = True
             conf.catalog = True
 
-        elif self.show_all["bg"] == conf.sel_color:
-            conf.marketing = False
-            conf.catalog = False
-        
         if self.btn_sort["text"] == conf.lang.filter_created:
             conf.sort_modified = False
         else:
@@ -310,12 +329,12 @@ class Thumbnails(CFrame):
 
         filter_row = []
 
-        if conf.marketing:
-            filter_row.append(conf.lang.thumbs_marketing)
-        elif conf.catalog:
+        if conf.product:
+            filter_row.append(conf.lang.thumbs_product)
+        if conf.models:
+            filter_row.append(conf.lang.thumbs_models)
+        if conf.catalog:
             filter_row.append(conf.lang.thumbs_catalog)
-        elif not any((conf.marketing, conf.catalog)):
-            filter_row.append(conf.lang.thumbs_showall)
 
         if date_start and not date_end:
             filter_row.append(
@@ -335,6 +354,7 @@ class Thumbnails(CFrame):
             filter_row.append(conf.lang.thumbs_alltime.lower())
 
         filter_row = ", ".join(filter_row)
+        filter_row = filter_row.lower().capitalize()
 
         if conf.sort_modified:
             sort_text = conf.lang.thumbs_changed
@@ -466,6 +486,7 @@ class Thumbnails(CFrame):
         self.load_thumbnails()
 
     def reload_without_scroll(self):
+        conf.lang_thumbs.clear()
         self.thumbs_frame.destroy()
         self.load_thumbnails()
 

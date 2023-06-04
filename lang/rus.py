@@ -33,9 +33,10 @@ class Rus:
         self.upd_btn = "Обновить"
 
         # thumbnails
-        self.thumbs_marketing = "Только имиджи"
-        self.thumbs_catalog = "Только каталог"
-        self.thumbs_showall = "Все фото"
+        self.thumbs_product = "Имиджи"
+        self.thumbs_models = "Модели"
+        self.thumbs_catalog = "Каталог"
+
         self.thumbs_alltime = "За все время"
         self.thumbs_changed = "По дате изменения"
         self.thumbs_created = "По дате создания"
@@ -52,14 +53,17 @@ class Rus:
         self.filter_start = "Начало"
         self.filter_end = "Конец"
         self.filter_oneday = "За один день"
-        self.filter_marketing = "Имиджи"
+
+        self.filter_product = "Имиджи"
+        self.filter_models = "Модели"
         self.filter_catalog = "Каталог"
-        self.filter_showall = "Показать все"
+
         self.filter_changed = "Дата изменения"
         self.filter_created = "Дата создания"
         self.filter_descr = (
-            "Имиджи - показывать только рекламные фото.",
-            "Каталог - показывать только каталожные фото.",
+            "Имиджи - показывать предметные фото.",
+            "Модели - показывать модельные фото.",
+            "Каталог - показывать каталожные фото.",
             "Сортировка - по дате изменения или по дате создания.",
             )
         

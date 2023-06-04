@@ -153,6 +153,7 @@ class Settings(CWindow):
                         wid["text"] = conf.lang.__dict__[k]
                 except tkinter.TclError:
                     print("change lang widget err", wid.widgetName)
+                    print(wid.__dict__)
 
     def lang_cmd(self, e=None):
         from lang import Eng, Rus
