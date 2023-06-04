@@ -248,6 +248,7 @@ class CCalendar(CFrame):
         self.title.configure(width=13, font=f)
         self.change_title()
         self.title.pack(side="left")
+        self.title.bind("<ButtonRelease-1>", self.custom_date)
         self.all_btns.append(self.title)
 
         next_m = CButton(titles, text=">")
@@ -341,6 +342,11 @@ class CCalendar(CFrame):
         self.title.configure(text=mtitle_t)
 
     def set_my_date(self):
+        if self.yy < 2015:
+            self.yy = 2015
+        elif self.yy > self.my_date.year:
+            self.yy = self.my_date.year
+
         try:
             self.my_date = datetime(self.yy, self.mm, self.dd)
         except ValueError:
@@ -401,3 +407,73 @@ class CCalendar(CFrame):
         self.set_my_date()
         self.change_title()
         self.fill_days()
+
+
+    def custom_date(self, e=None):
+        self.win = CWindow()
+        conf.root.eval(f'tk::PlaceWindow {self.win} center')
+        self.win.protocol("WM_DELETE_WINDOW", self.can_cmd)
+        self.win.bind('<Command-w>', self.can_cmd)
+        self.win.bind('<Escape>', self.can_cmd)
+
+        self.bind('<Command-q>', on_exit)
+
+        var = tkinter.StringVar(value="dd.mm.yyyy")
+        ent = tkinter.Entry(
+            self.win,
+            width=15,
+            textvariable=var,
+            bg=conf.bg_color,
+            insertbackground="white",
+            fg=conf.fg_color,
+            highlightthickness=0,
+            justify="center",
+            selectbackground=conf.hov_color
+            )
+        ent.pack()
+        var.trace("w", lambda *args: self.character_limit(var))
+        ent.icursor(10)
+        ent.selection_range(0, "end")
+
+        btns = CFrame(self.win)
+        btns.pack(pady=(15, 0))
+
+        self.ok = CButton(btns, text=conf.lang.ok)
+        self.ok.configure(fg=conf.hov_color)
+        self.ok.pack(side="left", padx=(0, 15))
+
+        self.cancel = CButton(btns, text=conf.lang.cancel)
+        self.cancel.pack(side="left")
+        self.cancel.bind("<ButtonRelease-1>", self.can_cmd)
+
+        self.win.deiconify()
+        self.win.wait_visibility()
+        self.win.grab_set_global()
+        ent.focus_force()
+
+    def character_limit(self, entry_text:tkinter.StringVar):
+        try:
+            self.cust_date = datetime.strptime(entry_text.get(), '%d.%m.%Y')
+            self.ok.configure(fg=conf.fg_color)
+            self.ok.bind("<ButtonRelease-1>", self.ok_cmd)
+        except ValueError:
+            self.ok.configure(fg=conf.hov_color)
+            self.ok.unbind("<ButtonRelease-1>")
+
+        if len(entry_text.get()) > 10:
+            entry_text.set(entry_text.get()[:10])
+
+    def ok_cmd(self, e=None):
+        self.yy, self.mm, self.dd = tuple(self.cust_date.timetuple())[:3]
+        self.set_my_date()
+        self.change_title()
+        self.fill_days()
+
+        self.win.destroy()
+        self.winfo_toplevel().grab_set_global()
+        self.winfo_toplevel().focus_force()
+
+    def can_cmd(self, e=None):
+        self.win.destroy()
+        self.winfo_toplevel().grab_set_global()
+        self.winfo_toplevel().focus_force()

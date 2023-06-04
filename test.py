@@ -1,8 +1,8 @@
 from datetime import datetime
-from calendar import monthrange
-
-d = datetime(2022, 2, 22)
-day = monthrange(2022, 2)[1]
 
 
-print(day)
+entry_text = "10.1.1991"
+datetime_object = datetime.strptime(entry_text, '%d.%m.%Y')
+
+
+print(datetime_object)

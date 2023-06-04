@@ -15,7 +15,7 @@ __all__ = (
 class Config:
     def __init__(self):
         self.app_name = 'MiuzCollections'
-        self.app_ver = '3.7.0'
+        self.app_ver = '3.7.5'
         self.db_name = "db.db"
 
         self.cfg_dir = os.path.join(
