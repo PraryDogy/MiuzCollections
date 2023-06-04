@@ -300,6 +300,7 @@ class CCalendar(CFrame):
 
     def disable_calendar(self):
         self.enabled = False
+        self.title.unbind("<ButtonRelease-1>")
 
         for i in self.all_btns:
             if i["bg"] in (conf.btn_color, conf.sel_color):
@@ -307,6 +308,7 @@ class CCalendar(CFrame):
 
     def enable_calendar(self):
        self.enabled = True
+       self.title.bind("<ButtonRelease-1>", self.custom_date)
 
        for i in self.all_btns:
             i["fg"] = conf.fg_color
@@ -456,14 +458,18 @@ class CCalendar(CFrame):
             self.cust_date = datetime.strptime(entry_text.get(), '%d.%m.%Y')
             self.ok.configure(fg=conf.fg_color)
             self.ok.bind("<ButtonRelease-1>", self.ok_cmd)
+            self.win.bind_all("<Return>", self.ok_cmd)
         except ValueError:
             self.ok.configure(fg=conf.hov_color)
             self.ok.unbind("<ButtonRelease-1>")
+            self.win.unbind_all("<Return>")
 
         if len(entry_text.get()) > 10:
             entry_text.set(entry_text.get()[:10])
 
     def ok_cmd(self, e=None):
+        self.clicked = True
+
         self.yy, self.mm, self.dd = tuple(self.cust_date.timetuple())[:3]
         self.set_my_date()
         self.change_title()
