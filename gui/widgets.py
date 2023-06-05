@@ -245,9 +245,9 @@ class CCalendar(CFrame):
             titles,
             name=str(self.my_date.month)
             )
-        self.title.configure(width=13, font=f)
+        self.title.configure(width=13, font=f, bg=conf.btn_color)
         self.change_title()
-        self.title.pack(side="left")
+        self.title.pack(side="left", padx=5)
         self.title.bind("<ButtonRelease-1>", self.cust_date_win)
         self.all_btns.append(self.title)
 
@@ -378,8 +378,10 @@ class CCalendar(CFrame):
 
         if self.mm > 12:
             self.mm = 1
+            self.yy += 1
         elif self.mm <1:
             self.mm = 12
+            self.yy -= 1
 
         self.set_my_date()
         self.change_title()
@@ -395,11 +397,6 @@ class CCalendar(CFrame):
             self.yy += 1
         else:
             self.yy -= 1
-
-        if self.yy > self.today.year:
-            self.yy = 2015
-        elif self.yy < 2015:
-            self.yy = self.today.year
 
         self.set_my_date()
         self.change_title()
@@ -472,23 +469,13 @@ class CCalendar(CFrame):
             self.ok.unbind("<ButtonRelease-1>")
             self.win_cust.unbind("<Return>")
 
-        if len(t) > 10:
-            e.set(t[:10])
-
-        r1 = r"\d{,2}|\d{,2}\.\d{,2}"
-        if re.fullmatch(r1, t):
-            e.set(t + ".")
-            conf.root.event_generate("<Right>")
+            if len(t) > 10:
+                e.set(t[:10])
 
     def cust_ok_cmd(self, e=None):
         self.clicked = True
 
         self.yy, self.mm, self.dd = tuple(self.cust_date.timetuple())[:3]
-
-        if self.yy > self.today.year:
-            self.yy = self.today.year
-        elif self.yy < 2015:
-            self.yy = 2015
 
         try:
             self.change_title()
