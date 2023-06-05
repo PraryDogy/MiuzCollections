@@ -11,6 +11,7 @@ __all__ = (
 
 date_start: datetime = None
 date_end: datetime = None
+search_item = None
 
 
 def stamp_range():
@@ -31,7 +32,13 @@ def stamp_day():
 
 
 def create_query():
+    global search_item
+
     q = sqlalchemy.select(Thumbs.img150, Thumbs.src, Thumbs.modified)
+
+    if search_item:
+        q = q.filter(Thumbs.src.like("%" + search_item + "%"))
+        return q
 
     if conf.sort_modified:
         q = q.order_by(-Thumbs.modified)
@@ -301,6 +308,7 @@ class Thumbnails(CFrame):
 
         conf.root.bind('<Configure>', self.decect_resize)
         self.resize_task = None
+        self.search_task = None
 
     def load_scrollable(self):
         self.scroll_frame = CFrame(self)
@@ -309,6 +317,36 @@ class Thumbnails(CFrame):
         self.sframe = tkmacosx.SFrame(
             self.scroll_frame, bg=conf.bg_color, scrollbarwidth=7)
         self.sframe.pack(expand=1, fill=tkinter.BOTH)
+
+    def search(self, master: tkinter):
+        self.var = tkinter.StringVar()
+        self.cust_ent = tkinter.Entry(
+            master,
+            width=15,
+            textvariable=self.var,
+            bg=conf.bg_color,
+            insertbackground="white",
+            fg=conf.fg_color,
+            highlightthickness=0,
+            justify="center",
+            selectbackground=conf.hov_color
+            )
+        self.var.trace("w", lambda *args: self.search_task_set())
+        self.cust_ent.icursor(10)
+        self.cust_ent.selection_range(0, "end")
+        return self.cust_ent
+
+    def search_task_set(self):
+        if self.search_task:
+            conf.root.after_cancel(self.search_task)
+        self.search_task = conf.root.after(1000, self.search_go)
+
+    def search_go(self):
+        global search_item
+        search_item = self.var.get()
+        search_item = search_item.replace("\n", "").strip()
+        self.reload_with_scroll()
+        conf.root.focus_force()
 
     def load_thumbnails(self):
         self.all_src = []
@@ -377,29 +415,40 @@ class Thumbnails(CFrame):
 
         sub_font=('San Francisco Pro', 13, 'normal')
 
-        l_subtitle = CLabel(
-            main_sub_frame,
-            text=f"{conf.lang.thumbs_summary}\n{conf.lang.thumbs_filter}\n{conf.lang.thumbs_sort}"
+        l_subtitle_t = (
+            f"{conf.lang.thumbs_summary}"
+            f"\n{conf.lang.thumbs_filter}"
+            f"\n{conf.lang.thumbs_sort}"
+            f"\n{conf.lang.thumbs_search}"
             )
+        l_subtitle = CLabel(main_sub_frame, text=l_subtitle_t)
         l_subtitle.configure(font=sub_font, justify="right", anchor="e", width=35)
         l_subtitle.pack(anchor="e", side="left", padx=(0, 10))
 
-        r_text = f"{summary} {conf.lang.thumbs_photo.lower()}\n{filter_row}\n{sort_text}"
-        r_subtitle = CLabel(main_sub_frame, text=r_text)
+        r_subtitle_t = (
+            f"{summary} {conf.lang.thumbs_photo.lower()}"
+            f"\n{filter_row}"
+            f"\n{sort_text}"
+            f"\n{'-' if not search_item else search_item}"
+            )
+        r_subtitle = CLabel(main_sub_frame, text=r_subtitle_t)
         r_subtitle.configure(font=sub_font, justify="left", anchor="w", width=45)
         r_subtitle.pack(anchor="w", side="right")
 
-        btn_filter = CButton(title_frame, text=conf.lang.thumbs_filters)
-        btn_filter.pack()
+        filt_reset = CFrame(title_frame)
+        filt_reset.pack()
+
+        btn_filter = CButton(filt_reset, text=conf.lang.thumbs_filters)
+        btn_filter.pack(side="left", padx=(0, 15))
         if any((date_start, date_end)):
             btn_filter.configure(bg=conf.sel_color)
         btn_filter.cmd(lambda e: FilterWin())
 
-        if any((date_start, date_end)):
-            reset = CButton(title_frame, text=conf.lang.thumbs_reset)
-            reset.configure(width=13)
-            reset.pack(pady=(15, 0))
-            reset.cmd(lambda e: self.reset_filter_cmd())
+        reset = CButton(filt_reset, text=conf.lang.thumbs_reset)
+        reset.pack(side="left")
+        reset.cmd(lambda e: self.reset_filter_cmd())
+
+        self.search(title_frame).pack(pady=(15, 0))
 
         for dates, img_list in self.thumbs.items():
             thumbs_title = CLabel(
@@ -449,10 +498,14 @@ class Thumbnails(CFrame):
         self.reload_without_scroll()
 
     def reset_filter_cmd(self):
-        global date_start, date_end
+        global date_start, date_end, search_item
 
         date_start = None
         date_end = None
+        conf.product = True
+        conf.models = True
+        conf.catalog = True
+        search_item = None
 
         self.reload_without_scroll()
 

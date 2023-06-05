@@ -45,8 +45,9 @@ class Rus:
         self.thumbs_sort = "Сортировка"
         self.thumbs_photo = "Фото"
         self.thumbs_filters = "Фильтры"
-        self.thumbs_reset = "Сбросить даты"
+        self.thumbs_reset = "Сброс"
         self.thumbs_showmore = "Позазать еще"
+        self.thumbs_search = "Поиск"
 
         # filter window
         self.filter_title = "Фильтр"

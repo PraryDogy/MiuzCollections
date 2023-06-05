@@ -46,8 +46,9 @@ class Eng:
         self.thumbs_sort = "Sort"
         self.thumbs_photo = "Photos"
         self.thumbs_filters = "Filters"
-        self.thumbs_reset = "Reset date"
+        self.thumbs_reset = "Reset"
         self.thumbs_showmore = "Show more"
+        self.thumbs_search = "Search"
 
         # filter window
         self.filter_title = "Filter"
