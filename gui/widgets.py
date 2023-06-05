@@ -476,10 +476,9 @@ class CCalendar(CFrame):
             e.set(t[:10])
 
         r1 = r"\d{,2}|\d{,2}\.\d{,2}"
-        if re.fullmatch(r1, t) and len(t) > 1:
+        if re.fullmatch(r1, t):
             e.set(t + ".")
-            self.cust_ent.icursor(len(t) + 1)
-
+            conf.root.event_generate("<Right>")
 
     def cust_ok_cmd(self, e=None):
         self.clicked = True
