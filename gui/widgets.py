@@ -420,7 +420,7 @@ class CCalendar(CFrame):
 
         var_t = f"{self.dd}.{self.mm}.{self.yy}"
         var = tkinter.StringVar(value=var_t)
-        ent = tkinter.Entry(
+        self.cust_ent = tkinter.Entry(
             self.win_cust,
             width=15,
             textvariable=var,
@@ -431,10 +431,10 @@ class CCalendar(CFrame):
             justify="center",
             selectbackground=conf.hov_color
             )
-        ent.pack()
+        self.cust_ent.pack()
         var.trace("w", lambda *args: self.character_limit(var))
-        ent.icursor(10)
-        ent.selection_range(0, "end")
+        self.cust_ent.icursor(10)
+        self.cust_ent.selection_range(0, "end")
 
         btns = CFrame(self.win_cust)
         btns.pack(pady=(15, 0))
@@ -447,7 +447,6 @@ class CCalendar(CFrame):
         self.cancel.pack(side="left")
         self.cancel.bind("<ButtonRelease-1>", self.cust_can_cmd)
 
-
         conf.root.update_idletasks()
 
         under_win = self.winfo_toplevel()
@@ -459,11 +458,12 @@ class CCalendar(CFrame):
         self.win_cust.deiconify()
         self.win_cust.wait_visibility()
         self.win_cust.grab_set_global()
-        ent.focus_force()
+        self.cust_ent.focus_force()
 
-    def character_limit(self, entry_text:tkinter.StringVar):
+    def character_limit(self, e:tkinter.StringVar):
+        t = e.get()
         try:
-            self.cust_date = datetime.strptime(entry_text.get(), '%d.%m.%Y')
+            self.cust_date = datetime.strptime(t, '%d.%m.%Y')
             self.ok.configure(fg=conf.fg_color)
             self.ok.bind("<ButtonRelease-1>", self.cust_ok_cmd)
             self.win_cust.bind("<Return>", self.cust_ok_cmd)
@@ -472,10 +472,14 @@ class CCalendar(CFrame):
             self.ok.unbind("<ButtonRelease-1>")
             self.win_cust.unbind("<Return>")
 
-        if len(entry_text.get()) > 10:
-            entry_text.set(entry_text.get()[:10])
+        if len(t) > 10:
+            e.set(t[:10])
 
-        re.
+        r1 = r"\d{,2}|\d{,2}\.\d{,2}"
+        if re.fullmatch(r1, t) and len(t) > 1:
+            e.set(t + ".")
+            self.cust_ent.icursor(len(t) + 1)
+
 
     def cust_ok_cmd(self, e=None):
         self.clicked = True
@@ -493,7 +497,6 @@ class CCalendar(CFrame):
             self.fill_days()
         except tkinter.TclError:
             print("enter custom date widgets calendar error title change")
-
 
         self.win_cust.destroy()
         self.winfo_toplevel().grab_set_global()
