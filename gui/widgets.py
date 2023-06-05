@@ -1,5 +1,5 @@
 from . import (Image, calendar, conf, datetime, get_coll_name, on_exit, os,
-               partial, place_center, sys, tkinter)
+               partial, place_center, sys, tkinter, re)
 
 __all__ = (
     "CSep",
@@ -474,6 +474,8 @@ class CCalendar(CFrame):
 
         if len(entry_text.get()) > 10:
             entry_text.set(entry_text.get()[:10])
+
+        re.
 
     def cust_ok_cmd(self, e=None):
         self.clicked = True

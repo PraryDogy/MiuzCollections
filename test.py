@@ -1,8 +1,12 @@
 from datetime import datetime
+import re
 
+date1 = "10.01"
+date2 = "10.01"
 
-entry_text = "10.1.1991"
-datetime_object = datetime.strptime(entry_text, '%d.%m.%Y')
-
-
-print(datetime_object)
+r1 = r"\d{,2}"
+r2 = r"\d{,2}\.\d{,2}"
+if any(
+    (re.fullmatch(r1, date1), re.fullmatch(r2, date1))
+    ):
+    print(date1 + ".")
