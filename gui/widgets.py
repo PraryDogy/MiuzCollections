@@ -210,6 +210,7 @@ class CCalendarEntry(CWindow):
         self.win_cust.bind('<Command-w>', self.cust_can_cmd)
         self.win_cust.bind('<Escape>', self.cust_can_cmd)
         self.bind('<Command-q>', on_exit)
+        self.bind_all("<ButtonRelease-1>", self.g_click)
 
         cust_l = CLabel(self.win_cust, text=conf.lang.cust_l)
         cust_l.pack(pady=(0, 5))
@@ -257,6 +258,13 @@ class CCalendarEntry(CWindow):
         self.win_cust.grab_set_global()
         self.cust_ent.focus_force()
 
+    def g_click(self, e:tkinter.Event=None):
+        try:
+            if e.widget.widgetName != "entry":
+                e.widget.focus()
+        except AttributeError:
+            print("entry click error")
+
     def character_limit(self, e:tkinter.StringVar):
         t = e.get()
         try:
@@ -289,6 +297,7 @@ class CCalendarEntry(CWindow):
         self.winfo_toplevel().focus_force()
 
     def cust_can_cmd(self, e=None):
+        self.unbind_all("<ButtonRelease-1>")
         self.win_cust.destroy()
         self.winfo_toplevel().grab_set_global()
         self.winfo_toplevel().focus_force()

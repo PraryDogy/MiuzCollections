@@ -14,23 +14,6 @@ d_end: datetime = None
 search_item = None
 
 
-def stamp_range():
-    start = datetime.combine(d_start, datetime.min.time())
-    end = datetime.combine(
-        d_end, datetime.max.time().replace(microsecond=0)
-        )
-
-    return (datetime.timestamp(start), datetime.timestamp(end))
-
-
-def stamp_day():
-    start = datetime.combine(d_start, datetime.min.time())
-    end = datetime.combine(
-        d_start, datetime.max.time().replace(microsecond=0)
-        )
-    return int(start.timestamp()), int(end.timestamp())
-
-
 class ContextMenu(tkinter.Menu):
     def __init__(self, src: str, all_src: list, e: tkinter.Event):
         super().__init__()
@@ -247,7 +230,7 @@ class FilterWin(CWindow):
 
 
 class ThumbnailsSearch:
-    def search(self, master: tkinter):
+    def search_frame(self, master: tkinter):
         try:
             self.var = tkinter.StringVar(value=search_item)
         except AttributeError:
@@ -268,6 +251,11 @@ class ThumbnailsSearch:
         self.var.trace("w", lambda *args: self.search_task_set())
         self.cust_ent.bind("<Escape>", self.search_esc)
         return self.cust_ent
+
+    def reload_search(self):
+        """for external use in menu frame"""
+        global search_item
+        search_item = None
 
     def search_esc(self, e=None):
         conf.root.focus_force()
@@ -313,23 +301,6 @@ class ThumbnailsPrepare:
         if conf.catalog:
             filter_row.append(conf.lang.thumbs_catalog)
 
-        if d_start and not d_end:
-            filter_row.append(
-                f"{d_start.day} {conf.lang.months_p[d_start.month]} "
-                f"{d_start.year}"
-                )
-        elif all((d_start, d_end)):
-            start = (
-                f"{d_start.day} {conf.lang.months_p[d_start.month]} "
-                f"{d_start.year}"
-                )
-            end = (f"{d_end.day} {conf.lang.months_p[d_end.month]} "
-                   f"{d_end.year}"
-                   )
-            filter_row.append(f"{start} - {end}")
-        else:
-            filter_row.append(conf.lang.thumbs_alltime.lower())
-
         filter_row = ", ".join(filter_row)
         self.filter_row = filter_row.lower().capitalize()
 
@@ -362,13 +333,13 @@ class ThumbnailsPrepare:
 
         for chunk, img_list in enumerate(chunk_thumbs):
             for img, src, modified in img_list:
-                t = datetime.fromtimestamp(modified).date()
+                key = datetime.fromtimestamp(modified).date()
 
                 if not any((d_start, d_end)):
-                    t = f"{conf.lang.months[t.month]} {t.year}"
+                    key = f"{conf.lang.months[key.month]} {key.year}"
 
                 elif d_start and not d_end:
-                    t = f"{t.day} {conf.lang.months_p[t.month]} {t.year}"
+                    key = f"{key.day} {conf.lang.months_p[key.month]} {key.year}"
 
                 elif all((d_start, d_end)):
                     start = (
@@ -379,18 +350,32 @@ class ThumbnailsPrepare:
                         f"{d_end.day} {conf.lang.months_p[d_end.month]} "
                         f"{d_end.year}"
                         )
-                    t = f"{start} - {end}"
+                    key = f"{start} - {end}"
 
                 if len(chunk_thumbs) > 2:
                     thumbs_dict.setdefault(
-                        f"{chunk+1}: {t}", []
+                        f"{chunk+1}: {key}", []
                         ).append((img, src))
                 else:
                     thumbs_dict.setdefault(
-                        t, []
+                        key, []
                         ).append((img, src))
 
         return thumbs_dict
+
+    def stamp_range(self):
+        start = datetime.combine(d_start, datetime.min.time())
+        end = datetime.combine(
+            d_end, datetime.max.time().replace(microsecond=0)
+            )
+        return (datetime.timestamp(start), datetime.timestamp(end))
+
+    def stamp_day(self):
+        start = datetime.combine(d_start, datetime.min.time())
+        end = datetime.combine(
+            d_start, datetime.max.time().replace(microsecond=0)
+            )
+        return int(start.timestamp()), int(end.timestamp())
 
     def get_query(self):
         global search_item
@@ -431,12 +416,12 @@ class ThumbnailsPrepare:
             q = q.limit(conf.limit)
 
         elif d_start and not d_end:
-            t = stamp_day()
+            t = self.stamp_day()
             q = q.filter(Thumbs.modified > t[0])
             q = q.filter(Thumbs.modified < t[1])
         
         elif all((d_start, d_end)):
-            t = stamp_range()
+            t = self.stamp_range()
             q = q.filter(Thumbs.modified > t[0])
             q = q.filter(Thumbs.modified < t[1])
 
@@ -464,6 +449,15 @@ class Thumbnails(CFrame, ThumbnailsSearch, ThumbnailsPrepare):
         self.sframe = tkmacosx.SFrame(
             self.scroll_frame, bg=conf.bg_color, scrollbarwidth=7)
         self.sframe.pack(expand=1, fill=tkinter.BOTH)
+
+        self.scroll_frame.bind_all("<ButtonRelease-1>", self.g_click)
+
+    def g_click(e: tkinter.Event=None, ee: tkinter.Event=None):
+        try:
+            if ee.widget.widgetName == "frame":
+                ee.widget.focus()
+        except AttributeError:
+            print("thumbnails global click error")
 
     def load_thumbnails(self):
         self.thumbs_prepare()
@@ -523,7 +517,7 @@ class Thumbnails(CFrame, ThumbnailsSearch, ThumbnailsPrepare):
         reset.pack(side="left")
         reset.cmd(lambda e: self.reset_filter_cmd())
 
-        self.search(title_frame).pack(pady=(15, 0), ipady=2)
+        self.search_frame(title_frame).pack(pady=(15, 0), ipady=2)
 
         for dates, img_list in self.thumbs_lbls.items():
             thumbs_title = CLabel(
@@ -583,10 +577,6 @@ class Thumbnails(CFrame, ThumbnailsSearch, ThumbnailsPrepare):
 
         d_start = None
         d_end = None
-        conf.product = True
-        conf.models = True
-        conf.catalog = True
-        search_item = None
 
         self.reload_without_scroll()
 

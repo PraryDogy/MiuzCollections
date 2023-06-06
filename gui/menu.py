@@ -26,6 +26,7 @@ def show_collection(master: tkinter.Button, collection_name):
     conf.curr_coll = collection_name
 
     from . import app
+    app.thumbnails.reload_search()
     app.thumbnails.reload_with_scroll()
 
 

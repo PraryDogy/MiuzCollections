@@ -44,7 +44,7 @@ class Rus:
         self.thumbs_sort = "Сортировка"
         self.thumbs_photo = "Фото"
         self.thumbs_filters = "Фильтры"
-        self.thumbs_reset = "Сброс"
+        self.thumbs_reset = "Сброс дат"
         self.thumbs_showmore = "Позазать еще"
         self.thumbs_summary = "Всего"
 
