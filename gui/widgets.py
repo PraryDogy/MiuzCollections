@@ -229,7 +229,7 @@ class CCalendar(CFrame):
         titles = CFrame(parrent)
         titles.pack(pady=5)
 
-        prev_m = CButton(titles, text="<")
+        prev_m = CButton(titles, text="❰")
         prev_m.configure(width=6, font=f, bg=conf.bg_color)
         prev_m.pack(side="left")
         prev_m.cmd(self.switch_month)
