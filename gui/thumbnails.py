@@ -9,77 +9,26 @@ __all__ = (
     )
 
 
-date_start: datetime = None
-date_end: datetime = None
+d_start: datetime = None
+d_end: datetime = None
 search_item = None
 
 
 def stamp_range():
-    start = datetime.combine(date_start, datetime.min.time())
+    start = datetime.combine(d_start, datetime.min.time())
     end = datetime.combine(
-        date_end, datetime.max.time().replace(microsecond=0)
+        d_end, datetime.max.time().replace(microsecond=0)
         )
 
     return (datetime.timestamp(start), datetime.timestamp(end))
 
 
 def stamp_day():
-    start = datetime.combine(date_start, datetime.min.time())
+    start = datetime.combine(d_start, datetime.min.time())
     end = datetime.combine(
-        date_start, datetime.max.time().replace(microsecond=0)
+        d_start, datetime.max.time().replace(microsecond=0)
         )
     return int(start.timestamp()), int(end.timestamp())
-
-
-def create_query():
-    global search_item
-
-    q = sqlalchemy.select(Thumbs.img150, Thumbs.src, Thumbs.modified)
-
-    if search_item:
-        q = q.filter(Thumbs.src.like("%" + search_item + "%"))
-        q = q.order_by(-Thumbs.modified)
-        return q
-
-    if conf.sort_modified:
-        q = q.order_by(-Thumbs.modified)
-    else:
-        q = q.order_by(-Thumbs.created)
-
-    if conf.curr_coll != conf.all_colls:
-        q = q.filter(Thumbs.collection == conf.curr_coll)
-
-    filters = []
-
-    if conf.models:
-        filters.append(Thumbs.src.like("%" + conf.models_name + "%"))
-
-    if conf.catalog:
-        filters.append(Thumbs.src.like("%" + conf.catalog_name + "%"))
-
-    if conf.product:
-        tmp = sqlalchemy.and_(
-            Thumbs.src.not_like("%" + conf.catalog_name + "%"),
-            Thumbs.src.not_like("%" + conf.models_name + "%")
-            )
-        filters.append(tmp)
-
-    q = q.filter(sqlalchemy.or_(*filters))
-
-    if not any((date_start, date_end)):
-        q = q.limit(conf.limit)
-
-    elif date_start and not date_end:
-        t = stamp_day()
-        q = q.filter(Thumbs.modified > t[0])
-        q = q.filter(Thumbs.modified < t[1])
-    
-    elif all((date_start, date_end)):
-        t = stamp_range()
-        q = q.filter(Thumbs.modified > t[0])
-        q = q.filter(Thumbs.modified < t[1])
-
-    return q
 
 
 class ContextMenu(tkinter.Menu):
@@ -130,7 +79,7 @@ class FilterWin(CWindow):
         left_title["font"] = f
         left_title.pack()
 
-        self.left_calendar = CCalendar(left_frame, date_start)
+        self.left_calendar = CCalendar(left_frame, d_start)
         self.left_calendar.pack()
 
         right_frame = CFrame(calendar_frames)
@@ -140,7 +89,7 @@ class FilterWin(CWindow):
         right_title["font"] = f
         right_title.pack()
 
-        self.right_calendar = CCalendar(right_frame, date_end)
+        self.right_calendar = CCalendar(right_frame, d_end)
         self.right_calendar.pack()
 
         self.oneday_btn = CButton(self, text=conf.lang.filter_oneday)
@@ -202,7 +151,7 @@ class FilterWin(CWindow):
         cancel_btn.pack(side="left")
         cancel_btn.cmd(lambda e: self.cancel())
 
-        if date_start and not date_end:
+        if d_start and not d_end:
             self.oneday = True
             self.oneday_btn["bg"] = conf.sel_color
             self.right_calendar.disable_calendar()
@@ -252,15 +201,15 @@ class FilterWin(CWindow):
             self.right_calendar.enable_calendar()
 
     def ok_cmd(self, e=None):
-        global date_start, date_end
+        global d_start, d_end
 
         if any((self.left_calendar.clicked, self.right_calendar.clicked)):
-            date_start = self.left_calendar.my_date
+            d_start = self.left_calendar.my_date
 
             if not self.oneday:
-                date_end = self.right_calendar.my_date
+                d_end = self.right_calendar.my_date
             else:
-                date_end = None
+                d_end = None
 
         if self.product["bg"] == conf.sel_color:
             conf.product = True
@@ -297,7 +246,204 @@ class FilterWin(CWindow):
         focus_last()
 
 
-class Thumbnails(CFrame):
+class ThumbnailsSearch:
+    def search(self, master: tkinter):
+        try:
+            self.var = tkinter.StringVar(value=search_item)
+        except AttributeError:
+            tkinter.StringVar(value="-")
+
+        self.cust_ent = tkinter.Entry(
+            master,
+            width=20,
+            textvariable=self.var,
+            bg=conf.ent_color,
+            insertbackground="white",
+            fg=conf.fg_color,
+            highlightthickness=0,
+            justify="center",
+            selectbackground=conf.btn_color,
+            border=1
+            )
+        self.var.trace("w", lambda *args: self.search_task_set())
+        self.cust_ent.bind("<Escape>", self.search_esc)
+        return self.cust_ent
+
+    def search_esc(self, e=None):
+        conf.root.focus_force()
+
+    def search_task_set(self):
+        if self.search_task:
+            conf.root.after_cancel(self.search_task)
+        self.search_task = conf.root.after(1000, self.search_go)
+
+    def search_go(self):
+        global search_item
+        search_item = self.var.get()
+        search_item = search_item.replace("\n", "").strip()
+        self.reload_with_scroll()
+        conf.root.focus_force()
+
+
+class ThumbnailsPrepare:
+    def thumbs_prepare(self):
+        self.all_src = []
+        self.thumbs_coords = dict()
+        self.clmns_count = self.get_clmns_count()
+
+        self.thumbs_lbls = Dbase.conn.execute(self.get_query()).fetchall()
+        self.total = len(self.thumbs_lbls)
+
+        self.thumbs_lbls = self.decode_thumbs()
+        self.thumbs_lbls = self.create_thumbs_dict()
+
+        self.size = conf.thumb_size + conf.thumb_pad
+
+        if conf.curr_coll == conf.all_colls:
+            self.coll_title = conf.lang.all_colls
+        else:
+            self.coll_title = conf.curr_coll
+
+        filter_row = []
+
+        if conf.product:
+            filter_row.append(conf.lang.thumbs_product)
+        if conf.models:
+            filter_row.append(conf.lang.thumbs_models)
+        if conf.catalog:
+            filter_row.append(conf.lang.thumbs_catalog)
+
+        if d_start and not d_end:
+            filter_row.append(
+                f"{d_start.day} {conf.lang.months_p[d_start.month]} "
+                f"{d_start.year}"
+                )
+        elif all((d_start, d_end)):
+            start = (
+                f"{d_start.day} {conf.lang.months_p[d_start.month]} "
+                f"{d_start.year}"
+                )
+            end = (f"{d_end.day} {conf.lang.months_p[d_end.month]} "
+                   f"{d_end.year}"
+                   )
+            filter_row.append(f"{start} - {end}")
+        else:
+            filter_row.append(conf.lang.thumbs_alltime.lower())
+
+        filter_row = ", ".join(filter_row)
+        self.filter_row = filter_row.lower().capitalize()
+
+        if conf.sort_modified:
+            self.sort_text = conf.lang.thumbs_changed
+        else:
+            self.sort_text = conf.lang.thumbs_created
+
+    def decode_thumbs(self):
+        result = []
+        for blob, src, modified in self.thumbs_lbls:
+            try:
+                decoded = decode_image(blob)
+                cropped = crop_image(decoded)
+                img = convert_to_rgb(cropped)
+                result.append((img, src, modified))
+
+            except Exception:
+                print(traceback.format_exc())
+
+        return result
+
+    def create_thumbs_dict(self):
+        thumbs_dict = {}
+        limit = 100
+        chunk_thumbs = [
+            self.thumbs_lbls[i:i+limit]
+            for i in range(0, len(self.thumbs_lbls), limit)
+        ]
+
+        for chunk, img_list in enumerate(chunk_thumbs):
+            for img, src, modified in img_list:
+                t = datetime.fromtimestamp(modified).date()
+
+                if not any((d_start, d_end)):
+                    t = f"{conf.lang.months[t.month]} {t.year}"
+
+                elif d_start and not d_end:
+                    t = f"{t.day} {conf.lang.months_p[t.month]} {t.year}"
+
+                elif all((d_start, d_end)):
+                    start = (
+                        f"{d_start.day} {conf.lang.months_p[d_start.month]} "
+                        f"{d_start.year}"
+                        )
+                    end = (
+                        f"{d_end.day} {conf.lang.months_p[d_end.month]} "
+                        f"{d_end.year}"
+                        )
+                    t = f"{start} - {end}"
+
+                if len(chunk_thumbs) > 2:
+                    thumbs_dict.setdefault(
+                        f"{chunk+1}: {t}", []
+                        ).append((img, src))
+                else:
+                    thumbs_dict.setdefault(
+                        t, []
+                        ).append((img, src))
+
+        return thumbs_dict
+
+    def get_query(self):
+        global search_item
+
+        q = sqlalchemy.select(Thumbs.img150, Thumbs.src, Thumbs.modified)
+
+        if search_item:
+            q = q.filter(Thumbs.src.like("%" + search_item + "%"))
+            q = q.order_by(-Thumbs.modified)
+            return q
+
+        if conf.sort_modified:
+            q = q.order_by(-Thumbs.modified)
+        else:
+            q = q.order_by(-Thumbs.created)
+
+        if conf.curr_coll != conf.all_colls:
+            q = q.filter(Thumbs.collection == conf.curr_coll)
+
+        filters = []
+
+        if conf.models:
+            filters.append(Thumbs.src.like("%" + conf.models_name + "%"))
+
+        if conf.catalog:
+            filters.append(Thumbs.src.like("%" + conf.catalog_name + "%"))
+
+        if conf.product:
+            tmp = sqlalchemy.and_(
+                Thumbs.src.not_like("%" + conf.catalog_name + "%"),
+                Thumbs.src.not_like("%" + conf.models_name + "%")
+                )
+            filters.append(tmp)
+
+        q = q.filter(sqlalchemy.or_(*filters))
+
+        if not any((d_start, d_end)):
+            q = q.limit(conf.limit)
+
+        elif d_start and not d_end:
+            t = stamp_day()
+            q = q.filter(Thumbs.modified > t[0])
+            q = q.filter(Thumbs.modified < t[1])
+        
+        elif all((d_start, d_end)):
+            t = stamp_range()
+            q = q.filter(Thumbs.modified > t[0])
+            q = q.filter(Thumbs.modified < t[1])
+
+        return q
+
+
+class Thumbnails(CFrame, ThumbnailsSearch, ThumbnailsPrepare):
     def __init__(self, master):
         super().__init__(master)
         self.clmns_count = 1
@@ -319,100 +465,16 @@ class Thumbnails(CFrame):
             self.scroll_frame, bg=conf.bg_color, scrollbarwidth=7)
         self.sframe.pack(expand=1, fill=tkinter.BOTH)
 
-    def search(self, master: tkinter):
-        try:
-            self.var = tkinter.StringVar(value=search_item)
-        except AttributeError:
-            tkinter.StringVar(value="-")
-
-        self.cust_ent = tkinter.Entry(
-            master,
-            width=20,
-            textvariable=self.var,
-            bg=conf.bg_color,
-            insertbackground="white",
-            fg=conf.fg_color,
-            highlightthickness=0,
-            justify="center",
-            selectbackground=conf.hov_color
-            )
-        self.var.trace("w", lambda *args: self.search_task_set())
-        self.cust_ent.bind("<Escape>", self.search_esc)
-        return self.cust_ent
-
-    def search_esc(self, e=None):
-        conf.root.focus_force()
-
-    def search_task_set(self):
-        if self.search_task:
-            conf.root.after_cancel(self.search_task)
-        self.search_task = conf.root.after(2000, self.search_go)
-
-    def search_go(self):
-        global search_item
-        search_item = self.var.get()
-        search_item = search_item.replace("\n", "").strip()
-        self.reload_with_scroll()
-        conf.root.focus_force()
-
     def load_thumbnails(self):
-        self.all_src = []
-        self.thumbs_coords = dict()
-        self.clmns_count = self.get_clmns_count()
-
-        self.thumbs = Dbase.conn.execute(create_query()).fetchall()
-        summary = len(self.thumbs)
-
-        self.thumbs = self.decode_thumbs()
-        self.thumbs = self.create_thumbs_dict()
-
-        self.size = conf.thumb_size + conf.thumb_pad
-
-        if conf.curr_coll == conf.all_colls:
-            txt = conf.lang.all_colls
-        else:
-            txt = conf.curr_coll
-
-        filter_row = []
-
-        if conf.product:
-            filter_row.append(conf.lang.thumbs_product)
-        if conf.models:
-            filter_row.append(conf.lang.thumbs_models)
-        if conf.catalog:
-            filter_row.append(conf.lang.thumbs_catalog)
-
-        if date_start and not date_end:
-            filter_row.append(
-                f"{date_start.day} {conf.lang.months_p[date_start.month]} "
-                f"{date_start.year}"
-                )
-        elif all((date_start, date_end)):
-            start = (
-                f"{date_start.day} {conf.lang.months_p[date_start.month]} "
-                f"{date_start.year}"
-                )
-            end = (f"{date_end.day} {conf.lang.months_p[date_end.month]} "
-                   f"{date_end.year}"
-                   )
-            filter_row.append(f"{start} - {end}")
-        else:
-            filter_row.append(conf.lang.thumbs_alltime.lower())
-
-        filter_row = ", ".join(filter_row)
-        filter_row = filter_row.lower().capitalize()
-
-        if conf.sort_modified:
-            sort_text = conf.lang.thumbs_changed
-        else:
-            sort_text = conf.lang.thumbs_created
+        self.thumbs_prepare()
 
         self.thumbs_frame = CFrame(self.sframe)
+        # .configure(bg="red")
 
         title_frame = CFrame(self.thumbs_frame)
         title_frame.pack()
 
-        main_title = CLabel(title_frame, text=txt, width=30)
+        main_title = CLabel(title_frame, text=self.coll_title, width=30)
         main_title.configure(font=('San Francisco Pro', 30, 'bold'))
         main_title.pack(anchor="center")
         conf.lang_thumbs.append(main_title)
@@ -423,19 +485,29 @@ class Thumbnails(CFrame):
         sub_font=('San Francisco Pro', 13, 'normal')
 
         l_subtitle_t = (
-            f"\n{conf.lang.thumbs_filter}"
+            f"{conf.lang.thumbs_filter}"
             f"\n{conf.lang.thumbs_sort}"
             )
         l_subtitle = CLabel(main_sub_frame, text=l_subtitle_t)
-        l_subtitle.configure(font=sub_font, justify="right", anchor="e", width=35)
+        l_subtitle.configure(
+            font=sub_font,
+            justify="right",
+            anchor="e",
+            width=35
+            )
         l_subtitle.pack(anchor="e", side="left", padx=(0, 10))
 
         r_subtitle_t = (
-            f"\n{filter_row}"
-            f"\n{sort_text}"
+            f"{self.filter_row}"
+            f"\n{self.sort_text}"
             )
         r_subtitle = CLabel(main_sub_frame, text=r_subtitle_t)
-        r_subtitle.configure(font=sub_font, justify="left", anchor="w", width=45)
+        r_subtitle.configure(
+            font=sub_font,
+            justify="left",
+            anchor="w",
+            width=45
+            )
         r_subtitle.pack(anchor="w", side="right")
 
         filt_reset = CFrame(title_frame)
@@ -443,7 +515,7 @@ class Thumbnails(CFrame):
 
         btn_filter = CButton(filt_reset, text=conf.lang.thumbs_filters)
         btn_filter.pack(side="left", padx=(0, 15))
-        if any((date_start, date_end)):
+        if any((d_start, d_end)):
             btn_filter.configure(bg=conf.sel_color)
         btn_filter.cmd(lambda e: FilterWin())
 
@@ -451,9 +523,9 @@ class Thumbnails(CFrame):
         reset.pack(side="left")
         reset.cmd(lambda e: self.reset_filter_cmd())
 
-        self.search(title_frame).pack(pady=(15, 0), ipady=2, ipadx=5)
+        self.search(title_frame).pack(pady=(15, 0), ipady=2)
 
-        for dates, img_list in self.thumbs.items():
+        for dates, img_list in self.thumbs_lbls.items():
             thumbs_title = CLabel(
                 self.thumbs_frame,
                 text=(
@@ -489,10 +561,10 @@ class Thumbnails(CFrame):
             img_lbl = CLabel(self.thumbs_frame, image=img, text=dates)
             img_lbl.pack(anchor="w")
             img_lbl.image_names = img
-            img_lbl.bind('<Button-1>', partial(self.click))
-            img_lbl.bind("<Button-2>", partial(self.r_click))
+            img_lbl.bind('<ButtonRelease-1>', partial(self.click))
+            img_lbl.bind("<ButtonRelease-2>", partial(self.r_click))
 
-        if summary >= 150:
+        if self.total >= 150:
             more_btn = CButton(
                 self.thumbs_frame,
                 text=conf.lang.thumbs_showmore
@@ -507,10 +579,10 @@ class Thumbnails(CFrame):
         self.reload_without_scroll()
 
     def reset_filter_cmd(self):
-        global date_start, date_end, search_item
+        global d_start, d_end, search_item
 
-        date_start = None
-        date_end = None
+        d_start = None
+        d_end = None
         conf.product = True
         conf.models = True
         conf.catalog = True
@@ -521,9 +593,9 @@ class Thumbnails(CFrame):
     def decect_resize(self, e):
         if self.resize_task:
             conf.root.after_cancel(self.resize_task)
-        self.resize_task = conf.root.after(500, self.update_thumbnails)
+        self.resize_task = conf.root.after(500, self.frame_resize)
 
-    def update_thumbnails(self):
+    def frame_resize(self):
         old_w = conf.root_w
         new_w = conf.root.winfo_width()
 
@@ -537,10 +609,10 @@ class Thumbnails(CFrame):
                 self.reload_without_scroll()
 
     def reload_with_scroll(self):
-        global date_start, date_end
+        global d_start, d_end
 
-        date_start = None
-        date_end = None
+        d_start = None
+        d_end = None
         conf.lang_thumbs.clear()
 
         self.scroll_frame.destroy()
@@ -556,56 +628,6 @@ class Thumbnails(CFrame):
     def get_clmns_count(self):
         clmns = (conf.root_w - conf.menu_w) // conf.thumb_size
         return 1 if clmns == 0 else clmns
-
-    def decode_thumbs(self):
-        result = []
-        for blob, src, modified in self.thumbs:
-            try:
-                decoded = decode_image(blob)
-                cropped = crop_image(decoded)
-                img = convert_to_rgb(cropped)
-                result.append((img, src, modified))
-
-            except Exception:
-                print(traceback.format_exc())
-
-        return result
-
-    def create_thumbs_dict(self):
-        thumbs_dict = {}
-        limit = 100
-        chunk_thumbs = [
-            self.thumbs[i:i+limit]
-            for i in range(0, len(self.thumbs), limit)
-        ]
-
-        for chunk, img_list in enumerate(chunk_thumbs):
-            for img, src, modified in img_list:
-                t = datetime.fromtimestamp(modified).date()
-
-                if not any((date_start, date_end)):
-                    t = f"{conf.lang.months[t.month]} {t.year}"
-
-                elif date_start and not date_end:
-                    t = f"{t.day} {conf.lang.months_p[t.month]} {t.year}"
-
-                elif all((date_start, date_end)):
-                    start = (
-                        f"{date_start.day} {conf.lang.months_p[date_start.month]} "
-                        f"{date_start.year}"
-                        )
-                    end = (
-                        f"{date_end.day} {conf.lang.months_p[date_end.month]} "
-                        f"{date_end.year}"
-                        )
-                    t = f"{start} - {end}"
-
-                if len(chunk_thumbs) > 2:
-                    thumbs_dict.setdefault(f"{chunk+1}: {t}", []).append((img, src))
-                else:
-                    thumbs_dict.setdefault(t, []).append((img, src))
-
-        return thumbs_dict
 
     def click(self, e: tkinter.Event):
         try:

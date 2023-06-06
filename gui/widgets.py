@@ -220,14 +220,15 @@ class CCalendarEntry(CWindow):
             self.win_cust,
             width=15,
             textvariable=var,
-            bg=conf.bg_color,
+            bg=conf.ent_color,
             insertbackground="white",
             fg=conf.fg_color,
             highlightthickness=0,
             justify="center",
-            selectbackground=conf.hov_color
+            selectbackground=conf.btn_color,
+            border=1
             )
-        self.cust_ent.pack()
+        self.cust_ent.pack(ipady=2)
         var.trace("w", lambda *args: self.character_limit(var))
         self.cust_ent.icursor(10)
         self.cust_ent.selection_range(0, "end")

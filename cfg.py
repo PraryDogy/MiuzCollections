@@ -31,6 +31,7 @@ class Config:
         # self.sel_color = '#0056D9'
         self.sel_color = "#4B4B4B"
         self.hov_color = '#3A3A3E'
+        self.ent_color = "#141416"
 
         self.thumb_size = 150
         self.menu_w = 180
