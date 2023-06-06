@@ -417,7 +417,7 @@ class CCalendar(CFrame, CCalendarEntry):
     def change_title(self):
         mtitle_t = (
             f"{self.dd} "
-            f"{conf.lang.months_parental[self.mm]} "
+            f"{conf.lang.months_p[self.mm]} "
             f"{self.yy}"
             )
         self.title.configure(text=mtitle_t)

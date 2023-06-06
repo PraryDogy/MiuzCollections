@@ -109,7 +109,7 @@ class Eng:
         self.live_finish = "Finishing"
         self.live_updating = "Updating"
 
-        self.months_parental = {
+        self.months_p = {
             1: "january",
             2: "february",
             3: "march",
@@ -125,7 +125,7 @@ class Eng:
 
         self.months = {
             k: v.capitalize()
-            for k, v in self.months_parental.items()
+            for k, v in self.months_p.items()
             }
 
     def update_autoscan(self):

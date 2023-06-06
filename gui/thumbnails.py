@@ -384,15 +384,15 @@ class Thumbnails(CFrame):
 
         if date_start and not date_end:
             filter_row.append(
-                f"{date_start.day} {conf.lang.months_parental[date_start.month]} "
+                f"{date_start.day} {conf.lang.months_p[date_start.month]} "
                 f"{date_start.year}"
                 )
         elif all((date_start, date_end)):
             start = (
-                f"{date_start.day} {conf.lang.months_parental[date_start.month]} "
+                f"{date_start.day} {conf.lang.months_p[date_start.month]} "
                 f"{date_start.year}"
                 )
-            end = (f"{date_end.day} {conf.lang.months_parental[date_end.month]} "
+            end = (f"{date_end.day} {conf.lang.months_p[date_end.month]} "
                    f"{date_end.year}"
                    )
             filter_row.append(f"{start} - {end}")
@@ -456,7 +456,10 @@ class Thumbnails(CFrame):
         for dates, img_list in self.thumbs.items():
             thumbs_title = CLabel(
                 self.thumbs_frame,
-                text=f"{dates}, {conf.lang.thumbs_summary.lower()}: {len(img_list)}",
+                text=(
+                f"{dates}, "
+                f"{conf.lang.thumbs_summary.lower()}: {len(img_list)}"
+                ),
                 anchor="w",
                 justify="left",
                 )
@@ -490,7 +493,10 @@ class Thumbnails(CFrame):
             img_lbl.bind("<Button-2>", partial(self.r_click))
 
         if summary >= 150:
-            more_btn = CButton(self.thumbs_frame, text=conf.lang.thumbs_showmore)
+            more_btn = CButton(
+                self.thumbs_frame,
+                text=conf.lang.thumbs_showmore
+                )
             more_btn.cmd(lambda e: self.show_more_cmd())
             more_btn.pack(pady=(15, 0))
 
@@ -567,47 +573,37 @@ class Thumbnails(CFrame):
 
     def create_thumbs_dict(self):
         thumbs_dict = {}
-        for img, src, modified in self.thumbs:
-            t = datetime.fromtimestamp(modified).date()
+        limit = 100
+        chunk_thumbs = [
+            self.thumbs[i:i+limit]
+            for i in range(0, len(self.thumbs), limit)
+        ]
 
-            if not date_start and not date_end:
-                t = f"{conf.lang.months[t.month]} {t.year}"
+        for chunk, img_list in enumerate(chunk_thumbs):
+            for img, src, modified in img_list:
+                t = datetime.fromtimestamp(modified).date()
 
-            elif date_start and not date_end:
-                t = f"{t.day} {conf.lang.months_parental[t.month]} {t.year}"
+                if not any((date_start, date_end)):
+                    t = f"{conf.lang.months[t.month]} {t.year}"
 
-            elif all((date_start, date_end)):
-                start = (
-                    f"{date_start.day} {conf.lang.months_parental[date_start.month]} "
-                    f"{date_start.year}"
-                    )
-                end = (
-                    f"{date_end.day} {conf.lang.months_parental[date_end.month]} "
-                    f"{date_end.year}"
-                    )
-                t = f"{start} - {end}"
+                elif date_start and not date_end:
+                    t = f"{t.day} {conf.lang.months_p[t.month]} {t.year}"
 
-            thumbs_dict.setdefault(t, []).append((img, src))
+                elif all((date_start, date_end)):
+                    start = (
+                        f"{date_start.day} {conf.lang.months_p[date_start.month]} "
+                        f"{date_start.year}"
+                        )
+                    end = (
+                        f"{date_end.day} {conf.lang.months_p[date_end.month]} "
+                        f"{date_end.year}"
+                        )
+                    t = f"{start} - {end}"
 
-            if len(thumbs_dict[t]) > 100:
-                thumbs_dict.setdefault(f"{t} {src}", []).append((img, src))
-
-        # limit = 100
-        # chunked_keys = []
-        # for i in thumbs_dict.keys():
-        #     if len(thumbs_dict[i]) > limit:
-        #         chunked_keys.append(i)
-
-        # chunked_dict = {}
-        # for i in chunked_keys:
-        #     images = thumbs_dict[i]
-        #     for x in range(0, len(images), limit):
-        #         chunked_dict[f"{i} part {x}"] = images[x:x+limit]
-
-        # for i in chunked_keys:
-        #     thumbs_dict.pop(i)
-
-        # thumbs_dict = {**thumbs_dict, **chunked_dict}
+                if len(chunk_thumbs) > 2:
+                    thumbs_dict.setdefault(f"{chunk+1}: {t}", []).append((img, src))
+                else:
+                    thumbs_dict.setdefault(t, []).append((img, src))
 
         return thumbs_dict
 
