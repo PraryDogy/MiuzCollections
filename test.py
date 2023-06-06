@@ -1,15 +1,24 @@
-from datetime import datetime
-import re
+class aa:
+    def __init__(self) -> None:
+        self.test = 5
 
-date1 = "10"
-date2 = "10.01"
 
-# r2 = r"\d{,2}\.\d{,2}"
-# if any(
-#     (re.fullmatch(r1, date1), re.fullmatch(r2, date1))
-#     ):
-#     print(date1 + ".")
+class bb:
+    def __init__(self):
+        pass
 
-r1 = r"\d{,2}|\d{,2}\.\d{,2}"
-if re.fullmatch(r1, date1):
-    ""
+    def change_test(self):
+        self.test = 888
+
+
+class cc(aa, bb):
+    def __init__(self) -> None:
+        aa.__init__(self)
+        bb.__init__(self)
+
+
+
+abc = cc()
+abc.change_test()
+
+print(abc.test)
