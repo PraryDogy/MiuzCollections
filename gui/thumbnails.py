@@ -319,7 +319,11 @@ class Thumbnails(CFrame):
         self.sframe.pack(expand=1, fill=tkinter.BOTH)
 
     def search(self, master: tkinter):
-        self.var = tkinter.StringVar()
+        try:
+            self.var = tkinter.StringVar(value=search_item)
+        except AttributeError:
+            tkinter.StringVar(value="-")
+
         self.cust_ent = tkinter.Entry(
             master,
             width=15,
@@ -332,8 +336,6 @@ class Thumbnails(CFrame):
             selectbackground=conf.hov_color
             )
         self.var.trace("w", lambda *args: self.search_task_set())
-        self.cust_ent.icursor(10)
-        self.cust_ent.selection_range(0, "end")
         return self.cust_ent
 
     def search_task_set(self):
