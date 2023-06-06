@@ -47,7 +47,7 @@ class Eng:
         self.thumbs_filters = "Filters"
         self.thumbs_reset = "Reset"
         self.thumbs_showmore = "Show more"
-
+        self.thumbs_summary = "Total"
         # filter window
         self.filter_title = "Filter"
         self.filter_start = "Start"

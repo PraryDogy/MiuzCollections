@@ -346,7 +346,7 @@ class Thumbnails(CFrame):
     def search_task_set(self):
         if self.search_task:
             conf.root.after_cancel(self.search_task)
-        self.search_task = conf.root.after(1000, self.search_go)
+        self.search_task = conf.root.after(2000, self.search_go)
 
     def search_go(self):
         global search_item
@@ -413,7 +413,7 @@ class Thumbnails(CFrame):
         title_frame.pack()
 
         main_title = CLabel(title_frame, text=txt, width=30)
-        main_title.configure(font=('San Francisco Pro', 45, 'bold'))
+        main_title.configure(font=('San Francisco Pro', 30, 'bold'))
         main_title.pack(anchor="center")
         conf.lang_thumbs.append(main_title)
 

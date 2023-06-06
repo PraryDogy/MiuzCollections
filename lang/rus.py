@@ -46,6 +46,7 @@ class Rus:
         self.thumbs_filters = "Фильтры"
         self.thumbs_reset = "Сброс"
         self.thumbs_showmore = "Позазать еще"
+        self.thumbs_summary = "Всего"
 
         # filter window
         self.filter_title = "Фильтр"
