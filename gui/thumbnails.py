@@ -352,13 +352,13 @@ class ThumbnailsPrepare:
                         )
                     key = f"{start} - {end}"
 
-                if len(chunk_thumbs) > 2:
+                if len(chunk_thumbs) > 1:
                     thumbs_dict.setdefault(
-                        f"{chunk}:{key}", []
+                        (len(self.thumbs_lbls),f"{chunk}:{key}"), []
                         ).append((img, src))
                 else:
                     thumbs_dict.setdefault(
-                        key, []
+                        (None, key), []
                         ).append((img, src))
 
         return thumbs_dict
@@ -450,7 +450,7 @@ class Thumbnails(CFrame, ThumbnailsSearch, ThumbnailsPrepare):
             self.scroll_frame, bg=conf.bg_color, scrollbarwidth=7)
         self.sframe.pack(expand=1, fill=tkinter.BOTH)
 
-        self.scroll_frame.bind_all("<ButtonRelease-1>", self.g_click)
+        self.sframe.bind_all("<ButtonRelease-1>", self.g_click)
 
     def g_click(e: tkinter.Event=None, ee: tkinter.Event=None):
         try:
@@ -463,7 +463,6 @@ class Thumbnails(CFrame, ThumbnailsSearch, ThumbnailsPrepare):
         self.thumbs_prepare()
 
         self.thumbs_frame = CFrame(self.sframe)
-        # .configure(bg="red")
 
         title_frame = CFrame(self.thumbs_frame)
         title_frame.pack()
@@ -519,13 +518,16 @@ class Thumbnails(CFrame, ThumbnailsSearch, ThumbnailsPrepare):
 
         self.search_frame(title_frame).pack(pady=(15, 0), ipady=2)
 
-        for dates, img_list in self.thumbs_lbls.items():
+        for (chunk_ln, dates), img_list in self.thumbs_lbls.items():
+
             dates_title = dates.split(":")[-1]
+            ln_title = str(chunk_ln) if chunk_ln else len(img_list)
+
             thumbs_title = CLabel(
                 self.thumbs_frame,
                 text=(
                 f"{dates_title}, "
-                f"{conf.lang.thumbs_summary.lower()}: {len(img_list)}"
+                f"{conf.lang.thumbs_summary.lower()}: {ln_title}"
                 ),
                 anchor="w",
                 justify="left",
