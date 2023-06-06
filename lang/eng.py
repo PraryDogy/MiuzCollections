@@ -41,14 +41,12 @@ class Eng:
         self.thumbs_alltime = "All time"
         self.thumbs_changed = "By date modified"
         self.thumbs_created = "By date created"
-        self.thumbs_summary = "Total"
         self.thumbs_filter = "Filter"
         self.thumbs_sort = "Sort"
         self.thumbs_photo = "Photos"
         self.thumbs_filters = "Filters"
         self.thumbs_reset = "Reset"
         self.thumbs_showmore = "Show more"
-        self.thumbs_search = "Search"
 
         # filter window
         self.filter_title = "Filter"

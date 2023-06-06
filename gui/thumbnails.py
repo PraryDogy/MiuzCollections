@@ -423,7 +423,6 @@ class Thumbnails(CFrame):
         sub_font=('San Francisco Pro', 13, 'normal')
 
         l_subtitle_t = (
-            f"{conf.lang.thumbs_summary}"
             f"\n{conf.lang.thumbs_filter}"
             f"\n{conf.lang.thumbs_sort}"
             f"\n{conf.lang.thumbs_search}"
@@ -433,10 +432,8 @@ class Thumbnails(CFrame):
         l_subtitle.pack(anchor="e", side="left", padx=(0, 10))
 
         r_subtitle_t = (
-            f"{summary} {conf.lang.thumbs_photo.lower()}"
             f"\n{filter_row}"
             f"\n{sort_text}"
-            f"\n{'-' if not search_item else search_item}"
             )
         r_subtitle = CLabel(main_sub_frame, text=r_subtitle_t)
         r_subtitle.configure(font=sub_font, justify="left", anchor="w", width=45)

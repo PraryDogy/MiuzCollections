@@ -40,14 +40,12 @@ class Rus:
         self.thumbs_alltime = "За все время"
         self.thumbs_changed = "По дате изменения"
         self.thumbs_created = "По дате создания"
-        self.thumbs_summary = "Всего"
         self.thumbs_filter = "Фильтр"
         self.thumbs_sort = "Сортировка"
         self.thumbs_photo = "Фото"
         self.thumbs_filters = "Фильтры"
         self.thumbs_reset = "Сброс"
         self.thumbs_showmore = "Позазать еще"
-        self.thumbs_search = "Поиск"
 
         # filter window
         self.filter_title = "Фильтр"
