@@ -590,22 +590,21 @@ class Thumbnails(CFrame):
             thumbs_dict.setdefault(t, []).append((img, src))
 
         limit = 100
-        to_rem = []
-        tmp_dict = {}
+        chunked_keys = []
         for i in thumbs_dict.keys():
             if len(thumbs_dict[i]) > limit:
-                chunks = [
-                    thumbs_dict[i][h:h+2]
-                    for h in range(0, len(thumbs_dict[i]), limit)
-                    ]
-                for x, ch in enumerate(chunks):
-                    tmp_dict.setdefault(f"{t} x {x}", []).append(ch)
-                to_rem.append(i)
+                chunked_keys.append(i)
 
-        for i in to_rem:
+        chunked_dict = {}
+        for i in chunked_keys:
+            images = thumbs_dict[i]
+            for x in range(0, len(images), limit):
+                chunked_dict[f"{i} part {x}"] = images[x:x+limit]
+
+        for i in chunked_keys:
             thumbs_dict.pop(i)
 
-        thumbs_dict = {**thumbs_dict, **tmp_dict}
+        thumbs_dict = {**thumbs_dict, **chunked_dict}
 
         return thumbs_dict
 
