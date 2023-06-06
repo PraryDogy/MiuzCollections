@@ -166,17 +166,17 @@ class ImgViewer(CWindow):
         self.img_set(rgb_thumb)
 
     def img_place(self, width, height):
-        img_read = cv2.imread(src, cv2.IMREAD_UNCHANGED)
-        
-        if src.endswith(("png", "PNG")):
-            img_read = replace_bg(img_read, conf.bg_color)
-
-        resized = resize_image(img_read, width, height, False)
-        img_rgb = convert_to_rgb(resized)
         try:
+            img_read = cv2.imread(src, cv2.IMREAD_UNCHANGED)
+            
+            if src.endswith(("png", "PNG")):
+                img_read = replace_bg(img_read, conf.bg_color)
+
+            resized = resize_image(img_read, width, height, False)
+            img_rgb = convert_to_rgb(resized)
             self.img_set(img_rgb)
-        except Exception as e:
-            print(e)
+        except AttributeError:
+            print("img viewer no img")
 
     def set_title(self):
         name = src.split(os.sep)[-1]
