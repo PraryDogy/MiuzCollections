@@ -482,6 +482,9 @@ class Thumbnails(CFrame):
                     row += self.size
                     clmn = 0
 
+                if x % 300 == 0:
+                    print('1')
+
             img = ImageTk.PhotoImage(empty)
             img_lbl = CLabel(self.thumbs_frame, image=img, text=dates)
             img_lbl.pack(anchor="w")
@@ -587,7 +590,7 @@ class Thumbnails(CFrame):
                     )
                 t = f"{start} - {end}"
 
-            thumbs_dict.setdefault(t, []).append((img, src))
+            thumbs_dict.setdefault( t, []).append((img, src))
 
         return thumbs_dict
 
