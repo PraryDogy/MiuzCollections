@@ -229,14 +229,8 @@ class CCalendar(CFrame):
         titles = CFrame(parrent)
         titles.pack(pady=5)
 
-        prev_y = CButton(titles, text="<<")
-        prev_y.configure(width=2, font=f, bg=conf.bg_color)
-        prev_y.pack(side="left")
-        prev_y.cmd(self.switch_year)
-        self.all_btns.append(prev_y)
-
         prev_m = CButton(titles, text="<")
-        prev_m.configure(width=2, font=f, bg=conf.bg_color)
+        prev_m.configure(width=6, font=f, bg=conf.bg_color)
         prev_m.pack(side="left")
         prev_m.cmd(self.switch_month)
         self.all_btns.append(prev_m)
@@ -245,23 +239,17 @@ class CCalendar(CFrame):
             titles,
             name=str(self.my_date.month)
             )
-        self.title.configure(width=13, font=f, bg=conf.btn_color)
+        self.title.configure(width=13, font=f)
         self.change_title()
-        self.title.pack(side="left", padx=5)
+        self.title.pack(side="left")
         self.title.bind("<ButtonRelease-1>", self.cust_date_win)
         self.all_btns.append(self.title)
 
         next_m = CButton(titles, text=">")
-        next_m.configure(width=2, font=f, bg=conf.bg_color)
+        next_m.configure(width=6, font=f, bg=conf.bg_color)
         next_m.pack(side="left")
         next_m.cmd(self.switch_month)
         self.all_btns.append(next_m)
-
-        next_y = CButton(titles, text=">>")
-        next_y.configure(width=2, font=f, bg=conf.bg_color)
-        next_y.pack(side="left")
-        next_y.cmd(self.switch_year)
-        self.all_btns.append(next_y)
 
         row = CFrame(parrent)
         row.pack()
@@ -387,22 +375,6 @@ class CCalendar(CFrame):
         self.change_title()
         self.fill_days()
 
-    def switch_year(self, e=None):
-        if not self.enabled:
-            return
-
-        self.clicked = True
-
-        if e.widget["text"] == ">>":
-            self.yy += 1
-        else:
-            self.yy -= 1
-
-        self.set_my_date()
-        self.change_title()
-        self.fill_days()
-
-
     def cust_date_win(self, e=None):
         self.win_cust = CWindow()
         self.win_cust.title(conf.lang.cust_title)
@@ -410,7 +382,6 @@ class CCalendar(CFrame):
         self.win_cust.bind('<Command-w>', self.cust_can_cmd)
         self.win_cust.bind('<Escape>', self.cust_can_cmd)
         self.bind('<Command-q>', on_exit)
-
 
         cust_l = CLabel(self.win_cust, text=conf.lang.cust_l)
         cust_l.pack(pady=(0, 5))
