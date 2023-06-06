@@ -8,7 +8,7 @@ from .widgets import *
 class Application:
     def __init__(self):
         conf.root.title(conf.app_name)
-        conf.root.configure(bg=conf.bg_color)
+        conf.root.configure(bg=conf.bg_color, pady=10)
 
         conf.root.createcommand(
             'tk::mac::ReopenApplication', conf.root.deiconify)
@@ -17,8 +17,6 @@ class Application:
 
         conf.root.createcommand("tk::mac::Quit" , on_exit)
         conf.root.protocol("WM_DELETE_WINDOW", on_exit)
-
-        CSep(conf.root).pack(fill=tkinter.X, pady=15, padx=(15, 5))
 
         self.menu = Menu(conf.root)
         self.menu.pack(side=tkinter.LEFT, fill=tkinter.Y, pady=(0, 15))
@@ -32,7 +30,7 @@ class Application:
         CSep(right_frame).pack(fill=tkinter.X, pady=10, padx=15)
 
         self.st_bar = StBar(right_frame)
-        self.st_bar.pack(pady=(0, 10))
+        self.st_bar.pack()
 
         MacMenu()
 

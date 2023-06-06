@@ -384,8 +384,6 @@ class ThumbnailsPrepare:
 
         if search_item:
             q = q.filter(Thumbs.src.like("%" + search_item + "%"))
-            q = q.order_by(-Thumbs.modified)
-            return q
 
         if conf.sort_modified:
             q = q.order_by(-Thumbs.modified)
@@ -431,6 +429,12 @@ class ThumbnailsPrepare:
 class Thumbnails(CFrame, ThumbnailsSearch, ThumbnailsPrepare):
     def __init__(self, master):
         super().__init__(master)
+
+        move_top = CButton(self, text="▲")
+        move_top.configure(font=('San Francisco Pro', 12, 'normal'), width=13)
+        move_top.pack(pady=(0, 10), padx=(0, 10))
+        move_top.cmd(self.scroll_up)
+
         self.clmns_count = 1
 
         conf.root.update_idletasks()
@@ -639,3 +643,6 @@ class Thumbnails(CFrame, ThumbnailsSearch, ThumbnailsPrepare):
             return
 
         ContextMenu(src, self.all_src, e)
+
+    def scroll_up(self, e=None):
+        self.sframe['canvas'].yview_moveto('0.0')
