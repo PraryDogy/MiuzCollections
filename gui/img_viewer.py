@@ -176,7 +176,7 @@ class ImgViewer(CWindow):
             img_rgb = convert_to_rgb(resized)
             self.img_set(img_rgb)
         except AttributeError:
-            print("img viewer no img")
+            print("img viewer no img\n\n")
 
     def set_title(self):
         name = src.split(os.sep)[-1]

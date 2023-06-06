@@ -361,9 +361,6 @@ class ThumbnailsPrepare:
                         key, []
                         ).append((img, src))
 
-        print(len(self.thumbs_lbls))
-        print(thumbs_dict.keys())
-
         return thumbs_dict
 
     def stamp_range(self):
@@ -453,7 +450,7 @@ class Thumbnails(CFrame, ThumbnailsSearch, ThumbnailsPrepare):
             self.scroll_frame, bg=conf.bg_color, scrollbarwidth=7)
         self.sframe.pack(expand=1, fill=tkinter.BOTH)
 
-        # self.scroll_frame.bind_all("<ButtonRelease-1>", self.g_click)
+        self.scroll_frame.bind_all("<ButtonRelease-1>", self.g_click)
 
     def g_click(e: tkinter.Event=None, ee: tkinter.Event=None):
         try:
@@ -523,11 +520,11 @@ class Thumbnails(CFrame, ThumbnailsSearch, ThumbnailsPrepare):
         self.search_frame(title_frame).pack(pady=(15, 0), ipady=2)
 
         for dates, img_list in self.thumbs_lbls.items():
-            dates = dates.split(":")[-1]
+            dates_title = dates.split(":")[-1]
             thumbs_title = CLabel(
                 self.thumbs_frame,
                 text=(
-                f"{dates}, "
+                f"{dates_title}, "
                 f"{conf.lang.thumbs_summary.lower()}: {len(img_list)}"
                 ),
                 anchor="w",

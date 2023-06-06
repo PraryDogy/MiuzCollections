@@ -210,7 +210,7 @@ class CCalendarEntry(CWindow):
         self.win_cust.bind('<Command-w>', self.cust_can_cmd)
         self.win_cust.bind('<Escape>', self.cust_can_cmd)
         self.bind('<Command-q>', on_exit)
-        # self.bind_all("<ButtonRelease-1>", self.g_click)
+        self.bind_all("<ButtonRelease-1>", self.g_click)
 
         cust_l = CLabel(self.win_cust, text=conf.lang.cust_l)
         cust_l.pack(pady=(0, 5))
