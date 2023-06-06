@@ -38,6 +38,7 @@ def create_query():
 
     if search_item:
         q = q.filter(Thumbs.src.like("%" + search_item + "%"))
+        q = q.order_by(-Thumbs.modified)
         return q
 
     if conf.sort_modified:
@@ -326,7 +327,7 @@ class Thumbnails(CFrame):
 
         self.cust_ent = tkinter.Entry(
             master,
-            width=15,
+            width=20,
             textvariable=self.var,
             bg=conf.bg_color,
             insertbackground="white",
@@ -336,7 +337,11 @@ class Thumbnails(CFrame):
             selectbackground=conf.hov_color
             )
         self.var.trace("w", lambda *args: self.search_task_set())
+        self.cust_ent.bind("<Escape>", self.search_esc)
         return self.cust_ent
+
+    def search_esc(self, e=None):
+        conf.root.focus_force()
 
     def search_task_set(self):
         if self.search_task:
@@ -450,7 +455,7 @@ class Thumbnails(CFrame):
         reset.pack(side="left")
         reset.cmd(lambda e: self.reset_filter_cmd())
 
-        self.search(title_frame).pack(pady=(15, 0))
+        self.search(title_frame).pack(pady=(15, 0), ipady=2, ipadx=5)
 
         for dates, img_list in self.thumbs.items():
             thumbs_title = CLabel(
