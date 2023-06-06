@@ -425,7 +425,6 @@ class Thumbnails(CFrame):
         l_subtitle_t = (
             f"\n{conf.lang.thumbs_filter}"
             f"\n{conf.lang.thumbs_sort}"
-            f"\n{conf.lang.thumbs_search}"
             )
         l_subtitle = CLabel(main_sub_frame, text=l_subtitle_t)
         l_subtitle.configure(font=sub_font, justify="right", anchor="e", width=35)
