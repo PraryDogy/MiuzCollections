@@ -1,24 +1,7 @@
-class aa:
-    def __init__(self) -> None:
-        self.test = 5
-
-
-class bb:
-    def __init__(self):
-        pass
-
-    def change_test(self):
-        self.test = 888
-
-
-class cc(aa, bb):
-    def __init__(self) -> None:
-        aa.__init__(self)
-        bb.__init__(self)
+a = [i for i in range(0, 1661)]
 
 
 
-abc = cc()
-abc.change_test()
-
-print(abc.test)
+if len(a) > 100:
+    for i in range(0, len(a), 100):
+        print(i)
