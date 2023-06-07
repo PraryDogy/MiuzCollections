@@ -384,7 +384,7 @@ class ThumbnailsPrepare:
 
                 if len(chunk_thumbs) > 1:
                     thumbs_dict.setdefault(
-                        (len(self.thumbs_lbls),f"{chunk}:{key}"), []
+                        (len(self.thumbs_lbls), f"{chunk}:{key}"), []
                         ).append((img, src))
                 else:
                     thumbs_dict.setdefault(
