@@ -430,9 +430,13 @@ class Thumbnails(CFrame, ThumbnailsSearch, ThumbnailsPrepare):
     def __init__(self, master):
         super().__init__(master)
 
-        move_top = CButton(self, text="▲")
-        move_top.configure(font=('San Francisco Pro', 12, 'normal'), width=33, bg=conf.bg_color)
-        move_top.pack(pady=(0, 10), padx=(0, 10))
+        move_top = CButton(self, text="▲  ")
+        move_top.configure(
+            font=('San Francisco Pro', 13, 'normal'),
+            bg=conf.bg_color,
+            width=50
+            )
+        move_top.pack()
         move_top.cmd(self.scroll_up)
 
         self.clmns_count = 1
