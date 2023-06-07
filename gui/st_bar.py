@@ -41,9 +41,11 @@ class ScanerGui(CWindow):
 
 
 class StBar(CFrame):
+    btn_change = None
     def __init__(self, master):
         super().__init__(master)
         self.normal_mode()
+        setattr(__class__, "btn_change", self.__upd_btn_change)
 
     def normal_mode(self):
         widgets = tuple(v for k, v in self.children.items())
@@ -77,5 +79,5 @@ class StBar(CFrame):
         else:
             ScanerGui()
 
-    def upd_btn_change(self):
+    def __upd_btn_change(self):
         return self.upd_btn

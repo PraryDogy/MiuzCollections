@@ -228,5 +228,5 @@ class Settings(CWindow):
                 SmbAlert()
 
         if self.changed_lang:
-            from .application import app
-            app.thumbnails.reload_with_scroll()
+            from .thumbnails import Thumbnails
+            Thumbnails.reload_with_scroll()

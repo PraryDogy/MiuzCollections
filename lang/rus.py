@@ -6,6 +6,10 @@ class Rus:
         self.all_colls = "Все коллекции"
         self.close = "Закрыть"
 
+        # search_context
+        self.search_paste = "Вставить"
+        self.search_clear = "Очистить"
+
         # context menu
         self.preview = "Просмотр"
         self.info = "Инфо"

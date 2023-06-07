@@ -22,8 +22,8 @@ from database import *
 from scaner import *
 from utils import *
 
-from .application import app
+from .application import Application
 
 __all__ = (
-    "app"
+    "Application",
     )

@@ -6,6 +6,10 @@ class Eng:
         self.all_colls = "All collections"
         self.close = "Close"
 
+        # search_context
+        self.search_paste = "Paste"
+        self.search_clear = "Clear"
+
         # context menu
         self.preview = "Preview"
         self.info = "Info"

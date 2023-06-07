@@ -25,9 +25,9 @@ def show_collection(master: tkinter.Button, collection_name):
     master['bg'] = conf.sel_color
     conf.curr_coll = collection_name
 
-    from . import app
-    app.thumbnails.reload_search()
-    app.thumbnails.reload_with_scroll()
+    from .thumbnails import Thumbnails, ThumbSearch
+    ThumbSearch.reload_search()
+    Thumbnails.reload_with_scroll()
 
 
 class ContextMenu(tkinter.Menu):
@@ -51,6 +51,7 @@ class ContextMenu(tkinter.Menu):
 
 
 class Menu(tkmacosx.SFrame):
+    reload_menu = None
     def __init__(self, master: tkinter):
         super().__init__(
             master,
@@ -64,6 +65,7 @@ class Menu(tkmacosx.SFrame):
 
         self.menu_buttons = self.load_menu_buttons()
         self.menu_buttons.pack()
+        setattr(__class__, "reload_menu", self.__reload_menu)
 
     def load_menu_parent(self):
         frame = CFrame(self)
@@ -140,7 +142,7 @@ class Menu(tkmacosx.SFrame):
 
         return frame
 
-    def reload(self):
+    def __reload_menu(self):
         menu_buttons.clear()
         conf.lang_menu.clear()
         self.menu_buttons.destroy()

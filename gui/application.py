@@ -47,5 +47,3 @@ class Application:
 
     def minim(self, e=None):
         conf.root.iconify()
-
-app = Application()

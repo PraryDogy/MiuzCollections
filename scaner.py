@@ -7,6 +7,7 @@ from cfg import conf
 from database import Dbase, Thumbs
 from utils import encode_image, get_coll_name, smb_check
 
+
 __all__ = (
     "scaner",
     "auto_scan",
@@ -21,8 +22,8 @@ def change_live_lvl(text):
 
 
 def st_bar_btn(text: str, color: str):
-    from gui import app
-    btn = app.st_bar.upd_btn_change()
+    from gui.st_bar import StBar
+    btn = StBar.btn_change()
     btn.configure(text=text, bg=color)
     return
 
@@ -181,9 +182,10 @@ def scaner():
     conf.live_text = ""
 
     if UPDATE_THUMBNAILS:
-        from gui import app
-        app.thumbnails.reload_without_scroll()
-        app.menu.reload()
+        from gui.thumbnails import Thumbnails
+        from gui.menu import Menu
+        Thumbnails.reload_without_scroll()
+        Menu.reload_menu()
         UPDATE_THUMBNAILS = False
 
     conf.flag = False

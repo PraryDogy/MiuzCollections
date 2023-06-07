@@ -1,6 +1,7 @@
 from . import (Dbase, Image, ImageTk, Thumbs, conf, convert_to_rgb, crop_image,
                datetime, decode_image, find_jpeg, find_tiff, math, partial,
-               place_center, sqlalchemy, tkinter, tkmacosx, traceback)
+               place_center, sqlalchemy, subprocess, tkinter, tkmacosx,
+               traceback)
 from .img_viewer import ImgViewer
 from .widgets import *
 
@@ -219,21 +220,21 @@ class FilterWin(CWindow):
 
         self.destroy()
         focus_last()
-        from . import app
-        app.thumbnails.reload_without_scroll()
+        Thumbnails.reload_without_scroll()
 
     def cancel(self):
         self.destroy()
         focus_last()
 
 
-class ThumbSearch:
+class ThumbSearch(tkinter.Entry):
     search_item = None
+    reload_search = None
 
-    def search_frame(self, master: tkinter):
+    def __init__(self, master: tkinter):
         self.ent_value = tkinter.StringVar(value=self.search_item)
 
-        self.cust_ent = tkinter.Entry(
+        super().__init__(
             master,
             width=20,
             textvariable=self.ent_value,
@@ -246,32 +247,43 @@ class ThumbSearch:
             border=1
             )
         self.ent_value.trace("w", lambda *args: self.search_task_set())
-        self.cust_ent.bind("<Escape>", self.search_esc)
+        self.bind("<Escape>", self.search_esc)
         conf.root.bind("<Command-f>", self.search_focus)
-        self.cust_ent.bind("<ButtonRelease-2>", self.search_context)
-        return self.cust_ent
+        self.bind("<ButtonRelease-2>", self.search_context)
+        self.search_task = None
+        setattr(__class__, "reload_search", self.__reload_search)
 
     def search_context(self, e=None):
         menu = tkinter.Menu()
         menu.add_command(
-            label=conf.lang.info,
-            command=lambda: print("clear entry")
+            label=conf.lang.search_clear,
+            command=self.context_clear
             )
         menu.add_separator()
         menu.add_command(
-            label=conf.lang.show_finder,
-            command = lambda: print("paste")
+            label=conf.lang.search_paste,
+            command=self.context_paste
             )
         try:
             menu.tk_popup(e.x_root, e.y_root)
         finally:
             menu.grab_release()
 
-    def search_focus(self, e=None):
-        self.cust_ent.focus_force()
+    def context_paste(self, e=None):
+        self.ent_value.set(subprocess.check_output(
+            'pbpaste',
+            env={'LANG': 'en_US.UTF-8'}
+            ).decode('utf-8')
+            )
+    
+    def context_clear(self, e=None):
+        self.ent_value.set("")
+        setattr(__class__, "search_item", None)
 
-    def reload_search(self):
-        """for external use in menu frame"""
+    def search_focus(self, e=None):
+        self.focus_force()
+
+    def __reload_search(self):
         setattr(__class__, "search_item", None)
 
     def search_esc(self, e=None):
@@ -286,7 +298,7 @@ class ThumbSearch:
         search_item = self.ent_value.get()
         search_item = search_item.replace("\n", "").strip()
         setattr(__class__, "search_item", search_item)
-        self.reload_with_scroll()
+        Thumbnails.reload_with_scroll()
         conf.root.focus_force()
 
 
@@ -442,7 +454,10 @@ class ThumbnailsPrepare:
         return q
 
 
-class Thumbnails(CFrame, ThumbSearch, ThumbnailsPrepare):
+class Thumbnails(CFrame, ThumbnailsPrepare):
+    reload_with_scroll = None
+    reload_without_scroll = None
+
     def __init__(self, master):
         super().__init__(master)
 
@@ -465,6 +480,8 @@ class Thumbnails(CFrame, ThumbSearch, ThumbnailsPrepare):
         conf.root.bind('<Configure>', self.decect_resize)
         self.resize_task = None
         self.search_task = None
+        setattr(__class__, "reload_with_scroll", self.__reload_with_scroll)
+        setattr(__class__, "reload_without_scroll", self.__reload_without_scroll)
 
     def load_scrollable(self):
         self.scroll_frame = CFrame(self)
@@ -473,12 +490,6 @@ class Thumbnails(CFrame, ThumbSearch, ThumbnailsPrepare):
         self.sframe = tkmacosx.SFrame(
             self.scroll_frame, bg=conf.bg_color, scrollbarwidth=7)
         self.sframe.pack(expand=1, fill=tkinter.BOTH)
-
-        self.sframe.bind_all("<MouseWheel>", self.scroll_decect)
-
-    def scroll_decect(self, e=None):
-        print(e.__dict__)
-        # self.canvas.yview_scroll(int(-1*(event.delta/120)), "units")
 
     def g_click(e: tkinter.Event=None, ee: tkinter.Event=None):
         try:
@@ -544,7 +555,8 @@ class Thumbnails(CFrame, ThumbSearch, ThumbnailsPrepare):
         reset.pack(side="left")
         reset.cmd(lambda e: self.reset_filter_cmd())
 
-        self.search_frame(title_frame).pack(pady=(15, 0), ipady=2)
+        search = ThumbSearch(title_frame)
+        search.pack(pady=(15, 0), ipady=2)
 
         for (chunk_ln, dates), img_list in self.thumbs_lbls.items():
 
@@ -601,7 +613,7 @@ class Thumbnails(CFrame, ThumbSearch, ThumbnailsPrepare):
 
     def show_more_cmd(self):
         conf.limit += 150
-        self.reload_without_scroll()
+        Thumbnails.reload_without_scroll()
 
     def reset_filter_cmd(self):
         global search_item
@@ -609,7 +621,7 @@ class Thumbnails(CFrame, ThumbSearch, ThumbnailsPrepare):
         setattr(Dates, "start", None)
         setattr(Dates, "end", None)
 
-        self.reload_without_scroll()
+        Thumbnails.reload_without_scroll()
 
     def decect_resize(self, e):
         if self.resize_task:
@@ -627,9 +639,9 @@ class Thumbnails(CFrame, ThumbSearch, ThumbnailsPrepare):
                 w, h = conf.root.winfo_width(), conf.root.winfo_height()
                 conf.root_w, conf.root_h = w, h
                 conf.root.update_idletasks()
-                self.reload_without_scroll()
+                Thumbnails.reload_without_scroll()
 
-    def reload_with_scroll(self):
+    def __reload_with_scroll(self):
         setattr(Dates, "start", None)
         setattr(Dates, "end", None)
         conf.lang_thumbs.clear()
@@ -639,7 +651,7 @@ class Thumbnails(CFrame, ThumbSearch, ThumbnailsPrepare):
         self.thumbs_frame.destroy()
         self.load_thumbnails()
 
-    def reload_without_scroll(self):
+    def __reload_without_scroll(self):
         conf.lang_thumbs.clear()
         self.thumbs_frame.destroy()
         self.load_thumbnails()
