@@ -270,11 +270,7 @@ class ThumbSearch(tkinter.Entry):
             menu.grab_release()
 
     def context_paste(self, e=None):
-        self.ent_value.set(subprocess.check_output(
-            'pbpaste',
-            env={'LANG': 'en_US.UTF-8'}
-            ).decode('utf-8')
-            )
+        self.ent_value.set(conf.root.clipboard_get())
     
     def context_clear(self, e=None):
         self.ent_value.set("")
