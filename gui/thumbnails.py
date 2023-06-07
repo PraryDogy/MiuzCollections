@@ -9,9 +9,9 @@ __all__ = (
     )
 
 
-d_start: datetime = None
-d_end: datetime = None
-search_item = None
+class Dates:
+    start: datetime = None
+    end: datetime = None
 
 
 class ContextMenu(tkinter.Menu):
@@ -46,6 +46,10 @@ class ContextMenu(tkinter.Menu):
 
 
 class FilterWin(CWindow):
+    l_calendar = CCalendar
+    r_calendar = CCalendar
+    
+
     def __init__(self):
         super().__init__()
         self.bind("<Return>", self.ok_cmd)
@@ -62,8 +66,9 @@ class FilterWin(CWindow):
         left_title["font"] = f
         left_title.pack()
 
-        self.left_calendar = CCalendar(left_frame, d_start)
-        self.left_calendar.pack()
+        l_calendar = CCalendar(left_frame, Dates.start)
+        l_calendar.pack()
+        setattr(__class__, "l_calendar", l_calendar)
 
         right_frame = CFrame(calendar_frames)
         right_frame.pack(side="left")
@@ -72,8 +77,9 @@ class FilterWin(CWindow):
         right_title["font"] = f
         right_title.pack()
 
-        self.right_calendar = CCalendar(right_frame, d_end)
-        self.right_calendar.pack()
+        r_calendar = CCalendar(right_frame, Dates.end)
+        r_calendar.pack()
+        setattr(__class__, "r_calendar", r_calendar)
 
         self.oneday_btn = CButton(self, text=conf.lang.filter_oneday)
         self.oneday_btn.pack()
@@ -134,10 +140,10 @@ class FilterWin(CWindow):
         cancel_btn.pack(side="left")
         cancel_btn.cmd(lambda e: self.cancel())
 
-        if d_start and not d_end:
+        if Dates.start and not Dates.end:
             self.oneday = True
             self.oneday_btn["bg"] = conf.sel_color
-            self.right_calendar.disable_calendar()
+            self.r_calendar.disable_calendar()
 
         conf.root.update_idletasks()
 
@@ -171,28 +177,26 @@ class FilterWin(CWindow):
             self.models.configure(bg=conf.sel_color)
 
     def oneday_cmd(self):
-        self.left_calendar.clicked = True
+        self.l_calendar.clicked = True
 
         if not self.oneday:
             self.oneday = True
             self.oneday_btn["bg"] = conf.sel_color
-            self.right_calendar.disable_calendar()
+            self.r_calendar.disable_calendar()
 
         else:
             self.oneday = False
             self.oneday_btn["bg"] = conf.btn_color
-            self.right_calendar.enable_calendar()
+            self.r_calendar.enable_calendar()
 
     def ok_cmd(self, e=None):
-        global d_start, d_end
-
-        if any((self.left_calendar.clicked, self.right_calendar.clicked)):
-            d_start = self.left_calendar.my_date
+        if any((self.l_calendar.clicked, self.r_calendar.clicked)):
+            setattr(Dates, "start", self.l_calendar.my_date)
 
             if not self.oneday:
-                d_end = self.right_calendar.my_date
+                setattr(Dates, "end", self.r_calendar.my_date)
             else:
-                d_end = None
+                setattr(Dates, "end", None)
 
         if self.product["bg"] == conf.sel_color:
             conf.product = True
@@ -230,16 +234,18 @@ class FilterWin(CWindow):
 
 
 class ThumbnailsSearch:
+    search_item = None
+
     def search_frame(self, master: tkinter):
         try:
-            self.var = tkinter.StringVar(value=search_item)
+            self.ent_value = tkinter.StringVar(value=self.search_item)
         except AttributeError:
             tkinter.StringVar(value="-")
 
         self.cust_ent = tkinter.Entry(
             master,
             width=20,
-            textvariable=self.var,
+            textvariable=self.ent_value,
             bg=conf.ent_color,
             insertbackground="white",
             fg=conf.fg_color,
@@ -248,14 +254,13 @@ class ThumbnailsSearch:
             selectbackground=conf.btn_color,
             border=1
             )
-        self.var.trace("w", lambda *args: self.search_task_set())
+        self.ent_value.trace("w", lambda *args: self.search_task_set())
         self.cust_ent.bind("<Escape>", self.search_esc)
         return self.cust_ent
 
     def reload_search(self):
         """for external use in menu frame"""
-        global search_item
-        search_item = None
+        setattr(__class__, "search_item", None)
 
     def search_esc(self, e=None):
         conf.root.focus_force()
@@ -266,9 +271,9 @@ class ThumbnailsSearch:
         self.search_task = conf.root.after(1000, self.search_go)
 
     def search_go(self):
-        global search_item
-        search_item = self.var.get()
+        search_item = self.ent_value.get()
         search_item = search_item.replace("\n", "").strip()
+        setattr(__class__, "search_item", search_item)
         self.reload_with_scroll()
         conf.root.focus_force()
 
@@ -335,20 +340,21 @@ class ThumbnailsPrepare:
             for img, src, modified in img_list:
                 key = datetime.fromtimestamp(modified).date()
 
-                if not any((d_start, d_end)):
+                if not any((Dates.start, Dates.end)):
                     key = f"{conf.lang.months[key.month]} {key.year}"
 
-                elif d_start and not d_end:
+                elif Dates.start and not Dates.end:
                     key = f"{key.day} {conf.lang.months_p[key.month]} {key.year}"
 
-                elif all((d_start, d_end)):
+                elif all((Dates.start, Dates.end)):
                     start = (
-                        f"{d_start.day} {conf.lang.months_p[d_start.month]} "
-                        f"{d_start.year}"
+                        f"{Dates.start.day} "
+                        f"{conf.lang.months_p[Dates.start.month]} "
+                        f"{Dates.start.year}"
                         )
                     end = (
-                        f"{d_end.day} {conf.lang.months_p[d_end.month]} "
-                        f"{d_end.year}"
+                        f"{Dates.end.day} {conf.lang.months_p[Dates.end.month]} "
+                        f"{Dates.end.year}"
                         )
                     key = f"{start} - {end}"
 
@@ -364,26 +370,24 @@ class ThumbnailsPrepare:
         return thumbs_dict
 
     def stamp_range(self):
-        start = datetime.combine(d_start, datetime.min.time())
+        start = datetime.combine(Dates.start, datetime.min.time())
         end = datetime.combine(
-            d_end, datetime.max.time().replace(microsecond=0)
+            Dates.end, datetime.max.time().replace(microsecond=0)
             )
         return (datetime.timestamp(start), datetime.timestamp(end))
 
     def stamp_day(self):
-        start = datetime.combine(d_start, datetime.min.time())
+        start = datetime.combine(Dates.start, datetime.min.time())
         end = datetime.combine(
-            d_start, datetime.max.time().replace(microsecond=0)
+            Dates.start, datetime.max.time().replace(microsecond=0)
             )
         return int(start.timestamp()), int(end.timestamp())
 
     def get_query(self):
-        global search_item
-
         q = sqlalchemy.select(Thumbs.img150, Thumbs.src, Thumbs.modified)
 
-        if search_item:
-            q = q.filter(Thumbs.src.like("%" + search_item + "%"))
+        if ThumbnailsSearch.search_item:
+            q = q.filter(Thumbs.src.like("%" + ThumbnailsSearch.search_item + "%"))
 
         if conf.sort_modified:
             q = q.order_by(-Thumbs.modified)
@@ -410,15 +414,15 @@ class ThumbnailsPrepare:
 
         q = q.filter(sqlalchemy.or_(*filters))
 
-        if not any((d_start, d_end)):
+        if not any((Dates.start, Dates.end)):
             q = q.limit(conf.limit)
 
-        elif d_start and not d_end:
+        elif Dates.start and not Dates.end:
             t = self.stamp_day()
             q = q.filter(Thumbs.modified > t[0])
             q = q.filter(Thumbs.modified < t[1])
         
-        elif all((d_start, d_end)):
+        elif all((Dates.start, Dates.end)):
             t = self.stamp_range()
             q = q.filter(Thumbs.modified > t[0])
             q = q.filter(Thumbs.modified < t[1])
@@ -516,7 +520,7 @@ class Thumbnails(CFrame, ThumbnailsSearch, ThumbnailsPrepare):
 
         btn_filter = CButton(filt_reset, text=conf.lang.thumbs_filters)
         btn_filter.pack(side="left", padx=(0, 15))
-        if any((d_start, d_end)):
+        if any((Dates.start, Dates.end)):
             btn_filter.configure(bg=conf.sel_color)
         btn_filter.cmd(lambda e: FilterWin())
 
@@ -584,10 +588,10 @@ class Thumbnails(CFrame, ThumbnailsSearch, ThumbnailsPrepare):
         self.reload_without_scroll()
 
     def reset_filter_cmd(self):
-        global d_start, d_end, search_item
+        global search_item
 
-        d_start = None
-        d_end = None
+        setattr(Dates, "start", None)
+        setattr(Dates, "end", None)
 
         self.reload_without_scroll()
 
@@ -610,10 +614,8 @@ class Thumbnails(CFrame, ThumbnailsSearch, ThumbnailsPrepare):
                 self.reload_without_scroll()
 
     def reload_with_scroll(self):
-        global d_start, d_end
-
-        d_start = None
-        d_end = None
+        setattr(Dates, "start", None)
+        setattr(Dates, "end", None)
         conf.lang_thumbs.clear()
 
         self.scroll_frame.destroy()
