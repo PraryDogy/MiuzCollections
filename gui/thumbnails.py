@@ -231,10 +231,7 @@ class ThumbSearch:
     search_item = None
 
     def search_frame(self, master: tkinter):
-        try:
-            self.ent_value = tkinter.StringVar(value=self.search_item)
-        except AttributeError:
-            tkinter.StringVar(value="-")
+        self.ent_value = tkinter.StringVar(value=self.search_item)
 
         self.cust_ent = tkinter.Entry(
             master,
@@ -250,7 +247,28 @@ class ThumbSearch:
             )
         self.ent_value.trace("w", lambda *args: self.search_task_set())
         self.cust_ent.bind("<Escape>", self.search_esc)
+        conf.root.bind("<Command-f>", self.search_focus)
+        self.cust_ent.bind("<ButtonRelease-2>", self.search_context)
         return self.cust_ent
+
+    def search_context(self, e=None):
+        menu = tkinter.Menu()
+        menu.add_command(
+            label=conf.lang.info,
+            command=lambda: print("clear entry")
+            )
+        menu.add_separator()
+        menu.add_command(
+            label=conf.lang.show_finder,
+            command = lambda: print("paste")
+            )
+        try:
+            menu.tk_popup(e.x_root, e.y_root)
+        finally:
+            menu.grab_release()
+
+    def search_focus(self, e=None):
+        self.cust_ent.focus_force()
 
     def reload_search(self):
         """for external use in menu frame"""
