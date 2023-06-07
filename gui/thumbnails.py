@@ -46,10 +46,6 @@ class ContextMenu(tkinter.Menu):
 
 
 class FilterWin(CWindow):
-    l_calendar = CCalendar
-    r_calendar = CCalendar
-    
-
     def __init__(self):
         super().__init__()
         self.bind("<Return>", self.ok_cmd)
@@ -66,9 +62,8 @@ class FilterWin(CWindow):
         left_title["font"] = f
         left_title.pack()
 
-        l_calendar = CCalendar(left_frame, Dates.start)
-        l_calendar.pack()
-        setattr(__class__, "l_calendar", l_calendar)
+        self.l_calendar = CCalendar(left_frame, Dates.start)
+        self.l_calendar.pack()
 
         right_frame = CFrame(calendar_frames)
         right_frame.pack(side="left")
@@ -77,9 +72,8 @@ class FilterWin(CWindow):
         right_title["font"] = f
         right_title.pack()
 
-        r_calendar = CCalendar(right_frame, Dates.end)
-        r_calendar.pack()
-        setattr(__class__, "r_calendar", r_calendar)
+        self.r_calendar = CCalendar(right_frame, Dates.end)
+        self.r_calendar.pack()
 
         self.oneday_btn = CButton(self, text=conf.lang.filter_oneday)
         self.oneday_btn.pack()
