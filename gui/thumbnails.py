@@ -227,7 +227,7 @@ class FilterWin(CWindow):
         focus_last()
 
 
-class ThumbnailsSearch:
+class ThumbSearch:
     search_item = None
 
     def search_frame(self, master: tkinter):
@@ -380,8 +380,8 @@ class ThumbnailsPrepare:
     def get_query(self):
         q = sqlalchemy.select(Thumbs.img150, Thumbs.src, Thumbs.modified)
 
-        if ThumbnailsSearch.search_item:
-            q = q.filter(Thumbs.src.like("%" + ThumbnailsSearch.search_item + "%"))
+        if ThumbSearch.search_item:
+            q = q.filter(Thumbs.src.like("%" + ThumbSearch.search_item + "%"))
 
         if conf.sort_modified:
             q = q.order_by(-Thumbs.modified)
@@ -424,7 +424,7 @@ class ThumbnailsPrepare:
         return q
 
 
-class Thumbnails(CFrame, ThumbnailsSearch, ThumbnailsPrepare):
+class Thumbnails(CFrame, ThumbSearch, ThumbnailsPrepare):
     def __init__(self, master):
         super().__init__(master)
 
@@ -456,7 +456,11 @@ class Thumbnails(CFrame, ThumbnailsSearch, ThumbnailsPrepare):
             self.scroll_frame, bg=conf.bg_color, scrollbarwidth=7)
         self.sframe.pack(expand=1, fill=tkinter.BOTH)
 
-        # self.sframe.bind_all("<ButtonRelease-1>", self.g_click)
+        self.sframe.bind_all("<MouseWheel>", self.scroll_decect)
+
+    def scroll_decect(self, e=None):
+        print(e.__dict__)
+        # self.canvas.yview_scroll(int(-1*(event.delta/120)), "units")
 
     def g_click(e: tkinter.Event=None, ee: tkinter.Event=None):
         try:
