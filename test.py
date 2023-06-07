@@ -1,7 +1,11 @@
-a = [i for i in range(0, 1661)]
+class Foo:
+    test = 1
+
+    def go(self):
+        setattr(self, "test", 9000)
 
 
-
-if len(a) > 100:
-    for i in range(0, len(a), 100):
-        print(i)
+a = Foo()
+print(a.test)
+a.go()
+print(a.test)
