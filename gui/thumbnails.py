@@ -454,7 +454,7 @@ class Thumbnails(CFrame, ThumbnailsSearch, ThumbnailsPrepare):
             self.scroll_frame, bg=conf.bg_color, scrollbarwidth=7)
         self.sframe.pack(expand=1, fill=tkinter.BOTH)
 
-        self.sframe.bind_all("<ButtonRelease-1>", self.g_click)
+        # self.sframe.bind_all("<ButtonRelease-1>", self.g_click)
 
     def g_click(e: tkinter.Event=None, ee: tkinter.Event=None):
         try:
