@@ -463,7 +463,7 @@ class Thumbnails(CFrame, ThumbnailsPrepare):
             bg=conf.bg_color,
             width=50
             )
-        move_top.pack()
+        move_top.pack(pady=3)
         move_top.cmd(self.scroll_up)
 
         self.clmns_count = 1
