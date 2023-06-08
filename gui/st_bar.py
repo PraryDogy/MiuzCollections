@@ -28,16 +28,19 @@ class ScanerGui(CWindow):
         self.wait_visibility()
         self.grab_set_global()
 
+        self.live_task = False
         self.update_livelbl()
 
     def update_livelbl(self):
+
         if self.winfo_exists():
             self.live_lbl["text"] = conf.live_text
+            self.live_task = conf.root.after(100, self.update_livelbl)
 
         if not conf.live_text:
+            conf.root.after_cancel(self.live_task)
             self.destroy()
-
-        conf.root.after(100, self.update_livelbl)
+            focus_last()
 
 
 class StBar(CFrame):
