@@ -1,4 +1,4 @@
-from . import conf, place_center, auto_scan, smb_check, tkinter
+from . import conf, place_center, AutoScan, smb_check, tkinter
 from .settings import Settings
 from .widgets import *
 
@@ -45,7 +45,7 @@ class StBar(CFrame):
     def __init__(self, master):
         super().__init__(master)
         self.normal_mode()
-        setattr(__class__, "btn_change", self.__upd_btn_change)
+        __class__.btn_change = self.__upd_btn_change
 
     def normal_mode(self):
         widgets = tuple(v for k, v in self.children.items())
@@ -72,7 +72,7 @@ class StBar(CFrame):
     def update_cmd(self, btn: CButton):
         if not conf.flag:
             if smb_check():
-                auto_scan()
+                AutoScan().auto_scan()
             else:
                 SmbAlert()
                 return

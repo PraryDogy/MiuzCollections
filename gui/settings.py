@@ -1,5 +1,5 @@
-from . import (Dbase, Thumbs, auto_scan, conf, filedialog, on_exit,
-               place_center, smb_check, sqlalchemy, tkinter, cancel_scan)
+from . import (AutoScan, conf, filedialog,
+               place_center, smb_check, tkinter)
 from .widgets import *
 
 __all__ = (
@@ -219,13 +219,7 @@ class Settings(CWindow):
 
         if self.scan_again:
             self.scan_again = False
-
-            cancel_scan()
-
-            if smb_check():
-                auto_scan()
-            else:
-                SmbAlert()
+            AutoScan().auto_scan() if smb_check() else SmbAlert()
 
         if self.changed_lang:
             from .thumbnails import Thumbnails

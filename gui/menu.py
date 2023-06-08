@@ -65,7 +65,8 @@ class Menu(tkmacosx.SFrame):
 
         self.menu_buttons = self.load_menu_buttons()
         self.menu_buttons.pack()
-        setattr(__class__, "reload_menu", self.__reload_menu)
+
+        __class__.reload_menu = self.__reload_menu
 
     def load_menu_parent(self):
         frame = CFrame(self)

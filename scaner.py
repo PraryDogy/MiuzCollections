@@ -5,204 +5,207 @@ import sqlalchemy
 
 from cfg import conf
 from database import Dbase, Thumbs
-from utils import encode_image, get_coll_name, smb_check
-
+from utils import encode_image, get_coll_name
 
 __all__ = (
-    "scaner",
-    "auto_scan",
-    "cancel_scan",
+    "AutoScan",
     )
 
-UPDATE_THUMBNAILS = False
 
+class AutoScan:
+    update_thumbs = False
+    reload_menu = None
+    reload_thumbs = None
+    stbar_change = None
 
-def change_live_lvl(text):
-    conf.live_text = text
+    def auto_scan(self):
+        self.cancel_scan()
+        self.scaner()
+        ms = conf.autoscan_time*60000
+        conf.root.after(ms, self.auto_scan)
 
+    def cancel_scan(self):
+        conf.flag = False
+        if conf.scaner_task:
+            while conf.scaner_task.is_alive():
+                conf.root.update()
+        return True
 
-def st_bar_btn(text: str, color: str):
-    from gui.st_bar import StBar
-    btn = StBar.btn_change()
-    btn.configure(text=text, bg=color)
-    return
+    def scaner(self):
+        conf.flag = True
+        self.st_bar_btn(conf.lang.live_updating, conf.sel_color)
 
-
-def update_collections():
-    global UPDATE_THUMBNAILS
-
-    change_live_lvl(conf.lang.scaner_prepare)
-
-    db_images = Dbase.conn.execute(
-        sqlalchemy.select(
-        Thumbs.src, Thumbs.size, Thumbs.created, Thumbs.modified
-        )
-        ).fetchall()
-
-    exts = (".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG")
-
-    collections = [
-        os.path.join(conf.coll_folder, i)
-        for i in os.listdir(conf.coll_folder)
-        if not i.startswith((".", "_"))
-        ]
-
-    ln = len(collections)
-
-    new_images = []
-    found_images = []
-
-    for x, collection in enumerate(collections, 1):
-        change_live_lvl(
-            f"{conf.lang.live_scan} {x} {conf.lang.live_from} {ln} {conf.lang.live_collections}."
+        conf.scaner_task = threading.Thread(
+            target=self.update_colls,
+            daemon=True
             )
+        conf.scaner_task.start()
 
-        for root, dirs, files in os.walk(collection):
+        while conf.scaner_task.is_alive():
+            conf.root.update()
 
-            if not conf.flag:
-                return
+        conf.live_text = ""
 
-            for file in files:
+        if __class__.update_thumbs:
+            __class__.reload_thumbs()
+            __class__.reload_menu()
+            __class__.update_thumbs = False
+
+        conf.flag = False
+        self.st_bar_btn(conf.lang.upd_btn, conf.btn_color)
+
+    def update_colls(self):
+        self.change_live_lvl(conf.lang.scaner_prepare)
+
+        db_images = Dbase.conn.execute(
+            sqlalchemy.select(
+            Thumbs.src, Thumbs.size, Thumbs.created, Thumbs.modified
+            )
+            ).fetchall()
+
+        exts = (".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG")
+
+        collections = [
+            os.path.join(conf.coll_folder, i)
+            for i in os.listdir(conf.coll_folder)
+            if not i.startswith((".", "_"))
+            ]
+
+        ln = len(collections)
+
+        new_images = []
+        found_images = []
+
+        for x, collection in enumerate(collections, 1):
+            self.change_live_lvl(
+                (
+                    f"{conf.lang.live_scan} "
+                    f"{x} "
+                    f"{conf.lang.live_from} "
+                    f"{ln} "
+                    f"{conf.lang.live_collections}."
+                    )
+                    )
+
+            for root, dirs, files in os.walk(collection):
 
                 if not conf.flag:
                     return
 
-                if file.endswith(exts):
-                    src = os.path.join(root, file)
-                    data = (
-                        src,
-                        int(os.path.getsize(src)),
-                        int(os.stat(src).st_birthtime),
-                        int(os.stat(src).st_mtime)
-                        )
-                    found_images.append(data)
+                for file in files:
 
-                    if data not in db_images:
-                        new_images.append(data)
+                    if not conf.flag:
+                        return
 
-    if new_images:
-        UPDATE_THUMBNAILS = True
-        ln = len(new_images)
+                    if file.endswith(exts):
+                        src = os.path.join(root, file)
+                        data = (
+                            src,
+                            int(os.path.getsize(src)),
+                            int(os.stat(src).st_birthtime),
+                            int(os.stat(src).st_mtime)
+                            )
+                        found_images.append(data)
 
-        values = [
-            {
-            "b_img150": encode_image(src),
-            "b_src": src,
-            "b_size": size,
-            "b_created": created,
-            "b_modified": modified,
-            "b_collection": get_coll_name(src),
-            "temp": change_live_lvl(
-                f"{conf.lang.live_added} {x} {conf.lang.live_from} {ln} {conf.lang.live_newphoto}."
-                )
-                }
-            for x, (src, size, created, modified) in enumerate(new_images, 1)
-            if conf.flag
-            ]
+                        if data not in db_images:
+                            new_images.append(data)
 
-        limit = 300
-        values = [
-            values[i:i+limit]
-            for i in range(0, len(values), limit)
-            ]
+        if new_images:
+            __class__.update_thumbs = True
+            ln = len(new_images)
 
-        for vals in values:
-            
-            if not conf.flag:
-                return
-
-            q = sqlalchemy.insert(Thumbs).values(
+            values = [
                 {
-                    "img150": sqlalchemy.bindparam("b_img150"),
-                    "src": sqlalchemy.bindparam("b_src"),
-                    "size": sqlalchemy.bindparam("b_size"),
-                    "created": sqlalchemy.bindparam("b_created"),
-                    "modified": sqlalchemy.bindparam("b_modified"),
-                    "collection": sqlalchemy.bindparam("b_collection")
-                    })
-            Dbase.conn.execute(q, vals)
+                "b_img150": encode_image(src),
+                "b_src": src,
+                "b_size": size,
+                "b_created": created,
+                "b_modified": modified,
+                "b_collection": get_coll_name(src),
+                "temp": self.change_live_lvl(
+                    (
+                        f"{conf.lang.live_added} "
+                        f"{x} "
+                        f"{conf.lang.live_from} "
+                        f"{ln} "
+                        f"{conf.lang.live_newphoto}."
+                        )
+                    )
+                    }
+                for x, (src, size, created, modified) in enumerate(new_images, 1)
+                if conf.flag
+                ]
 
-    remove_images = []
+            limit = 300
+            values = [
+                values[i:i+limit]
+                for i in range(0, len(values), limit)
+                ]
 
-    for src, size, created, modified in db_images:
-        if not conf.flag:
-            return
+            for vals in values:
+                
+                if not conf.flag:
+                    return
 
-        if (src, size, created, modified) not in found_images:
-            remove_images.append((src, size, created, modified))
+                q = sqlalchemy.insert(Thumbs).values(
+                    {
+                        "img150": sqlalchemy.bindparam("b_img150"),
+                        "src": sqlalchemy.bindparam("b_src"),
+                        "size": sqlalchemy.bindparam("b_size"),
+                        "created": sqlalchemy.bindparam("b_created"),
+                        "modified": sqlalchemy.bindparam("b_modified"),
+                        "collection": sqlalchemy.bindparam("b_collection")
+                        })
+                Dbase.conn.execute(q, vals)
 
-    if remove_images:
+        remove_images = []
 
-        change_live_lvl(conf.lang.live_finish)
-        UPDATE_THUMBNAILS = True
-
-        values = [
-            {
-            "b_src": src,
-            "b_size": size,
-            "b_created": created,
-            "b_modified": modified,
-            }
-            for src, size, created, modified in remove_images
-            if conf.flag
-            ]
-
-        limit = 300
-        values = [
-            values[i:i+limit]
-            for i in range(0, len(values), limit)
-            ]
-
-        for vals in values:
-
+        for src, size, created, modified in db_images:
             if not conf.flag:
                 return
 
-            q = sqlalchemy.delete(Thumbs).filter(
-                Thumbs.src == sqlalchemy.bindparam("b_src"),
-                Thumbs.size == sqlalchemy.bindparam("b_size"),
-                Thumbs.created == sqlalchemy.bindparam("b_created"),
-                Thumbs.modified == sqlalchemy.bindparam("b_modified")
-                )
-            Dbase.conn.execute(q, vals)
+            if (src, size, created, modified) not in found_images:
+                remove_images.append((src, size, created, modified))
 
+        if remove_images:
 
-def scaner():
-    global UPDATE_THUMBNAILS
+            self.change_live_lvl(conf.lang.live_finish)
+            __class__.update_thumbs = True
 
-    conf.flag = True
-    st_bar_btn(conf.lang.live_updating, conf.sel_color)
+            values = [
+                {
+                "b_src": src,
+                "b_size": size,
+                "b_created": created,
+                "b_modified": modified,
+                }
+                for src, size, created, modified in remove_images
+                if conf.flag
+                ]
 
-    conf.scaner_task = threading.Thread(target=update_collections, daemon=True)
-    conf.scaner_task.start()
+            limit = 300
+            values = [
+                values[i:i+limit]
+                for i in range(0, len(values), limit)
+                ]
 
-    while conf.scaner_task.is_alive():
-        conf.root.update()
+            for vals in values:
 
-    conf.live_text = ""
+                if not conf.flag:
+                    return
 
-    if UPDATE_THUMBNAILS:
-        from gui.thumbnails import Thumbnails
-        from gui.menu import Menu
-        Thumbnails.reload_without_scroll()
-        Menu.reload_menu()
-        UPDATE_THUMBNAILS = False
+                q = sqlalchemy.delete(Thumbs).filter(
+                    Thumbs.src == sqlalchemy.bindparam("b_src"),
+                    Thumbs.size == sqlalchemy.bindparam("b_size"),
+                    Thumbs.created == sqlalchemy.bindparam("b_created"),
+                    Thumbs.modified == sqlalchemy.bindparam("b_modified")
+                    )
+                Dbase.conn.execute(q, vals)
 
-    conf.flag = False
-    st_bar_btn(conf.lang.upd_btn, conf.btn_color)
+    def change_live_lvl(self, text):
+        conf.live_text = text
 
-
-def cancel_scan():
-    conf.flag = False
-    if conf.scaner_task:
-        while conf.scaner_task.is_alive():
-            conf.root.update()
-    return True
-
-
-def auto_scan():
-    cancel_scan()
-    if smb_check():
-        scaner()
-    ms = conf.autoscan_time*60000
-    conf.root.after(ms, auto_scan)
+    def st_bar_btn(self, text, color):
+        btn = __class__.stbar_change()
+        btn.configure(text=text, bg=color)
+        return

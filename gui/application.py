@@ -1,4 +1,4 @@
-from . import conf, on_exit, smb_check, auto_scan
+from . import conf, on_exit, smb_check, AutoScan
 from .menu import Menu
 from .st_bar import StBar
 from .thumbnails import Thumbnails
@@ -19,19 +19,19 @@ class Application:
         conf.root.createcommand("tk::mac::Quit" , on_exit)
         conf.root.protocol("WM_DELETE_WINDOW", on_exit)
 
-        self.menu = Menu(conf.root)
-        self.menu.pack(side="left", fill="y", pady=10)
+        menu = Menu(conf.root)
+        menu.pack(side="left", fill="y", pady=10)
 
         r_frame = CFrame(conf.root)
         r_frame.pack(fill="both", expand=True)
     
-        self.thumbnails = Thumbnails(r_frame)
-        self.thumbnails.pack(fill="both", expand=True, padx=10)
+        thumbnails = Thumbnails(r_frame)
+        thumbnails.pack(fill="both", expand=True, padx=10)
 
         CSep(r_frame).pack(fill="x", pady=10, padx=15)
 
-        self.st_bar = StBar(r_frame)
-        self.st_bar.pack(pady=(0, 10))
+        st_bar = StBar(r_frame)
+        st_bar.pack(pady=(0, 10))
 
         MacMenu()
 
@@ -46,7 +46,11 @@ class Application:
             )
         conf.root.minsize(870, 500)
 
-        auto_scan() if smb_check() else SmbAlert()
+        AutoScan.reload_menu = menu.reload_menu
+        AutoScan.reload_thumbs = thumbnails.reload_without_scroll
+        AutoScan.stbar_change = st_bar.btn_change
+
+        AutoScan().auto_scan() if smb_check() else SmbAlert()
 
     def minim(self, e=None):
         conf.root.withdraw()

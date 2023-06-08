@@ -186,12 +186,12 @@ class FilterWin(CWindow):
 
     def ok_cmd(self, e=None):
         if any((self.l_calendar.clicked, self.r_calendar.clicked)):
-            setattr(Dates, "start", self.l_calendar.my_date)
+            Dates.start = self.l_calendar.my_date
 
             if not self.oneday:
-                setattr(Dates, "end", self.r_calendar.my_date)
+                Dates.end = self.r_calendar.my_date
             else:
-                setattr(Dates, "end", None)
+                Dates.end = None
 
         if self.product["bg"] == conf.sel_color:
             conf.product = True
@@ -251,7 +251,7 @@ class ThumbSearch(tkinter.Entry):
         conf.root.bind("<Command-f>", self.search_focus)
         self.bind("<ButtonRelease-2>", self.search_context)
         self.search_task = None
-        setattr(__class__, "reload_search", self.__reload_search)
+        __class__.reload_search = self.__reload_search
 
     def search_context(self, e=None):
         menu = tkinter.Menu()
@@ -274,13 +274,13 @@ class ThumbSearch(tkinter.Entry):
     
     def context_clear(self, e=None):
         self.ent_value.set("")
-        setattr(__class__, "search_item", None)
+        __class__.search_item = None
 
     def search_focus(self, e=None):
         self.focus_force()
 
     def __reload_search(self):
-        setattr(__class__, "search_item", None)
+        __class__.search_item = None
 
     def search_esc(self, e=None):
         conf.root.focus_force()
@@ -293,7 +293,7 @@ class ThumbSearch(tkinter.Entry):
     def search_go(self):
         search_item = self.ent_value.get()
         search_item = search_item.replace("\n", "").strip()
-        setattr(__class__, "search_item", search_item)
+        __class__.search_item = search_item
         Thumbnails.reload_with_scroll()
         conf.root.focus_force()
 
@@ -476,8 +476,9 @@ class Thumbnails(CFrame, ThumbnailsPrepare):
         conf.root.bind('<Configure>', self.decect_resize)
         self.resize_task = None
         self.search_task = None
-        setattr(__class__, "reload_with_scroll", self.__reload_with_scroll)
-        setattr(__class__, "reload_without_scroll", self.__reload_without_scroll)
+
+        __class__.reload_with_scroll = self.__reload_with_scroll
+        __class__.reload_without_scroll = self.__reload_without_scroll
 
     def load_scrollable(self):
         self.scroll_frame = CFrame(self)
@@ -614,9 +615,7 @@ class Thumbnails(CFrame, ThumbnailsPrepare):
     def reset_filter_cmd(self):
         global search_item
 
-        setattr(Dates, "start", None)
-        setattr(Dates, "end", None)
-
+        Dates.start, Dates.end = None, None
         Thumbnails.reload_without_scroll()
 
     def decect_resize(self, e):
@@ -638,8 +637,7 @@ class Thumbnails(CFrame, ThumbnailsPrepare):
                 Thumbnails.reload_without_scroll()
 
     def __reload_with_scroll(self):
-        setattr(Dates, "start", None)
-        setattr(Dates, "end", None)
+        Dates.start, Dates.end = None, None
         conf.lang_thumbs.clear()
 
         self.scroll_frame.destroy()
