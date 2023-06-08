@@ -1,4 +1,4 @@
-from . import conf, place_center, scaner, smb_check, tkinter
+from . import conf, place_center, auto_scan, smb_check, tkinter
 from .settings import Settings
 from .widgets import *
 
@@ -72,7 +72,7 @@ class StBar(CFrame):
     def update_cmd(self, btn: CButton):
         if not conf.flag:
             if smb_check():
-                scaner()
+                auto_scan()
             else:
                 SmbAlert()
                 return

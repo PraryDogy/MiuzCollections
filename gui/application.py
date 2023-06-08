@@ -1,4 +1,4 @@
-from . import conf, on_exit, tkinter
+from . import conf, on_exit, smb_check, auto_scan
 from .menu import Menu
 from .st_bar import StBar
 from .thumbnails import Thumbnails
@@ -7,6 +7,7 @@ from .widgets import *
 
 class Application:
     def __init__(self):
+        conf.root.deiconify()
         conf.root.title(conf.app_name)
         conf.root.configure(bg=conf.bg_color)
 
@@ -45,5 +46,7 @@ class Application:
             )
         conf.root.minsize(870, 500)
 
+        auto_scan() if smb_check() else SmbAlert()
+
     def minim(self, e=None):
-        conf.root.iconify()
+        conf.root.withdraw()

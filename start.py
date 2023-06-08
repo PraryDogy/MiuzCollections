@@ -3,19 +3,9 @@ try:
     import traceback
 
     from cfg import conf
-    from gui.widgets import SmbAlert
     from gui import Application
-    from scaner import auto_scan
-    from utils import smb_check
 
     Application()
-    conf.root.deiconify()
-
-    if smb_check():
-        auto_scan()
-    else:
-        SmbAlert()
-
     conf.root.mainloop()
 
 except Exception as e:
