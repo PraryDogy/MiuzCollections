@@ -7,7 +7,6 @@ from .widgets import *
 
 class Application:
     def __init__(self):
-        conf.root.deiconify()
         conf.root.title(conf.app_name)
         conf.root.configure(bg=conf.bg_color)
 
@@ -20,17 +19,15 @@ class Application:
         conf.root.protocol("WM_DELETE_WINDOW", on_exit)
 
         menu = Menu(conf.root)
-        menu.pack(side="left", fill="y", pady=10)
-
         r_frame = CFrame(conf.root)
-        r_frame.pack(fill="both", expand=True)
-    
         thumbnails = Thumbnails(r_frame)
-        thumbnails.pack(fill="both", expand=True, padx=10)
-
-        CSep(r_frame).pack(fill="x", pady=10, padx=15)
-
+        sep = CSep(r_frame)
         st_bar = StBar(r_frame)
+
+        menu.pack(side="left", fill="y", pady=10)
+        r_frame.pack(fill="both", expand=True)
+        thumbnails.pack(fill="both", expand=True, padx=10)
+        sep.pack(fill="x", pady=10, padx=15)
         st_bar.pack(pady=(0, 10))
 
         MacMenu()
@@ -51,6 +48,8 @@ class Application:
         AutoScan.stbar_change = st_bar.btn_change
 
         AutoScan().auto_scan() if smb_check() else SmbAlert()
+
+        conf.root.deiconify()
 
     def minim(self, e=None):
         conf.root.withdraw()
