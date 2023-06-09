@@ -304,13 +304,13 @@ class CCalendarEntry(CWindow):
 
 
 class CCalendar(CFrame, CCalendarEntry):
-    def __init__(self, master, my_date: datetime):
+    def __init__(self, master, input: datetime):
         super().__init__(master)
 
-        if not my_date:
-            my_date = datetime.today().date()
+        if not input:
+            input = datetime.today().date()
 
-        self.yy, self.mm, self.dd = tuple(my_date.timetuple())[:3]
+        self.yy, self.mm, self.dd = tuple(input.timetuple())[:3]
 
         self.enabled = True
         self.clicked = False
