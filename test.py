@@ -1,11 +1,7 @@
-class Foo:
-    test = 1
+a = 1
+b = 2
 
-    def go(self):
-        setattr(self, "test", 9000)
+c = bool(all((a==1, b==1)))
 
 
-a = Foo()
-print(a.test)
-a.go()
-print(a.test)
+print(c)
