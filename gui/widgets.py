@@ -374,7 +374,7 @@ class CCalendar(CFrame, CCalendarEntry):
             lbl = CButton(row)
             lbl.configure(width=4, height=2)
             lbl.pack(side="left")
-            lbl.cmd(partial(self.switch_day, lbl))
+            lbl.cmd(self.switch_day)
 
             if i % 7 == 0:
                 row = CFrame(parrent)
@@ -441,16 +441,16 @@ class CCalendar(CFrame, CCalendarEntry):
 
         self.yy, self.mm, self.dd = tuple(self.my_date.timetuple())[:3]
 
-    def switch_day(self, btn, e=None):
+    def switch_day(self, e=None):
         if not self.enabled:
             return
 
         self.clicked = True
-        if btn["text"]:
+        if e.widget["text"]:
             self.selected.configure(bg=conf.btn_color)
-            self.selected = btn
+            self.selected = e.widget
             self.selected.configure(bg=conf.sel_color)
-            self.dd = int(btn["text"])
+            self.dd = int(e.widget["text"])
 
         self.set_my_date()
         self.change_title()
