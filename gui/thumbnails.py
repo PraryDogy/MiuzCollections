@@ -185,6 +185,10 @@ class FilterWin(CWindow):
             self.r_calendar.enable_calendar()
 
     def ok_cmd(self, e=None):
+        a = self.l_calendar.get_date()
+        print(a)
+        return
+
         if any((self.l_calendar.clicked, self.r_calendar.clicked)):
             Dates.start = self.l_calendar.my_date
 
