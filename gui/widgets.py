@@ -312,16 +312,13 @@ class CCalendar(CFrame, CCalendarEntry):
 
         self.yy, self.mm, self.dd = tuple(input.timetuple())[:3]
 
-        self.enabled = True
-        self.clicked = False
-        self.selected: tkinter.Label = None
+        self.sel_btn: tkinter.Label = None
+        self.btns = []
 
         self.load_calendar().pack()
 
     def load_calendar(self):
         parrent = CFrame(self)
-
-        self.all_btns = []
         f = ("San Francisco Pro", 15, "bold")
 
         titles = CFrame(parrent)
@@ -331,7 +328,6 @@ class CCalendar(CFrame, CCalendarEntry):
         prev_m.configure(width=6, font=f, bg=conf.bg_color)
         prev_m.pack(side="left")
         prev_m.cmd(self.switch_month)
-        self.all_btns.append(prev_m)
 
         self.title = CLabel(
             titles,
@@ -341,13 +337,11 @@ class CCalendar(CFrame, CCalendarEntry):
         self.change_title()
         self.title.pack(side="left")
         self.title.bind("<ButtonRelease-1>", self.cust_date_win)
-        self.all_btns.append(self.title)
 
         next_m = CButton(titles, text=">")
         next_m.configure(width=6, font=f, bg=conf.bg_color)
         next_m.pack(side="left")
         next_m.cmd(self.switch_month)
-        self.all_btns.append(next_m)
 
         row = CFrame(parrent)
         row.pack()
@@ -356,7 +350,6 @@ class CCalendar(CFrame, CCalendarEntry):
             lbl = CButton(row, text = i)
             lbl.configure(width=4, height=2)
             lbl.pack(side="left")
-            self.all_btns.append(lbl)
 
         sep = CSep(parrent)
         sep.configure(bg=conf.bg_color, height=2)
@@ -364,8 +357,6 @@ class CCalendar(CFrame, CCalendarEntry):
 
         row = CFrame(parrent)
         row.pack()
-
-        self.btns = []
 
         for i in range(1, 43):
             lbl = CButton(row)
@@ -378,28 +369,10 @@ class CCalendar(CFrame, CCalendarEntry):
                 row.pack(anchor="w")
 
             self.btns.append(lbl)
-            self.all_btns.append(lbl)
 
-        self.fill_days()
-
+        self.fill()
+        self.fill_first()
         return parrent
-
-    def disable_calendar(self):
-        self.enabled = False
-        self.title.unbind("<ButtonRelease-1>")
-
-        for i in self.all_btns:
-            if i["bg"] in (conf.btn_color, conf.sel_color):
-                i.config(fg=conf.hov_color, bg=conf.btn_color)
-
-    def enable_calendar(self):
-       self.enabled = True
-       self.title.bind("<ButtonRelease-1>", self.cust_date_win)
-
-       for i in self.all_btns:
-            i["fg"] = conf.fg_color
-            if self.dd == i["text"]:
-                i.configure(bg=conf.sel_color)
 
     def create_days(self):
         first_weekday = datetime.weekday(datetime(self.yy, self.mm, 1))
@@ -411,14 +384,18 @@ class CCalendar(CFrame, CCalendarEntry):
 
         return days
 
-    def fill_days(self):
+    def fill(self):
         for day, btn in zip(self.create_days(), self.btns):
             if day:
                 btn.configure(text=day, bg=conf.btn_color)
             else:
                 btn.configure(text="", bg=conf.bg_color)
-            if btn["text"] == self.dd:
-                btn.configure(bg=conf.sel_color)
+
+    def fill_first(self):
+        for i in self.btns:
+            if i["text"] == self.dd:
+                self.sel_btn = i
+                i.configure(bg=conf.sel_color)
 
     def change_title(self):
         if self.dd:
@@ -428,22 +405,15 @@ class CCalendar(CFrame, CCalendarEntry):
         self.title.configure(text=t)
 
     def select_day_click(self, e:tkinter.Event = None):
-        if not self.enabled:
-            return
-
-        if self.selected:
-            self.selected.configure(bg=conf.btn_color)
-        self.selected = e.widget
-        self.selected.configure(bg=conf.sel_color)
-        self.dd = self.selected["text"]
+        if self.sel_btn:
+            self.sel_btn.configure(bg=conf.btn_color)
+        self.sel_btn = e.widget
+        self.sel_btn.configure(bg=conf.sel_color)
+        self.dd = self.sel_btn["text"]
 
         self.change_title()
-        self.clicked = True
 
     def switch_month(self, e=None):
-        if not self.enabled:
-            return
-
         if e.widget["text"] != "<":
             self.mm += 1
         else:
@@ -460,9 +430,10 @@ class CCalendar(CFrame, CCalendarEntry):
         self.dd = None
 
         self.change_title()
-        self.fill_days()
+        self.fill()
 
     def get_date(self):
-        if all((self.clicked, self.dd, self.yy, self.mm)):
-            return datetime(self.yy, self.mm, self.dd)
-        return False
+        try:
+            return datetime(self.yy, self.mm, self.dd).date()
+        except TypeError:
+            return None

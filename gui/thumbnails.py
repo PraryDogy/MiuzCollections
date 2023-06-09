@@ -76,12 +76,6 @@ class FilterWin(CWindow):
         self.r_calendar = CCalendar(right_frame, Dates.end)
         self.r_calendar.pack()
 
-        self.oneday_btn = CButton(self, text=conf.lang.filter_oneday)
-        self.oneday_btn.pack()
-        self.oneday_btn.cmd(lambda e: self.oneday_cmd())
-
-        self.oneday = False
-
         CSep(self).pack(fill="x", padx=15, pady=15)
 
         grop_frame = CFrame(self)
@@ -135,11 +129,6 @@ class FilterWin(CWindow):
         cancel_btn.pack(side="left")
         cancel_btn.cmd(lambda e: self.cancel())
 
-        if Dates.start and not Dates.end:
-            self.oneday = True
-            self.oneday_btn["bg"] = conf.sel_color
-            self.r_calendar.disable_calendar()
-
         conf.root.update_idletasks()
 
         place_center(self)
@@ -171,31 +160,9 @@ class FilterWin(CWindow):
         else:
             self.models.configure(bg=conf.sel_color)
 
-    def oneday_cmd(self):
-        self.l_calendar.clicked = True
-
-        if not self.oneday:
-            self.oneday = True
-            self.oneday_btn["bg"] = conf.sel_color
-            self.r_calendar.disable_calendar()
-
-        else:
-            self.oneday = False
-            self.oneday_btn["bg"] = conf.btn_color
-            self.r_calendar.enable_calendar()
-
     def ok_cmd(self, e=None):
-        a = self.l_calendar.get_date()
-        print(a)
-        return
-
-        if any((self.l_calendar.clicked, self.r_calendar.clicked)):
-            Dates.start = self.l_calendar.my_date
-
-            if not self.oneday:
-                Dates.end = self.r_calendar.my_date
-            else:
-                Dates.end = None
+        Dates.start = self.l_calendar.get_date()
+        Dates.end = self.r_calendar.get_date()
 
         if self.product["bg"] == conf.sel_color:
             conf.product = True
@@ -225,6 +192,8 @@ class FilterWin(CWindow):
         self.destroy()
         focus_last()
         Thumbnails.reload_without_scroll()
+
+        print(Dates.start, Dates.end)
 
     def cancel(self):
         self.destroy()
