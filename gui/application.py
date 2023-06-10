@@ -16,7 +16,7 @@ class Application:
         conf.root.bind('<Command-w>', self.minim)
 
         conf.root.createcommand("tk::mac::Quit" , on_exit)
-        conf.root.protocol("WM_DELETE_WINDOW", on_exit)
+        conf.root.protocol("WM_DELETE_WINDOW", self.minim)
 
         menu = Menu(conf.root)
         r_frame = CFrame(conf.root)
