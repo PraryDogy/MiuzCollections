@@ -59,8 +59,8 @@ class Reveal:
                 )
 
             subprocess.call(["osascript", *args])
-
-        threading.Thread(target=task).start()
+        if list_paths:
+            threading.Thread(target=task).start()
 
     def find_tiffs(self, src: str):
         path, filename = os.path.split(src)

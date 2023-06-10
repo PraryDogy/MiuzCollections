@@ -24,8 +24,8 @@ class ContextThumbs(ContextMenu):
         self.context_img_info(e)
         self.context_show_jpg(e)
         self.context_show_tiffs(e)
+        
         self.do_popup(e)
-
 
 class ContextSearch(ContextMenu):
     def __init__(self, e: tkinter.Event):

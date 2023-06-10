@@ -505,12 +505,10 @@ class ContextMenu(tkinter.Menu, Reveal):
             )
 
     def context_show_tiffs(self, e: tkinter.Event):
-        tiffs = self.find_tiffs(e.src)
-        if tiffs:
-            self.add_command(
-                label=conf.lang.show_tiff,
-                command = lambda: self.reveal_tiffs(tiffs)
-                )
+        self.add_command(
+            label=conf.lang.show_tiff,
+            command = lambda: self.reveal_tiffs(self.find_tiffs(e.src))
+            )
 
     def context_paste(self, str_var: tkinter.StringVar):
         self.add_command(
