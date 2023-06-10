@@ -1,7 +1,7 @@
+from gui import tkinter
 from . import (Dbase, Image, ImageTk, Thumbs, conf, convert_to_rgb, crop_image,
-               datetime, decode_image, find_jpeg, find_tiff, math, partial,
-               place_center, sqlalchemy, subprocess, tkinter, tkmacosx,
-               traceback)
+               datetime, decode_image, math, partial, place_center, sqlalchemy,
+               tkinter, tkmacosx, traceback)
 from .img_viewer import ImgViewer
 from .widgets import *
 
@@ -15,35 +15,23 @@ class Dates:
     end: datetime = None
 
 
-class ContextMenu(tkinter.Menu):
-    def __init__(self, src: str, all_src: list, e: tkinter.Event):
+class ContextThumbs(ContextMenu):
+    def __init__(self, e: tkinter.Event):
         super().__init__()
-
-        self.add_command(
-            label=conf.lang.preview,
-            command=lambda: ImgViewer(src, all_src)
-            )
-        self.add_separator()
-        self.add_command(
-            label=conf.lang.info,
-            command=lambda: ImageInfo(src)
-            )
-        self.add_command(
-            label=conf.lang.show_finder,
-            command = lambda: find_jpeg(src)
-            )
-        self.add_command(
-            label=conf.lang.show_tiff,
-            command = lambda: find_tiff(src)
-            )
-
+        self.context_view(e)
+        self.context_sep()
+        self.context_img_info(e)
+        self.context_show_jpg(e)
+        self.context_show_tiffs(e)
         self.do_popup(e)
 
-    def do_popup(self, event):
-        try:
-            self.tk_popup(event.x_root, event.y_root)
-        finally:
-            self.grab_release()
+
+class ContextSearch(ContextMenu):
+    def __init__(self, str_var: tkinter.StringVar, e: tkinter.Event):
+        super().__init__()
+        self.context_clear(str_var)
+        self.context_paste(str_var)
+        self.do_popup(e)
 
 
 class FilterWin(CWindow):
@@ -232,12 +220,12 @@ class ThumbSearch(tkinter.Entry):
     reload_search = None
 
     def __init__(self, master: tkinter):
-        self.ent_value = tkinter.StringVar(value=self.search_item)
+        self.str_var = tkinter.StringVar(value=self.search_item)
 
         super().__init__(
             master,
             width=20,
-            textvariable=self.ent_value,
+            textvariable=self.str_var,
             bg=conf.ent_color,
             insertbackground="white",
             fg=conf.fg_color,
@@ -246,35 +234,12 @@ class ThumbSearch(tkinter.Entry):
             selectbackground=conf.btn_color,
             border=1
             )
-        self.ent_value.trace("w", lambda *args: self.search_task_set())
+        self.str_var.trace("w", lambda *args: self.search_task_set())
         self.bind("<Escape>", self.search_esc)
         conf.root.bind("<Command-f>", self.search_focus)
-        self.bind("<ButtonRelease-2>", self.search_context)
+        self.bind("<ButtonRelease-2>", lambda e: ContextSearch(self.str_var, e))
         self.search_task = None
         __class__.reload_search = self.__reload_search
-
-    def search_context(self, e=None):
-        menu = tkinter.Menu()
-        menu.add_command(
-            label=conf.lang.search_clear,
-            command=self.context_clear
-            )
-        menu.add_separator()
-        menu.add_command(
-            label=conf.lang.search_paste,
-            command=self.context_paste
-            )
-        try:
-            menu.tk_popup(e.x_root, e.y_root)
-        finally:
-            menu.grab_release()
-
-    def context_paste(self, e=None):
-        self.ent_value.set(conf.root.clipboard_get())
-    
-    def context_clear(self, e=None):
-        self.ent_value.set("")
-        __class__.search_item = None
 
     def search_focus(self, e=None):
         self.focus_force()
@@ -291,7 +256,7 @@ class ThumbSearch(tkinter.Entry):
         self.search_task = conf.root.after(1000, self.search_go)
 
     def search_go(self):
-        search_item = self.ent_value.get()
+        search_item = self.str_var.get()
         search_item = search_item.replace("\n", "").strip()
         __class__.search_item = search_item
         Thumbnails.reload_with_scroll()
@@ -666,11 +631,12 @@ class Thumbnails(CFrame, ThumbnailsPrepare):
     def r_click(self, e: tkinter.Event):
         try:
             clmn, row = e.x//self.size, e.y//self.size
-            src = self.thumbs_coords[e.widget.cget("text")][(clmn, row)]
+            e.src = self.thumbs_coords[e.widget.cget("text")][(clmn, row)]
+            e.all_src = self.all_src
         except KeyError:
             return
 
-        ContextMenu(src, self.all_src, e)
+        ContextThumbs(e)
 
     def scroll_up(self, e=None):
         self.sframe['canvas'].yview_moveto('0.0')

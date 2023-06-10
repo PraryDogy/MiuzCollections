@@ -1,5 +1,5 @@
-from . import (Image, calendar, conf, datetime, get_coll_name, on_exit, os,
-               partial, place_center, sys, tkinter, re)
+from . import (Image, Reveal, calendar, conf, datetime, get_coll_name, on_exit,
+               os, place_center, sys, tkinter)
 
 __all__ = (
     "CSep",
@@ -12,6 +12,7 @@ __all__ = (
     "MacMenu",
     "CCalendar",
     "focus_last",
+    "ContextMenu",
     )
 
 
@@ -475,3 +476,57 @@ class CCalendar(CFrame, CCalendarEntry):
         self.set_my_date()
         self.change_title()
         self.fill_days()
+
+
+class ContextMenu(tkinter.Menu, Reveal):
+    def __init__(self):
+        super().__init__()
+
+    def context_view(self, e: tkinter.Event):
+        from .img_viewer import ImgViewer
+        self.add_command(
+            label=conf.lang.preview,
+            command=lambda: ImgViewer(e.src, e.all_src)
+            )
+
+    def context_sep(self):
+        self.add_separator()
+
+    def context_img_info(self, e: tkinter.Event):
+        self.add_command(
+            label=conf.lang.info,
+            command=lambda: ImageInfo(e.src)
+            )
+
+    def context_show_jpg(self, e: tkinter.Event):
+        self.add_command(
+            label=conf.lang.show_finder,
+            command = lambda: self.reveal_jpg(e.src)
+            )
+
+    def context_show_tiffs(self, e: tkinter.Event):
+        tiffs = self.find_tiffs(e.src)
+        if tiffs:
+            self.add_command(
+                label=conf.lang.show_tiff,
+                command = lambda: self.reveal_tiffs(tiffs)
+                )
+
+    def context_paste(self, str_var: tkinter.StringVar):
+        self.add_command(
+            label=conf.lang.search_paste,
+            command=lambda: str_var.set(conf.root.clipboard_get())
+            )
+    
+    def context_clear(self, str_var: tkinter.StringVar):
+        self.add_command(
+            label=conf.lang.search_clear,
+            command=lambda: str_var.set("")
+            )
+        # __class__.search_item = None
+
+    def do_popup(self, e: tkinter.Event):
+        try:
+            self.tk_popup(e.x_root, e.y_root)
+        finally:
+            self.grab_release()

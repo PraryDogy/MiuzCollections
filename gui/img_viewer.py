@@ -1,6 +1,6 @@
-from . import (Dbase, ImageTk, Thumbs, conf, convert_to_rgb, cv2, decode_image,
-               find_jpeg, find_tiff, get_coll_name, os, place_center,
-               resize_image, replace_bg, sqlalchemy, tkinter)
+from . import (Dbase, ImageTk, Thumbs, conf, convert_to_rgb, cv2,
+               decode_image, get_coll_name, os, place_center, replace_bg,
+               resize_image, sqlalchemy, tkinter)
 from .widgets import *
 
 __all__ = (
@@ -10,38 +10,18 @@ __all__ = (
 
 src = str
 all_src = []
-img_frame = tkinter.Frame
 win = tkinter.Toplevel
 
 
-class ContextMenu(tkinter.Menu):
-    def __init__(self, master: tkinter.Label):
-        tkinter.Menu.__init__(self, master)
+class ContextViewer(ContextMenu):
+    def __init__(self, e: tkinter.Event):
+        super().__init__()
+        self.context_img_info(e)
+        self.context_sep()
+        self.context_show_jpg(e)
+        self.context_show_tiffs(e)
+        self.do_popup(e)
 
-        self.add_command(
-            label=conf.lang.info,
-            command=lambda: ImageInfo(src)
-            )
-
-        self.add_separator()
-
-        self.add_command(
-            label=conf.lang.show_finder,
-            command=lambda: find_jpeg(src)
-            )
-
-        self.add_command(
-            label=conf.lang.show_tiff,
-            command=lambda: find_tiff(src)
-            )
-
-        master.bind("<Button-2>", self.do_popup)
-
-    def do_popup(self, event):
-        try:
-            self.tk_popup(event.x_root, event.y_root)
-        finally:
-            self.grab_release()
 
 
 class ImgViewer(CWindow):
@@ -80,9 +60,13 @@ class ImgViewer(CWindow):
         self.grab_set_global()
 
         self.bind('<Configure>', self.decect_resize)
+        self.bind("<ButtonRelease-2>", self.r_click)
         self.resize_task = None
 
-        self.context = ContextMenu(self)
+    def r_click(self, e):
+        e.src = src
+        e.all_src = all_src
+        ContextViewer(e)
 
     def decect_resize(self, e):
         if self.resize_task:
@@ -123,8 +107,6 @@ class ImgViewer(CWindow):
         conf.root.after_cancel(self.task)
         try:
             src = all_src[ind]
-            self.context.destroy()
-            self.context = ContextMenu(self)
             self.set_title()
         except IndexError:
             src = all_src[0]

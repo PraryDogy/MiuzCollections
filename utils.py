@@ -21,71 +21,70 @@ __all__ = (
     "crop_image",
     "resize_image",
     "smb_check",
-    "find_tiff",
-    "find_jpeg",
     "on_exit",
-    "replace_bg"
+    "replace_bg",
+    "Reveal"
     )
 
 
-def reveal_finder(list_paths: list):
-    paths = (
-        f"\"{i}\" as POSIX file"
-        for i in list_paths
-        )
+class Reveal:
+    def normalize_name(self, name: str):
+        name, ext = os.path.splitext(name)
+        name = name.translate(str.maketrans("", "", string.punctuation))
 
-    paths = ", ".join(paths)
+        for i in conf.stopwords:
+            name = name.replace(i, "")
 
-    args = (
-        "-e", "tell application \"Finder\"",
-        "-e", f"reveal {{{paths}}}",
-        "-e", "activate",
-        "-e", "end tell",
-        )
+        return name.replace(" ", "")
 
-    subprocess.call(["osascript", *args])
+    def reveal_jpg(self, src: str):
+        def task():
+            subprocess.call(["open", "-R", src])
+        threading.Thread(target = task).start()
 
+    def reveal_tiffs(self, list_paths: list):
+        def task():
+            paths = (
+                f"\"{i}\" as POSIX file"
+                for i in list_paths
+                )
 
-def normalize_name(name: str):
-    name, ext = os.path.splitext(name)
-    name = name.translate(str.maketrans("", "", string.punctuation))
+            paths = ", ".join(paths)
 
-    for i in conf.stopwords:
-        name = name.replace(i, "")
+            args = (
+                "-e", "tell application \"Finder\"",
+                "-e", f"reveal {{{paths}}}",
+                "-e", "activate",
+                "-e", "end tell",
+                )
 
-    return name.replace(" ", "")
+            subprocess.call(["osascript", *args])
 
+        threading.Thread(target=task).start()
 
-def find_tiff(src: str):
-    path, filename = os.path.split(src)
-    src_file_no_ext = normalize_name(filename)
-    exts = (".tiff", ".TIFF", ".psd", ".PSD", ".psb", ".PSB", ".tif", ".TIF")
-    images = []
+    def find_tiffs(self, src: str):
+        path, filename = os.path.split(src)
+        src_file_no_ext = self.normalize_name(filename)
+        exts = (".tiff", ".TIFF", ".psd", ".PSD", ".psb", ".PSB", ".tif", ".TIF")
+        images = []
 
-    for root, dirs, files in os.walk(path):
-        for file in files:
+        for root, dirs, files in os.walk(path):
+            for file in files:
 
-            if file.endswith(exts):
+                if file.endswith(exts):
 
-                file_no_ext = normalize_name(file)
+                    file_no_ext = self.normalize_name(file)
 
-                if src_file_no_ext in file_no_ext:
-                    images.append(os.path.join(root, file))
+                    if src_file_no_ext in file_no_ext:
+                        images.append(os.path.join(root, file))
 
-                elif file_no_ext in src_file_no_ext and len(file_no_ext) > 5:
-                    images.append(os.path.join(root, file))
+                    elif file_no_ext in src_file_no_ext and len(file_no_ext) > 5:
+                        images.append(os.path.join(root, file))
+        if images:
+            return images
+        else:
+            return False
 
-    if images:
-        threading.Thread(target=reveal_finder, args=[images]).start()
-        return True
-    else:
-        return False
-
-
-def find_jpeg(src: str):
-    def task():
-        subprocess.call(["open", "-R", src])
-    threading.Thread(target = task).start()
 
 
 def get_coll_name(src: str):
