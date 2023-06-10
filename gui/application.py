@@ -32,8 +32,6 @@ class Application:
 
         MacMenu()
 
-        conf.root.eval(f'tk::PlaceWindow {conf.root} center')
-
         if conf.root_w < 50 or conf.root_h < 50:
             conf.root_w, conf.root_h = 700, 500
 
