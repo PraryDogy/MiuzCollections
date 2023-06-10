@@ -10,9 +10,10 @@ __all__ = (
     )
 
 
-class Dates:
+class Globs:
     start: datetime = None
     end: datetime = None
+    str_var = tkinter.StringVar(value="")
 
 
 class ContextThumbs(ContextMenu):
@@ -27,10 +28,10 @@ class ContextThumbs(ContextMenu):
 
 
 class ContextSearch(ContextMenu):
-    def __init__(self, str_var: tkinter.StringVar, e: tkinter.Event):
+    def __init__(self, e: tkinter.Event):
         super().__init__()
-        self.context_clear(str_var)
-        self.context_paste(str_var)
+        self.context_clear(Globs.str_var)
+        self.context_paste(Globs.str_var)
         self.do_popup(e)
 
 
@@ -51,7 +52,7 @@ class FilterWin(CWindow):
         left_title["font"] = f
         left_title.pack()
 
-        self.l_calendar = CCalendar(left_frame, Dates.start)
+        self.l_calendar = CCalendar(left_frame, Globs.start)
         self.l_calendar.pack()
 
         right_frame = CFrame(calendar_frames)
@@ -61,7 +62,7 @@ class FilterWin(CWindow):
         right_title["font"] = f
         right_title.pack()
 
-        self.r_calendar = CCalendar(right_frame, Dates.end)
+        self.r_calendar = CCalendar(right_frame, Globs.end)
         self.r_calendar.pack()
 
         self.oneday_btn = CButton(self, text=conf.lang.filter_oneday)
@@ -123,7 +124,7 @@ class FilterWin(CWindow):
         cancel_btn.pack(side="left")
         cancel_btn.cmd(lambda e: self.cancel())
 
-        if Dates.start and not Dates.end:
+        if Globs.start and not Globs.end:
             self.oneday = True
             self.oneday_btn["bg"] = conf.sel_color
             self.r_calendar.disable_calendar()
@@ -174,12 +175,12 @@ class FilterWin(CWindow):
 
     def ok_cmd(self, e=None):
         if any((self.l_calendar.clicked, self.r_calendar.clicked)):
-            Dates.start = self.l_calendar.my_date
+            Globs.start = self.l_calendar.my_date
 
             if not self.oneday:
-                Dates.end = self.r_calendar.my_date
+                Globs.end = self.r_calendar.my_date
             else:
-                Dates.end = None
+                Globs.end = None
 
         if self.product["bg"] == conf.sel_color:
             conf.product = True
@@ -216,16 +217,11 @@ class FilterWin(CWindow):
 
 
 class ThumbSearch(tkinter.Entry):
-    search_item = None
-    reload_search = None
-
     def __init__(self, master: tkinter):
-        self.str_var = tkinter.StringVar(value=self.search_item)
-
         super().__init__(
             master,
             width=20,
-            textvariable=self.str_var,
+            textvariable=Globs.str_var,
             bg=conf.ent_color,
             insertbackground="white",
             fg=conf.fg_color,
@@ -234,18 +230,19 @@ class ThumbSearch(tkinter.Entry):
             selectbackground=conf.btn_color,
             border=1
             )
-        self.str_var.trace("w", lambda *args: self.search_task_set())
+
+        traces = Globs.str_var.trace_vinfo()
+        if traces:
+            Globs.str_var.trace_vdelete(*traces[0])
+        Globs.str_var.trace("w", lambda *args: self.search_task_set())
+
         self.bind("<Escape>", self.search_esc)
         conf.root.bind("<Command-f>", self.search_focus)
-        self.bind("<ButtonRelease-2>", lambda e: ContextSearch(self.str_var, e))
+        self.bind("<ButtonRelease-2>", lambda e: ContextSearch(e))
         self.search_task = None
-        __class__.reload_search = self.__reload_search
 
     def search_focus(self, e=None):
         self.focus_force()
-
-    def __reload_search(self):
-        __class__.search_item = None
 
     def search_esc(self, e=None):
         conf.root.focus_force()
@@ -256,9 +253,6 @@ class ThumbSearch(tkinter.Entry):
         self.search_task = conf.root.after(1000, self.search_go)
 
     def search_go(self):
-        search_item = self.str_var.get()
-        search_item = search_item.replace("\n", "").strip()
-        __class__.search_item = search_item
         Thumbnails.reload_with_scroll()
         conf.root.focus_force()
 
@@ -325,21 +319,21 @@ class ThumbnailsPrepare:
             for img, src, modified in img_list:
                 key = datetime.fromtimestamp(modified).date()
 
-                if not any((Dates.start, Dates.end)):
+                if not any((Globs.start, Globs.end)):
                     key = f"{conf.lang.months[key.month]} {key.year}"
 
-                elif Dates.start and not Dates.end:
+                elif Globs.start and not Globs.end:
                     key = f"{key.day} {conf.lang.months_p[key.month]} {key.year}"
 
-                elif all((Dates.start, Dates.end)):
+                elif all((Globs.start, Globs.end)):
                     start = (
-                        f"{Dates.start.day} "
-                        f"{conf.lang.months_p[Dates.start.month]} "
-                        f"{Dates.start.year}"
+                        f"{Globs.start.day} "
+                        f"{conf.lang.months_p[Globs.start.month]} "
+                        f"{Globs.start.year}"
                         )
                     end = (
-                        f"{Dates.end.day} {conf.lang.months_p[Dates.end.month]} "
-                        f"{Dates.end.year}"
+                        f"{Globs.end.day} {conf.lang.months_p[Globs.end.month]} "
+                        f"{Globs.end.year}"
                         )
                     key = f"{start} - {end}"
 
@@ -355,24 +349,26 @@ class ThumbnailsPrepare:
         return thumbs_dict
 
     def stamp_range(self):
-        start = datetime.combine(Dates.start, datetime.min.time())
+        start = datetime.combine(Globs.start, datetime.min.time())
         end = datetime.combine(
-            Dates.end, datetime.max.time().replace(microsecond=0)
+            Globs.end, datetime.max.time().replace(microsecond=0)
             )
         return (datetime.timestamp(start), datetime.timestamp(end))
 
     def stamp_day(self):
-        start = datetime.combine(Dates.start, datetime.min.time())
+        start = datetime.combine(Globs.start, datetime.min.time())
         end = datetime.combine(
-            Dates.start, datetime.max.time().replace(microsecond=0)
+            Globs.start, datetime.max.time().replace(microsecond=0)
             )
         return int(start.timestamp()), int(end.timestamp())
 
     def get_query(self):
         q = sqlalchemy.select(Thumbs.img150, Thumbs.src, Thumbs.modified)
+        search = Globs.str_var.get()
 
-        if ThumbSearch.search_item:
-            q = q.filter(Thumbs.src.like("%" + ThumbSearch.search_item + "%"))
+        if search:
+            search.replace("\n", "").strip()
+            q = q.filter(Thumbs.src.like("%" + search + "%"))
 
         if conf.sort_modified:
             q = q.order_by(-Thumbs.modified)
@@ -399,15 +395,15 @@ class ThumbnailsPrepare:
 
         q = q.filter(sqlalchemy.or_(*filters))
 
-        if not any((Dates.start, Dates.end)):
+        if not any((Globs.start, Globs.end)):
             q = q.limit(conf.limit)
 
-        elif Dates.start and not Dates.end:
+        elif Globs.start and not Globs.end:
             t = self.stamp_day()
             q = q.filter(Thumbs.modified > t[0])
             q = q.filter(Thumbs.modified < t[1])
         
-        elif all((Dates.start, Dates.end)):
+        elif all((Globs.start, Globs.end)):
             t = self.stamp_range()
             q = q.filter(Thumbs.modified > t[0])
             q = q.filter(Thumbs.modified < t[1])
@@ -509,7 +505,7 @@ class Thumbnails(CFrame, ThumbnailsPrepare):
 
         btn_filter = CButton(filt_reset, text=conf.lang.thumbs_filters)
         btn_filter.pack(side="left", padx=(0, 15))
-        if any((Dates.start, Dates.end)):
+        if any((Globs.start, Globs.end)):
             btn_filter.configure(bg=conf.sel_color)
         btn_filter.cmd(lambda e: FilterWin())
 
@@ -578,9 +574,7 @@ class Thumbnails(CFrame, ThumbnailsPrepare):
         Thumbnails.reload_without_scroll()
 
     def reset_filter_cmd(self):
-        global search_item
-
-        Dates.start, Dates.end = None, None
+        Globs.start, Globs.end = None, None
         Thumbnails.reload_without_scroll()
 
     def decect_resize(self, e):
@@ -602,7 +596,7 @@ class Thumbnails(CFrame, ThumbnailsPrepare):
                 Thumbnails.reload_without_scroll()
 
     def __reload_with_scroll(self):
-        Dates.start, Dates.end = None, None
+        Globs.start, Globs.end = None, None
         conf.lang_thumbs.clear()
 
         self.scroll_frame.destroy()

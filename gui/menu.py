@@ -17,9 +17,9 @@ class MenuExtend:
         subprocess.check_output(["/usr/bin/open", coll_path])
 
 
-class ContextMenu(tkinter.Menu, MenuExtend):
+class ContextMenuMenu(ContextMenu, MenuExtend):
     def __init__(self, e: tkinter.Event):
-        super().__init__(e.widget)
+        super().__init__()
 
         self.add_command(
             label=conf.lang.show_finder,
@@ -27,12 +27,6 @@ class ContextMenu(tkinter.Menu, MenuExtend):
             )
 
         self.do_popup(e)
-
-    def do_popup(self, e):
-        try:
-            self.tk_popup(e.x_root, e.y_root)
-        finally:
-            self.grab_release()
 
 
 class Menu(tkmacosx.SFrame, MenuExtend):
@@ -87,7 +81,7 @@ class Menu(tkmacosx.SFrame, MenuExtend):
         last.true_name = conf.all_colls
         last.cmd(self.show_coll)
         last.pack(pady=(0, 15))
-        last.bind("<Button-2>", ContextMenu)
+        last.bind("<Button-2>", ContextMenuMenu)
 
         self.menu_buttons.append(last)
         conf.lang_menu.append(last)
@@ -102,7 +96,7 @@ class Menu(tkmacosx.SFrame, MenuExtend):
             btn.true_name = collection_name
             btn.cmd(self.show_coll)
             btn.pack()
-            btn.bind("<Button-2>", ContextMenu)
+            btn.bind("<Button-2>", ContextMenuMenu)
 
             self.menu_buttons.append(btn)
 
@@ -136,6 +130,11 @@ class Menu(tkmacosx.SFrame, MenuExtend):
         self.sel_btn = e.widget
         conf.curr_coll = e.widget.true_name
 
-        from .thumbnails import Thumbnails, ThumbSearch
-        ThumbSearch.reload_search()
+        from .thumbnails import Thumbnails, Globs
+
+        traces = Globs.str_var.trace_vinfo()
+        if traces:
+            Globs.str_var.trace_vdelete(*traces[0])
+        Globs.str_var.set("")
+
         Thumbnails.reload_with_scroll()

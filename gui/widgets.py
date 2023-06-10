@@ -523,7 +523,6 @@ class ContextMenu(tkinter.Menu, Reveal):
             label=conf.lang.search_clear,
             command=lambda: str_var.set("")
             )
-        # __class__.search_item = None
 
     def do_popup(self, e: tkinter.Event):
         try:
