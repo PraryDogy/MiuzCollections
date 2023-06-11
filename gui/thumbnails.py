@@ -399,6 +399,12 @@ class Thumbnails(CFrame, ThumbnailsPrepare):
         GlobGui.reload_thumbs_scroll = self.reload_with_scroll
         GlobGui.reload_thumbs = self.reload_without_scroll
 
+        self.bind("<Enter>", self.focus_menu)
+        self.bind("Leave", self.focus_menu)
+
+    def focus_menu(self, e=None):
+        self.focus_force()
+
     def load_scrollable(self):
         self.scroll_frame = CFrame(self)
         self.scroll_frame.pack(expand=1, fill=tkinter.BOTH)
@@ -406,13 +412,6 @@ class Thumbnails(CFrame, ThumbnailsPrepare):
         self.sframe = tkmacosx.SFrame(
             self.scroll_frame, bg=conf.bg_color, scrollbarwidth=7)
         self.sframe.pack(expand=1, fill=tkinter.BOTH)
-
-    def g_click(e: tkinter.Event=None, ee: tkinter.Event=None):
-        try:
-            if ee.widget.widgetName == "frame":
-                ee.widget.focus()
-        except AttributeError:
-            print("thumbnails global click error")
 
     def load_thumbnails(self):
         self.thumbs_prepare()

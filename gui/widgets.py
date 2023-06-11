@@ -254,13 +254,6 @@ class CCalendarEntry(CWindow):
         self.win_cust.grab_set_global()
         self.cust_ent.focus_force()
 
-    def g_click(self, e:tkinter.Event=None):
-        try:
-            if e.widget.widgetName != "entry":
-                e.widget.focus()
-        except AttributeError:
-            print("entry click error")
-
     def character_limit(self, e:tkinter.StringVar):
         t = e.get()
         try:

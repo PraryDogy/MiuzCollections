@@ -47,6 +47,11 @@ class Menu(tkmacosx.SFrame, MenuExtend):
 
         self.menu_frame = self.load_menu_buttons()
         self.menu_frame.pack()
+        self.bind("<Enter>", self.focus_menu)
+        self.bind("Leave", self.focus_menu)
+
+    def focus_menu(self, e=None):
+        self.focus_force()
 
     def fake_name(self, coll: str):
         try:
