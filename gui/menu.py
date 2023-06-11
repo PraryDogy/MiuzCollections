@@ -1,4 +1,4 @@
-from . import (Dbase, Thumbs, conf, os, partial, re, sqlalchemy, subprocess,
+from . import (Dbase, Thumbs, conf, os, re, sqlalchemy, subprocess,
                tkinter, tkmacosx)
 from .widgets import *
 
@@ -8,7 +8,7 @@ __all__ = (
 
 
 class MenuExtend:
-    def open_finder(self, e):
+    def reveal_coll(self, e: tkinter.Event):
         if e.widget.true_name != conf.all_colls:
             coll_path = os.path.join(conf.coll_folder, e.widget.true_name)
         else:
@@ -23,7 +23,7 @@ class ContextMenuMenu(ContextMenu, MenuExtend):
 
         self.add_command(
             label=conf.lang.show_finder,
-            command=lambda: self.open_finder(e)
+            command=lambda: self.reveal_coll(e)
             )
 
         self.do_popup(e)
@@ -39,7 +39,6 @@ class Menu(tkmacosx.SFrame, MenuExtend):
             width = conf.menu_w
             )
 
-        self.menu_buttons = []
         self.sel_btn = tkinter.Label
 
         self.menu_frame = self.load_menu_buttons()
@@ -47,7 +46,7 @@ class Menu(tkmacosx.SFrame, MenuExtend):
 
         __class__.reload_menu = self.__reload_menu
 
-    def re_collname(self, coll: str):
+    def fake_name(self, coll: str):
         try:
             coll = re.search("[A-Za-zА-Яа-я]+.{0,11}", coll).group(0)[:13]
             return coll
@@ -69,12 +68,16 @@ class Menu(tkmacosx.SFrame, MenuExtend):
         colls_list = (i[0] for i in colls_list)
 
         menus = {
-            coll: self.re_collname(coll)
+            self.fake_name(coll): coll
             for coll in colls_list
             }
 
-        menus = sorted(menus.items(), key=lambda item: item[1].casefold())
-        menus = dict(menus)
+        sort_keys = sorted(menus.keys())
+
+        menus = {
+            fake_name: menus[fake_name]
+            for fake_name in sort_keys
+            }
 
         last = CButton(frame, text=conf.lang.all_colls)
         last.configure(width=13, pady=5, anchor=tkinter.W, padx=10)
@@ -83,24 +86,21 @@ class Menu(tkmacosx.SFrame, MenuExtend):
         last.pack(pady=(0, 15))
         last.bind("<Button-2>", ContextMenuMenu)
 
-        self.menu_buttons.append(last)
         conf.lang_menu.append(last)
 
         sep = CSep(frame)
         sep['bg'] = '#272727'
         sep.pack(fill=tkinter.X)
 
-        for collection_name, menu_name in menus.items():
-            btn = CButton(frame, text = menu_name)
+        for fake_name, true_name in menus.items():
+            btn = CButton(frame, text = fake_name)
             btn.configure(width=13, pady=5, anchor=tkinter.W, padx=10)
-            btn.true_name = collection_name
+            btn.true_name = true_name
             btn.cmd(self.show_coll)
             btn.pack()
             btn.bind("<Button-2>", ContextMenuMenu)
 
-            self.menu_buttons.append(btn)
-
-            if collection_name == conf.curr_coll:
+            if true_name == conf.curr_coll:
                 btn.configure(bg=conf.sel_color)
                 self.sel_btn = btn
 
@@ -115,7 +115,6 @@ class Menu(tkmacosx.SFrame, MenuExtend):
         return frame
 
     def __reload_menu(self):
-        self.menu_buttons.clear()
         conf.lang_menu.clear()
         self.menu_frame.destroy()
         self.menu_frame = self.load_menu_buttons()

@@ -41,10 +41,13 @@ class Config:
 
         # dynamic variables for gui
         self.lang = None
+
+        # list stores widgets for dynamicaly language change
         self.lang_menu = []
         self.lang_st_bar = []
         self.lang_thumbs = []
         self.lang_sett = []
+
         self.flag = False
         self.live_text = ""
         self.scaner_task: threading.Thread = None
