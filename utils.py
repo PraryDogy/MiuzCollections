@@ -89,7 +89,12 @@ class Reveal:
 def get_coll_name(src: str):
     coll = src.replace(conf.coll_folder, "")
     coll = coll.strip(os.sep)
-    return coll.split(os.sep)[0]
+    splited = coll.split(os.sep)
+
+    if len(splited) > 1:
+        return splited[0]
+    else:
+        return conf.coll_folder.strip(os.sep).split(os.sep)[-1]
 
 
 def place_center(top_level: tkinter.Toplevel):

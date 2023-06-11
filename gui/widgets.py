@@ -70,7 +70,6 @@ class CWindow(tkinter.Toplevel):
         self.withdraw()
 
         self.protocol("WM_DELETE_WINDOW", self.close_win)
-        self.bind('<Command-w>', self.close_win)
         self.bind('<Escape>', self.close_win)
 
         self.bind('<Command-q>', on_exit)
@@ -88,12 +87,12 @@ class SmbAlert(CWindow):
         super().__init__()
 
         txt = conf.lang.smb_title
-        title_lbl = CLabel(
-            self, text=txt, font=('San Francisco Pro', 22, 'bold'))
-        title_lbl.pack(pady=(0, 5), padx=20)
+        title_lbl = CLabel(self, text=txt)
+        title_lbl.configure(font=('San Francisco Pro', 22, 'bold'))
+        title_lbl.pack()
 
         txt2 = conf.lang.smb_descr
-        descr_lbl = CLabel(self, text=txt2, justify=tkinter.LEFT, )
+        descr_lbl = CLabel(self, text=txt2, justify=tkinter.LEFT)
         descr_lbl.pack(padx=15, pady=(0, 5))
 
         btn = CButton(self, text=conf.lang.close)
@@ -109,7 +108,6 @@ class SmbAlert(CWindow):
     def btn_cmd(self, e=None):
         self.destroy()
         focus_last()
-
 
 class ImageInfo(CWindow):
     def __init__(self, src: str):
@@ -166,7 +164,6 @@ class ImageInfo(CWindow):
         right_lbl.pack(anchor=tkinter.CENTER, side=tkinter.LEFT)
 
         self.protocol("WM_DELETE_WINDOW", self.close_win)
-        self.bind('<Command-w>', self.close_win)
         self.bind('<Escape>', self.close_win)
 
         conf.root.update_idletasks()
@@ -208,10 +205,8 @@ class CCalendarEntry(CWindow):
         self.win_cust = CWindow()
         self.win_cust.title(conf.lang.cust_title)
         self.win_cust.protocol("WM_DELETE_WINDOW", self.cust_can_cmd)
-        self.win_cust.bind('<Command-w>', self.cust_can_cmd)
         self.win_cust.bind('<Escape>', self.cust_can_cmd)
         self.bind('<Command-q>', on_exit)
-        # self.bind_all("<ButtonRelease-1>", self.g_click)
 
         cust_l = CLabel(self.win_cust, text=conf.lang.cust_l)
         cust_l.pack(pady=(0, 5))
@@ -387,23 +382,6 @@ class CCalendar(CFrame, CCalendarEntry):
         self.fill_days()
 
         return parrent
-
-    def disable_calendar(self):
-        self.enabled = False
-        self.title.unbind("<ButtonRelease-1>")
-
-        for i in self.all_btns:
-            if i["bg"] in (conf.btn_color, conf.sel_color):
-                i.config(fg=conf.hov_color, bg=conf.btn_color)
-
-    def enable_calendar(self):
-       self.enabled = True
-       self.title.bind("<ButtonRelease-1>", self.cust_date_win)
-
-       for i in self.all_btns:
-            i["fg"] = conf.fg_color
-            if self.dd == i["text"]:
-                i.configure(bg=conf.sel_color)
 
     def create_days(self):
         first_weekday = datetime.weekday(datetime(self.yy, self.mm, 1))

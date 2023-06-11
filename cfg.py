@@ -4,7 +4,6 @@ import shutil
 import threading
 import tkinter
 from lang import Rus, Eng
-import locale
 import subprocess
 
 __all__ = (

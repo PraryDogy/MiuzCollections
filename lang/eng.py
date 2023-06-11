@@ -52,6 +52,9 @@ class Eng:
         self.thumbs_reset = "Reset date"
         self.thumbs_showmore = "Show more"
         self.thumbs_summary = "Total"
+        self.thumbs_nophoto = "No photos"
+        self.thumbs_withname = "with name"
+
         # filter window
         self.filter_title = "Filter"
         self.filter_start = "Start"
@@ -81,7 +84,7 @@ class Eng:
         # smb alert
         self.smb_title = "No connection."
         self.smb_descr = (
-            '\n- Check internet connection.'
+            '- Check internet connection.'
             '\n- Try to open any Miuz network folder.'
             '\n- Open settings and select collections folder.'
             '\n- Restart app.'

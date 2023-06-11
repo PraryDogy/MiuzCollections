@@ -15,7 +15,10 @@ class MenuExtend:
         else:
             coll_path = conf.coll_folder
 
-        subprocess.check_output(["/usr/bin/open", coll_path])
+        try:
+            subprocess.check_output(["/usr/bin/open", coll_path])
+        except subprocess.CalledProcessError:
+            subprocess.check_output(["/usr/bin/open", conf.coll_folder])
 
 
 class ContextMenuMenu(ContextMenu, MenuExtend):
@@ -32,7 +35,7 @@ class ContextMenuMenu(ContextMenu, MenuExtend):
 
 class Menu(tkmacosx.SFrame, MenuExtend):
     def __init__(self, master: tkinter):
-        self.sel_btn = tkinter.Label
+        self.sel_btn: tkinter.Label = None
         GlobGui.reload_menu = self.reload_menu
 
         super().__init__(
@@ -128,11 +131,9 @@ class Menu(tkmacosx.SFrame, MenuExtend):
         self.sel_btn = e.widget
         conf.curr_coll = e.widget.true_name
 
-        from .thumbnails import Thumbnails, Globs
-
-        traces = Globs.str_var.trace_vinfo()
+        traces = GlobGui.str_var.trace_vinfo()
         if traces:
-            Globs.str_var.trace_vdelete(*traces[0])
-        Globs.str_var.set("")
+            GlobGui.str_var.trace_vdelete(*traces[0])
+        GlobGui.str_var.set("")
 
         GlobGui.reload_thumbs_scroll()

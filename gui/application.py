@@ -9,9 +9,10 @@ class Application:
     def __init__(self):
         conf.root.title(conf.app_name)
         conf.root.configure(bg=conf.bg_color)
+        conf.root.deiconify()
 
         conf.root.createcommand(
-            'tk::mac::ReopenApplication', conf.root.deiconify)
+            'tk::mac::ReopenApplication', conf.root.wm_deiconify)
 
         conf.root.bind('<Command-w>', self.minim)
 
@@ -39,11 +40,13 @@ class Application:
             (f"{conf.root_w}x{conf.root_h}"
             f"+{conf.root_x}+{conf.root_y}")
             )
+
         conf.root.minsize(870, 500)
 
-        AutoScan().auto_scan() if smb_check() else SmbAlert()
-
-        conf.root.deiconify()
+        if smb_check():
+            AutoScan().auto_scan()
+        else:
+            SmbAlert()
 
     def minim(self, e=None):
-        conf.root.withdraw()
+        conf.root.wm_iconify()

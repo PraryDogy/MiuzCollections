@@ -51,6 +51,8 @@ class Rus:
         self.thumbs_reset = "Сброс дат"
         self.thumbs_showmore = "Позазать еще"
         self.thumbs_summary = "Всего"
+        self.thumbs_nophoto = "Нет фотографий"
+        self.thumbs_withname = "с именем"
 
         # filter window
         self.filter_title = "Фильтр"
@@ -81,7 +83,7 @@ class Rus:
         # smb alert
         self.smb_title = "Нет подключения."
         self.smb_descr = (
-            '\n- Проверьте подключение к интернету.'
+            '- Проверьте подключение к интернету.'
             '\n- Откройте любую папку на сетевом диске,'
             '\n- Укажите правильный путь к коллекциям в настройках'
             '\n- Перезапустите приложение.'

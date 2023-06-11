@@ -87,6 +87,19 @@ class AutoScan:
                     f"{conf.lang.live_collections}."
                     )
 
+            if not os.path.isdir(collection):
+                if collection.endswith(exts):
+                    data = (
+                        collection,
+                        int(os.path.getsize(collection)),
+                        int(os.stat(collection).st_birthtime),
+                        int(os.stat(collection).st_mtime)
+                        )
+                    found_images.append(data)
+
+                    if data not in db_images:
+                        new_images.append(data)
+
             for root, dirs, files in os.walk(collection):
 
                 if not conf.flag:

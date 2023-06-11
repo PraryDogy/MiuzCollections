@@ -12,13 +12,14 @@ class Settings(CWindow):
     def __init__(self):
         super().__init__()
         self.protocol("WM_DELETE_WINDOW", self.cancel_cmd)
-        self.bind('<Command-w>', self.cancel_cmd)
         self.bind('<Escape>', self.cancel_cmd)
+        self.bind("<Return>", self.save_cmd)
         self.title(conf.lang.settings_title)
         self.geometry("400x310")
 
         self.changed_lang = False
         self.scan_again = False
+        self.old_curr_coll = conf.curr_coll
 
         self.main_wid = self.main_widget()
         self.main_wid.pack(expand=True, fill="both")
@@ -109,7 +110,7 @@ class Settings(CWindow):
 
         save_btn = CButton(cancel_frame, text=conf.lang.ok)
         save_btn.cmd(self.save_cmd)
-        save_btn.pack(padx=(0, 10), side="left")
+        save_btn.pack(padx=(0, 15), side="left")
         conf.lang_sett.append(save_btn)
 
         cancel_btn = CButton(cancel_frame, text=conf.lang.cancel)
@@ -219,8 +220,12 @@ class Settings(CWindow):
         focus_last()
 
         if self.scan_again:
+            conf.curr_coll = conf.all_colls
             self.scan_again = False
-            AutoScan().auto_scan() if smb_check() else SmbAlert()
+            if smb_check():
+                AutoScan().auto_scan()
+            else:
+                SmbAlert()
 
         if self.changed_lang:
             GlobGui.reload_thumbs_scroll()
