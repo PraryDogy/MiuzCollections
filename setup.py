@@ -36,7 +36,7 @@ img.write(f'icon.icns')
 APP = ['start.py']
 
 DATA_FILES = [
-    conf.db_name,
+    conf.db_name, conf.thumb_err
     ]
 
 OPTIONS = {

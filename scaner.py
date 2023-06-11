@@ -6,6 +6,7 @@ import sqlalchemy
 from cfg import conf
 from database import Dbase, Thumbs
 from utils import encode_image, get_coll_name
+from gui.gui_utils import GlobGui
 
 __all__ = (
     "AutoScan",
@@ -13,10 +14,8 @@ __all__ = (
 
 
 class AutoScan:
-    update_thumbs = False
-    reload_menu = None
-    reload_thumbs = None
-    stbar_change = None
+    def __init__(self) -> None:
+        self.update_thumbs = False
 
     def auto_scan(self):
         self.cancel_scan()
@@ -33,7 +32,10 @@ class AutoScan:
 
     def scaner(self):
         conf.flag = True
-        self.st_bar_btn(conf.lang.live_updating, conf.sel_color)
+        GlobGui.st_bar_btn.configure(
+            text=conf.lang.live_updating,
+            bg=conf.sel_color
+            )
 
         conf.scaner_task = threading.Thread(
             target=self.update_colls,
@@ -44,18 +46,18 @@ class AutoScan:
         while conf.scaner_task.is_alive():
             conf.root.update()
 
-        conf.live_text = ""
+        self.change_live_text("")
 
-        if __class__.update_thumbs:
-            __class__.reload_thumbs()
-            __class__.reload_menu()
-            __class__.update_thumbs = False
+        if self.update_thumbs:
+            GlobGui.reload_thumbs()
+            GlobGui.reload_menu()
+            self.update_thumbs = False
 
         conf.flag = False
-        self.st_bar_btn(conf.lang.upd_btn, conf.btn_color)
+        GlobGui.st_bar_btn.configure(text=conf.lang.upd_btn, bg=conf.btn_color)
 
     def update_colls(self):
-        self.change_live_lvl(conf.lang.scaner_prepare)
+        self.change_live_text(conf.lang.scaner_prepare)
 
         db_images = Dbase.conn.execute(
             sqlalchemy.select(
@@ -77,14 +79,12 @@ class AutoScan:
         found_images = []
 
         for x, collection in enumerate(collections, 1):
-            self.change_live_lvl(
-                (
+            self.change_live_text(
                     f"{conf.lang.live_scan} "
                     f"{x} "
                     f"{conf.lang.live_from} "
                     f"{ln} "
                     f"{conf.lang.live_collections}."
-                    )
                     )
 
             for root, dirs, files in os.walk(collection):
@@ -111,7 +111,7 @@ class AutoScan:
                             new_images.append(data)
 
         if new_images:
-            __class__.update_thumbs = True
+            self.update_thumbs = True
             ln = len(new_images)
 
             values = [
@@ -122,15 +122,13 @@ class AutoScan:
                 "b_created": created,
                 "b_modified": modified,
                 "b_collection": get_coll_name(src),
-                "temp": self.change_live_lvl(
-                    (
+                "temp": self.change_live_text(
                         f"{conf.lang.live_added} "
                         f"{x} "
                         f"{conf.lang.live_from} "
                         f"{ln} "
                         f"{conf.lang.live_newphoto}."
                         )
-                    )
                     }
                 for x, (src, size, created, modified) in enumerate(new_images, 1)
                 if conf.flag
@@ -169,8 +167,8 @@ class AutoScan:
 
         if remove_images:
 
-            self.change_live_lvl(conf.lang.live_finish)
-            __class__.update_thumbs = True
+            self.change_live_text(conf.lang.live_finish)
+            self.update_thumbs = True
 
             values = [
                 {
@@ -202,10 +200,5 @@ class AutoScan:
                     )
                 Dbase.conn.execute(q, vals)
 
-    def change_live_lvl(self, text):
+    def change_live_text(self, text):
         conf.live_text = text
-
-    def st_bar_btn(self, text, color):
-        btn = __class__.stbar_change()
-        btn.configure(text=text, bg=color)
-        return

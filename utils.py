@@ -1,14 +1,13 @@
-import json
+import io
 import os
 import string
 import subprocess
 import threading
 import tkinter
-from difflib import SequenceMatcher
 
 import cv2
 import numpy
-from PIL import Image
+from PIL import Image, ImageDraw
 
 from cfg import conf
 
@@ -151,8 +150,12 @@ def encode_image(src):
 
 
 def decode_image(image):
-    nparr = numpy.frombuffer(image, numpy.byte)
-    return cv2.imdecode(nparr, cv2.IMREAD_ANYCOLOR)
+    try:
+        nparr = numpy.frombuffer(image, numpy.byte)
+        return cv2.imdecode(nparr, cv2.IMREAD_ANYCOLOR)
+    except TypeError:
+        print("utils.py decode_image NoneType instead bytes like img")
+        return decode_image(encode_image(conf.thumb_err))
 
 
 def convert_to_rgb(image):

@@ -1,6 +1,7 @@
 from . import (AutoScan, conf, filedialog,
                place_center, smb_check, tkinter)
 from .widgets import *
+from .gui_utils import GlobGui
 
 __all__ = (
     "Settings",
@@ -222,5 +223,4 @@ class Settings(CWindow):
             AutoScan().auto_scan() if smb_check() else SmbAlert()
 
         if self.changed_lang:
-            from .thumbnails import Thumbnails
-            Thumbnails.reload_with_scroll()
+            GlobGui.reload_thumbs_scroll()

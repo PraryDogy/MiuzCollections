@@ -17,6 +17,7 @@ class Config:
         self.app_name = 'MiuzCollections'
         self.app_ver = '3.8.0'
         self.db_name = "db.db"
+        self.thumb_err = "thumb.jpg"
 
         self.cfg_dir = os.path.join(
             os.path.expanduser("~"),

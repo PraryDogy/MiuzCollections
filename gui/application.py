@@ -41,10 +41,6 @@ class Application:
             )
         conf.root.minsize(870, 500)
 
-        AutoScan.reload_menu = menu.reload_menu
-        AutoScan.reload_thumbs = thumbnails.reload_without_scroll
-        AutoScan.stbar_change = st_bar.btn_change
-
         AutoScan().auto_scan() if smb_check() else SmbAlert()
 
         conf.root.deiconify()

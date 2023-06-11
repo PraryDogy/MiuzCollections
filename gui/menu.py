@@ -1,6 +1,7 @@
 from . import (Dbase, Thumbs, conf, os, re, sqlalchemy, subprocess,
                tkinter, tkmacosx)
 from .widgets import *
+from .gui_utils import GlobGui
 
 __all__ = (
     "Menu",
@@ -30,8 +31,10 @@ class ContextMenuMenu(ContextMenu, MenuExtend):
 
 
 class Menu(tkmacosx.SFrame, MenuExtend):
-    reload_menu = None
     def __init__(self, master: tkinter):
+        self.sel_btn = tkinter.Label
+        GlobGui.reload_menu = self.reload_menu
+
         super().__init__(
             master,
             bg = conf.bg_color,
@@ -39,12 +42,8 @@ class Menu(tkmacosx.SFrame, MenuExtend):
             width = conf.menu_w
             )
 
-        self.sel_btn = tkinter.Label
-
         self.menu_frame = self.load_menu_buttons()
         self.menu_frame.pack()
-
-        __class__.reload_menu = self.__reload_menu
 
     def fake_name(self, coll: str):
         try:
@@ -114,7 +113,7 @@ class Menu(tkmacosx.SFrame, MenuExtend):
 
         return frame
 
-    def __reload_menu(self):
+    def reload_menu(self):
         conf.lang_menu.clear()
         self.menu_frame.destroy()
         self.menu_frame = self.load_menu_buttons()
@@ -136,4 +135,4 @@ class Menu(tkmacosx.SFrame, MenuExtend):
             Globs.str_var.trace_vdelete(*traces[0])
         Globs.str_var.set("")
 
-        Thumbnails.reload_with_scroll()
+        GlobGui.reload_thumbs_scroll()

@@ -1,6 +1,7 @@
 from . import conf, place_center, AutoScan, smb_check, tkinter
 from .settings import Settings
 from .widgets import *
+from .gui_utils import GlobGui
 
 __all__ = (
     "StBar",
@@ -44,11 +45,10 @@ class ScanerGui(CWindow):
 
 
 class StBar(CFrame):
-    btn_change = None
     def __init__(self, master):
         super().__init__(master)
         self.normal_mode()
-        __class__.btn_change = self.__upd_btn_change
+        GlobGui.st_bar_btn = self.upd_btn
 
     def normal_mode(self):
         widgets = tuple(v for k, v in self.children.items())
@@ -81,6 +81,3 @@ class StBar(CFrame):
                 return
         else:
             ScanerGui()
-
-    def __upd_btn_change(self):
-        return self.upd_btn

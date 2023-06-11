@@ -1,7 +1,9 @@
 from gui import tkinter
+
 from . import (Dbase, Image, ImageTk, Thumbs, conf, convert_to_rgb, crop_image,
                datetime, decode_image, math, partial, place_center, sqlalchemy,
                tkinter, tkmacosx, traceback)
+from .gui_utils import GlobGui
 from .img_viewer import ImgViewer
 from .widgets import *
 
@@ -209,7 +211,7 @@ class FilterWin(CWindow):
 
         self.destroy()
         focus_last()
-        Thumbnails.reload_without_scroll()
+        GlobGui.reload_thumbs()
 
     def cancel(self):
         self.destroy()
@@ -253,7 +255,7 @@ class ThumbSearch(tkinter.Entry):
         self.search_task = conf.root.after(1000, self.search_go)
 
     def search_go(self):
-        Thumbnails.reload_with_scroll()
+        GlobGui.reload_thumbs_scroll()
         conf.root.focus_force()
 
 
@@ -412,9 +414,6 @@ class ThumbnailsPrepare:
 
 
 class Thumbnails(CFrame, ThumbnailsPrepare):
-    reload_with_scroll = None
-    reload_without_scroll = None
-
     def __init__(self, master):
         super().__init__(master)
 
@@ -438,8 +437,8 @@ class Thumbnails(CFrame, ThumbnailsPrepare):
         self.resize_task = None
         self.search_task = None
 
-        __class__.reload_with_scroll = self.__reload_with_scroll
-        __class__.reload_without_scroll = self.__reload_without_scroll
+        GlobGui.reload_thumbs_scroll = self.reload_with_scroll
+        GlobGui.reload_thumbs = self.reload_without_scroll
 
     def load_scrollable(self):
         self.scroll_frame = CFrame(self)
@@ -571,11 +570,11 @@ class Thumbnails(CFrame, ThumbnailsPrepare):
 
     def show_more_cmd(self):
         conf.limit += 150
-        Thumbnails.reload_without_scroll()
+        GlobGui.reload_thumbs()
 
     def reset_filter_cmd(self):
         Globs.start, Globs.end = None, None
-        Thumbnails.reload_without_scroll()
+        GlobGui.reload_thumbs()
 
     def decect_resize(self, e):
         if self.resize_task:
@@ -593,9 +592,9 @@ class Thumbnails(CFrame, ThumbnailsPrepare):
                 w, h = conf.root.winfo_width(), conf.root.winfo_height()
                 conf.root_w, conf.root_h = w, h
                 conf.root.update_idletasks()
-                Thumbnails.reload_without_scroll()
+                GlobGui.reload_thumbs()
 
-    def __reload_with_scroll(self):
+    def reload_with_scroll(self):
         Globs.start, Globs.end = None, None
         conf.lang_thumbs.clear()
 
@@ -604,7 +603,7 @@ class Thumbnails(CFrame, ThumbnailsPrepare):
         self.thumbs_frame.destroy()
         self.load_thumbnails()
 
-    def __reload_without_scroll(self):
+    def reload_without_scroll(self):
         conf.lang_thumbs.clear()
         self.thumbs_frame.destroy()
         self.load_thumbnails()
