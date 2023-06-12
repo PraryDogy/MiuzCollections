@@ -58,7 +58,7 @@ class Rus:
         self.filter_title = "Фильтр"
         self.filter_start = "Начало"
         self.filter_end = "Конец"
-        self.filter_oneday = "За один день"
+        self.filter_notselected = "Даты не выбраны"
 
         self.filter_product = "Имиджи"
         self.filter_models = "Модели"

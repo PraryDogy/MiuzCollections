@@ -300,8 +300,8 @@ class CCalendar(CFrame, CCalendarEntry):
         self.my_date = my_date
         self.today = datetime.today().date()
         self.clicked = False
-        self.curr_btn = str
-        self.today_btn = tkinter.Label
+        self.curr_btn = tkinter.Label
+        self.btns = []
 
         if not self.my_date:
             self.my_date = self.today
@@ -358,8 +358,6 @@ class CCalendar(CFrame, CCalendarEntry):
         row = CFrame(parrent)
         row.pack()
 
-        self.btns = []
-
         for i in range(1, 43):
             lbl = CButton(row)
             lbl.configure(width=4, height=2)
@@ -407,16 +405,16 @@ class CCalendar(CFrame, CCalendarEntry):
 
     def set_my_date(self):
         try:
-            self.my_date = datetime(self.yy, self.mm, self.dd)
+            self.my_date = datetime(self.yy, self.mm, self.dd).date()
         except ValueError:
             max_day = calendar.monthrange(self.yy, self.mm)[1]
-            self.my_date = datetime(self.yy, self.mm, max_day)
+            self.my_date = datetime(self.yy, self.mm, max_day).date()
 
         self.yy, self.mm, self.dd = tuple(self.my_date.timetuple())[:3]
 
     def switch_day(self, e=None):
-        self.clicked = True
         if e.widget["text"]:
+            self.clicked = True
             self.curr_btn.configure(bg=conf.btn_color)
             self.curr_btn = e.widget
             self.curr_btn.configure(bg=conf.sel_color)
@@ -443,6 +441,14 @@ class CCalendar(CFrame, CCalendarEntry):
         self.change_title()
         self.fill_days()
 
+    def reset_cal(self):
+        self.dd = self.today.day
+        self.mm = self.today.month
+        self.yy = self.today.year
+
+        self.set_my_date()
+        self.change_title()
+        self.fill_days()
 
 class ContextMenu(tkinter.Menu, Reveal):
     def __init__(self):

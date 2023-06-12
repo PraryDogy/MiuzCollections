@@ -44,6 +44,7 @@ class FilterWin(CWindow):
         self.bind("<Return>", self.ok_cmd)
         self.title(conf.lang.filter_title)
         f = ("San Francisco Pro", 17, "bold")
+        self.reseted = False
 
         calendar_frames = CFrame(self)
         calendar_frames.pack()
@@ -67,6 +68,18 @@ class FilterWin(CWindow):
 
         self.r_calendar = CCalendar(right_frame, Dates.end)
         self.r_calendar.pack()
+
+        if any((Dates.start, Dates.end)):
+            cals_t = f"{Dates.named_start} - {Dates.named_end}"
+        else:
+            cals_t = conf.lang.filter_notselected
+        self.cals_titles = CLabel(self, text=cals_t)
+        self.cals_titles.configure(font=f)
+        self.cals_titles.pack()
+
+        cals_reset = CButton(self, text=conf.lang.settings_reset)
+        cals_reset.pack(pady=(15, 0))
+        cals_reset.cmd(self.cals_titles_reset)
 
         CSep(self).pack(fill="x", padx=15, pady=15)
 
@@ -127,6 +140,30 @@ class FilterWin(CWindow):
         self.deiconify()
         self.wait_visibility()
         self.grab_set_global()
+        self.cals_titles_cmd()
+
+    def named_date(self, date: datetime):
+        day = f"{date.day} "
+        month = f"{conf.lang.months_p[date.month]} "
+        year = f"{date.year}"
+        return day + month + year
+
+    def cals_titles_cmd(self):
+        if self.winfo_exists():
+            if any((self.l_calendar.clicked, self.r_calendar.clicked)):
+                start = self.named_date(self.l_calendar.my_date)
+                end = self.named_date(self.r_calendar.my_date)
+                self.cals_titles.configure(
+                    text=f"{start} - {end}"
+                    )
+            self.after(100, self.cals_titles_cmd)
+    
+    def cals_titles_reset(self, e=None):
+        for i in (self.l_calendar, self.r_calendar):
+            i.clicked = False
+            i.reset_cal()
+        self.reseted = True
+        self.cals_titles.configure(text=conf.lang.filter_notselected)
 
     def sort_btn_cmd(self, e):
         if self.btn_sort["text"] == conf.lang.filter_changed:
@@ -156,16 +193,12 @@ class FilterWin(CWindow):
         if any((self.l_calendar.clicked, self.r_calendar.clicked)):
             Dates.start = self.l_calendar.my_date
             Dates.end = self.r_calendar.my_date
-            Dates.named_start = (
-                        f"{Dates.start.day} "
-                        f"{conf.lang.months_p[Dates.start.month]} "
-                        f"{Dates.start.year}"
-                        )
-            Dates.named_end = (
-                        f"{Dates.end.day} "
-                        f"{conf.lang.months_p[Dates.end.month]} "
-                        f"{Dates.end.year}"
-                        )
+            Dates.named_start = self.named_date(Dates.start)
+            Dates.named_end = self.named_date(Dates.end)
+
+        if self.reseted:
+            Dates.start = None
+            Dates.end = None
 
         if self.product["bg"] == conf.sel_color:
             conf.product = True
@@ -457,18 +490,11 @@ class Thumbnails(CFrame, ThumbnailsPrepare):
             )
         r_subtitle.pack(anchor="w", side="right")
 
-        filt_reset = CFrame(title_frame)
-        filt_reset.pack()
-
-        btn_filter = CButton(filt_reset, text=conf.lang.thumbs_filters)
-        btn_filter.pack(side="left", padx=(0, 15))
+        btn_filter = CButton(title_frame, text=conf.lang.thumbs_filters)
+        btn_filter.pack()
         if any((Dates.start, Dates.end)):
             btn_filter.configure(bg=conf.sel_color)
         btn_filter.cmd(lambda e: FilterWin())
-
-        reset = CButton(filt_reset, text=conf.lang.thumbs_reset)
-        reset.pack(side="left")
-        reset.cmd(lambda e: self.reset_filter_cmd())
 
         search = ThumbSearch(title_frame)
         search.pack(pady=(15, 0), ipady=2)
@@ -540,10 +566,6 @@ class Thumbnails(CFrame, ThumbnailsPrepare):
 
     def show_more_cmd(self):
         conf.limit += 150
-        GlobGui.reload_thumbs()
-
-    def reset_filter_cmd(self):
-        Dates.start, Dates.end = None, None
         GlobGui.reload_thumbs()
 
     def decect_resize(self, e):

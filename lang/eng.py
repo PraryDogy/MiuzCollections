@@ -59,7 +59,7 @@ class Eng:
         self.filter_title = "Filter"
         self.filter_start = "Start"
         self.filter_end = "End"
-        self.filter_oneday = "From one day"
+        self.filter_notselected = "Dates not selected"
 
         self.filter_product = "Product"
         self.filter_models = "Models"
