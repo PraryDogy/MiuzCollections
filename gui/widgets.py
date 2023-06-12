@@ -419,9 +419,8 @@ class CCalendar(CFrame, CCalendarEntry):
             self.curr_btn = e.widget
             self.curr_btn.configure(bg=conf.sel_color)
             self.dd = int(e.widget["text"])
-
-        self.set_my_date()
-        self.change_title()
+            self.set_my_date()
+            self.change_title()
 
     def switch_month(self, e=None):
         self.clicked = True
