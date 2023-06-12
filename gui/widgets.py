@@ -109,6 +109,7 @@ class SmbAlert(CWindow):
         self.destroy()
         focus_last()
 
+
 class ImageInfo(CWindow):
     def __init__(self, src: str):
         under_win = None
@@ -298,14 +299,14 @@ class CCalendar(CFrame, CCalendarEntry):
 
         self.my_date = my_date
         self.today = datetime.today().date()
+        self.clicked = False
+        self.curr_btn = str
+        self.today_btn = tkinter.Label
 
         if not self.my_date:
             self.my_date = self.today
 
         self.yy, self.mm, self.dd = tuple(self.my_date.timetuple())[:3]
-        self.enabled = True
-        self.clicked = False
-        self.selected = tkinter.Label
 
         self.calendar = self.load_calendar()
         self.calendar.pack()
@@ -393,8 +394,8 @@ class CCalendar(CFrame, CCalendarEntry):
             else:
                 btn.configure(text="", bg=conf.bg_color)
             if btn["text"] == self.dd:
-                btn["bg"] = conf.sel_color
-                self.selected = btn
+                btn.configure(bg=conf.sel_color)
+                self.curr_btn = btn
 
     def change_title(self):
         mtitle_t = (
@@ -414,23 +415,17 @@ class CCalendar(CFrame, CCalendarEntry):
         self.yy, self.mm, self.dd = tuple(self.my_date.timetuple())[:3]
 
     def switch_day(self, e=None):
-        if not self.enabled:
-            return
-
         self.clicked = True
         if e.widget["text"]:
-            self.selected.configure(bg=conf.btn_color)
-            self.selected = e.widget
-            self.selected.configure(bg=conf.sel_color)
+            self.curr_btn.configure(bg=conf.btn_color)
+            self.curr_btn = e.widget
+            self.curr_btn.configure(bg=conf.sel_color)
             self.dd = int(e.widget["text"])
 
         self.set_my_date()
         self.change_title()
 
     def switch_month(self, e=None):
-        if not self.enabled:
-            return
-
         self.clicked = True
         if e.widget["text"] != "<":
             self.mm += 1
