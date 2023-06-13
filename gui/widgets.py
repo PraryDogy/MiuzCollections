@@ -480,16 +480,16 @@ class ContextMenu(tkinter.Menu, Reveal):
             command = lambda: self.reveal_tiffs(self.find_tiffs(e.src))
             )
 
-    def context_paste(self, str_var: tkinter.StringVar):
+    def context_paste(self):
         self.add_command(
             label=conf.lang.search_paste,
-            command=lambda: str_var.set(conf.root.clipboard_get())
+            command=lambda: GlobGui.str_var.set(conf.root.clipboard_get())
             )
     
-    def context_clear(self, str_var: tkinter.StringVar):
+    def context_clear(self):
         self.add_command(
             label=conf.lang.search_clear,
-            command=lambda: str_var.set("")
+            command=lambda: GlobGui.str_var.set("")
             )
 
     def do_popup(self, e: tkinter.Event):

@@ -33,8 +33,8 @@ class ContextThumbs(ContextMenu):
 class ContextSearch(ContextMenu):
     def __init__(self, e: tkinter.Event):
         super().__init__()
-        self.context_clear(GlobGui.str_var)
-        self.context_paste(GlobGui.str_var)
+        self.context_clear()
+        self.context_paste()
         self.do_popup(e)
 
 
