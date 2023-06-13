@@ -228,4 +228,4 @@ class Settings(CWindow):
                 SmbAlert()
 
         if self.changed_lang:
-            GlobGui.reload_thumbs_scroll()
+            GlobGui().reload_thumbs_scroll()

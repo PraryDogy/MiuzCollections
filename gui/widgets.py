@@ -278,7 +278,7 @@ class CCalendarEntry(CWindow):
             self.change_title()
             self.set_my_date()
             self.fill_days()
-            GlobGui.cals_titles_cmd()
+            GlobGui().cals_titles_cmd()
         except tkinter.TclError:
             print("enter custom date widgets calendar error title change")
 
@@ -419,7 +419,7 @@ class CCalendar(CFrame, CCalendarEntry):
             self.dd = int(e.widget["text"])
             self.set_my_date()
             self.change_title()
-            GlobGui.cals_titles_cmd()
+            GlobGui().cals_titles_cmd()
 
     def switch_month(self, e=None):
         if e.widget["text"] != "<":
@@ -437,7 +437,7 @@ class CCalendar(CFrame, CCalendarEntry):
         self.set_my_date()
         self.change_title()
         self.fill_days()
-        GlobGui.cals_titles_cmd()
+        GlobGui().cals_titles_cmd()
 
     def reset_cal(self):
         self.dd = self.today.day

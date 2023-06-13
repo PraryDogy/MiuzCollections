@@ -36,7 +36,7 @@ class ContextMenuMenu(ContextMenu, MenuExtend):
 class Menu(tkmacosx.SFrame, MenuExtend):
     def __init__(self, master: tkinter):
         self.sel_btn: tkinter.Label = None
-        GlobGui.reload_menu = self.reload_menu
+        GlobGui._reload_menu = self.reload_menu
 
         super().__init__(
             master,
@@ -141,4 +141,4 @@ class Menu(tkmacosx.SFrame, MenuExtend):
             GlobGui.str_var.trace_vdelete(*traces[0])
         GlobGui.str_var.set("")
 
-        GlobGui.reload_thumbs_scroll()
+        GlobGui().reload_thumbs_scroll()

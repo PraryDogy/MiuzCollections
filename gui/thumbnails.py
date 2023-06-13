@@ -141,7 +141,7 @@ class FilterWin(CWindow):
         self.deiconify()
         self.wait_visibility()
         self.grab_set_global()
-        GlobGui.cals_titles_cmd = self.cals_titles_cmd
+        GlobGui._cals_titles_cmd = self.cals_titles_cmd
 
     def named_date(self, date: datetime):
         day = f"{date.day} "
@@ -225,7 +225,7 @@ class FilterWin(CWindow):
 
         self.destroy()
         focus_last()
-        GlobGui.reload_thumbs()
+        GlobGui().reload_thumbs()
 
     def cancel(self):
         self.destroy()
@@ -269,7 +269,7 @@ class ThumbSearch(tkinter.Entry):
         self.search_task = conf.root.after(1000, self.search_go)
 
     def search_go(self):
-        GlobGui.reload_thumbs_scroll()
+        GlobGui().reload_thumbs_scroll()
         conf.root.focus_force()
 
 
@@ -427,8 +427,8 @@ class Thumbnails(CFrame, ThumbnailsPrepare):
         self.resize_task = None
         self.search_task = None
 
-        GlobGui.reload_thumbs_scroll = self.reload_with_scroll
-        GlobGui.reload_thumbs = self.reload_without_scroll
+        GlobGui._reload_thumbs_scroll = self.reload_with_scroll
+        GlobGui._reload_thumbs = self.reload_without_scroll
 
         self.bind("<Enter>", self.focus_menu)
         self.bind("Leave", self.focus_menu)
@@ -564,7 +564,7 @@ class Thumbnails(CFrame, ThumbnailsPrepare):
 
     def show_more_cmd(self):
         conf.limit += 150
-        GlobGui.reload_thumbs()
+        GlobGui().reload_thumbs()
 
     def decect_resize(self, e):
         if self.resize_task:
@@ -582,7 +582,7 @@ class Thumbnails(CFrame, ThumbnailsPrepare):
                 w, h = conf.root.winfo_width(), conf.root.winfo_height()
                 conf.root_w, conf.root_h = w, h
                 conf.root.update_idletasks()
-                GlobGui.reload_thumbs()
+                GlobGui().reload_thumbs()
 
     def reload_with_scroll(self):
         Dates.start, Dates.end = None, None

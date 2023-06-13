@@ -49,8 +49,8 @@ class AutoScan:
         self.change_live_text("")
 
         if self.update_thumbs:
-            GlobGui.reload_thumbs()
-            GlobGui.reload_menu()
+            GlobGui().reload_thumbs()
+            GlobGui().reload_menu()
             self.update_thumbs = False
 
         conf.flag = False
