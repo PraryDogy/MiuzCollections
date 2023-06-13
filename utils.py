@@ -165,8 +165,7 @@ def convert_to_rgb(image):
     # convert cv2 color to rgb
     image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     # load numpy array image
-    img = Image.fromarray(image_rgb)
-    return img
+    return Image.fromarray(image_rgb)
 
 
 def crop_image(img):
@@ -181,13 +180,12 @@ def crop_image(img):
 
 
 def smb_check():
-    """
-    Check smb disk avability with os path exists.
-    Return bool.
-    """
+    smb_ip = "smb://192.168.10.105/Shares"
+
     if not os.path.exists(conf.coll_folder):
-        return False
-    return True
+        cmd = f"mount volume \"{smb_ip}\""
+        subprocess.call(["osascript", "-e", cmd])
+    return bool(os.path.exists(conf.coll_folder))
 
 
 def on_exit(e=None):
