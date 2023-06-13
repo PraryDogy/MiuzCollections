@@ -110,8 +110,6 @@ class FilterWin(CWindow):
         else:
             sort_btn_t = conf.lang.filter_created
 
-        self.sort_modified = conf.sort_modified
-
         self.btn_sort = CButton(self, text=sort_btn_t)
         self.btn_sort.configure(width=13)
         self.btn_sort.pack(pady=(15, 0))
