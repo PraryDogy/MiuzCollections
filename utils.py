@@ -58,6 +58,7 @@ class Reveal:
                 )
 
             subprocess.call(["osascript", *args])
+
         if list_paths:
             threading.Thread(target=task).start()
 
@@ -85,28 +86,25 @@ class Reveal:
             return False
 
 
-
 def get_coll_name(src: str):
-    coll = src.replace(conf.coll_folder, "")
-    coll = coll.strip(os.sep)
-    splited = coll.split(os.sep)
+    coll = src.replace(conf.coll_folder, "").strip(os.sep).split(os.sep)
 
-    if len(splited) > 1:
-        return splited[0]
+    if len(coll) > 1:
+        return coll[0]
     else:
         return conf.coll_folder.strip(os.sep).split(os.sep)[-1]
 
 
-def place_center(top_level: tkinter.Toplevel):
-    """
-    Place new tkinter window to center relavive main window.
-    * param `top_level`: tkinter.TopLevel
-    """
-    x, y = conf.root.winfo_x(), conf.root.winfo_y()
-    xx = x + conf.root.winfo_width()//2 - top_level.winfo_width()//2
-    yy = y + conf.root.winfo_height()//2 - top_level.winfo_height()//2
+def place_center():
+    win: tkinter.Toplevel = [
+        i for i in conf.root.winfo_children()
+        if isinstance(i, tkinter.Toplevel)][-1]
 
-    top_level.geometry(f'+{xx}+{yy}')
+    x, y = conf.root.winfo_x(), conf.root.winfo_y()
+    xx = x + conf.root.winfo_width()//2 - win.winfo_width()//2
+    yy = y + conf.root.winfo_height()//2 - win.winfo_height()//2
+
+    win.geometry(f'+{xx}+{yy}')
 
 
 def resize_image(img, widget_w, widget_h, thumbnail: bool):

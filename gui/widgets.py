@@ -101,7 +101,7 @@ class SmbAlert(CWindow):
         btn.pack()
 
         conf.root.update_idletasks()
-        place_center(self)
+        place_center()
         self.deiconify()
         self.wait_visibility()
         self.grab_set_global()

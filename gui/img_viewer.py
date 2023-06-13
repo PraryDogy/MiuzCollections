@@ -54,7 +54,7 @@ class ImgViewer(CWindow):
         self.task = conf.root.after(
             250, lambda: self.img_place(conf.preview_w, conf.preview_h))
 
-        place_center(self)
+        place_center()
         self.deiconify()
         self.wait_visibility()
         self.grab_set_global()
