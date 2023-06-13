@@ -6,3 +6,4 @@ class GlobGui:
     reload_thumbs_scroll = None #reload thumbnails grid with scroll
     st_bar_btn = tkinter.Label #status bar button
     str_var = tkinter.StringVar(value="")
+    cals_titles_cmd = None

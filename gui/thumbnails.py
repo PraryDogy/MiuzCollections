@@ -45,6 +45,7 @@ class FilterWin(CWindow):
         self.title(conf.lang.filter_title)
         f = ("San Francisco Pro", 17, "bold")
         self.reseted = False
+        self.date_changed = False
 
         calendar_frames = CFrame(self)
         calendar_frames.pack()
@@ -140,7 +141,7 @@ class FilterWin(CWindow):
         self.deiconify()
         self.wait_visibility()
         self.grab_set_global()
-        self.cals_titles_cmd()
+        GlobGui.cals_titles_cmd = self.cals_titles_cmd
 
     def named_date(self, date: datetime):
         day = f"{date.day} "
@@ -149,20 +150,17 @@ class FilterWin(CWindow):
         return day + month + year
 
     def cals_titles_cmd(self):
-        if self.winfo_exists():
-            if any((self.l_calendar.clicked, self.r_calendar.clicked)):
-                start = self.named_date(self.l_calendar.my_date)
-                end = self.named_date(self.r_calendar.my_date)
-                self.cals_titles.configure(
-                    text=f"{start} - {end}"
-                    )
-            self.after(100, self.cals_titles_cmd)
-    
+        start = self.named_date(self.l_calendar.my_date)
+        end = self.named_date(self.r_calendar.my_date)
+        self.cals_titles.configure(text=f"{start} - {end}")
+        self.date_changed = True
+
     def cals_titles_reset(self, e=None):
         for i in (self.l_calendar, self.r_calendar):
             i.clicked = False
             i.reset_cal()
         self.reseted = True
+        self.date_changed = False
         self.cals_titles.configure(text=conf.lang.filter_notselected)
 
     def sort_btn_cmd(self, e):
@@ -190,7 +188,7 @@ class FilterWin(CWindow):
             self.models.configure(bg=conf.sel_color)
 
     def ok_cmd(self, e=None):
-        if any((self.l_calendar.clicked, self.r_calendar.clicked)):
+        if self.date_changed:
             Dates.start = self.l_calendar.my_date
             Dates.end = self.r_calendar.my_date
             Dates.named_start = self.named_date(Dates.start)

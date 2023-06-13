@@ -1,5 +1,6 @@
 from . import (Image, Reveal, calendar, conf, datetime, get_coll_name, on_exit,
                os, place_center, sys, tkinter)
+from .gui_utils import GlobGui
 
 __all__ = (
     "CSep",
@@ -271,14 +272,13 @@ class CCalendarEntry(CWindow):
                 e.set(t[:10])
 
     def cust_ok_cmd(self, e=None):
-        self.clicked = True
-
         self.yy, self.mm, self.dd = tuple(self.cust_date.timetuple())[:3]
 
         try:
             self.change_title()
             self.set_my_date()
             self.fill_days()
+            GlobGui.cals_titles_cmd()
         except tkinter.TclError:
             print("enter custom date widgets calendar error title change")
 
@@ -299,7 +299,6 @@ class CCalendar(CFrame, CCalendarEntry):
 
         self.my_date = my_date
         self.today = datetime.today().date()
-        self.clicked = False
         self.curr_btn = tkinter.Label
         self.btns = []
 
@@ -414,16 +413,15 @@ class CCalendar(CFrame, CCalendarEntry):
 
     def switch_day(self, e=None):
         if e.widget["text"]:
-            self.clicked = True
             self.curr_btn.configure(bg=conf.btn_color)
             self.curr_btn = e.widget
             self.curr_btn.configure(bg=conf.sel_color)
             self.dd = int(e.widget["text"])
             self.set_my_date()
             self.change_title()
+            GlobGui.cals_titles_cmd()
 
     def switch_month(self, e=None):
-        self.clicked = True
         if e.widget["text"] != "<":
             self.mm += 1
         else:
@@ -439,6 +437,7 @@ class CCalendar(CFrame, CCalendarEntry):
         self.set_my_date()
         self.change_title()
         self.fill_days()
+        GlobGui.cals_titles_cmd()
 
     def reset_cal(self):
         self.dd = self.today.day
