@@ -183,8 +183,11 @@ def crop_image(img):
 def smb_check():
     def task():
         if not os.path.exists(conf.coll_folder):
-            cmd = f"mount volume \"{conf.smb_ip}\""
-            subprocess.call(["osascript", "-e", cmd])
+            try:
+                cmd = f"mount volume \"{conf.smb_ip}\""
+                subprocess.call(["osascript", "-e", cmd], timeout=3)
+            except subprocess.TimeoutExpired:
+                print("timeout 3 sec, utils.py, smb_check")
 
     t = threading.Thread(target=task, daemon=True)
     t.start()

@@ -49,4 +49,4 @@ class Application:
             SmbAlert()
 
     def minim(self, e=None):
-        conf.root.wm_iconify()
+        conf.root.wm_withdraw()
