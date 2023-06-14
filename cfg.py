@@ -57,7 +57,8 @@ class Config:
         self.root.withdraw()
 
         # user settings for json
-        self.coll_folder = '/Volumes/Shares/Marketing/Photo/_Collections'
+        self.coll_folder = "/Volumes/Shares/Marketing/Photo/_Collections"
+        self.smb_ip = "smb://192.168.10.105/Shares/"
 
         self.curr_coll = self.all_colls
 

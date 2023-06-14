@@ -180,12 +180,17 @@ def crop_image(img):
 
 
 def smb_check():
-    smb_ip = "smb://192.168.10.105/Shares"
-
     if not os.path.exists(conf.coll_folder):
-        cmd = f"mount volume \"{smb_ip}\""
+        cmd = f"mount volume \"{conf.smb_ip}\""
         subprocess.call(["osascript", "-e", cmd])
     return bool(os.path.exists(conf.coll_folder))
+
+
+def smb_ip():
+    df = subprocess.Popen(['df', conf.coll_folder], stdout=subprocess.PIPE)
+    outputLine = df.stdout.readlines()[1]
+    unc_path = str(outputLine.split()[0])
+    return "smb://" + unc_path.split("@")[-1]
 
 
 def on_exit(e=None):
