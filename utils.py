@@ -22,7 +22,8 @@ __all__ = (
     "smb_check",
     "on_exit",
     "replace_bg",
-    "Reveal"
+    "Reveal",
+    "smb_ip",
     )
 
 
@@ -180,9 +181,16 @@ def crop_image(img):
 
 
 def smb_check():
-    if not os.path.exists(conf.coll_folder):
-        cmd = f"mount volume \"{conf.smb_ip}\""
-        subprocess.call(["osascript", "-e", cmd])
+    def task():
+        if not os.path.exists(conf.coll_folder):
+            cmd = f"mount volume \"{conf.smb_ip}\""
+            subprocess.call(["osascript", "-e", cmd])
+
+    t = threading.Thread(target=task, daemon=True)
+    t.start()
+    while t.is_alive():
+        conf.root.update()
+
     return bool(os.path.exists(conf.coll_folder))
 
 
@@ -190,7 +198,7 @@ def smb_ip():
     df = subprocess.Popen(['df', conf.coll_folder], stdout=subprocess.PIPE)
     outputLine = df.stdout.readlines()[1]
     unc_path = str(outputLine.split()[0])
-    return "smb://" + unc_path.split("@")[-1]
+    return "smb://" + unc_path.split("@")[-1][:-1]
 
 
 def on_exit(e=None):

@@ -1,5 +1,5 @@
 from . import (AutoScan, conf, filedialog,
-               place_center, smb_check, tkinter)
+               place_center, smb_check, smb_ip, tkinter)
 from .widgets import *
 from .gui_utils import GlobGui
 
@@ -209,6 +209,7 @@ class Settings(CWindow):
     def save_cmd(self, e=None):
         conf.lang_sett.clear()
         conf.coll_folder = self.path_widget['text']
+        conf.smb_ip = smb_ip()
 
         if self.lang_btn["text"] == "English":
             conf.json_lang = "English"
