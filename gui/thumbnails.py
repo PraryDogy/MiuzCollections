@@ -495,17 +495,21 @@ class Thumbnails(CFrame, ThumbnailsPrepare):
         search = ThumbSearch(title_frame)
         search.pack(pady=(15, 0), ipady=2)
 
-        for (chunk_ln, dates), img_list in self.thumbs_lbls.items():
+        for x, ((chunk_ln, dates), img_list) in enumerate(self.thumbs_lbls.items()):
 
-            dates_title = dates.split(":")[-1]
-            ln_title = str(chunk_ln) if chunk_ln else len(img_list)
+            dates_thumbs = dates.split(":")[-1]
+            img_lb_thumbs = chunk_ln if chunk_ln else len(img_list)
+            title_thumbs = (
+                f"{dates_thumbs}, "
+                f"{conf.lang.thumbs_summary.lower()}: {img_lb_thumbs}"
+                )
+
+            if chunk_ln and x > 0:
+                title_thumbs = ""
 
             thumbs_title = CLabel(
                 self.thumbs_frame,
-                text=(
-                f"{dates_title}, "
-                f"{conf.lang.thumbs_summary.lower()}: {ln_title}"
-                ),
+                text=title_thumbs,
                 anchor="w",
                 justify="left",
                 )
