@@ -319,11 +319,12 @@ class ThumbnailsPrepare:
 
     def create_thumbs_dict(self):
         thumbs_dict = {}
+        date_keys = set()
         limit = 500
         chunks = (
             self.thumbs_lbls[i:i+limit]
             for i in range(0, len(self.thumbs_lbls), limit)
-        )
+            )
 
         for chunk, img_list in enumerate(chunks):
             for img, src, modified in img_list:
@@ -333,6 +334,10 @@ class ThumbnailsPrepare:
                     date_key = f"{conf.lang.months[date_key.month]} {date_key.year}"
                 else:
                     date_key = f"{Dates.named_start} - {Dates.named_end}"
+
+                if date_key not in date_keys:
+                    chunk = 0
+                    date_keys.add(date_key)
 
                 thumbs_dict.setdefault(date_key, {})
                 thumbs_dict[date_key].setdefault(chunk, [])
