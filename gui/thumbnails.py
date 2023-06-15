@@ -273,16 +273,13 @@ class ThumbSearch(tkinter.Entry):
 
 class ThumbnailsPrepare:
     def thumbs_prepare(self):
-        self.all_src = []
-        self.thumbs_coords = dict()
         self.clmns_count = self.get_clmns_count()
 
         self.thumbs_lbls = Dbase.conn.execute(self.get_query()).fetchall()
- 
         self.thumbs_lbls = self.decode_thumbs()
         self.thumbs_lbls = self.create_thumbs_dict()
 
-        self.size = conf.thumb_size + conf.thumb_pad
+        self.thumb_size = conf.thumb_size + conf.thumb_pad
 
         if conf.curr_coll == conf.all_colls:
             self.coll_title = conf.lang.all_colls
@@ -323,12 +320,12 @@ class ThumbnailsPrepare:
     def create_thumbs_dict(self):
         thumbs_dict = {}
         limit = 500
-        chunk_thumbs = [
+        chunks = (
             self.thumbs_lbls[i:i+limit]
             for i in range(0, len(self.thumbs_lbls), limit)
-        ]
+        )
 
-        for x, img_list in enumerate(chunk_thumbs):
+        for chunk, img_list in enumerate(chunks):
             for img, src, modified in img_list:
                 date_key = datetime.fromtimestamp(modified).date()
 
@@ -338,12 +335,11 @@ class ThumbnailsPrepare:
                     date_key = f"{Dates.named_start} - {Dates.named_end}"
 
                 thumbs_dict.setdefault(date_key, {})
-                thumbs_dict[date_key].setdefault(x, []).append((img, src))
+                thumbs_dict[date_key].setdefault(chunk, [])
                 thumbs_dict[date_key].setdefault("total", 0)
-                thumbs_dict[date_key]["total"] += 1
 
-        # for k, v in thumbs_dict.items():
-            # print(k, v)
+                thumbs_dict[date_key][chunk].append((img, src))
+                thumbs_dict[date_key]["total"] += 1
 
         return thumbs_dict
 
@@ -492,9 +488,12 @@ class Thumbnails(CFrame, ThumbnailsPrepare):
         search = ThumbSearch(title_frame)
         search.pack(pady=(15, 0), ipady=2)
 
-        # for x, ((chunk_ln, dates), img_list) in enumerate(self.thumbs_lbls.items()):
+        all_src = []
         for date_key in self.thumbs_lbls:
             for chunk in self.thumbs_lbls[date_key]:
+
+                if chunk == "total":
+                    continue
 
                 if chunk == 0:
                     t = [date_key + ","]
@@ -509,32 +508,38 @@ class Thumbnails(CFrame, ThumbnailsPrepare):
                     chunk_title.configure(font=('San Francisco Pro', 18, 'bold'))
                     chunk_title.pack(anchor="w", pady=(30, 0), padx=2)
 
-                for img, src in self.thumbs_lbls
-            # w = self.size * self.clmns_count
-            # h = self.size * (math.ceil(len(img_list) / self.clmns_count))
-            # empty = Image.new("RGBA", (w, h), color=conf.bg_color)
+                chunk_ln = len(self.thumbs_lbls[date_key][chunk])
+                w = self.thumb_size * self.clmns_count
+                h = self.thumb_size * (math.ceil(chunk_ln / self.clmns_count))
+                empty = Image.new("RGBA", (w, h), color=conf.bg_color)
+                row, clmn = 0, 0
+                images = self.thumbs_lbls[date_key][chunk]
 
-            # row, clmn = 0, 0
-            # for x, (img, src) in enumerate(img_list, 1):
+                coords = {}
 
-            #     self.all_src.append(src)
-            #     self.thumbs_coords.setdefault(
-            #         dates, dict()
-            #         )[(clmn//self.size, row//self.size)] = src
+                for x, (img, src) in enumerate(images, 1):
 
-            #     empty.paste(img, (clmn, row))
+                    all_src.append(src)
 
-            #     clmn += self.size
-            #     if x % self.clmns_count == 0:
-            #         row += self.size
-            #         clmn = 0
+                    coord = (clmn//self.thumb_size, row//self.thumb_size)
+                    coords[coord] = src
 
-            # img = ImageTk.PhotoImage(empty)
-            # img_lbl = CLabel(self.thumbs_frame, image=img, text=dates)
-            # img_lbl.pack(anchor="w")
-            # img_lbl.image_names = img
-            # img_lbl.bind('<ButtonRelease-1>', self.click)
-            # img_lbl.bind("<ButtonRelease-2>", self.r_click)
+                    empty.paste(img, (clmn, row))
+
+                    clmn += self.thumb_size
+                    if x % self.clmns_count == 0:
+                        row += self.thumb_size
+                        clmn = 0
+
+                img = ImageTk.PhotoImage(empty)
+                img_lbl = CLabel(self.thumbs_frame, image=img)
+                img_lbl.pack(anchor="w")
+                img_lbl.image_names = img
+                img_lbl.name = (date_key, chunk)
+                img_lbl.coords = coords
+                img_lbl.all_src = all_src
+                img_lbl.bind('<ButtonRelease-1>', self.click)
+                img_lbl.bind("<ButtonRelease-2>", self.r_click)
 
         if not self.thumbs_lbls.items():
             no_img_lst = [conf.lang.thumbs_nophoto]
@@ -548,13 +553,12 @@ class Thumbnails(CFrame, ThumbnailsPrepare):
             no_images.configure(font=('San Francisco Pro', 18, 'bold'))
             no_images.pack(pady=(15, 0))
 
-        # if self.total >= 150:
-        #     more_btn = CButton(
-        #         self.thumbs_frame,
-        #         text=conf.lang.thumbs_showmore
-        #         )
-        #     more_btn.cmd(lambda e: self.show_more_cmd())
-        #     more_btn.pack(pady=(15, 0))
+        more_btn = CButton(
+            self.thumbs_frame,
+            text=conf.lang.thumbs_showmore
+            )
+        more_btn.cmd(lambda e: self.show_more_cmd())
+        more_btn.pack(pady=(15, 0))
 
         self.thumbs_frame.pack(expand=1, fill=tkinter.BOTH)
 
@@ -600,18 +604,18 @@ class Thumbnails(CFrame, ThumbnailsPrepare):
 
     def click(self, e: tkinter.Event):
         try:
-            clmn, row = e.x//self.size, e.y//self.size
-            src = self.thumbs_coords[e.widget.cget("text")][(clmn, row)]
+            clmn, row = e.x//self.thumb_size, e.y//self.thumb_size
+            src = e.widget.coords[(clmn, row)]
         except KeyError:
             return
 
-        ImgViewer(src, self.all_src)
+        ImgViewer(src, e.widget.all_src)
 
     def r_click(self, e: tkinter.Event):
         try:
-            clmn, row = e.x//self.size, e.y//self.size
-            e.src = self.thumbs_coords[e.widget.cget("text")][(clmn, row)]
-            e.all_src = self.all_src
+            clmn, row = e.x//self.thumb_size, e.y//self.thumb_size
+            e.src = e.widget.coords[(clmn, row)]
+            e.all_src = e.widget.all_src
         except KeyError:
             return
 
