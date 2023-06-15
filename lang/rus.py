@@ -50,7 +50,7 @@ class Rus:
         self.thumbs_filters = "Фильтры"
         self.thumbs_reset = "Сброс дат"
         self.thumbs_showmore = "Позазать еще"
-        self.thumbs_summary = "Всего"
+        self.thumbs_total = "Всего"
         self.thumbs_nophoto = "Нет фотографий"
         self.thumbs_withname = "с именем"
 

@@ -278,8 +278,7 @@ class ThumbnailsPrepare:
         self.clmns_count = self.get_clmns_count()
 
         self.thumbs_lbls = Dbase.conn.execute(self.get_query()).fetchall()
-        self.total = len(self.thumbs_lbls)
-
+ 
         self.thumbs_lbls = self.decode_thumbs()
         self.thumbs_lbls = self.create_thumbs_dict()
 
@@ -329,24 +328,22 @@ class ThumbnailsPrepare:
             for i in range(0, len(self.thumbs_lbls), limit)
         ]
 
-        for chunk, img_list in enumerate(chunk_thumbs):
+        for x, img_list in enumerate(chunk_thumbs):
             for img, src, modified in img_list:
-                key = datetime.fromtimestamp(modified).date()
+                date_key = datetime.fromtimestamp(modified).date()
 
                 if not any((Dates.start, Dates.end)):
-                    key = f"{conf.lang.months[key.month]} {key.year}"
-
+                    date_key = f"{conf.lang.months[date_key.month]} {date_key.year}"
                 else:
-                    key = f"{Dates.named_start} - {Dates.named_end}"
+                    date_key = f"{Dates.named_start} - {Dates.named_end}"
 
-                if len(chunk_thumbs) > 1:
-                    thumbs_dict.setdefault(
-                        (len(self.thumbs_lbls), f"{chunk}:{key}"), []
-                        ).append((img, src))
-                else:
-                    thumbs_dict.setdefault(
-                        (None, key), []
-                        ).append((img, src))
+                thumbs_dict.setdefault(date_key, {})
+                thumbs_dict[date_key].setdefault(x, []).append((img, src))
+                thumbs_dict[date_key].setdefault("total", 0)
+                thumbs_dict[date_key]["total"] += 1
+
+        # for k, v in thumbs_dict.items():
+            # print(k, v)
 
         return thumbs_dict
 
@@ -495,52 +492,49 @@ class Thumbnails(CFrame, ThumbnailsPrepare):
         search = ThumbSearch(title_frame)
         search.pack(pady=(15, 0), ipady=2)
 
-        for x, ((chunk_ln, dates), img_list) in enumerate(self.thumbs_lbls.items()):
+        # for x, ((chunk_ln, dates), img_list) in enumerate(self.thumbs_lbls.items()):
+        for date_key in self.thumbs_lbls:
+            for chunk in self.thumbs_lbls[date_key]:
 
-            dates_thumbs = dates.split(":")[-1]
-            img_lb_thumbs = chunk_ln if chunk_ln else len(img_list)
-            title_thumbs = (
-                f"{dates_thumbs}, "
-                f"{conf.lang.thumbs_summary.lower()}: {img_lb_thumbs}"
-                )
+                if chunk == 0:
+                    t = [date_key + ","]
+                    t.append(conf.lang.thumbs_total.lower() + ":")
+                    t.append(str(self.thumbs_lbls[date_key]['total']))
+                    chunk_title = CLabel(
+                        self.thumbs_frame,
+                        text=" ".join(t),
+                        anchor="w",
+                        justify="left"
+                        )
+                    chunk_title.configure(font=('San Francisco Pro', 18, 'bold'))
+                    chunk_title.pack(anchor="w", pady=(30, 0), padx=2)
 
-            if chunk_ln and x > 0:
-                title_thumbs = ""
+                for img, src in self.thumbs_lbls
+            # w = self.size * self.clmns_count
+            # h = self.size * (math.ceil(len(img_list) / self.clmns_count))
+            # empty = Image.new("RGBA", (w, h), color=conf.bg_color)
 
-            thumbs_title = CLabel(
-                self.thumbs_frame,
-                text=title_thumbs,
-                anchor="w",
-                justify="left",
-                )
-            thumbs_title["font"] = ('San Francisco Pro', 18, 'bold')
-            thumbs_title.pack(anchor="w", pady=(30, 0), padx=2)
+            # row, clmn = 0, 0
+            # for x, (img, src) in enumerate(img_list, 1):
 
-            w = self.size * self.clmns_count
-            h = self.size * (math.ceil(len(img_list) / self.clmns_count))
-            empty = Image.new("RGBA", (w, h), color=conf.bg_color)
+            #     self.all_src.append(src)
+            #     self.thumbs_coords.setdefault(
+            #         dates, dict()
+            #         )[(clmn//self.size, row//self.size)] = src
 
-            row, clmn = 0, 0
-            for x, (img, src) in enumerate(img_list, 1):
+            #     empty.paste(img, (clmn, row))
 
-                self.all_src.append(src)
-                self.thumbs_coords.setdefault(
-                    dates, dict()
-                    )[(clmn//self.size, row//self.size)] = src
+            #     clmn += self.size
+            #     if x % self.clmns_count == 0:
+            #         row += self.size
+            #         clmn = 0
 
-                empty.paste(img, (clmn, row))
-
-                clmn += self.size
-                if x % self.clmns_count == 0:
-                    row += self.size
-                    clmn = 0
-
-            img = ImageTk.PhotoImage(empty)
-            img_lbl = CLabel(self.thumbs_frame, image=img, text=dates)
-            img_lbl.pack(anchor="w")
-            img_lbl.image_names = img
-            img_lbl.bind('<ButtonRelease-1>', self.click)
-            img_lbl.bind("<ButtonRelease-2>", self.r_click)
+            # img = ImageTk.PhotoImage(empty)
+            # img_lbl = CLabel(self.thumbs_frame, image=img, text=dates)
+            # img_lbl.pack(anchor="w")
+            # img_lbl.image_names = img
+            # img_lbl.bind('<ButtonRelease-1>', self.click)
+            # img_lbl.bind("<ButtonRelease-2>", self.r_click)
 
         if not self.thumbs_lbls.items():
             no_img_lst = [conf.lang.thumbs_nophoto]
@@ -554,13 +548,13 @@ class Thumbnails(CFrame, ThumbnailsPrepare):
             no_images.configure(font=('San Francisco Pro', 18, 'bold'))
             no_images.pack(pady=(15, 0))
 
-        if self.total >= 150:
-            more_btn = CButton(
-                self.thumbs_frame,
-                text=conf.lang.thumbs_showmore
-                )
-            more_btn.cmd(lambda e: self.show_more_cmd())
-            more_btn.pack(pady=(15, 0))
+        # if self.total >= 150:
+        #     more_btn = CButton(
+        #         self.thumbs_frame,
+        #         text=conf.lang.thumbs_showmore
+        #         )
+        #     more_btn.cmd(lambda e: self.show_more_cmd())
+        #     more_btn.pack(pady=(15, 0))
 
         self.thumbs_frame.pack(expand=1, fill=tkinter.BOTH)
 

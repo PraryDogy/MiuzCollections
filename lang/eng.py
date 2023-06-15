@@ -51,7 +51,7 @@ class Eng:
         self.thumbs_filters = "Filters"
         self.thumbs_reset = "Reset date"
         self.thumbs_showmore = "Show more"
-        self.thumbs_summary = "Total"
+        self.thumbs_total = "Total"
         self.thumbs_nophoto = "No photos"
         self.thumbs_withname = "with name"
 
