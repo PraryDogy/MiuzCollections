@@ -319,32 +319,17 @@ class ThumbnailsPrepare:
 
     def create_thumbs_dict(self):
         thumbs_dict = {}
-        date_keys = set()
-        limit = 500
-        chunks = (
-            self.thumbs_lbls[i:i+limit]
-            for i in range(0, len(self.thumbs_lbls), limit)
-            )
 
-        for chunk, img_list in enumerate(chunks):
-            for img, src, modified in img_list:
-                date_key = datetime.fromtimestamp(modified).date()
+        for img, src, modified in self.thumbs_lbls:
+            date_key = datetime.fromtimestamp(modified).date()
 
-                if not any((Dates.start, Dates.end)):
-                    date_key = f"{conf.lang.months[date_key.month]} {date_key.year}"
-                else:
-                    date_key = f"{Dates.named_start} - {Dates.named_end}"
+            if not any((Dates.start, Dates.end)):
+                date_key = f"{conf.lang.months[date_key.month]} {date_key.year}"
+            else:
+                date_key = f"{Dates.named_start} - {Dates.named_end}"
 
-                if date_key not in date_keys:
-                    chunk = 0
-                    date_keys.add(date_key)
-
-                thumbs_dict.setdefault(date_key, {})
-                thumbs_dict[date_key].setdefault(chunk, [])
-                thumbs_dict[date_key].setdefault("total", 0)
-
-                thumbs_dict[date_key][chunk].append((img, src))
-                thumbs_dict[date_key]["total"] += 1
+            thumbs_dict.setdefault(date_key, [])
+            thumbs_dict[date_key].append((img, src))
 
         return thumbs_dict
 
@@ -469,7 +454,7 @@ class Thumbnails(CFrame, ThumbnailsPrepare):
             anchor="e",
             width=35
             )
-        l_subtitle.pack(anchor="e", side="left", padx=(0, 10))
+        l_subtitle.pack(side="left", padx=(0, 10))
 
         r_subtitle_t = (
             f"{self.filter_row}"
@@ -482,7 +467,7 @@ class Thumbnails(CFrame, ThumbnailsPrepare):
             anchor="w",
             width=45
             )
-        r_subtitle.pack(anchor="w", side="right")
+        r_subtitle.pack(side="right")
 
         btn_filter = CButton(title_frame, text=conf.lang.thumbs_filters)
         btn_filter.pack()
@@ -494,35 +479,31 @@ class Thumbnails(CFrame, ThumbnailsPrepare):
         search.pack(pady=(15, 0), ipady=2)
 
         all_src = []
+        limit = 500
+
         for date_key in self.thumbs_lbls:
-            for chunk in self.thumbs_lbls[date_key]:
+            
+            images = self.thumbs_lbls[date_key]
+            chunks = [images[i:i+limit] for i in range(0, len(images), limit)]
 
-                if chunk == "total":
-                    continue
+            t = f"{date_key}, {conf.lang.thumbs_total}: {len(images)}"
+            chunk_title = CLabel(self.thumbs_frame, text=t)
+            chunk_title.configure(font=('San Francisco Pro', 18, 'bold'))
+            chunk_title.pack(anchor="w", pady=(30, 0), padx=2)
 
-                if chunk == 0:
-                    t = [date_key + ","]
-                    t.append(conf.lang.thumbs_total.lower() + ":")
-                    t.append(str(self.thumbs_lbls[date_key]['total']))
-                    chunk_title = CLabel(
-                        self.thumbs_frame,
-                        text=" ".join(t),
-                        anchor="w",
-                        justify="left"
-                        )
-                    chunk_title.configure(font=('San Francisco Pro', 18, 'bold'))
-                    chunk_title.pack(anchor="w", pady=(30, 0), padx=2)
+            for chunk in chunks:
 
-                chunk_ln = len(self.thumbs_lbls[date_key][chunk])
+                chunk_ln = len(chunk)
+                rows = math.ceil(chunk_ln/self.clmns_count)
+
                 w = self.thumb_size * self.clmns_count
-                h = self.thumb_size * (math.ceil(chunk_ln / self.clmns_count))
+                h = self.thumb_size * rows
+
                 empty = Image.new("RGBA", (w, h), color=conf.bg_color)
                 row, clmn = 0, 0
-                images = self.thumbs_lbls[date_key][chunk]
-
                 coords = {}
 
-                for x, (img, src) in enumerate(images, 1):
+                for x, (img, src) in enumerate(chunk, 1):
 
                     all_src.append(src)
 
@@ -546,7 +527,7 @@ class Thumbnails(CFrame, ThumbnailsPrepare):
                 img_lbl.bind('<ButtonRelease-1>', self.click)
                 img_lbl.bind("<ButtonRelease-2>", self.r_click)
 
-        if not self.thumbs_lbls.items():
+        if not self.thumbs_lbls:
             no_img_lst = [conf.lang.thumbs_nophoto]
             str_var = GlobGui.str_var.get()
             if str_var:
