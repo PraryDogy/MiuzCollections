@@ -411,10 +411,9 @@ class Thumbnails(CFrame, ThumbnailsPrepare):
         GlobGui._reload_thumbs_scroll = self.reload_with_scroll
         GlobGui._reload_thumbs = self.reload_without_scroll
 
-        self.bind("<Enter>", self.focus_menu)
-        self.bind("Leave", self.focus_menu)
+        self.bind("<Enter>", self.focus_widget)
 
-    def focus_menu(self, e=None):
+    def focus_widget(self, e=None):
         self.focus_force()
 
     def load_scrollable(self):
