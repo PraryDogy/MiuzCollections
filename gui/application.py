@@ -49,4 +49,5 @@ class Application:
             SmbAlert()
 
     def minim(self, e=None):
-        conf.root.wm_withdraw()
+        pass
+        # conf.root.wm_withdraw()
