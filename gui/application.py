@@ -3,6 +3,7 @@ from .menu import Menu
 from .st_bar import StBar
 from .thumbnails import Thumbnails
 from .widgets import *
+import subprocess
 
 
 class Application:
@@ -49,5 +50,11 @@ class Application:
             SmbAlert()
 
     def minim(self, e=None):
-        pass
-        # conf.root.wm_withdraw()
+
+        args = (
+            "-e", f"set tApp to \"{conf.app_name}\"",
+            "-e", "tell application \"System Events\" to "
+            "set visible of process tApp to false",
+            )
+
+        subprocess.call(["osascript", *args])
