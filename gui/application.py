@@ -53,8 +53,9 @@ class Application:
 
         args = (
             "-e", f"set tApp to \"{conf.app_name}\"",
+            "-e", "tell application tApp to activate",
             "-e", "tell application \"System Events\" to "
-            "set visible of process tApp to false",
+            "tell process tApp to keystroke \"h\" using command down"
             )
-
+            # "set visible of process tApp to false",
         subprocess.call(["osascript", *args])
