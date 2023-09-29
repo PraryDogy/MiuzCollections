@@ -12,11 +12,7 @@ class Application:
         conf.root.configure(bg=conf.bg_color)
         conf.root.deiconify()
 
-        conf.root.createcommand(
-            'tk::mac::ReopenApplication', conf.root.wm_deiconify)
-
         conf.root.bind('<Command-w>', self.minim)
-
         conf.root.createcommand("tk::mac::Quit" , on_exit)
         conf.root.protocol("WM_DELETE_WINDOW", self.minim)
 
