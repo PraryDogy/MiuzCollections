@@ -50,12 +50,20 @@ class Application:
             SmbAlert()
 
     def minim(self, e=None):
+        applescript = f"""
+            set appName to "{conf.app_name}"
+            tell application "System Events"
+                if visible of application process appName is true then
+                    set visible of application process appName to false
+                else
+                    set visible of application process appName to true
+                end if
+            end tell
+            """
 
-        args = (
-            "-e", f"set tApp to \"{conf.app_name}\"",
-            "-e", "tell application tApp to activate",
-            "-e", "tell application \"System Events\" to "
-            "tell process tApp to keystroke \"h\" using command down"
-            )
-            # "set visible of process tApp to false",
-        subprocess.call(["osascript", *args])
+        args = [
+            item
+            for x in [("-e",l.strip())
+            for l in applescript.split('\n')
+            if l.strip() != ''] for item in x]
+        subprocess.call(["osascript"] + args)
