@@ -63,10 +63,15 @@ setup(
     install_requires = []
     )
 
-shutil.copytree(
-    "lib",
-    f"dist/{conf.app_name}.app/Contents/lib"
-    )
+ver = "3.11"
+lib_src = f"/Library/Frameworks/Python.framework/Versions/{ver}/lib"
+folders = "tcl8", "tcl8.6", "tk8.6"
+
+for i in folders:
+    shutil.copytree(
+        os.path.join(lib_src, i),
+        os.path.join(f"dist/{conf.app_name}.app/Contents/lib", i)
+        )
 
 shutil.move(
     f"dist/{conf.app_name}.app",
