@@ -12,13 +12,26 @@ except Exception as e:
     import os
     e_type, e_val, e_tb = sys.exc_info()
 
-    path = os.path.join(
+    APP_NAME = 'MiuzCollections'
+
+    CFG_DIR = os.path.join(
         os.path.expanduser("~"),
-        "Library", "Application Support", "MiuzCollections", "log.txt"
+       f"Library/Application Support/{APP_NAME}"
         )
 
-    with open(path, "w") as file:
-        traceback.print_exception(e_type, e_val, e_tb, file=file)
+    if not os.path.exists(CFG_DIR):
+        os.mkdir(CFG_DIR)
 
-    with open(path, "r") as file:
-        print(file.read())
+    if not os.path.exists(os.path.join(CFG_DIR, 'err.txt')):
+        with open(os.path.join(CFG_DIR, 'err.txt'), 'w') as err_file:
+            pass
+
+    with open(os.path.join(CFG_DIR, 'err.txt'), 'r') as err_file:
+        data = err_file.read()
+
+    data = f'{data}\n\n{traceback.format_exc()}'
+
+    with open(os.path.join(CFG_DIR, 'err.txt'), 'w') as err_file:
+        print(data, file=err_file)
+
+    print(data)

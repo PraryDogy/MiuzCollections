@@ -13,8 +13,10 @@ class Application:
         conf.root.deiconify()
 
         conf.root.bind('<Command-w>', self.minim)
-        conf.root.createcommand("tk::mac::Quit" , on_exit)
         conf.root.protocol("WM_DELETE_WINDOW", self.minim)
+        conf.root.createcommand("tk::mac::Quit" , on_exit)
+        conf.root.createcommand('tk::mac::ReopenApplication', conf.root.deiconify)
+
 
         menu = Menu(conf.root)
         r_frame = CFrame(conf.root)
