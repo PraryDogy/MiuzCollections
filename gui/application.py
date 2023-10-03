@@ -1,4 +1,7 @@
-from . import conf, on_exit, smb_check, AutoScan, 
+from cfg import conf
+from utils import on_exit, smb_check, run_applescript
+from scaner import AutoScan
+# from . import conf, on_exit, smb_check, AutoScan
 from .menu import Menu
 from .st_bar import StBar
 from .thumbnails import Thumbnails
