@@ -9,11 +9,11 @@ from utils import encode_image, get_coll_name
 from gui.gui_utils import GlobGui
 
 __all__ = (
-    "AutoScan",
+    "Scaner",
     )
 
 
-class AutoScan:
+class Scaner:
     def __init__(self) -> None:
         self.update_thumbs = False
 

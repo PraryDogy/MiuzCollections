@@ -1,7 +1,12 @@
-from . import (AutoScan, conf, filedialog,
-               place_center, smb_check, smb_ip, tkinter)
-from .widgets import *
+import tkinter
+from tkinter import filedialog
+
+from cfg import conf
+from scaner import Scaner
+from utils import *
+
 from .gui_utils import GlobGui
+from .widgets import *
 
 __all__ = (
     "Settings",
@@ -224,7 +229,7 @@ class Settings(CWindow):
             conf.curr_coll = conf.all_colls
             self.scan_again = False
             if smb_check():
-                AutoScan().auto_scan()
+                Scaner().auto_scan()
             else:
                 SmbAlert()
 

@@ -24,6 +24,7 @@ __all__ = (
     "replace_bg",
     "Reveal",
     "smb_ip",
+    "run_applescript"
     )
 
 

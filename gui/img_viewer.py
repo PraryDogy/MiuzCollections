@@ -1,6 +1,14 @@
-from . import (Dbase, ImageTk, Thumbs, conf, convert_to_rgb, cv2,
-               decode_image, get_coll_name, os, place_center, replace_bg,
-               resize_image, sqlalchemy, tkinter)
+import tkinter
+
+import cv2
+import sqlalchemy
+from PIL import ImageTk
+
+from cfg import conf
+from database import Dbase, Thumbs
+from utils import *
+from utils import place_center
+
 from .widgets import *
 
 __all__ = (

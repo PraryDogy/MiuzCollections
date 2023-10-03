@@ -1,11 +1,15 @@
 from cfg import conf
-from utils import on_exit, smb_check, run_applescript
-from scaner import AutoScan
-# from . import conf, on_exit, smb_check, AutoScan
+from scaner import Scaner
+from utils import on_exit, run_applescript, smb_check
+
 from .menu import Menu
 from .st_bar import StBar
 from .thumbnails import Thumbnails
 from .widgets import *
+
+__all__ = (
+    "Application",
+    )
 
 
 class Application:
@@ -18,7 +22,6 @@ class Application:
         conf.root.protocol("WM_DELETE_WINDOW", self.minim)
         conf.root.createcommand("tk::mac::Quit" , on_exit)
         # conf.root.createcommand('tk::mac::ReopenApplication', conf.root.deiconify)
-
 
         menu = Menu(conf.root)
         r_frame = CFrame(conf.root)
@@ -45,7 +48,7 @@ class Application:
         conf.root.minsize(870, 500)
 
         if smb_check():
-            AutoScan().auto_scan()
+            Scaner().auto_scan()
         else:
             SmbAlert()
 

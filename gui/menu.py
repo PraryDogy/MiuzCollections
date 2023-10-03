@@ -1,7 +1,16 @@
-from . import (Dbase, Thumbs, conf, os, re, sqlalchemy, subprocess,
-               tkinter, tkmacosx)
-from .widgets import *
+import os
+import re
+import subprocess
+import tkinter
+
+import sqlalchemy
+import tkmacosx
+
+from cfg import conf
+from database import Dbase, Thumbs
+
 from .gui_utils import GlobGui
+from .widgets import *
 
 __all__ = (
     "Menu",

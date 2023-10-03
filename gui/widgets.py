@@ -1,5 +1,14 @@
-from . import (Image, Reveal, calendar, conf, datetime, get_coll_name, on_exit,
-               os, place_center, sys, tkinter)
+import calendar
+import os
+import sys
+import tkinter
+from datetime import datetime
+
+from PIL import Image
+
+from cfg import conf
+from utils import *
+
 from .gui_utils import GlobGui
 
 __all__ = (

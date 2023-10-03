@@ -1,7 +1,12 @@
-from . import conf, place_center, AutoScan, smb_check, tkinter
+import tkinter
+
+from cfg import conf
+from scaner import Scaner
+from utils import *
+
+from .gui_utils import GlobGui
 from .settings import Settings
 from .widgets import *
-from .gui_utils import GlobGui
 
 __all__ = (
     "StBar",
@@ -75,7 +80,7 @@ class StBar(CFrame):
     def update_cmd(self, btn: CButton):
         if not conf.flag:
             if smb_check():
-                AutoScan().auto_scan()
+                Scaner().auto_scan()
             else:
                 SmbAlert()
                 return
