@@ -1,9 +1,8 @@
-from . import conf, on_exit, smb_check, AutoScan
+from . import conf, on_exit, smb_check, AutoScan, 
 from .menu import Menu
 from .st_bar import StBar
 from .thumbnails import Thumbnails
 from .widgets import *
-import subprocess
 
 
 class Application:
@@ -49,19 +48,19 @@ class Application:
 
     def minim(self, e=None):
         applescript = f"""
-            set appName to "{conf.app_name}"
+            set appName to "{conf.root}"
             tell application "System Events"
-                if visible of application process appName is true then
-                    set visible of application process appName to false
-                else
-                    set visible of application process appName to true
-                end if
+                set visible of application process appName to false
             end tell
             """
 
-        args = [
-            item
-            for x in [("-e",l.strip())
-            for l in applescript.split('\n')
-            if l.strip() != ''] for item in x]
-        subprocess.call(["osascript"] + args)
+        run_applescript(applescript)
+
+    def maxim(self, e=None):
+        applescript = f"""
+            set appName to "{conf.root}"
+            tell application appName to activate 
+            end tell
+            """
+
+        run_applescript(applescript)

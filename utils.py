@@ -217,3 +217,12 @@ def on_exit(e=None):
 
     conf.flag = False
     quit()
+
+
+def run_applescript(applescript: str):
+    args = [
+        item
+        for x in [("-e",l.strip())
+        for l in applescript.split('\n')
+        if l.strip() != ''] for item in x]
+    subprocess.call(["osascript"] + args)
