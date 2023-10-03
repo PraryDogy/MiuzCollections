@@ -26,6 +26,10 @@ class Dates:
     named_start = None
     named_end = None
 
+class ContextThumbs(ContextMenu):
+    def __init__(self, e: tkinter.Event):
+        super().__init__()
+
 
 class ContextThumbs(ContextMenu):
     def __init__(self, e: tkinter.Event):
@@ -497,6 +501,9 @@ class Thumbnails(CFrame, ThumbnailsPrepare):
             chunk_title = CLabel(self.thumbs_frame, text=t)
             chunk_title.configure(font=('San Francisco Pro', 18, 'bold'))
             chunk_title.pack(anchor="w", pady=(30, 0), padx=2)
+
+            print(date_key, self.thumbs_lbls[date_key])
+
 
             for chunk in chunks:
 
