@@ -26,7 +26,8 @@ class Dates:
     named_start = None
     named_end = None
 
-class ContextThumbs(ContextMenu):
+
+class ContextTitles(ContextMenu):
     def __init__(self, e: tkinter.Event):
         super().__init__()
 
@@ -502,8 +503,8 @@ class Thumbnails(CFrame, ThumbnailsPrepare):
             chunk_title.configure(font=('San Francisco Pro', 18, 'bold'))
             chunk_title.pack(anchor="w", pady=(30, 0), padx=2)
 
-            print(date_key, self.thumbs_lbls[date_key])
-
+            # print(date_key, self.thumbs_lbls[date_key])
+            chunk_title.bind("<ButtonRelease-1>", lambda e: print(self.thumbs_lbls[date_key]))
 
             for chunk in chunks:
 
