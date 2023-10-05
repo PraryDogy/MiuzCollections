@@ -13,8 +13,8 @@ class Rus:
         # context menu
         self.preview = "Просмотр"
         self.info = "Инфо"
-        self.show_finder = "Показать в Finder"
-        self.show_tiff = "Показать tiff"
+        self.show_finder = "Найти jpeg"
+        self.show_tiff = "Найти tiff"
 
         # menu
         self.menu_title = "Меню"

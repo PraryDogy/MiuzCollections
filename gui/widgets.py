@@ -484,9 +484,10 @@ class ContextMenu(tkinter.Menu, Reveal):
             )
 
     def context_show_tiffs(self, e: tkinter.Event):
+        tiffs = self.find_tiffs(e.src)
         self.add_command(
             label=conf.lang.show_tiff,
-            command = lambda: self.reveal_tiffs(self.find_tiffs(e.src))
+            command = lambda: self.reveal_tiffs(tiffs)
             )
 
     def context_paste(self):
@@ -501,12 +502,23 @@ class ContextMenu(tkinter.Menu, Reveal):
             command=lambda: GlobGui.str_var.set("")
             )
     
-    def context_copy_downloads(self, e: tkinter.Event):
+    def context_download(self, title, paths_list):
         self.add_command(
-            label=f"{conf.lang.context_copy} \"{e.widget.title}\" {conf.lang.context_downloads}",
-            command=lambda: copy_files(e.widget.title, e.widget.paths_list)
+            label=f"{conf.lang.context_copy} \"{title}\" {conf.lang.context_downloads}",
+            command=lambda: download_files(title, paths_list)
         )
 
+    def context_download_onefile(self, title, filepath):
+        self.add_command(
+            label=f"{conf.lang.context_copy} jpeg {conf.lang.context_downloads}",
+            command=lambda: download_onefile(title, filepath)
+        )
+
+    def context_download_tiffs(self, e: tkinter.Event):
+        self.add_command(
+            label=f"{conf.lang.context_copy} tiff {conf.lang.context_downloads}",
+            command=lambda: download_tiffs(e.src)
+        )
 
     def do_popup(self, e: tkinter.Event):
         try:

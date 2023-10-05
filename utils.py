@@ -25,7 +25,9 @@ __all__ = (
     "Reveal",
     "smb_ip",
     "run_applescript",
-    "copy_files"
+    "download_files",
+    "download_onefile",
+    "download_tiffs"
     )
 
 
@@ -230,7 +232,7 @@ def run_applescript(applescript: str):
     subprocess.call(["osascript"] + args)
 
 
-def copy_files(title, pahts_list: list):
+def download_files(title, pahts_list: list):
     parrent_path = os.path.join(os.path.expanduser('~'), "Downloads", conf.app_name)
     dest_path = os.path.join(parrent_path, title)
 
@@ -245,3 +247,30 @@ def copy_files(title, pahts_list: list):
         shutil.copy(i, os.path.join(dest_path, filename))
 
     subprocess.Popen(["open", dest_path])
+
+
+def download_onefile(title, filepath):
+    parrent_path = os.path.join(os.path.expanduser('~'), "Downloads", conf.app_name)
+    dest_path = os.path.join(parrent_path, title)
+
+    if not os.path.exists(parrent_path):
+        os.mkdir(parrent_path)
+
+    shutil.copy(filepath, dest_path)
+
+    subprocess.Popen(["open", parrent_path])
+
+
+def download_tiffs(filepath):
+    tiffs = Reveal().find_tiffs(filepath)
+    if tiffs:
+        parrent_path = os.path.join(os.path.expanduser('~'), "Downloads", conf.app_name)
+        if not os.path.exists(parrent_path):
+            os.mkdir(parrent_path)
+
+        for i in tiffs:
+            filename = i.split("/")[-1]
+            dest = os.path.join(parrent_path, filename)
+            shutil.copy(i, dest)
+
+        subprocess.Popen(["open", parrent_path])

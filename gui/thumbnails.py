@@ -30,7 +30,7 @@ class Dates:
 class ContextTitles(ContextMenu):
     def __init__(self, e: tkinter.Event):
         super().__init__()
-        self.context_copy_downloads(e)
+        self.context_download(e.widget.title, e.widget.paths_list)
         self.do_popup(e)
 
 
@@ -38,11 +38,16 @@ class ContextThumbs(ContextMenu):
     def __init__(self, e: tkinter.Event):
         super().__init__()
         self.context_view(e)
-        self.context_sep()
         self.context_img_info(e)
+
+        self.context_sep()
         self.context_show_jpg(e)
+        self.context_download_onefile(e.title, e.src)
+
+        self.context_sep()
         self.context_show_tiffs(e)
-        
+        self.context_download_tiffs(e)
+
         self.do_popup(e)
 
 class ContextSearch(ContextMenu):
@@ -620,6 +625,7 @@ class Thumbnails(CFrame, ThumbnailsPrepare):
             clmn, row = e.x//self.thumb_size, e.y//self.thumb_size
             e.src = e.widget.coords[(clmn, row)]
             e.all_src = e.widget.all_src
+            e.title = e.src.split("/")[-1]
         except KeyError:
             return
 

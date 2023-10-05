@@ -13,7 +13,7 @@ class Eng:
         # context menu
         self.preview = "Preview"
         self.info = "Info"
-        self.show_finder = "Show in Finder"
+        self.show_finder = "Find jpeg"
         self.show_tiff = "Find tiff"
 
         # menu
