@@ -6,11 +6,12 @@
 
 import os
 import shutil
+import subprocess
 
-from setuptools import setup
-from cfg import conf
 import icnsutil
+from setuptools import setup
 
+from cfg import conf
 
 packages = [
     'cffi',
@@ -73,11 +74,12 @@ for i in folders:
         os.path.join(f"dist/{conf.app_name}.app/Contents/lib", i)
         )
 
-shutil.move(
-    f"dist/{conf.app_name}.app",
-    os.path.expanduser(f"~/Desktop/{conf.app_name}.app")
-    )
+dest = os.path.expanduser(f"~/Desktop/{conf.app_name}.app")
+
+shutil.move(f"dist/{conf.app_name}.app", dest)
 
 shutil.rmtree('build')
 shutil.rmtree('.eggs')
 shutil.rmtree('dist')
+
+subprocess.Popen(["open", "-R", dest])

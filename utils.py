@@ -258,7 +258,7 @@ def download_onefile(title, filepath):
 
     shutil.copy(filepath, dest_path)
 
-    subprocess.Popen(["open", parrent_path])
+    subprocess.Popen(["open", "-R", dest_path])
 
 
 def download_tiffs(filepath):
