@@ -500,6 +500,13 @@ class ContextMenu(tkinter.Menu, Reveal):
             label=conf.lang.search_clear,
             command=lambda: GlobGui.str_var.set("")
             )
+    
+    def context_copy_downloads(self, e: tkinter.Event):
+        self.add_command(
+            label=f"{conf.lang.context_copy} \"{e.widget.title}\" {conf.lang.context_downloads}",
+            command=lambda: copy_files(e.widget.title, e.widget.paths_list)
+        )
+
 
     def do_popup(self, e: tkinter.Event):
         try:

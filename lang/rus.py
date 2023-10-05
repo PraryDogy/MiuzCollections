@@ -115,6 +115,10 @@ class Rus:
         self.live_finish = "Завершаю"
         self.live_updating = "Обновление"
 
+        # context copy to downloads
+        self.context_copy = "Копировать"
+        self.context_downloads = "в загрузки"
+
         self.months_p = {
             1: "января",
             2: "февраля",

@@ -1,4 +1,4 @@
-import io
+import shutil
 import os
 import string
 import subprocess
@@ -24,7 +24,8 @@ __all__ = (
     "replace_bg",
     "Reveal",
     "smb_ip",
-    "run_applescript"
+    "run_applescript",
+    "copy_files"
     )
 
 
@@ -227,3 +228,20 @@ def run_applescript(applescript: str):
         for l in applescript.split('\n')
         if l.strip() != ''] for item in x]
     subprocess.call(["osascript"] + args)
+
+
+def copy_files(title, pahts_list: list):
+    parrent_path = os.path.join(os.path.expanduser('~'), "Downloads", conf.app_name)
+    dest_path = os.path.join(parrent_path, title)
+
+    if not os.path.exists(parrent_path):
+        os.mkdir(parrent_path)
+
+    if not os.path.exists(dest_path):
+        os.mkdir(dest_path)
+
+    for i in pahts_list:
+        filename = i.split("/")[-1]
+        shutil.copy(i, os.path.join(dest_path, filename))
+
+    subprocess.Popen(["open", dest_path])

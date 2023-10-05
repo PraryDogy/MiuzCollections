@@ -116,6 +116,10 @@ class Eng:
         self.live_finish = "Finishing"
         self.live_updating = "Updating"
 
+        # context copy to downloads
+        self.context_copy = "Copy"
+        self.context_downloads = "to Downloads"
+
         self.months_p = {
             1: "january",
             2: "february",
