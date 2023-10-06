@@ -44,7 +44,7 @@ class Config:
 
         # list stores widgets for dynamicaly language change
         self.lang_menu = []
-        self.lang_st_bar = []
+        self.lang_stbar = []
         self.lang_thumbs = []
         self.lang_sett = []
 

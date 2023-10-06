@@ -9,7 +9,7 @@ from PIL import Image
 from cfg import conf
 from utils import *
 
-from .gui_utils import Globals
+from .globals import Globals
 
 __all__ = (
     "CSep",

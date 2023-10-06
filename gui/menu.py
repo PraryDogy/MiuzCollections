@@ -9,7 +9,7 @@ import tkmacosx
 from cfg import conf
 from database import Dbase, Thumbs
 
-from .gui_utils import Globals
+from .globals import Globals
 from .widgets import *
 
 __all__ = (

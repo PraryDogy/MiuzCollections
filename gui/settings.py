@@ -5,7 +5,7 @@ from cfg import conf
 from scaner import Scaner
 from utils import *
 
-from .gui_utils import Globals
+from .globals import Globals
 from .widgets import *
 
 __all__ = (
@@ -151,7 +151,7 @@ class Settings(CWindow):
         self.autoupd_wid.configure(text=conf.lang.sett_autoscan)
 
         wids = conf.lang_menu + conf.lang_sett
-        wids = wids + conf.lang_st_bar + conf.lang_thumbs
+        wids = wids + conf.lang_stbar + conf.lang_thumbs
 
         for wid in (wids):
             for k, v in self.old_lang.__dict__.items():

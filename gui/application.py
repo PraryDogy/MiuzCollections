@@ -3,7 +3,7 @@ from scaner import Scaner
 from utils import on_exit, run_applescript, smb_check
 
 from .menu import Menu
-from .st_bar import StBar
+from .stbar import StBar
 from .thumbnails import Thumbnails
 from .widgets import *
 
@@ -27,13 +27,13 @@ class Application:
         r_frame = CFrame(conf.root)
         thumbnails = Thumbnails(r_frame)
         sep = CSep(r_frame)
-        st_bar = StBar(r_frame)
+        stbar = StBar(r_frame)
 
         menu.pack(side="left", fill="y", pady=10)
         r_frame.pack(fill="both", expand=True)
         thumbnails.pack(fill="both", expand=True, padx=10)
         sep.pack(fill="x", pady=10, padx=15)
-        st_bar.pack(pady=(0, 10))
+        stbar.pack(pady=(0, 10))
 
         MacMenu()
 

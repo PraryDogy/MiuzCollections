@@ -11,7 +11,7 @@ from cfg import conf
 from database import Dbase, Thumbs
 from utils import *
 
-from .gui_utils import Globals
+from .globals import Globals
 from .img_viewer import ImgViewer
 from .widgets import *
 

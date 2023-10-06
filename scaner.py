@@ -6,7 +6,7 @@ import sqlalchemy
 from cfg import conf
 from database import Dbase, Thumbs
 from utils import encode_image, get_coll_name
-from gui.gui_utils import Globals
+from gui.globals import Globals
 
 __all__ = (
     "Scaner",
