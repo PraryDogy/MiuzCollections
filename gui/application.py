@@ -54,7 +54,7 @@ class Application:
 
     def minim(self, e=None):
         applescript = f"""
-            set appName to "{conf.root}"
+            set appName to "{conf.app_name}"
             tell application "System Events"
                 set visible of application process appName to false
             end tell
@@ -64,7 +64,7 @@ class Application:
 
     def maxim(self, e=None):
         applescript = f"""
-            set appName to "{conf.root}"
+            set appName to "{conf.app_name}"
             tell application appName to activate 
             end tell
             """
