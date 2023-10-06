@@ -233,24 +233,30 @@ def run_applescript(applescript: str):
 
 
 def download_files(title, pahts_list: list):
-    parrent_path = os.path.join(os.path.expanduser('~'), "Downloads", conf.app_name)
-    dest_path = os.path.join(parrent_path, title)
+    coll = conf.curr_coll
+    if coll == "all":
+        coll = "All collections"
 
-    if not os.path.exists(parrent_path):
-        os.mkdir(parrent_path)
+    dest = os.path.join(
+        os.path.expanduser('~'), "Downloads", conf.app_name, coll, title
+        )
 
-    if not os.path.exists(dest_path):
-        os.mkdir(dest_path)
+    if not os.path.exists(dest):
+        os.makedirs(dest, exist_ok=True)
 
     for i in pahts_list:
         filename = i.split("/")[-1]
-        shutil.copy(i, os.path.join(dest_path, filename))
+        shutil.copy(i, os.path.join(dest, filename))
 
-    subprocess.Popen(["open", dest_path])
+    subprocess.Popen(["open", dest])
 
 
 def download_onefile(title, filepath):
-    parrent_path = os.path.join(os.path.expanduser('~'), "Downloads", conf.app_name)
+    parrent_path = os.path.join(
+        os.path.expanduser('~'),
+        "Downloads",
+        conf.app_name
+        )
     dest_path = os.path.join(parrent_path, title)
 
     if not os.path.exists(parrent_path):
