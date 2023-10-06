@@ -426,11 +426,6 @@ class Thumbnails(CFrame, ThumbnailsPrepare):
         Globals.reload_scroll = self.reload_with_scroll
         Globals.reload_thumbs = self.reload_without_scroll
 
-        self.bind("<Enter>", self.focus_widget)
-
-    def focus_widget(self, e=None):
-        self.focus_force()
-
     def load_scrollable(self):
         self.scroll_frame = CFrame(self)
         self.scroll_frame.pack(expand=1, fill=tkinter.BOTH)
