@@ -4,7 +4,7 @@ from cfg import conf
 from scaner import Scaner
 from utils import *
 
-from .gui_utils import GlobGui
+from .gui_utils import Globals
 from .settings import Settings
 from .widgets import *
 
@@ -53,7 +53,7 @@ class StBar(CFrame):
     def __init__(self, master):
         super().__init__(master)
         self.normal_mode()
-        GlobGui.st_bar_btn = self.upd_btn
+        Globals.stbar_btn = self.upd_btn
 
     def normal_mode(self):
         widgets = tuple(v for k, v in self.children.items())

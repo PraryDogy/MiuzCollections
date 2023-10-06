@@ -6,7 +6,7 @@ import sqlalchemy
 from cfg import conf
 from database import Dbase, Thumbs
 from utils import encode_image, get_coll_name
-from gui.gui_utils import GlobGui
+from gui.gui_utils import Globals
 
 __all__ = (
     "Scaner",
@@ -32,7 +32,7 @@ class Scaner:
 
     def scaner(self):
         conf.flag = True
-        GlobGui.st_bar_btn.configure(
+        Globals.stbar_btn.configure(
             text=conf.lang.live_updating,
             bg=conf.sel_color
             )
@@ -49,12 +49,12 @@ class Scaner:
         self.change_live_text("")
 
         if self.update_thumbs:
-            GlobGui().reload_thumbs()
-            GlobGui().reload_menu()
+            Globals.reload_thumbs()
+            Globals.reload_menu()
             self.update_thumbs = False
 
         conf.flag = False
-        GlobGui.st_bar_btn.configure(text=conf.lang.upd_btn, bg=conf.btn_color)
+        Globals.stbar_btn.configure(text=conf.lang.upd_btn, bg=conf.btn_color)
 
     def update_colls(self):
         self.change_live_text(conf.lang.scaner_prepare)

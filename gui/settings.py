@@ -5,7 +5,7 @@ from cfg import conf
 from scaner import Scaner
 from utils import *
 
-from .gui_utils import GlobGui
+from .gui_utils import Globals
 from .widgets import *
 
 __all__ = (
@@ -234,4 +234,4 @@ class Settings(CWindow):
                 SmbAlert()
 
         if self.changed_lang:
-            GlobGui().reload_thumbs_scroll()
+            Globals.reload_scroll()

@@ -11,7 +11,7 @@ from cfg import conf
 from database import Dbase, Thumbs
 from utils import *
 
-from .gui_utils import GlobGui
+from .gui_utils import Globals
 from .img_viewer import ImgViewer
 from .widgets import *
 
@@ -159,7 +159,7 @@ class FilterWin(CWindow):
         self.deiconify()
         self.wait_visibility()
         self.grab_set_global()
-        GlobGui._cals_titles_cmd = self.cals_titles_cmd
+        Globals.filter_text_cmd = self.cals_titles_cmd
 
     def named_date(self, date: datetime):
         day = f"{date.day} "
@@ -243,7 +243,7 @@ class FilterWin(CWindow):
 
         self.destroy()
         focus_last()
-        GlobGui().reload_thumbs()
+        Globals.reload_thumbs()
 
     def cancel(self):
         self.destroy()
@@ -255,7 +255,7 @@ class ThumbSearch(tkinter.Entry):
         super().__init__(
             master,
             width=20,
-            textvariable=GlobGui.str_var,
+            textvariable=Globals.search_var,
             bg=conf.ent_color,
             insertbackground="white",
             fg=conf.fg_color,
@@ -265,10 +265,10 @@ class ThumbSearch(tkinter.Entry):
             border=1
             )
 
-        traces = GlobGui.str_var.trace_vinfo()
+        traces = Globals.search_var.trace_vinfo()
         if traces:
-            GlobGui.str_var.trace_vdelete(*traces[0])
-        GlobGui.str_var.trace("w", lambda *args: self.search_task_set())
+            Globals.search_var.trace_vdelete(*traces[0])
+        Globals.search_var.trace("w", lambda *args: self.search_task_set())
 
         self.bind("<Escape>", self.search_esc)
         conf.root.bind("<Command-f>", self.search_focus)
@@ -287,7 +287,7 @@ class ThumbSearch(tkinter.Entry):
         self.search_task = conf.root.after(1000, self.search_go)
 
     def search_go(self):
-        GlobGui().reload_thumbs_scroll()
+        Globals.reload_scroll()
         conf.root.focus_force()
 
 
@@ -362,7 +362,7 @@ class ThumbnailsPrepare:
 
     def get_query(self):
         q = sqlalchemy.select(Thumbs.img150, Thumbs.src, Thumbs.modified)
-        search = GlobGui.str_var.get()
+        search = Globals.search_var.get()
 
         if search:
             search.replace("\n", "").strip()
@@ -428,8 +428,8 @@ class Thumbnails(CFrame, ThumbnailsPrepare):
         self.resize_task = None
         self.search_task = None
 
-        GlobGui._reload_thumbs_scroll = self.reload_with_scroll
-        GlobGui._reload_thumbs = self.reload_without_scroll
+        Globals.reload_scroll = self.reload_with_scroll
+        Globals.reload_thumbs = self.reload_without_scroll
 
         self.bind("<Enter>", self.focus_widget)
 
@@ -552,7 +552,7 @@ class Thumbnails(CFrame, ThumbnailsPrepare):
 
         if not self.thumbs_lbls:
             no_img_lst = [conf.lang.thumbs_nophoto]
-            str_var = GlobGui.str_var.get()
+            str_var = Globals.search_var.get()
             if str_var:
                 no_img_lst.append(f"{conf.lang.thumbs_withname} {str_var}")
             if any((Dates.start, Dates.end)):
@@ -573,7 +573,7 @@ class Thumbnails(CFrame, ThumbnailsPrepare):
 
     def show_more_cmd(self):
         conf.limit += 150
-        GlobGui().reload_thumbs()
+        Globals.reload_thumbs()
 
     def decect_resize(self, e):
         if self.resize_task:
@@ -591,7 +591,7 @@ class Thumbnails(CFrame, ThumbnailsPrepare):
                 w, h = conf.root.winfo_width(), conf.root.winfo_height()
                 conf.root_w, conf.root_h = w, h
                 conf.root.update_idletasks()
-                GlobGui().reload_thumbs()
+                Globals.reload_thumbs()
 
     def reload_with_scroll(self):
         Dates.start, Dates.end = None, None

@@ -9,7 +9,7 @@ from PIL import Image
 from cfg import conf
 from utils import *
 
-from .gui_utils import GlobGui
+from .gui_utils import Globals
 
 __all__ = (
     "CSep",
@@ -287,7 +287,7 @@ class CCalendarEntry(CWindow):
             self.change_title()
             self.set_my_date()
             self.fill_days()
-            GlobGui().cals_titles_cmd()
+            Globals.filter_text_cmd()
         except tkinter.TclError:
             print("enter custom date widgets calendar error title change")
 
@@ -428,7 +428,7 @@ class CCalendar(CFrame, CCalendarEntry):
             self.dd = int(e.widget["text"])
             self.set_my_date()
             self.change_title()
-            GlobGui().cals_titles_cmd()
+            Globals.filter_text_cmd()
 
     def switch_month(self, e=None):
         if e.widget["text"] != "<":
@@ -446,7 +446,7 @@ class CCalendar(CFrame, CCalendarEntry):
         self.set_my_date()
         self.change_title()
         self.fill_days()
-        GlobGui().cals_titles_cmd()
+        Globals.filter_text_cmd()
 
     def reset_cal(self):
         self.dd = self.today.day
@@ -493,13 +493,13 @@ class ContextMenu(tkinter.Menu, Reveal):
     def context_paste(self):
         self.add_command(
             label=conf.lang.search_paste,
-            command=lambda: GlobGui.str_var.set(conf.root.clipboard_get())
+            command=lambda: Globals.search_var.set(conf.root.clipboard_get())
             )
     
     def context_clear(self):
         self.add_command(
             label=conf.lang.search_clear,
-            command=lambda: GlobGui.str_var.set("")
+            command=lambda: Globals.search_var.set("")
             )
     
     def context_download(self, title, paths_list):

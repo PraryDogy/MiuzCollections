@@ -9,7 +9,7 @@ import tkmacosx
 from cfg import conf
 from database import Dbase, Thumbs
 
-from .gui_utils import GlobGui
+from .gui_utils import Globals
 from .widgets import *
 
 __all__ = (
@@ -45,7 +45,7 @@ class ContextMenuMenu(ContextMenu, MenuExtend):
 class Menu(tkmacosx.SFrame, MenuExtend):
     def __init__(self, master: tkinter):
         self.sel_btn: tkinter.Label = None
-        GlobGui._reload_menu = self.reload_menu
+        Globals.reload_menu = self.reload_menu
 
         super().__init__(
             master,
@@ -144,9 +144,9 @@ class Menu(tkmacosx.SFrame, MenuExtend):
         self.sel_btn = e.widget
         conf.curr_coll = e.widget.true_name
 
-        traces = GlobGui.str_var.trace_vinfo()
+        traces = Globals.search_var.trace_vinfo()
         if traces:
-            GlobGui.str_var.trace_vdelete(*traces[0])
-        GlobGui.str_var.set("")
+            Globals.search_var.trace_vdelete(*traces[0])
+        Globals.search_var.set("")
 
-        GlobGui().reload_thumbs_scroll()
+        Globals.reload_scroll()
