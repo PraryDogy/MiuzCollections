@@ -232,7 +232,7 @@ def run_applescript(applescript: str):
     subprocess.call(["osascript"] + args)
 
 
-def download_files(title, pahts_list: list):
+def download_files(title, paths_list: list):
     coll = conf.curr_coll
     if coll == "all":
         coll = "All collections"
@@ -244,9 +244,10 @@ def download_files(title, pahts_list: list):
     if not os.path.exists(dest):
         os.makedirs(dest, exist_ok=True)
 
-    for i in pahts_list:
+    for i in paths_list:
         filename = i.split("/")[-1]
         shutil.copy(i, os.path.join(dest, filename))
+        # subprocess.call(['cp', i, os.path.join(dest, filename)])
 
     subprocess.Popen(["open", dest])
 
