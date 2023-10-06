@@ -27,10 +27,15 @@ class ContextViewer(ContextMenu):
         super().__init__()
         self.context_img_info(e)
         self.context_sep()
-        self.context_show_jpg(e)
-        self.context_show_tiffs(e)
-        self.do_popup(e)
 
+        self.context_show_jpg(e)
+        self.context_download_onefile(e)
+        self.context_sep()
+
+        self.context_show_tiffs(e)
+        self.context_download_tiffs(e)
+
+        self.do_popup(e)
 
 
 class ImgViewer(CWindow):
@@ -73,8 +78,8 @@ class ImgViewer(CWindow):
         self.resize_task = None
 
     def r_click(self, e):
-        e.src = src
-        e.all_src = all_src
+        e.widget.src = src
+        e.widget.all_src = all_src
         ContextViewer(e)
 
     def decect_resize(self, e):

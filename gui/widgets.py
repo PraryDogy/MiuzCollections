@@ -465,7 +465,7 @@ class ContextMenu(tkinter.Menu, Reveal):
         from .img_viewer import ImgViewer
         self.add_command(
             label=conf.lang.preview,
-            command=lambda: ImgViewer(e.src, e.all_src)
+            command=lambda: ImgViewer(e.widget.src, e.widget.all_src)
             )
 
     def context_sep(self):
@@ -474,17 +474,17 @@ class ContextMenu(tkinter.Menu, Reveal):
     def context_img_info(self, e: tkinter.Event):
         self.add_command(
             label=conf.lang.info,
-            command=lambda: ImageInfo(e.src)
+            command=lambda: ImageInfo(e.widget.src)
             )
 
     def context_show_jpg(self, e: tkinter.Event):
         self.add_command(
             label=conf.lang.show_finder,
-            command = lambda: self.reveal_jpg(e.src)
+            command = lambda: self.reveal_jpg(e.widget.src)
             )
 
     def context_show_tiffs(self, e: tkinter.Event):
-        tiffs = self.find_tiffs(e.src)
+        tiffs = self.find_tiffs(e.widget.src)
         self.add_command(
             label=conf.lang.show_tiff,
             command = lambda: self.reveal_tiffs(tiffs)
@@ -495,29 +495,29 @@ class ContextMenu(tkinter.Menu, Reveal):
             label=conf.lang.search_paste,
             command=lambda: Globals.search_var.set(conf.root.clipboard_get())
             )
-    
+
     def context_clear(self):
         self.add_command(
             label=conf.lang.search_clear,
             command=lambda: Globals.search_var.set("")
             )
     
-    def context_download(self, title, paths_list):
+    def context_download_group(self, e: tkinter.Event):
         self.add_command(
-            label=f"{conf.lang.context_copy} \"{title}\" {conf.lang.context_downloads}",
-            command=lambda: download_files(title, paths_list)
+            label=f"{conf.lang.context_copy} \"{e.widget.title}\" {conf.lang.context_downloads}",
+            command=lambda: download_files(e.widget.title, e.widget.paths_list)
         )
 
-    def context_download_onefile(self, title, filepath):
+    def context_download_onefile(self, e: tkinter.Event):
         self.add_command(
             label=f"{conf.lang.context_copy} jpeg {conf.lang.context_downloads}",
-            command=lambda: download_onefile(title, filepath)
+            command=lambda: download_onefile(e.widget.src)
         )
 
     def context_download_tiffs(self, e: tkinter.Event):
         self.add_command(
             label=f"{conf.lang.context_copy} tiff {conf.lang.context_downloads}",
-            command=lambda: download_tiffs(e.src)
+            command=lambda: download_tiffs(e.widget.src)
         )
 
     def do_popup(self, e: tkinter.Event):

@@ -30,7 +30,7 @@ class Dates:
 class ContextTitles(ContextMenu):
     def __init__(self, e: tkinter.Event):
         super().__init__()
-        self.context_download(e.widget.title, e.widget.paths_list)
+        self.context_download_group(e)
         self.do_popup(e)
 
 
@@ -42,7 +42,7 @@ class ContextThumbs(ContextMenu):
 
         self.context_sep()
         self.context_show_jpg(e)
-        self.context_download_onefile(e.title, e.src)
+        self.context_download_onefile(e)
 
         self.context_sep()
         self.context_show_tiffs(e)
@@ -416,17 +416,17 @@ class Thumbnails(CFrame, ThumbnailsPrepare):
 
         conf.root.update_idletasks()
 
-        self.load_scrollable()
-        self.load_thumbnails()
+        self.load_scroll()
+        self.load_thumbs()
 
         conf.root.bind('<Configure>', self.decect_resize)
         self.resize_task = None
         self.search_task = None
 
-        Globals.reload_scroll = self.reload_with_scroll
-        Globals.reload_thumbs = self.reload_without_scroll
+        Globals.reload_scroll = self.reload_scroll
+        Globals.reload_thumbs = self.reload_thumbs
 
-    def load_scrollable(self):
+    def load_scroll(self):
         self.scroll_frame = CFrame(self)
         self.scroll_frame.pack(expand=1, fill=tkinter.BOTH)
 
@@ -434,7 +434,7 @@ class Thumbnails(CFrame, ThumbnailsPrepare):
             self.scroll_frame, bg=conf.bg_color, scrollbarwidth=7)
         self.sframe.pack(expand=1, fill=tkinter.BOTH)
 
-    def load_thumbnails(self):
+    def load_thumbs(self):
         self.thumbs_prepare()
 
         self.thumbs_frame = CFrame(self.sframe)
@@ -501,7 +501,7 @@ class Thumbnails(CFrame, ThumbnailsPrepare):
             chunk_title.pack(anchor="w", pady=(30, 0), padx=2)
 
             chunk_title.title = date_key
-            chunk_title.paths_list = (i[1] for i in self.thumbs_lbls[date_key])
+            chunk_title.paths_list = (i[1] for i in images)
             chunk_title.bind("<ButtonRelease-2>", ContextTitles)
 
             for chunk in chunks:
@@ -583,19 +583,19 @@ class Thumbnails(CFrame, ThumbnailsPrepare):
                 conf.root.update_idletasks()
                 Globals.reload_thumbs()
 
-    def reload_with_scroll(self):
+    def reload_scroll(self):
         Dates.start, Dates.end = None, None
         conf.lang_thumbs.clear()
 
         self.scroll_frame.destroy()
-        self.load_scrollable()
         self.thumbs_frame.destroy()
-        self.load_thumbnails()
+        self.load_scroll()
+        self.load_thumbs()
 
-    def reload_without_scroll(self):
+    def reload_thumbs(self):
         conf.lang_thumbs.clear()
         self.thumbs_frame.destroy()
-        self.load_thumbnails()
+        self.load_thumbs()
 
     def get_clmns_count(self):
         clmns = (conf.root_w - conf.menu_w) // conf.thumb_size
@@ -613,9 +613,7 @@ class Thumbnails(CFrame, ThumbnailsPrepare):
     def r_click(self, e: tkinter.Event):
         try:
             clmn, row = e.x//self.thumb_size, e.y//self.thumb_size
-            e.src = e.widget.coords[(clmn, row)]
-            e.all_src = e.widget.all_src
-            e.title = e.src.split("/")[-1]
+            e.widget.src = e.widget.coords[(clmn, row)]
         except KeyError:
             return
 

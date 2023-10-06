@@ -252,24 +252,23 @@ def download_files(title, paths_list: list):
     subprocess.Popen(["open", dest])
 
 
-def download_onefile(title, filepath):
+def download_onefile(src):
+    title = src.split("/")[-1]
     parrent_path = os.path.join(
-        os.path.expanduser('~'),
-        "Downloads",
-        conf.app_name
+        os.path.expanduser('~'), "Downloads", conf.app_name
         )
     dest_path = os.path.join(parrent_path, title)
 
     if not os.path.exists(parrent_path):
         os.mkdir(parrent_path)
 
-    shutil.copy(filepath, dest_path)
+    shutil.copy(src, dest_path)
 
     subprocess.Popen(["open", "-R", dest_path])
 
 
-def download_tiffs(filepath):
-    tiffs = Reveal().find_tiffs(filepath)
+def download_tiffs(src):
+    tiffs = Reveal().find_tiffs(src)
     if tiffs:
         parrent_path = os.path.join(os.path.expanduser('~'), "Downloads", conf.app_name)
         if not os.path.exists(parrent_path):
