@@ -490,18 +490,20 @@ class Thumbnails(CFrame, ThumbnailsPrepare):
         all_src = []
         limit = 500
 
-        for date_key in self.thumbs_lbls:
+        for date_key, img_list in self.thumbs_lbls.items():
             
-            images = self.thumbs_lbls[date_key]
-            chunks = [images[i:i+limit] for i in range(0, len(images), limit)]
+            chunks = [
+                img_list[i:i+limit]
+                for i in range(0, len(img_list), limit)
+                ]
 
-            t = f"{date_key}, {conf.lang.thumbs_total}: {len(images)}"
+            t = f"{date_key}, {conf.lang.thumbs_total}: {len(img_list)}"
             chunk_title = CLabel(self.thumbs_frame, text=t)
             chunk_title.configure(font=('San Francisco Pro', 18, 'bold'))
             chunk_title.pack(anchor="w", pady=(30, 0), padx=2)
 
             chunk_title.title = date_key
-            chunk_title.paths_list = (i[1] for i in images)
+            chunk_title.paths_list = (i[1] for i in img_list)
             chunk_title.bind("<ButtonRelease-2>", ContextTitles)
 
             for chunk in chunks:
