@@ -50,6 +50,7 @@ class ContextThumbs(ContextMenu):
 
         self.do_popup(e)
 
+
 class ContextSearch(ContextMenu):
     def __init__(self, e: tkinter.Event):
         super().__init__()
@@ -270,16 +271,10 @@ class ThumbSearch(tkinter.Entry):
             Globals.search_var.trace_vdelete(*traces[0])
         Globals.search_var.trace("w", lambda *args: self.search_task_set())
 
-        self.bind("<Escape>", self.search_esc)
-        conf.root.bind("<Command-f>", self.search_focus)
+        self.bind("<Escape>", lambda e: conf.root.focus_force())
+        conf.root.bind("<Command-f>", lambda e: self.focus_force())
         self.bind("<ButtonRelease-2>", lambda e: ContextSearch(e))
         self.search_task = None
-
-    def search_focus(self, e=None):
-        self.focus_force()
-
-    def search_esc(self, e=None):
-        conf.root.focus_force()
 
     def search_task_set(self):
         if self.search_task:
