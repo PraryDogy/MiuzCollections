@@ -491,7 +491,6 @@ class Thumbnails(CFrame, ThumbnailsPrepare):
         limit = 500
 
         for date_key, img_list in self.thumbs_lbls.items():
-            
             chunks = [
                 img_list[i:i+limit]
                 for i in range(0, len(img_list), limit)
