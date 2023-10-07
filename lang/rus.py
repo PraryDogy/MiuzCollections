@@ -13,8 +13,9 @@ class Rus:
         # context menu
         self.preview = "Просмотр"
         self.info = "Инфо"
-        self.show_finder = "Найти jpeg"
+        self.show_jpeg = "Найти jpeg"
         self.show_tiff = "Найти tiff"
+        self.show_coll = "Показать коллекцию"
 
         # menu
         self.menu_title = "Меню"

@@ -35,7 +35,7 @@ class ContextMenuMenu(Context, MenuExtend):
         super().__init__()
 
         self.add_command(
-            label=conf.lang.show_finder,
+            label=conf.lang.show_coll,
             command=lambda: self.reveal_coll(e)
             )
 

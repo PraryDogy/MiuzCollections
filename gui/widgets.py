@@ -222,7 +222,7 @@ class Context(tkinter.Menu, Reveal):
 
     def context_show_jpg(self, e: tkinter.Event):
         self.add_command(
-            label=conf.lang.show_finder,
+            label=conf.lang.show_jpeg,
             command = lambda: self.reveal_jpg(e.widget.src)
             )
 

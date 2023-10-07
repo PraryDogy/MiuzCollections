@@ -13,8 +13,9 @@ class Eng:
         # context menu
         self.preview = "Preview"
         self.info = "Info"
-        self.show_finder = "Find jpeg"
+        self.show_jpeg = "Find jpeg"
         self.show_tiff = "Find tiff"
+        self.show_coll = "Show collection"
 
         # menu
         self.menu_title = "Menu"
