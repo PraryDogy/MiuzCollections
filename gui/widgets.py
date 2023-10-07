@@ -6,7 +6,7 @@ from datetime import datetime
 from PIL import Image
 
 from cfg import conf
-from utils import *
+from .utils import *
 
 from .globals import Globals
 

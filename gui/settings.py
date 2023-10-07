@@ -2,8 +2,8 @@ import tkinter
 from tkinter import filedialog
 
 from cfg import conf
-from scaner import Scaner
-from utils import *
+from .scaner import Scaner
+from .utils import *
 
 from .globals import Globals
 from .widgets import *

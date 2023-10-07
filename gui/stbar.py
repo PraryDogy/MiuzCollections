@@ -1,8 +1,8 @@
 import tkinter
 
 from cfg import conf
-from scaner import Scaner
-from utils import *
+from .scaner import Scaner
+from .utils import *
 
 from .globals import Globals
 from .settings import Settings

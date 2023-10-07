@@ -1,6 +1,6 @@
 from cfg import conf
-from scaner import Scaner
-from utils import on_exit, run_applescript, smb_check
+from .scaner import Scaner
+from .utils import on_exit, run_applescript, smb_check
 
 from .menu import Menu
 from .stbar import StBar

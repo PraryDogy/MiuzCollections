@@ -7,8 +7,8 @@ from PIL import ImageTk
 
 from cfg import conf
 from database import Dbase, Thumbs
-from utils import *
-from utils import place_center
+from .utils import *
+from .utils import place_center
 
 from .widgets import *
 

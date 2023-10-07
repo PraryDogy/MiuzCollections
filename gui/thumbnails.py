@@ -9,7 +9,7 @@ from PIL import Image, ImageTk
 
 from cfg import conf
 from database import Dbase, Thumbs
-from utils import *
+from .utils import *
 
 from .globals import Globals
 from .img_viewer import ImgViewer

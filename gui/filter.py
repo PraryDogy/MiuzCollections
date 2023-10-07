@@ -3,7 +3,7 @@ import tkinter
 from datetime import datetime
 
 from cfg import conf
-from utils import *
+from .utils import *
 
 from .globals import Globals
 from .widgets import *
