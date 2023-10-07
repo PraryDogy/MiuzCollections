@@ -1,5 +1,5 @@
-import shutil
 import os
+import shutil
 import string
 import subprocess
 import threading
@@ -10,8 +10,6 @@ import numpy
 from PIL import Image, ImageDraw
 
 from cfg import conf
-
-
 
 __all__ = (
     "get_coll_name",
