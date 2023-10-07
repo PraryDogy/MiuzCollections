@@ -234,9 +234,10 @@ class Context(tkinter.Menu, Reveal):
             )
 
     def context_paste(self):
+        pasted = conf.root.clipboard_get().strip()
         self.add_command(
             label=conf.lang.search_paste,
-            command=lambda: Globals.search_var.set(conf.root.clipboard_get())
+            command=lambda: Globals.search_var.set(pasted)
             )
 
     def context_clear(self):
