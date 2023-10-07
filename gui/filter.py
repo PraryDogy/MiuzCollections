@@ -85,19 +85,17 @@ class CCalendarEntry(CWindow):
             self.change_title()
             self.set_my_date()
             self.fill_days()
-            Globals.filter_text_cmd()
+            Globals.set_calendar_title()
         except tkinter.TclError:
             print("enter custom date widgets calendar error title change")
 
         self.win_cust.destroy()
-        self.winfo_toplevel().grab_set_global()
-        self.winfo_toplevel().focus_force()
+        focus_last_win()
 
     def cust_can_cmd(self, e=None):
         self.unbind_all("<ButtonRelease-1>")
         self.win_cust.destroy()
-        self.winfo_toplevel().grab_set_global()
-        self.winfo_toplevel().focus_force()
+        focus_last_win()
 
 
 class CCalendar(CFrame, CCalendarEntry):
@@ -226,7 +224,7 @@ class CCalendar(CFrame, CCalendarEntry):
             self.dd = int(e.widget["text"])
             self.set_my_date()
             self.change_title()
-            Globals.filter_text_cmd()
+            Globals.set_calendar_title()
 
     def switch_month(self, e=None):
         if e.widget["text"] != "<":
@@ -244,7 +242,7 @@ class CCalendar(CFrame, CCalendarEntry):
         self.set_my_date()
         self.change_title()
         self.fill_days()
-        Globals.filter_text_cmd()
+        Globals.set_calendar_title()
 
     def reset_cal(self):
         self.dd = self.today.day
@@ -357,7 +355,7 @@ class Filter(CWindow):
         self.deiconify()
         self.wait_visibility()
         self.grab_set_global()
-        Globals.filter_text_cmd = self.cals_titles_cmd
+        Globals.set_calendar_title = self.set_calendar_title
 
     def named_date(self, date: datetime):
         day = f"{date.day} "
@@ -365,7 +363,7 @@ class Filter(CWindow):
         year = f"{date.year}"
         return day + month + year
 
-    def cals_titles_cmd(self):
+    def set_calendar_title(self):
         start = self.named_date(self.l_calendar.my_date)
         end = self.named_date(self.r_calendar.my_date)
         self.cals_titles.configure(text=f"{start} - {end}")
@@ -440,9 +438,9 @@ class Filter(CWindow):
             conf.sort_modified = True
 
         self.destroy()
-        focus_last()
+        conf.root.focus_force()
         Globals.reload_thumbs()
 
     def cancel(self):
         self.destroy()
-        focus_last()
+        conf.root.focus_force()

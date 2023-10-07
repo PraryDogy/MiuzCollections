@@ -46,7 +46,7 @@ class ScanerGui(CWindow):
         if not conf.live_text:
             conf.root.after_cancel(self.live_task)
             self.destroy()
-            focus_last()
+            focus_last_win()
 
 
 class StBar(CFrame):

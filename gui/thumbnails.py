@@ -53,7 +53,7 @@ class ContextSearch(Context):
         self.do_popup(e)
 
 
-class ThumbSearch(tkinter.Entry):
+class ThumbsSearch(tkinter.Entry):
     def __init__(self, master: tkinter):
         super().__init__(
             master,
@@ -88,7 +88,7 @@ class ThumbSearch(tkinter.Entry):
         conf.root.focus_force()
 
 
-class ThumbnailsPrepare:
+class ThumbsPrepare:
     def thumbs_prepare(self):
         self.clmns_count = self.get_clmns_count()
 
@@ -201,7 +201,7 @@ class ThumbnailsPrepare:
         return q
 
 
-class Thumbnails(CFrame, ThumbnailsPrepare):
+class Thumbnails(CFrame, ThumbsPrepare):
     def __init__(self, master):
         super().__init__(master)
 
@@ -286,7 +286,7 @@ class Thumbnails(CFrame, ThumbnailsPrepare):
             btn_filter.configure(bg=conf.sel_color)
         btn_filter.cmd(lambda e: Filter())
 
-        search = ThumbSearch(title_frame)
+        search = ThumbsSearch(title_frame)
         search.pack(pady=(15, 0), ipady=2)
 
         all_src = []

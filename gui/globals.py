@@ -3,11 +3,11 @@ from datetime import datetime
 
 
 class Globals:
-    reload_menu = None #reload left menu
-    reload_thumbs = None #reload thumbnails grid without scroll
-    reload_scroll = None #reload thumbnails grid with scroll
-    filter_text_cmd = None #change title text in filter window under calendars
-    stbar_btn = tkinter.Label #status bar button
+    reload_menu = None # menu > Menu().reload_menu()
+    reload_thumbs = None # thumbnails > Thumbnails().reload_thumbs()
+    reload_scroll = None # thumbnails > Thumbnails().reload_scroll()
+    set_calendar_title = None # filter > Filter().set_calendar_title()
+    stbar_btn = tkinter.Label # stbar > StBar.upd_btn
     search_var = tkinter.StringVar(value="")
 
     start: datetime = None
