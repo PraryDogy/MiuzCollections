@@ -204,9 +204,12 @@ def smb_check():
 
 def smb_ip():
     df = subprocess.Popen(['df', conf.coll_folder], stdout=subprocess.PIPE)
-    outputLine = df.stdout.readlines()[1]
-    unc_path = str(outputLine.split()[0])
-    return "smb://" + unc_path.split("@")[-1][:-1]
+    try:
+        outputLine = df.stdout.readlines()[1]
+        unc_path = str(outputLine.split()[0])
+        return "smb://" + unc_path.split("@")[-1][:-1]
+    except IndexError:
+        return None
 
 
 def on_exit(e=None):
