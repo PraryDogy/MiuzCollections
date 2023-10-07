@@ -233,54 +233,52 @@ def run_applescript(applescript: str):
     subprocess.call(["osascript"] + args)
 
 
-def download_files(title, paths_list: list):
+def create_dir(title=None):
     coll = conf.curr_coll
     if coll == "all":
         coll = "All collections"
 
     dest = os.path.join(
-        os.path.expanduser('~'), "Downloads", conf.app_name, coll, title
+        os.path.expanduser('~'), "Downloads", conf.app_name, coll
         )
+
+    if title:
+        dest = os.path.join(dest, title)
 
     if not os.path.exists(dest):
         os.makedirs(dest, exist_ok=True)
 
+    return dest
+
+
+def download_files(title, paths_list: list):
+    dest = create_dir(title)
+
     for i in paths_list:
         filename = i.split("/")[-1]
         shutil.copy(i, os.path.join(dest, filename))
-        # subprocess.call(['cp', i, os.path.join(dest, filename)])
 
     subprocess.Popen(["open", dest])
 
 
 def download_onefile(src):
-    title = src.split("/")[-1]
-    parrent_path = os.path.join(
-        os.path.expanduser('~'), "Downloads", conf.app_name
-        )
-    dest_path = os.path.join(parrent_path, title)
+    dest = create_dir()
+    dest = os.path.join(dest, src.split("/")[-1])
 
-    if not os.path.exists(parrent_path):
-        os.mkdir(parrent_path)
-
-    shutil.copy(src, dest_path)
-
-    subprocess.Popen(["open", "-R", dest_path])
+    shutil.copy(src, dest)
+    subprocess.Popen(["open", "-R", dest])
 
 
 def download_tiffs(src):
     tiffs = Reveal().find_tiffs(src)
+
     if tiffs:
-        parrent_path = os.path.join(os.path.expanduser('~'), "Downloads", conf.app_name)
-        if not os.path.exists(parrent_path):
-            os.mkdir(parrent_path)
+        parrent = create_dir()
 
         for i in tiffs:
-            filename = i.split("/")[-1]
-            dest = os.path.join(parrent_path, filename)
-            shutil.copy(i, dest)
+            shutil.copy(i, os.path.join(parrent, i.split("/")[-1]))
 
-        subprocess.Popen(["open", parrent_path])
+        subprocess.Popen(["open", parrent])
 
 
 def focus_last_win():
