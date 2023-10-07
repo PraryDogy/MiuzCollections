@@ -14,27 +14,21 @@ from utils import *
 from .globals import Globals
 from .img_viewer import ImgViewer
 from .widgets import *
+from .filter import Filter
 
 __all__ = (
     "Thumbnails",
     )
 
 
-class Dates:
-    start: datetime = None
-    end: datetime = None
-    named_start = None
-    named_end = None
-
-
-class ContextTitles(ContextMenu):
+class ContextTitles(Context):
     def __init__(self, e: tkinter.Event):
         super().__init__()
         self.context_download_group(e)
         self.do_popup(e)
 
 
-class ContextThumbs(ContextMenu):
+class ContextThumbs(Context):
     def __init__(self, e: tkinter.Event):
         super().__init__()
         self.context_view(e)
@@ -51,204 +45,12 @@ class ContextThumbs(ContextMenu):
         self.do_popup(e)
 
 
-class ContextSearch(ContextMenu):
+class ContextSearch(Context):
     def __init__(self, e: tkinter.Event):
         super().__init__()
         self.context_clear()
         self.context_paste()
         self.do_popup(e)
-
-
-class FilterWin(CWindow):
-    def __init__(self):
-        super().__init__()
-        self.bind("<Return>", self.ok_cmd)
-        self.title(conf.lang.filter_title)
-        f = ("San Francisco Pro", 17, "bold")
-        self.reseted = False
-        self.date_changed = False
-
-        calendar_frames = CFrame(self)
-        calendar_frames.pack()
-
-        left_frame = CFrame(calendar_frames)
-        left_frame.pack(side="left", padx=(0, 15))
-
-        left_title = CLabel(left_frame, text=conf.lang.filter_start)
-        left_title["font"] = f
-        left_title.pack()
-
-        self.l_calendar = CCalendar(left_frame, Dates.start)
-        self.l_calendar.pack()
-
-        right_frame = CFrame(calendar_frames)
-        right_frame.pack(side="left")
-
-        right_title = CLabel(right_frame, text=conf.lang.filter_end)
-        right_title["font"] = f
-        right_title.pack()
-
-        self.r_calendar = CCalendar(right_frame, Dates.end)
-        self.r_calendar.pack()
-
-        if any((Dates.start, Dates.end)):
-            cals_t = f"{Dates.named_start} - {Dates.named_end}"
-        else:
-            cals_t = conf.lang.filter_notselected
-        self.cals_titles = CLabel(self, text=cals_t)
-        self.cals_titles.configure(font=f)
-        self.cals_titles.pack()
-
-        cals_reset = CButton(self, text=conf.lang.settings_reset)
-        cals_reset.pack(pady=(15, 0))
-        cals_reset.cmd(self.cals_titles_reset)
-
-        CSep(self).pack(fill="x", padx=15, pady=15)
-
-        grop_frame = CFrame(self)
-        grop_frame.pack()
-
-        self.product = CButton(grop_frame, text=conf.lang.filter_product)
-        if conf.product:
-            self.product.configure(bg=conf.sel_color)
-        self.product.pack(side="left")
-        self.product.cmd(self.product_cmd)
-
-        self.models = CButton(grop_frame, text=conf.lang.filter_models)
-        if conf.models:
-            self.models.configure(bg=conf.sel_color)
-        self.models.pack(side="left", padx=15)
-        self.models.cmd(self.models_cmd)
-
-        self.catalog = CButton(grop_frame, text=conf.lang.filter_catalog)
-        if conf.catalog:
-            self.catalog.configure(bg=conf.sel_color)
-        self.catalog.pack(side="left")
-        self.catalog.cmd(self.catalog_cmd)
-
-        if conf.sort_modified:
-            sort_btn_t = conf.lang.filter_changed
-        else:
-            sort_btn_t = conf.lang.filter_created
-
-        self.btn_sort = CButton(self, text=sort_btn_t)
-        self.btn_sort.configure(width=13)
-        self.btn_sort.pack(pady=(15, 0))
-        self.btn_sort.cmd(self.sort_btn_cmd)
-
-        marketing_lbl = CLabel(
-            self, text="\n".join(conf.lang.filter_descr),
-            anchor="w", justify="left")
-        marketing_lbl.pack(anchor="w", pady=(15, 0))
-
-        CSep(self).pack(fill="x", padx=150, pady=15)
-
-        btns_frame = CFrame(self)
-        btns_frame.pack(pady=(15, 0))
-
-        ok_btn = CButton(btns_frame, text=conf.lang.ok)
-        ok_btn.pack(side="left", padx=15)
-        ok_btn.cmd(self.ok_cmd)
-
-        cancel_btn = CButton(btns_frame, text=conf.lang.cancel)
-        cancel_btn.pack(side="left")
-        cancel_btn.cmd(lambda e: self.cancel())
-
-        conf.root.update_idletasks()
-
-        place_center()
-        self.deiconify()
-        self.wait_visibility()
-        self.grab_set_global()
-        Globals.filter_text_cmd = self.cals_titles_cmd
-
-    def named_date(self, date: datetime):
-        day = f"{date.day} "
-        month = f"{conf.lang.months_p[date.month]} "
-        year = f"{date.year}"
-        return day + month + year
-
-    def cals_titles_cmd(self):
-        start = self.named_date(self.l_calendar.my_date)
-        end = self.named_date(self.r_calendar.my_date)
-        self.cals_titles.configure(text=f"{start} - {end}")
-        self.date_changed = True
-
-    def cals_titles_reset(self, e=None):
-        for i in (self.l_calendar, self.r_calendar):
-            i.clicked = False
-            i.reset_cal()
-        self.reseted = True
-        self.date_changed = False
-        self.cals_titles.configure(text=conf.lang.filter_notselected)
-
-    def sort_btn_cmd(self, e):
-        if self.btn_sort["text"] == conf.lang.filter_changed:
-            self.btn_sort.configure(text=conf.lang.filter_created)
-        else:
-            self.btn_sort.configure(text=conf.lang.filter_changed)
-
-    def product_cmd(self, e=None):
-        if self.product["bg"] == conf.sel_color:
-            self.product.configure(bg=conf.btn_color)
-        else:
-            self.product.configure(bg=conf.sel_color)
-
-    def catalog_cmd(self, e=None):
-        if self.catalog["bg"] == conf.sel_color:
-            self.catalog.configure(bg=conf.btn_color)
-        else:
-            self.catalog.configure(bg=conf.sel_color)
-
-    def models_cmd(self, e=None):
-        if self.models["bg"] == conf.sel_color:
-            self.models.configure(bg=conf.btn_color)
-        else:
-            self.models.configure(bg=conf.sel_color)
-
-    def ok_cmd(self, e=None):
-        if self.date_changed:
-            Dates.start = self.l_calendar.my_date
-            Dates.end = self.r_calendar.my_date
-            Dates.named_start = self.named_date(Dates.start)
-            Dates.named_end = self.named_date(Dates.end)
-
-        if self.reseted:
-            Dates.start = None
-            Dates.end = None
-
-        if self.product["bg"] == conf.sel_color:
-            conf.product = True
-        else:
-            conf.product = False
-
-        if self.models["bg"] == conf.sel_color:
-            conf.models = True
-        else:
-            conf.models = False
-
-        if self.catalog["bg"] == conf.sel_color:
-            conf.catalog = True
-        else:
-            conf.catalog = False
-
-        if not any((conf.product, conf.models, conf.catalog)):
-            conf.product = True
-            conf.models = True
-            conf.catalog = True
-
-        if self.btn_sort["text"] == conf.lang.filter_created:
-            conf.sort_modified = False
-        else:
-            conf.sort_modified = True
-
-        self.destroy()
-        focus_last()
-        Globals.reload_thumbs()
-
-    def cancel(self):
-        self.destroy()
-        focus_last()
 
 
 class ThumbSearch(tkinter.Entry):
@@ -338,10 +140,10 @@ class ThumbnailsPrepare:
         for img, src, modified in self.thumbs_lbls:
             date_key = datetime.fromtimestamp(modified).date()
 
-            if not any((Dates.start, Dates.end)):
+            if not any((Globals.start, Globals.end)):
                 date_key = f"{conf.lang.months[date_key.month]} {date_key.year}"
             else:
-                date_key = f"{Dates.named_start} - {Dates.named_end}"
+                date_key = f"{Globals.named_start} - {Globals.named_end}"
 
             thumbs_dict.setdefault(date_key, [])
             thumbs_dict[date_key].append((img, src))
@@ -349,9 +151,9 @@ class ThumbnailsPrepare:
         return thumbs_dict
 
     def stamp_dates(self):
-        start = datetime.combine(Dates.start, datetime.min.time())
+        start = datetime.combine(Globals.start, datetime.min.time())
         end = datetime.combine(
-            Dates.end, datetime.max.time().replace(microsecond=0)
+            Globals.end, datetime.max.time().replace(microsecond=0)
             )
         return (datetime.timestamp(start), datetime.timestamp(end))
 
@@ -388,7 +190,7 @@ class ThumbnailsPrepare:
 
         q = q.filter(sqlalchemy.or_(*filters))
 
-        if not any((Dates.start, Dates.end)):
+        if not any((Globals.start, Globals.end)):
             q = q.limit(conf.limit)
 
         else:
@@ -480,9 +282,9 @@ class Thumbnails(CFrame, ThumbnailsPrepare):
 
         btn_filter = CButton(title_frame, text=conf.lang.thumbs_filters)
         btn_filter.pack()
-        if any((Dates.start, Dates.end)):
+        if any((Globals.start, Globals.end)):
             btn_filter.configure(bg=conf.sel_color)
-        btn_filter.cmd(lambda e: FilterWin())
+        btn_filter.cmd(lambda e: Filter())
 
         search = ThumbSearch(title_frame)
         search.pack(pady=(15, 0), ipady=2)
@@ -546,8 +348,8 @@ class Thumbnails(CFrame, ThumbnailsPrepare):
             str_var = Globals.search_var.get()
             if str_var:
                 no_img_lst.append(f"{conf.lang.thumbs_withname} {str_var}")
-            if any((Dates.start, Dates.end)):
-                no_img_lst.append(f"{Dates.named_start} - {Dates.named_end}")
+            if any((Globals.start, Globals.end)):
+                no_img_lst.append(f"{Globals.named_start} - {Globals.named_end}")
 
             no_images = CLabel(self.thumbs_frame, text="\n".join(no_img_lst))
             no_images.configure(font=('San Francisco Pro', 18, 'bold'))
@@ -585,7 +387,7 @@ class Thumbnails(CFrame, ThumbnailsPrepare):
                 Globals.reload_thumbs()
 
     def reload_scroll(self):
-        Dates.start, Dates.end = None, None
+        Globals.start, Globals.end = None, None
         conf.lang_thumbs.clear()
 
         self.scroll_frame.destroy()

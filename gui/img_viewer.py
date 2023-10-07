@@ -22,7 +22,7 @@ all_src = []
 win = tkinter.Toplevel
 
 
-class ContextViewer(ContextMenu):
+class ContextViewer(Context):
     def __init__(self, e: tkinter.Event):
         super().__init__()
         self.context_img_info(e)

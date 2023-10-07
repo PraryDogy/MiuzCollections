@@ -30,7 +30,7 @@ class MenuExtend:
             subprocess.check_output(["/usr/bin/open", conf.coll_folder])
 
 
-class ContextMenuMenu(ContextMenu, MenuExtend):
+class ContextMenuMenu(Context, MenuExtend):
     def __init__(self, e: tkinter.Event):
         super().__init__()
 

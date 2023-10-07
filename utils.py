@@ -11,6 +11,8 @@ from PIL import Image, ImageDraw
 
 from cfg import conf
 
+
+
 __all__ = (
     "get_coll_name",
     "place_center",
@@ -27,7 +29,8 @@ __all__ = (
     "run_applescript",
     "download_files",
     "download_onefile",
-    "download_tiffs"
+    "download_tiffs",
+    "focus_last_win",
     )
 
 
@@ -280,3 +283,12 @@ def download_tiffs(src):
             shutil.copy(i, dest)
 
         subprocess.Popen(["open", parrent_path])
+
+
+def focus_last_win():
+    for k, v in conf.root.children.items():
+        if v.widgetName == "toplevel":
+            v.focus_force()
+            v.grab_set_global()
+            return
+    conf.root.focus_force()

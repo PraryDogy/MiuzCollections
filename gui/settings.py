@@ -209,7 +209,7 @@ class Settings(CWindow):
         conf.autoscan_time = self.temp_mins
 
         self.destroy()
-        focus_last()
+        conf.root.focus_force()
 
     def save_cmd(self, e=None):
         conf.lang_sett.clear()
@@ -223,7 +223,7 @@ class Settings(CWindow):
 
         conf.write_cfg()
         self.destroy()
-        focus_last()
+        conf.root.focus_force()
 
         if self.scan_again:
             conf.curr_coll = conf.all_colls
