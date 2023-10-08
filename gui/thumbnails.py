@@ -248,6 +248,13 @@ class Thumbnails(CFrame, ThumbsPrepare):
             self.scroll_frame, bg=conf.bg_color, scrollbarwidth=7)
         self.sframe.pack(expand=1, fill=tkinter.BOTH)
 
+
+
+
+
+        
+        a = self.sframe["canvas"].yview_scroll(-1, 'units')
+
     def load_thumbs(self):
         self.thumbs_prepare()
 
