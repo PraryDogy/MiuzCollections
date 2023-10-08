@@ -1,7 +1,7 @@
 import tkinter
 
 from cfg import conf
-from .scaner import Scaner
+from .scaner import scaner
 from .utils import *
 
 from .globals import Globals
@@ -79,7 +79,7 @@ class StBar(CFrame):
     def update_cmd(self, btn: CButton):
         if not conf.flag:
             if smb_check():
-                Scaner().auto_scan()
+                scaner.scaner_start()
             else:
                 SmbAlert()
                 return

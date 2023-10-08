@@ -1,5 +1,5 @@
 from cfg import conf
-from .scaner import Scaner
+from .scaner import scaner
 from .utils import on_exit, run_applescript, smb_check
 
 from .menu import Menu
@@ -48,7 +48,7 @@ class Application:
         conf.root.minsize(870, 500)
 
         if smb_check():
-            Scaner().auto_scan()
+            scaner.scaner_start()
         else:
             SmbAlert()
 

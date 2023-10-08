@@ -9,28 +9,28 @@ from .utils import encode_image, get_coll_name
 from .globals import Globals
 
 __all__ = (
-    "Scaner",
+    "scaner",
     )
 
 
 class Scaner:
     def __init__(self) -> None:
-        self.update_thumbs = False
+        self.need_update = False
 
-    def auto_scan(self):
-        self.cancel_scan()
-        self.scaner()
+    def scaner_start(self):
+        self.__scaner_cancel()
+        self.__scaner()
         ms = conf.autoscan_time*60000
-        conf.root.after(ms, self.auto_scan)
+        conf.root.after(ms, self.scaner_start)
 
-    def cancel_scan(self):
+    def __scaner_cancel(self):
         conf.flag = False
         if conf.scaner_task:
             while conf.scaner_task.is_alive():
                 conf.root.update()
         return True
 
-    def scaner(self):
+    def __scaner(self):
         conf.flag = True
         Globals.stbar_btn.configure(
             text=conf.lang.live_updating,
@@ -38,7 +38,7 @@ class Scaner:
             )
 
         conf.scaner_task = threading.Thread(
-            target=self.update_colls,
+            target=self.__update_db,
             daemon=True
             )
         conf.scaner_task.start()
@@ -46,18 +46,18 @@ class Scaner:
         while conf.scaner_task.is_alive():
             conf.root.update()
 
-        self.change_live_text("")
+        self.__change_live_text("")
 
-        if self.update_thumbs:
+        if self.need_update:
             Globals.reload_thumbs()
             Globals.reload_menu()
-            self.update_thumbs = False
+            self.need_update = False
 
         conf.flag = False
         Globals.stbar_btn.configure(text=conf.lang.upd_btn, bg=conf.btn_color)
 
-    def update_colls(self):
-        self.change_live_text(conf.lang.scaner_prepare)
+    def __update_db(self):
+        self.__change_live_text(conf.lang.scaner_prepare)
 
         db_images = Dbase.conn.execute(
             sqlalchemy.select(
@@ -79,7 +79,7 @@ class Scaner:
         found_images = []
 
         for x, collection in enumerate(collections, 1):
-            self.change_live_text(
+            self.__change_live_text(
                     f"{conf.lang.live_scan} "
                     f"{x} "
                     f"{conf.lang.live_from} "
@@ -124,7 +124,7 @@ class Scaner:
                             new_images.append(data)
 
         if new_images:
-            self.update_thumbs = True
+            self.need_update = True
             ln = len(new_images)
 
             values = [
@@ -135,7 +135,7 @@ class Scaner:
                 "b_created": created,
                 "b_modified": modified,
                 "b_collection": get_coll_name(src),
-                "temp": self.change_live_text(
+                "temp": self.__change_live_text(
                         f"{conf.lang.live_added} "
                         f"{x} "
                         f"{conf.lang.live_from} "
@@ -180,8 +180,8 @@ class Scaner:
 
         if remove_images:
 
-            self.change_live_text(conf.lang.live_finish)
-            self.update_thumbs = True
+            self.__change_live_text(conf.lang.live_finish)
+            self.need_update = True
 
             values = [
                 {
@@ -213,5 +213,8 @@ class Scaner:
                     )
                 Dbase.conn.execute(q, vals)
 
-    def change_live_text(self, text):
+    def __change_live_text(self, text):
         conf.live_text = text
+
+
+scaner = Scaner()

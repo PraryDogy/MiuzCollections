@@ -2,7 +2,7 @@ import tkinter
 from tkinter import filedialog
 
 from cfg import conf
-from .scaner import Scaner
+from .scaner import scaner
 from .utils import *
 
 from .globals import Globals
@@ -228,7 +228,7 @@ class Settings(CWindow):
             conf.curr_coll = conf.all_colls
             self.scan_again = False
             if smb_check():
-                Scaner().auto_scan()
+                scaner.scaner_start()
             else:
                 SmbAlert()
 
