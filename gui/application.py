@@ -70,3 +70,4 @@ class Application:
             """
 
         run_applescript(applescript)
+        conf.root.focus_force()
