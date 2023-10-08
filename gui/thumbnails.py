@@ -359,7 +359,7 @@ class Thumbnails(CFrame, ThumbsPrepare):
                     f"\n\"{str_var}\""
                     )
 
-            if any((Globals.start, Globals.end)):
+            elif any((Globals.start, Globals.end)):
                 noimg_t=(
                     f"{conf.lang.thumbs_nophoto}"
                     f"\n{Globals.named_start} - {Globals.named_end}"
