@@ -9,12 +9,12 @@ from PIL import Image, ImageTk
 
 from cfg import conf
 from database import Dbase, Thumbs
-from .utils import *
 
+from .filter import Filter
 from .globals import Globals
 from .img_viewer import ImgViewer
+from .utils import *
 from .widgets import *
-from .filter import Filter
 
 __all__ = (
     "Thumbnails",
@@ -59,17 +59,16 @@ class ThumbsSearch(CFrame):
 
         self.search_wid = tkinter.Entry(
             self,
-            width=20,
             textvariable=Globals.search_var,
             bg=conf.ent_color,
             insertbackground="white",
             fg=conf.fg_color,
-            highlightthickness=0,
             justify="center",
             selectbackground=conf.btn_color,
             border=1,
+            highlightthickness=0,
             )
-        self.search_wid.pack()
+        self.search_wid.pack(fill=tkinter.X)
 
         btns_frame = CFrame(self)
         btns_frame.pack(pady=(10, 0))
@@ -88,6 +87,7 @@ class ThumbsSearch(CFrame):
 
     def search_go(self, e=None):
         Globals.search_var.set(self.search_wid.get())
+        Globals.start, Globals.end = None, None
         Globals.reload_scroll()
 
     def search_clear(self, e=None):
@@ -351,14 +351,21 @@ class Thumbnails(CFrame, ThumbsPrepare):
                 img_lbl.bind("<ButtonRelease-2>", self.r_click)
 
         if not self.thumbs_lbls:
-            no_img_lst = [conf.lang.thumbs_nophoto]
             str_var = Globals.search_var.get()
             if str_var:
-                no_img_lst.append(f"{conf.lang.thumbs_withname} {str_var}")
-            if any((Globals.start, Globals.end)):
-                no_img_lst.append(f"{Globals.named_start} - {Globals.named_end}")
+                noimg_t = (
+                    f"{conf.lang.thumbs_nophoto}"
+                    f"{conf.lang.thumbs_withname}"
+                    f"\n\"{str_var}\""
+                    )
 
-            no_images = CLabel(self.thumbs_frame, text="\n".join(no_img_lst))
+            if any((Globals.start, Globals.end)):
+                noimg_t=(
+                    f"{conf.lang.thumbs_nophoto}"
+                    f"\n{Globals.named_start} - {Globals.named_end}"
+                    )
+
+            no_images = CLabel(self.thumbs_frame, text=noimg_t)
             no_images.configure(font=('San Francisco Pro', 18, 'bold'))
             no_images.pack(pady=(15, 0))
 
@@ -394,7 +401,6 @@ class Thumbnails(CFrame, ThumbsPrepare):
                 Globals.reload_thumbs()
 
     def reload_scroll(self):
-        Globals.start, Globals.end = None, None
         conf.lang_thumbs.clear()
 
         self.scroll_frame.destroy()

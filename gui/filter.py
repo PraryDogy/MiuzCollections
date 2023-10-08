@@ -440,7 +440,7 @@ class Filter(CWindow):
         self.destroy()
         conf.root.focus_force()
         Globals.search_var.set("")
-        Globals.reload_thumbs()
+        Globals.reload_scroll()
 
     def cancel(self):
         self.destroy()

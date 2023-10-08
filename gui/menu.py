@@ -144,5 +144,6 @@ class Menu(tkmacosx.SFrame, MenuExtend):
         self.sel_btn = e.widget
         conf.curr_coll = e.widget.true_name
 
+        Globals.start, Globals.end = None, None
         Globals.search_var.set("")
         Globals.reload_scroll()
