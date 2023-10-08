@@ -245,7 +245,7 @@ class Context(tkinter.Menu, Reveal):
             label=conf.lang.search_clear,
             command=lambda: Globals.search_var.set("")
             )
-    
+
     def context_download_group(self, e: tkinter.Event):
         self.add_command(
             label=(

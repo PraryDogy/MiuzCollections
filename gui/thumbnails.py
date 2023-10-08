@@ -53,10 +53,12 @@ class ContextSearch(Context):
         self.do_popup(e)
 
 
-class ThumbsSearch(tkinter.Entry):
+class ThumbsSearch(CFrame):
     def __init__(self, master: tkinter):
-        super().__init__(
-            master,
+        super().__init__(master)
+
+        self.search_wid = tkinter.Entry(
+            self,
             width=20,
             textvariable=Globals.search_var,
             bg=conf.ent_color,
@@ -65,27 +67,32 @@ class ThumbsSearch(tkinter.Entry):
             highlightthickness=0,
             justify="center",
             selectbackground=conf.btn_color,
-            border=1
+            border=1,
             )
+        self.search_wid.pack()
 
-        traces = Globals.search_var.trace_vinfo()
-        if traces:
-            Globals.search_var.trace_vdelete(*traces[0])
-        Globals.search_var.trace("w", lambda *args: self.search_task_set())
+        btns_frame = CFrame(self)
+        btns_frame.pack(pady=(10, 0))
 
-        self.bind("<Escape>", lambda e: conf.root.focus_force())
-        conf.root.bind("<Command-f>", lambda e: self.focus_force())
-        self.bind("<ButtonRelease-2>", lambda e: ContextSearch(e))
-        self.search_task = None
+        btn_search = CButton(btns_frame, text="Поиск")
+        btn_search.pack(side=tkinter.LEFT, padx=(0, 10))
+        btn_search.cmd(self.search_go)
 
-    def search_task_set(self):
-        if self.search_task:
-            conf.root.after_cancel(self.search_task)
-        self.search_task = conf.root.after(1000, self.search_go)
+        btn_clear = CButton(btns_frame, text="Очистить")
+        btn_clear.pack(side=tkinter.LEFT)
+        btn_clear.cmd(self.search_clear)
 
-    def search_go(self):
+        self.search_wid.bind("<Escape>", lambda e: conf.root.focus_force())
+        self.search_wid.bind("<ButtonRelease-2>", lambda e: ContextSearch(e))
+        conf.root.bind("<Command-f>", lambda e: self.search_wid.focus_force())
+
+    def search_go(self, e=None):
+        Globals.search_var.set(self.search_wid.get())
         Globals.reload_scroll()
-        conf.root.focus_force()
+
+    def search_clear(self, e=None):
+        Globals.search_var.set("")
+        Globals.reload_scroll()
 
 
 class ThumbsPrepare:

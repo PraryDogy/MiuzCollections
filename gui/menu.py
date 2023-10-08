@@ -144,9 +144,5 @@ class Menu(tkmacosx.SFrame, MenuExtend):
         self.sel_btn = e.widget
         conf.curr_coll = e.widget.true_name
 
-        traces = Globals.search_var.trace_vinfo()
-        if traces:
-            Globals.search_var.trace_vdelete(*traces[0])
         Globals.search_var.set("")
-
         Globals.reload_scroll()
