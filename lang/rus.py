@@ -16,7 +16,7 @@ class Rus:
         self.info = "Инфо"
         self.show_jpeg = "Найти jpeg"
         self.show_tiff = "Найти tiff"
-        self.show_coll = "Показать коллекцию"
+        self.show_coll = "Открыть папку"
 
         # menu
         self.menu_title = "Меню"

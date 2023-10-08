@@ -16,7 +16,7 @@ class Eng:
         self.info = "Info"
         self.show_jpeg = "Find jpeg"
         self.show_tiff = "Find tiff"
-        self.show_coll = "Show collection"
+        self.show_coll = "Open folder"
 
         # menu
         self.menu_title = "Menu"
