@@ -196,7 +196,6 @@ class Settings(CWindow):
             self.scan_again = True
 
     def default_cmd(self, e=None):
-        self.reset_btn.press()
         default = conf.get_defaults()
         self.path_widget['text'] = default.coll_folder
         self.scan_again = True

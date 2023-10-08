@@ -17,32 +17,16 @@ __all__ = (
     )
 
 
-class MenuExtend:
-    def reveal_coll(self, e: tkinter.Event):
-        if e.widget.true_name != conf.all_colls:
-            coll_path = os.path.join(conf.coll_folder, e.widget.true_name)
-        else:
-            coll_path = conf.coll_folder
-
-        try:
-            subprocess.check_output(["/usr/bin/open", coll_path])
-        except subprocess.CalledProcessError:
-            subprocess.check_output(["/usr/bin/open", conf.coll_folder])
-
-
-class ContextMenuMenu(Context, MenuExtend):
+class ContextMenu(Context):
     def __init__(self, e: tkinter.Event):
         super().__init__()
-
-        self.add_command(
-            label=conf.lang.show_coll,
-            command=lambda: self.reveal_coll(e)
-            )
-
+        self.context_show_coll(e)
+        self.context_sep()
+        self.context_reveal_coll(e)
         self.do_popup(e)
 
 
-class Menu(tkmacosx.SFrame, MenuExtend):
+class Menu(tkmacosx.SFrame):
     def __init__(self, master: tkinter):
         self.sel_btn: tkinter.Label = None
         Globals.reload_menu = self.reload_menu
@@ -56,10 +40,8 @@ class Menu(tkmacosx.SFrame, MenuExtend):
 
         self.menu_frame = self.load_menu_buttons()
         self.menu_frame.pack()
-        self.bind("<Enter>", self.focus_widget)
-
-    def focus_widget(self, e=None):
-        self.focus_force()
+        self.bind("<Enter>", lambda e: self.focus_force)
+        Globals.show_coll = self.show_coll
 
     def fake_name(self, coll: str):
         try:
@@ -96,10 +78,10 @@ class Menu(tkmacosx.SFrame, MenuExtend):
 
         last = CButton(frame, text=conf.lang.all_colls)
         last.configure(width=13, pady=5, anchor=tkinter.W, padx=10)
-        last.true_name = conf.all_colls
+        last.coll_name = conf.all_colls
         last.cmd(self.show_coll)
         last.pack(pady=(0, 15))
-        last.bind("<Button-2>", ContextMenuMenu)
+        last.bind("<Button-2>", ContextMenu)
 
         conf.lang_menu.append(last)
 
@@ -107,15 +89,15 @@ class Menu(tkmacosx.SFrame, MenuExtend):
         sep['bg'] = '#272727'
         sep.pack(fill=tkinter.X)
 
-        for fake_name, true_name in menus.items():
+        for fake_name, coll_name in menus.items():
             btn = CButton(frame, text = fake_name)
             btn.configure(width=13, pady=5, anchor=tkinter.W, padx=10)
-            btn.true_name = true_name
+            btn.coll_name = coll_name
             btn.cmd(self.show_coll)
             btn.pack()
-            btn.bind("<Button-2>", ContextMenuMenu)
+            btn.bind("<Button-2>", ContextMenu)
 
-            if true_name == conf.curr_coll:
+            if coll_name == conf.curr_coll:
                 btn.configure(bg=conf.sel_color)
                 self.sel_btn = btn
 
@@ -142,7 +124,7 @@ class Menu(tkmacosx.SFrame, MenuExtend):
         self.sel_btn.configure(bg=conf.btn_color)
         e.widget.configure(bg=conf.sel_color)
         self.sel_btn = e.widget
-        conf.curr_coll = e.widget.true_name
+        conf.curr_coll = e.widget.coll_name
 
         Globals.start, Globals.end = None, None
         Globals.search_var.set("")

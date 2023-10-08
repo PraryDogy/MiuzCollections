@@ -25,7 +25,7 @@ win = tkinter.Toplevel
 class ContextViewer(Context):
     def __init__(self, e: tkinter.Event):
         super().__init__()
-        self.context_img_info(e)
+        self.context_imginfo(e)
         self.context_sep()
 
         self.context_show_jpg(e)
@@ -50,7 +50,7 @@ class ImgViewer(CWindow):
         self.set_title()
         self["bg"] = "black"
 
-        self.geometry(f'{conf.preview_w}x{conf.preview_h}')
+        self.geometry(f'{conf.imgview_w}x{conf.imgview_h}')
         self.minsize(500, 300)
 
         self.configure(pady=0, padx=0)
@@ -61,12 +61,12 @@ class ImgViewer(CWindow):
 
         conf.root.update_idletasks()
 
-        self.img_frame['width'] = conf.preview_w
-        self.img_frame['height'] = conf.preview_h
+        self.img_frame['width'] = conf.imgview_w
+        self.img_frame['height'] = conf.imgview_h
 
-        self.thumb_place(conf.preview_w, conf.preview_h)
+        self.thumb_place(conf.imgview_w, conf.imgview_h)
         self.task = conf.root.after(
-            250, lambda: self.img_place(conf.preview_w, conf.preview_h))
+            250, lambda: self.img_place(conf.imgview_w, conf.imgview_h))
 
         place_center()
         self.deiconify()
@@ -94,17 +94,17 @@ class ImgViewer(CWindow):
             print("no win")
             return
 
-        if new_w != conf.preview_w or new_h != conf.preview_h:
-            conf.preview_h = new_h
-            conf.preview_w = new_w
+        if new_w != conf.imgview_w or new_h != conf.imgview_h:
+            conf.imgview_h = new_h
+            conf.imgview_w = new_w
 
-            self.img_frame['width'] = conf.preview_w
-            self.img_frame['height'] = conf.preview_h
+            self.img_frame['width'] = conf.imgview_w
+            self.img_frame['height'] = conf.imgview_h
 
-            self.thumb_place(conf.preview_w, conf.preview_h)
+            self.thumb_place(conf.imgview_w, conf.imgview_h)
             conf.root.after(
                 500,
-                lambda: self.img_place(conf.preview_w, conf.preview_h)
+                lambda: self.img_place(conf.imgview_w, conf.imgview_h)
                 )
 
     def img_widget(self):
@@ -126,10 +126,10 @@ class ImgViewer(CWindow):
             src = all_src[0]
             self.set_title()
 
-        self.thumb_place(conf.preview_w, conf.preview_h)
+        self.thumb_place(conf.imgview_w, conf.imgview_h)
         self.task = conf.root.after(
             500,
-            lambda: self.img_place(conf.preview_w, conf.preview_h)
+            lambda: self.img_place(conf.imgview_w, conf.imgview_h)
             )
 
     def img_ind(self):
@@ -141,9 +141,9 @@ class ImgViewer(CWindow):
         self.img_frame.image_names = img_tk
 
     def img_click(self, e: tkinter.Event):
-        if conf.preview_w == self.winfo_width():
+        if conf.imgview_w == self.winfo_width():
 
-            if e.x <= conf.preview_w//2:
+            if e.x <= conf.imgview_w//2:
                 index = self.img_ind() - 1
             else:
                 index = self.img_ind() + 1

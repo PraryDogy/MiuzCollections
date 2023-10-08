@@ -9,9 +9,10 @@ class Rus:
         # search_context
         self.search_paste = "Вставить"
         self.search_clear = "Очистить"
+        self.search_search = "Поиск"
 
         # context menu
-        self.preview = "Просмотр"
+        self.view = "Просмотр"
         self.info = "Инфо"
         self.show_jpeg = "Найти jpeg"
         self.show_tiff = "Найти tiff"

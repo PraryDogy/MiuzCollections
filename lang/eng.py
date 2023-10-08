@@ -9,9 +9,10 @@ class Eng:
         # search_context
         self.search_paste = "Paste"
         self.search_clear = "Clear"
+        self.search_search = "Search"
 
         # context menu
-        self.preview = "Preview"
+        self.view = "View"
         self.info = "Info"
         self.show_jpeg = "Find jpeg"
         self.show_tiff = "Find tiff"

@@ -67,8 +67,8 @@ class Config:
         self.root_x = 100
         self.root_y = 100
 
-        self.preview_w = 700
-        self.preview_h = 500
+        self.imgview_w = 700
+        self.imgview_h = 500
 
         self.autoscan_time = 10
 

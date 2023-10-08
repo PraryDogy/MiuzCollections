@@ -31,8 +31,8 @@ class ContextTitles(Context):
 class ContextThumbs(Context):
     def __init__(self, e: tkinter.Event):
         super().__init__()
-        self.context_view(e)
-        self.context_img_info(e)
+        self.context_imgview(e)
+        self.context_imginfo(e)
 
         self.context_sep()
         self.context_show_jpg(e)
@@ -73,26 +73,29 @@ class ThumbsSearch(CFrame):
         btns_frame = CFrame(self)
         btns_frame.pack(pady=(10, 0))
 
-        btn_search = CButton(btns_frame, text="Поиск")
-        btn_search.pack(side=tkinter.LEFT, padx=(0, 10))
-        btn_search.cmd(self.search_go)
+        self.btn_search = CButton(btns_frame, text=conf.lang.search_search)
+        self.btn_search.pack(side=tkinter.LEFT, padx=(0, 10))
+        self.btn_search.cmd(self.search_go)
 
-        btn_clear = CButton(btns_frame, text="Очистить")
-        btn_clear.pack(side=tkinter.LEFT)
-        btn_clear.cmd(self.search_clear)
+        self.btn_clear = CButton(btns_frame, text=conf.lang.search_clear)
+        self.btn_clear.pack(side=tkinter.LEFT)
+        self.btn_clear.cmd(self.search_clear)
 
         self.search_wid.bind("<Escape>", lambda e: conf.root.focus_force())
         self.search_wid.bind("<ButtonRelease-2>", lambda e: ContextSearch(e))
         conf.root.bind("<Command-f>", lambda e: self.search_wid.focus_force())
 
     def search_go(self, e=None):
-        Globals.search_var.set(self.search_wid.get())
-        Globals.start, Globals.end = None, None
-        Globals.reload_scroll()
+        search_text = self.search_wid.get()
+        if search_text:
+            Globals.search_var.set(search_text)
+            Globals.start, Globals.end = None, None
+            Globals.reload_scroll()
 
     def search_clear(self, e=None):
-        Globals.search_var.set("")
-        Globals.reload_scroll()
+        if self.search_wid.get():
+            Globals.search_var.set("")
+            Globals.reload_scroll()
 
 
 class ThumbsPrepare:

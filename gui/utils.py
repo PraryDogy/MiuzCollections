@@ -7,9 +7,11 @@ import tkinter
 
 import cv2
 import numpy
-from PIL import Image, ImageDraw
+from PIL import Image
 
 from cfg import conf
+
+from .globals import Globals
 
 __all__ = (
     "get_coll_name",
@@ -29,6 +31,7 @@ __all__ = (
     "download_onefile",
     "download_tiffs",
     "focus_last_win",
+    "reveal_coll",
     )
 
 
@@ -291,3 +294,15 @@ def focus_last_win():
             v.grab_set_global()
             return
     conf.root.focus_force()
+
+
+def reveal_coll(coll_name):
+    if coll_name != conf.all_colls:
+        coll_path = os.path.join(conf.coll_folder, coll_name)
+    else:
+        coll_path = conf.coll_folder
+
+    try:
+        subprocess.check_output(["/usr/bin/open", coll_path])
+    except subprocess.CalledProcessError:
+        subprocess.check_output(["/usr/bin/open", conf.coll_folder])

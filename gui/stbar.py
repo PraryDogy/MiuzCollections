@@ -74,7 +74,6 @@ class StBar(CFrame):
         conf.lang_stbar.append(self.upd_btn)
 
     def settings_cmd(self, btn: CButton):
-        btn.press()
         Settings()
 
     def update_cmd(self, btn: CButton):

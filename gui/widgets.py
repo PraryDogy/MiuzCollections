@@ -41,10 +41,6 @@ class CButton(tkinter.Label):
     def cmd(self, cmd):
         self.bind('<ButtonRelease-1>', cmd)
 
-    def press(self):
-        self.configure(bg=conf.sel_color)
-        conf.root.after(100, lambda: self.configure(bg=conf.btn_color))
-
 
 class CFrame(tkinter.Frame):
     def __init__(self, master: tkinter, **kwargs):
@@ -204,17 +200,17 @@ class Context(tkinter.Menu, Reveal):
     def __init__(self):
         super().__init__()
 
-    def context_view(self, e: tkinter.Event):
+    def context_imgview(self, e: tkinter.Event):
         from .img_viewer import ImgViewer
         self.add_command(
-            label=conf.lang.preview,
+            label=conf.lang.view,
             command=lambda: ImgViewer(e.widget.src, e.widget.all_src)
             )
 
     def context_sep(self):
         self.add_separator()
 
-    def context_img_info(self, e: tkinter.Event):
+    def context_imginfo(self, e: tkinter.Event):
         self.add_command(
             label=conf.lang.info,
             command=lambda: ImageInfo(e.widget.src)
@@ -281,3 +277,15 @@ class Context(tkinter.Menu, Reveal):
             self.tk_popup(e.x_root, e.y_root)
         finally:
             self.grab_release()
+
+    def context_reveal_coll(self, e: tkinter.Event):
+        self.add_command(
+            label=conf.lang.show_coll,
+            command=lambda: reveal_coll(e.widget.coll_name)
+            )
+
+    def context_show_coll(self, e: tkinter.Event):
+        self.add_command(
+            label=conf.lang.view,
+            command=lambda: Globals.show_coll(e)
+            )
