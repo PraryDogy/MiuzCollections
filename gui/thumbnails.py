@@ -82,10 +82,12 @@ class ThumbsSearch(CFrame):
         self.btn_clear.cmd(self.search_clear)
 
         self.search_wid.bind("<Escape>", lambda e: conf.root.focus_force())
-        self.search_wid.bind("<ButtonRelease-2>", lambda e: ContextSearch(e))
         conf.root.bind("<Command-f>", lambda e: self.search_wid.focus_force())
+        self.search_wid.bind("<Return>", self.search_go)
+        self.search_wid.bind("<ButtonRelease-2>", ContextSearch)
 
     def search_go(self, e=None):
+        print("go")
         search_text = self.search_wid.get()
         if search_text:
             Globals.search_var.set(search_text)
