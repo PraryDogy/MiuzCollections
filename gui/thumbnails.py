@@ -87,17 +87,13 @@ class ThumbsSearch(CFrame):
         self.search_wid.bind("<ButtonRelease-2>", ContextSearch)
 
     def search_go(self, e=None):
-        print("go")
-        search_text = self.search_wid.get()
-        if search_text:
-            Globals.search_var.set(search_text)
-            Globals.start, Globals.end = None, None
-            Globals.reload_scroll()
+        Globals.search_var.set(self.search_wid.get())
+        Globals.start, Globals.end = None, None
+        Globals.reload_scroll()
 
     def search_clear(self, e=None):
-        if self.search_wid.get():
-            Globals.search_var.set("")
-            Globals.reload_scroll()
+        Globals.search_var.set("")
+        Globals.reload_scroll()
 
 
 class ThumbsPrepare:
