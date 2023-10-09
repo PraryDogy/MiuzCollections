@@ -24,23 +24,25 @@ __all__ = (
 class ContextTitles(Context):
     def __init__(self, e: tkinter.Event):
         super().__init__()
-        self.context_download_group(e)
+        self.cont_download_group(e)
         self.do_popup(e)
 
 
 class ContextThumbs(Context):
     def __init__(self, e: tkinter.Event):
         super().__init__()
-        self.context_imgview(e)
-        self.context_imginfo(e)
+        self.cont_imgview(e)
+        self.cont_imginfo(e)
 
-        self.context_sep()
-        self.context_show_jpg(e)
-        self.context_download_onefile(e)
+        self.cont_sep()
+        self.cont_reveal_jpg(e)
+        self.cont_copy_jpeg_path(e)
+        self.cont_download_onefile(e)
 
-        self.context_sep()
-        self.context_show_tiffs(e)
-        self.context_download_tiffs(e)
+        self.cont_sep()
+        self.cont_reveal_tiffs(e)
+        self.cont_copy_tiffs_paths(e)
+        self.cont_download_tiffs(e)
 
         self.do_popup(e)
 
@@ -48,8 +50,8 @@ class ContextThumbs(Context):
 class ContextSearch(Context):
     def __init__(self, e: tkinter.Event):
         super().__init__()
-        self.context_clear()
-        self.context_paste()
+        self.cont_clear()
+        self.cont_pastesearch()
         self.do_popup(e)
 
 

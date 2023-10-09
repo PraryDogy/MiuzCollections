@@ -17,6 +17,8 @@ class Rus:
         self.show_jpeg = "Найти jpeg"
         self.show_tiff = "Найти tiff"
         self.show_coll = "Открыть папку"
+        self.copy_tiff_path = "Скопировать путь к tiff"
+        self.copy_jpeg_path = "Скопировать путь к jpeg"
 
         # menu
         self.menu_title = "Меню"

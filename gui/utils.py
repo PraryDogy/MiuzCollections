@@ -32,7 +32,9 @@ __all__ = (
     "download_tiffs",
     "focus_last_win",
     "reveal_coll",
-    "paste_search"
+    "paste_search",
+    "copy_text",
+    "copy_tiffs_paths",
     )
 
 
@@ -315,3 +317,14 @@ def paste_search():
         Globals.search_var.set(pasted)
     except tkinter.TclError:
         print("no clipboard")
+
+
+def copy_text(path):
+    conf.root.clipboard_clear()
+    conf.root.clipboard_append(path)
+
+
+def copy_tiffs_paths(path):
+    tiffs = Reveal().find_tiffs(path)
+    if tiffs:
+        copy_text("\n".join(tiffs))
