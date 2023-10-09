@@ -200,15 +200,21 @@ class Context(tkinter.Menu, Reveal):
     def __init__(self):
         super().__init__()
 
+    def cont_sep(self):
+        self.add_separator()
+
+    def do_popup(self, e: tkinter.Event):
+        try:
+            self.tk_popup(e.x_root, e.y_root)
+        finally:
+            self.grab_release()
+
     def cont_imgview(self, e: tkinter.Event):
         from .img_viewer import ImgViewer
         self.add_command(
             label=conf.lang.view,
             command=lambda: ImgViewer(e.widget.src, e.widget.all_src)
             )
-
-    def cont_sep(self):
-        self.add_separator()
 
     def cont_imginfo(self, e: tkinter.Event):
         self.add_command(
@@ -270,12 +276,6 @@ class Context(tkinter.Menu, Reveal):
                 ),
             command=lambda: download_tiffs(e.widget.src)
         )
-
-    def do_popup(self, e: tkinter.Event):
-        try:
-            self.tk_popup(e.x_root, e.y_root)
-        finally:
-            self.grab_release()
 
     def cont_reveal_coll(self, e: tkinter.Event):
         self.add_command(
