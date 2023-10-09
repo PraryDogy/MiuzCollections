@@ -32,6 +32,7 @@ __all__ = (
     "download_tiffs",
     "focus_last_win",
     "reveal_coll",
+    "paste_search"
     )
 
 
@@ -306,3 +307,11 @@ def reveal_coll(coll_name):
         subprocess.check_output(["/usr/bin/open", coll_path])
     except subprocess.CalledProcessError:
         subprocess.check_output(["/usr/bin/open", conf.coll_folder])
+
+
+def paste_search():
+    try:
+        pasted = conf.root.clipboard_get().strip()
+        Globals.search_var.set(pasted)
+    except tkinter.TclError:
+        print("no clipboard")
