@@ -16,3 +16,4 @@ lib2/
 venv311/
 venv39/
 env/
+db.db
