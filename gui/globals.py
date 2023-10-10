@@ -16,12 +16,16 @@ class Globals:
     named start, named end: datetime as readable text
     """
     reload_menu = None # menu > Menu().reload_menu()
+    show_coll = None # menu > Menu().show_coll()
+
+    search_var = tkinter.StringVar(value="") # thumbnails > ThumbsSearch()
     reload_thumbs = None # thumbnails > Thumbnails().reload_thumbs()
     reload_scroll = None # thumbnails > Thumbnails().reload_scroll()
-    show_coll = None # menu > Menu().show_coll()
+    topbar_text = None # thumbnails > Thumbnails().topbar_text(text)
+    topbar_default = None # thumbnails > Thumbnails().topbar_default()
+
     set_calendar_title = None # filter > Filter().set_calendar_title()
     stbar_btn = tkinter.Label # stbar > StBar().upd_btn tkinter label
-    search_var = tkinter.StringVar(value="") # thumbnails > ThumbsSearch()
 
     start: datetime = None
     end: datetime = None

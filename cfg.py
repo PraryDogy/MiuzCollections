@@ -28,7 +28,7 @@ class Config:
         self.fg_color = "#E2E2E2"
         self.bg_color = "#19191B"
         self.btn_color = "#2A2A2D"
-        # self.sel_color = '#0056D9'
+        self.topbar_color = '#0056D9'
         self.sel_color = "#4B4B4B"
         self.hov_color = '#3A3A3E'
         self.ent_color = "#141416"

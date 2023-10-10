@@ -82,6 +82,8 @@ class Reveal:
             run_thread(task)
 
     def find_tiffs(self, src: str):
+        Globals.topbar_text(conf.lang.live_wait)
+
         path, filename = os.path.split(src)
         src_file_no_ext = self.normalize_name(filename)
         exts = (".tiff", ".TIFF", ".psd", ".PSD", ".psb", ".PSB", ".tif", ".TIF")
@@ -100,8 +102,11 @@ class Reveal:
                     elif file_no_ext in src_file_no_ext and len(file_no_ext) > 5:
                         images.append(os.path.join(root, file))
         if images:
+            Globals.topbar_default()
             return images
         else:
+            Globals.topbar_text(conf.lang.live_notiff)
+            Globals.topbar_default
             return False
 
 
@@ -265,15 +270,22 @@ def create_dir(title=None):
 
 def download_files(title, paths_list: list):
     dest = create_dir(title)
+    ln_paths = len(paths_list)
 
-    for i in paths_list:
-        filename = i.split("/")[-1]
-        shutil.copy(i, os.path.join(dest, filename))
+    for num, imgpath in enumerate(paths_list, 1):
+        t = f"{conf.lang.live_copying} {num} {conf.lang.live_from} {ln_paths}"
+        Globals.topbar_text(t)
 
+        filename = imgpath.split("/")[-1]
+        shutil.copy(imgpath, os.path.join(dest, filename))
+
+    Globals.topbar_default()
     subprocess.Popen(["open", dest])
 
 
 def download_onefile(src):
+    Globals.topbar_text(conf.lang.live_copying)
+
     dest = create_dir()
     dest = os.path.join(dest, src.split("/")[-1])
 
@@ -282,18 +294,36 @@ def download_onefile(src):
         subprocess.Popen(["open", "-R", dest])
     run_thread(task)
 
+    Globals.topbar_default()
+
 
 def download_tiffs(src):
+    Globals.topbar_text(conf.lang.live_wait)
     tiffs = Reveal().find_tiffs(src)
 
     if tiffs:
         parrent = create_dir()
 
         def task():
-            for i in tiffs:
-                shutil.copy(i, os.path.join(parrent, i.split("/")[-1]))
+            ln_tiffs = len(tiffs)
+
+            for num, tiff in enumerate(tiffs, 1):
+                t = (
+                    f"{conf.lang.live_copying} "
+                    f"{num} {conf.lang.live_from} {ln_tiffs}"
+                    )
+                Globals.topbar_text(t)
+
+                shutil.copy(tiff, os.path.join(parrent, tiff.split("/")[-1]))
+
+            Globals.topbar_default()
             subprocess.Popen(["open", parrent])
+
         run_thread(task)
+    
+    else:
+        Globals.topbar_text(conf.lang.live_notiff)
+        Globals.topbar_default
 
 
 def focus_last_win():

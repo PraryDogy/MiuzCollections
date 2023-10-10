@@ -225,14 +225,13 @@ class Context(tkinter.Menu, Reveal):
     def cont_reveal_jpg(self, e: tkinter.Event):
         self.add_command(
             label=conf.lang.show_jpeg,
-            command = lambda: self.reveal_jpg(e.widget.src)
+            command=lambda: self.reveal_jpg(e.widget.src)
             )
 
     def cont_reveal_tiffs(self, e: tkinter.Event):
-        tiffs = self.find_tiffs(e.widget.src)
         self.add_command(
             label=conf.lang.show_tiff,
-            command = lambda: self.reveal_tiffs(tiffs)
+            command=lambda: self.reveal_tiffs(self.find_tiffs(e.widget.src))
             )
 
     def cont_pastesearch(self):

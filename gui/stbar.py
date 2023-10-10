@@ -65,7 +65,7 @@ class StBar(CFrame):
         btn.pack(side=tkinter.LEFT)
         conf.lang_stbar.append(btn)
 
-        CSep(self).pack(fill=tkinter.Y, side=tkinter.LEFT, padx=(15, 15))
+        CSep(self).pack(fill=tkinter.Y, side=tkinter.LEFT, padx=15)
 
         self.upd_btn = CButton(self, text=conf.lang.upd_btn, padx=5)
         self.upd_btn['width'] = 10

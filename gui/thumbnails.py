@@ -55,6 +55,11 @@ class ContextSearch(Context):
         self.do_popup(e)
 
 
+class TopBar(CFrame):
+    def __init__(self, master: tkinter):
+        super().__init__(master)
+
+
 class ThumbsSearch(CFrame):
     def __init__(self, master: tkinter):
         super().__init__(master)
@@ -215,14 +220,17 @@ class Thumbnails(CFrame, ThumbsPrepare):
     def __init__(self, master):
         super().__init__(master)
 
-        move_top = CButton(self, text="▲  ")
-        move_top.configure(
+        self.topbar = CButton(self, text="▲  ")
+        self.topbar.configure(
             font=('San Francisco Pro', 13, 'normal'),
             bg=conf.bg_color,
-            width=50
+            pady=1,
             )
-        move_top.pack(pady=3)
-        move_top.cmd(self.scroll_up)
+        self.topbar.pack(fill=tkinter.X, pady=(5, 0), padx=10)
+        self.topbar.cmd(self.scroll_up)
+
+        sep = CSep(self)
+        sep.pack(fill=tkinter.X, pady=5, padx=10)
 
         self.clmns_count = 1
 
@@ -237,6 +245,8 @@ class Thumbnails(CFrame, ThumbsPrepare):
 
         Globals.reload_scroll = self.reload_scroll
         Globals.reload_thumbs = self.reload_thumbs
+        Globals.topbar_text = self.topbar_text
+        Globals.topbar_default = self.topbar_default
 
     def load_scroll(self):
         self.scroll_frame = CFrame(self)
@@ -314,7 +324,7 @@ class Thumbnails(CFrame, ThumbsPrepare):
             chunk_title.pack(anchor="w", pady=(30, 0), padx=2)
 
             chunk_title.title = date_key
-            chunk_title.paths_list = (i[1] for i in img_list)
+            chunk_title.paths_list = [i[1] for i in img_list]
             chunk_title.bind("<ButtonRelease-2>", ContextTitles)
 
             for chunk in chunks:
@@ -440,3 +450,12 @@ class Thumbnails(CFrame, ThumbsPrepare):
 
     def scroll_up(self, e=None):
         self.sframe['canvas'].yview_moveto('0.0')
+
+    def topbar_text(self, text):
+        self.topbar.configure(text=text, bg=conf.sel_color)
+
+    def topbar_default(self):
+        conf.root.after(
+            3000,
+            lambda: self.topbar.configure(text="▲  ", bg=conf.bg_color)
+            )

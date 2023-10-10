@@ -113,12 +113,15 @@ class Eng:
 
         # live text
         self.live_scan = "Scaning"
+        self.live_copying = "Copying"
         self.live_from = "from"
         self.live_collections = "collections"
         self.live_added = "Added"
         self.live_newphoto = "new photos"
         self.live_finish = "Finishing"
         self.live_updating = "Updating"
+        self.live_wait = "Please, wait"
+        self.live_notiff = "Cant't find tiff"
 
         # context copy to downloads
         self.context_copy = "Copy"

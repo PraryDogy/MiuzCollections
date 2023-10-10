@@ -6,6 +6,8 @@ class Rus:
         self.all_colls = "Все коллекции"
         self.close = "Закрыть"
 
+
+
         # search_context
         self.search_paste = "Вставить"
         self.search_clear = "Очистить"
@@ -112,12 +114,15 @@ class Rus:
 
         # live text
         self.live_scan = "Сканирую"
+        self.live_copying = "Копирую"
         self.live_from = "из"
         self.live_collections = "коллекций"
         self.live_added = "Добавлено"
         self.live_newphoto = "новых фото"
         self.live_finish = "Завершаю"
         self.live_updating = "Обновление"
+        self.live_wait = "Подождите"
+        self.live_notiff = "Не могу найти tiff"
 
         # context copy to downloads
         self.context_copy = "Копировать"
