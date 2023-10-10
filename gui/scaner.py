@@ -1,12 +1,12 @@
 import os
-import threading
 
 import sqlalchemy
 
 from cfg import conf
 from database import Dbase, Thumbs
-from .utils import encode_image, get_coll_name
+
 from .globals import Globals
+from .utils import *
 
 __all__ = (
     "scaner",
@@ -37,15 +37,7 @@ class Scaner:
             bg=conf.sel_color
             )
 
-        conf.scaner_task = threading.Thread(
-            target=self.__update_db,
-            daemon=True
-            )
-        conf.scaner_task.start()
-
-        while conf.scaner_task.is_alive():
-            conf.root.update()
-
+        run_thread(self.__update_db)
         self.__change_live_text("")
 
         if self.need_update:

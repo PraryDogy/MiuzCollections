@@ -32,8 +32,17 @@ __all__ = (
     "download_tiffs",
     "focus_last_win",
     "reveal_coll",
-    "paste_search"
+    "paste_search",
+    "run_thread"
     )
+
+
+def run_thread(fn, args=[]):
+    task = threading.Thread(target=fn, args=args, daemon=True)
+    task.start()
+
+    while task.is_alive():
+        conf.root.update()
 
 
 class Reveal:
@@ -47,9 +56,7 @@ class Reveal:
         return name.replace(" ", "")
 
     def reveal_jpg(self, src: str):
-        def task():
-            subprocess.call(["open", "-R", src])
-        threading.Thread(target = task).start()
+        run_thread(lambda: subprocess.call(["open", "-R", src]))
 
     def reveal_tiffs(self, list_paths: list):
         def task():
@@ -70,7 +77,7 @@ class Reveal:
             subprocess.call(["osascript", *args])
 
         if list_paths:
-            threading.Thread(target=task).start()
+            run_thread(task)
 
     def find_tiffs(self, src: str):
         path, filename = os.path.split(src)
@@ -198,11 +205,7 @@ def smb_check():
             except subprocess.TimeoutExpired:
                 print("timeout 3 sec, utils.py, smb_check")
 
-    t = threading.Thread(target=task, daemon=True)
-    t.start()
-    while t.is_alive():
-        conf.root.update()
-
+    run_thread(task)
     return bool(os.path.exists(conf.coll_folder))
 
 
@@ -272,8 +275,10 @@ def download_onefile(src):
     dest = create_dir()
     dest = os.path.join(dest, src.split("/")[-1])
 
-    shutil.copy(src, dest)
-    subprocess.Popen(["open", "-R", dest])
+    def task():
+        shutil.copy(src, dest)
+        subprocess.Popen(["open", "-R", dest])
+    run_thread(task)
 
 
 def download_tiffs(src):
@@ -282,10 +287,11 @@ def download_tiffs(src):
     if tiffs:
         parrent = create_dir()
 
-        for i in tiffs:
-            shutil.copy(i, os.path.join(parrent, i.split("/")[-1]))
-
-        subprocess.Popen(["open", parrent])
+        def task():
+            for i in tiffs:
+                shutil.copy(i, os.path.join(parrent, i.split("/")[-1]))
+            subprocess.Popen(["open", parrent])
+        run_thread(task)
 
 
 def focus_last_win():
