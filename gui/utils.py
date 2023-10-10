@@ -34,8 +34,8 @@ __all__ = (
     "reveal_coll",
     "paste_search",
     "copy_text",
-    "copy_tiffs_paths",,
-    "run_thread"
+    "copy_tiffs_paths",
+    "run_thread",
     )
 
 
