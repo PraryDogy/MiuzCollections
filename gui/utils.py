@@ -106,7 +106,7 @@ class Reveal:
             return images
         else:
             Globals.topbar_text(conf.lang.live_notiff)
-            Globals.topbar_default
+            Globals.topbar_default()
             return False
 
 

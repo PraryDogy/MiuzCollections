@@ -220,7 +220,7 @@ class Thumbnails(CFrame, ThumbsPrepare):
     def __init__(self, master):
         super().__init__(master)
 
-        self.topbar = CButton(self, text="▲  ")
+        self.topbar = CButton(self, text="▲")
         self.topbar.configure(
             font=('San Francisco Pro', 13, 'normal'),
             bg=conf.bg_color,
@@ -457,5 +457,5 @@ class Thumbnails(CFrame, ThumbsPrepare):
     def topbar_default(self):
         conf.root.after(
             3000,
-            lambda: self.topbar.configure(text="▲  ", bg=conf.bg_color)
+            lambda: self.topbar.configure(text="▲", bg=conf.bg_color)
             )

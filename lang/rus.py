@@ -121,7 +121,7 @@ class Rus:
         self.live_newphoto = "новых фото"
         self.live_finish = "Завершаю"
         self.live_updating = "Обновление"
-        self.live_wait = "Подождите"
+        self.live_wait = "Пожалуйста, подождите"
         self.live_notiff = "Не могу найти tiff"
 
         # context copy to downloads
