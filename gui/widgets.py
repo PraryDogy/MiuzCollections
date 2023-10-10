@@ -200,48 +200,54 @@ class Context(tkinter.Menu, Reveal):
     def __init__(self):
         super().__init__()
 
-    def context_imgview(self, e: tkinter.Event):
+    def cont_sep(self):
+        self.add_separator()
+
+    def do_popup(self, e: tkinter.Event):
+        try:
+            self.tk_popup(e.x_root, e.y_root)
+        finally:
+            self.grab_release()
+
+    def cont_imgview(self, e: tkinter.Event):
         from .img_viewer import ImgViewer
         self.add_command(
             label=conf.lang.view,
             command=lambda: ImgViewer(e.widget.src, e.widget.all_src)
             )
 
-    def context_sep(self):
-        self.add_separator()
-
-    def context_imginfo(self, e: tkinter.Event):
+    def cont_imginfo(self, e: tkinter.Event):
         self.add_command(
             label=conf.lang.info,
             command=lambda: ImageInfo(e.widget.src)
             )
 
-    def context_show_jpg(self, e: tkinter.Event):
+    def cont_reveal_jpg(self, e: tkinter.Event):
         self.add_command(
             label=conf.lang.show_jpeg,
             command = lambda: self.reveal_jpg(e.widget.src)
             )
 
-    def context_show_tiffs(self, e: tkinter.Event):
+    def cont_reveal_tiffs(self, e: tkinter.Event):
         tiffs = self.find_tiffs(e.widget.src)
         self.add_command(
             label=conf.lang.show_tiff,
             command = lambda: self.reveal_tiffs(tiffs)
             )
 
-    def context_paste(self):
+    def cont_pastesearch(self):
         self.add_command(
             label=conf.lang.search_paste,
             command=paste_search
             )
 
-    def context_clear(self):
+    def cont_clear(self):
         self.add_command(
             label=conf.lang.search_clear,
             command=lambda: Globals.search_var.set("")
             )
 
-    def context_download_group(self, e: tkinter.Event):
+    def cont_download_group(self, e: tkinter.Event):
         self.add_command(
             label=(
                 f"{conf.lang.context_copy} "
@@ -251,7 +257,7 @@ class Context(tkinter.Menu, Reveal):
             command=lambda: download_files(e.widget.title, e.widget.paths_list)
         )
 
-    def context_download_onefile(self, e: tkinter.Event):
+    def cont_download_onefile(self, e: tkinter.Event):
         self.add_command(
             label=(
                 f"{conf.lang.context_copy} "
@@ -261,7 +267,7 @@ class Context(tkinter.Menu, Reveal):
             command=lambda: download_onefile(e.widget.src)
         )
 
-    def context_download_tiffs(self, e: tkinter.Event):
+    def cont_download_tiffs(self, e: tkinter.Event):
         self.add_command(
             label=(
                 f"{conf.lang.context_copy} "
@@ -271,20 +277,26 @@ class Context(tkinter.Menu, Reveal):
             command=lambda: download_tiffs(e.widget.src)
         )
 
-    def do_popup(self, e: tkinter.Event):
-        try:
-            self.tk_popup(e.x_root, e.y_root)
-        finally:
-            self.grab_release()
-
-    def context_reveal_coll(self, e: tkinter.Event):
+    def cont_reveal_coll(self, e: tkinter.Event):
         self.add_command(
             label=conf.lang.show_coll,
             command=lambda: reveal_coll(e.widget.coll_name)
             )
 
-    def context_show_coll(self, e: tkinter.Event):
+    def cont_show_coll(self, e: tkinter.Event):
         self.add_command(
             label=conf.lang.view,
             command=lambda: Globals.show_coll(e)
+            )
+        
+    def cont_copy_tiffs_paths(self, e: tkinter.Event):
+        self.add_command(
+            label=conf.lang.copy_tiff_path,
+            command=lambda: copy_tiffs_paths(e.widget.src)
+            )
+        
+    def cont_copy_jpeg_path(self, e: tkinter.Event):
+        self.add_command(
+            label=conf.lang.copy_jpeg_path,
+            command=lambda: copy_text(e.widget.src)
             )

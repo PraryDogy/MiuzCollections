@@ -17,6 +17,8 @@ class Eng:
         self.show_jpeg = "Find jpeg"
         self.show_tiff = "Find tiff"
         self.show_coll = "Open folder"
+        self.copy_tiff_path = "Copy path to tiff"
+        self.copy_jpeg_path = "Copy path to jpeg"
 
         # menu
         self.menu_title = "Menu"
