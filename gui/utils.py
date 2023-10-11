@@ -24,7 +24,6 @@ __all__ = (
     "smb_check",
     "on_exit",
     "replace_bg",
-    "Reveal",
     "smb_ip",
     "run_applescript",
     "download_files",
@@ -36,6 +35,10 @@ __all__ = (
     "copy_text",
     "copy_tiffs_paths",
     "run_thread",
+    "normalize_name",
+    "reveal_jpg",
+    "reveal_tiffs",
+    "find_tiffs",
     )
 
 
@@ -50,71 +53,66 @@ def run_thread(fn, args=[]):
         conf.root.update()
 
 
-class Reveal:
-    def normalize_name(self, name: str):
-        name, ext = os.path.splitext(name)
-        name = name.translate(str.maketrans("", "", string.punctuation))
+def normalize_name(name: str):
+    name, ext = os.path.splitext(name)
+    name = name.translate(str.maketrans("", "", string.punctuation))
 
-        for i in conf.stopwords:
-            name = name.replace(i, "")
+    for i in conf.stopwords:
+        name = name.replace(i, "")
 
-        return name.replace(" ", "")
+    return name.replace(" ", "")
 
-    def reveal_jpg(self, src: str):
-        run_thread(lambda: subprocess.call(["open", "-R", src]))
 
-    def reveal_tiffs(self, list_paths: list):
-        def task():
-            paths = (
-                f"\"{i}\" as POSIX file"
-                for i in list_paths
-                )
+def reveal_jpg(src: str):
+    run_thread(lambda: subprocess.call(["open", "-R", src]))
 
-            paths = ", ".join(paths)
 
-            args = (
-                "-e", "tell application \"Finder\"",
-                "-e", f"reveal {{{paths}}}",
-                "-e", "activate",
-                "-e", "end tell",
-                )
+def reveal_tiffs(list_paths: list):
+    def task():
+        paths = (
+            f"\"{i}\" as POSIX file"
+            for i in list_paths
+            )
 
-            subprocess.call(["osascript", *args])
+        paths = ", ".join(paths)
 
-        if list_paths:
-            run_thread(task)
+        args = (
+            "-e", "tell application \"Finder\"",
+            "-e", f"reveal {{{paths}}}",
+            "-e", "activate",
+            "-e", "end tell",
+            )
 
-    def find_tiffs(self, src: str):
-        global utils_task
-        utils_task = True
+        subprocess.call(["osascript", *args])
+
+    if list_paths:
         Globals.topbar_text(conf.lang.live_wait)
+        run_thread(task)
+        Globals.topbar_default()
 
-        path, filename = os.path.split(src)
-        src_file_no_ext = self.normalize_name(filename)
-        exts = (".tiff", ".TIFF", ".psd", ".PSD", ".psb", ".PSB", ".tif", ".TIF")
-        images = []
 
-        for root, dirs, files in os.walk(path):
-            for file in files:
+def find_tiffs(src: str):
+    path, filename = os.path.split(src)
+    src_file_no_ext = normalize_name(filename)
+    exts = (".tiff", ".TIFF", ".psd", ".PSD", ".psb", ".PSB", ".tif", ".TIF")
+    images = []
 
-                if file.endswith(exts):
+    for root, dirs, files in os.walk(path):
+        for file in files:
 
-                    file_no_ext = self.normalize_name(file)
+            if file.endswith(exts):
 
-                    if src_file_no_ext in file_no_ext:
-                        images.append(os.path.join(root, file))
+                file_no_ext = normalize_name(file)
 
-                    elif file_no_ext in src_file_no_ext and len(file_no_ext) > 5:
-                        images.append(os.path.join(root, file))
-        if images:
-            Globals.topbar_default()
-            return images
-        else:
-            Globals.topbar_text(conf.lang.live_notiff)
-            Globals.topbar_default()
-            return False
-        
-        utils_task = None
+                if src_file_no_ext in file_no_ext:
+                    images.append(os.path.join(root, file))
+
+                elif file_no_ext in src_file_no_ext and len(file_no_ext) > 5:
+                    images.append(os.path.join(root, file))
+    if images:
+        return images
+    else:
+        return False
 
 
 def get_coll_name(src: str):
@@ -307,11 +305,11 @@ def download_onefile(src):
 
 
 def download_tiffs(src):
-    tiffs = Reveal().find_tiffs(src)
+    Globals.topbar_text(conf.lang.live_wait)
+    tiffs = find_tiffs(src)
+
     if tiffs:
         parrent = create_dir()
-
-        while utils_task.
 
         def task():
             ln_tiffs = len(tiffs)
@@ -367,6 +365,11 @@ def copy_text(path):
 
 
 def copy_tiffs_paths(path):
-    tiffs = Reveal().find_tiffs(path)
+    Globals.topbar_text(conf.lang.live_wait)
+    tiffs = find_tiffs(path)
     if tiffs:
         copy_text("\n".join(tiffs))
+        Globals.topbar_default()
+    else:
+        Globals.topbar_text(conf.lang.live_notiff)
+        Globals.topbar_default()

@@ -196,7 +196,7 @@ class MacMenu(tkinter.Menu):
             print("no dialog panel")
 
 
-class Context(tkinter.Menu, Reveal):
+class Context(tkinter.Menu):
     def __init__(self):
         super().__init__()
 
@@ -225,13 +225,13 @@ class Context(tkinter.Menu, Reveal):
     def cont_reveal_jpg(self, e: tkinter.Event):
         self.add_command(
             label=conf.lang.show_jpeg,
-            command=lambda: self.reveal_jpg(e.widget.src)
+            command=lambda: reveal_jpg(e.widget.src)
             )
 
     def cont_reveal_tiffs(self, e: tkinter.Event):
         self.add_command(
             label=conf.lang.show_tiff,
-            command=lambda: self.reveal_tiffs(self.find_tiffs(e.widget.src))
+            command=lambda: reveal_tiffs(find_tiffs(e.widget.src))
             )
 
     def cont_pastesearch(self):
