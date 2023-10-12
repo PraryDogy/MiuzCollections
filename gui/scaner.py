@@ -34,7 +34,7 @@ class Scaner:
         conf.flag = True
         Globals.stbar_btn.configure(
             text=conf.lang.live_updating,
-            bg=conf.sel_color
+            bg=conf.topbar_color
             )
 
         run_thread(self.__update_db)
