@@ -456,6 +456,6 @@ class Thumbnails(CFrame, ThumbsPrepare):
 
     def topbar_default(self):
         conf.root.after(
-            3000,
+            1500,
             lambda: self.topbar.configure(text="▲", bg=conf.bg_color)
             )

@@ -26,8 +26,8 @@ __all__ = (
     "replace_bg",
     "smb_ip",
     "run_applescript",
-    "download_files",
-    "download_onefile",
+    "download_group_jpeg",
+    "download_one_jpeg",
     "download_tiffs",
     "focus_last_win",
     "reveal_coll",
@@ -42,15 +42,35 @@ __all__ = (
     )
 
 
-utils_task = None
+utils_task = threading.Thread
 
+
+
+
+# ********************system utils********************
 
 def run_thread(fn, args=[]):
-    task = threading.Thread(target=fn, args=args, daemon=True)
-    task.start()
+    global utils_task
+    utils_task = threading.Thread(target=fn, args=args, daemon=True)
+    utils_task.start()
 
-    while task.is_alive():
+    while utils_task.is_alive():
         conf.root.update()
+
+
+def wait_thread():
+    while utils_task.is_alive():
+        conf.root.update()
+
+
+def run_applescript(applescript: str):
+    args = [
+        item
+        for x in [("-e",l.strip())
+        for l in applescript.split('\n')
+        if l.strip() != ''] for item in x]
+    subprocess.call(["osascript"] + args)
+
 
 
 def normalize_name(name: str):
@@ -63,56 +83,60 @@ def normalize_name(name: str):
     return name.replace(" ", "")
 
 
-def reveal_jpg(src: str):
-    run_thread(lambda: subprocess.call(["open", "-R", src]))
-
-
-def reveal_tiffs(list_paths: list):
+def smb_check():
     def task():
-        paths = (
-            f"\"{i}\" as POSIX file"
-            for i in list_paths
-            )
+        if not os.path.exists(conf.coll_folder):
+            try:
+                cmd = f"mount volume \"{conf.smb_ip}\""
+                subprocess.call(["osascript", "-e", cmd], timeout=3)
+            except subprocess.TimeoutExpired:
+                print("timeout 3 sec, utils.py, smb_check")
 
-        paths = ", ".join(paths)
-
-        args = (
-            "-e", "tell application \"Finder\"",
-            "-e", f"reveal {{{paths}}}",
-            "-e", "activate",
-            "-e", "end tell",
-            )
-
-        subprocess.call(["osascript", *args])
-
-    if list_paths:
-        Globals.topbar_text(conf.lang.live_wait)
-        run_thread(task)
-        Globals.topbar_default()
+    run_thread(task)
+    return bool(os.path.exists(conf.coll_folder))
 
 
-def find_tiffs(src: str):
-    path, filename = os.path.split(src)
-    src_file_no_ext = normalize_name(filename)
-    exts = (".tiff", ".TIFF", ".psd", ".PSD", ".psb", ".PSB", ".tif", ".TIF")
-    images = []
+def smb_ip():
+    df = subprocess.Popen(['df', conf.coll_folder], stdout=subprocess.PIPE)
+    try:
+        outputLine = df.stdout.readlines()[1]
+        unc_path = str(outputLine.split()[0])
+        return "smb://" + unc_path.split("@")[-1][:-1]
+    except IndexError:
+        return None
 
-    for root, dirs, files in os.walk(path):
-        for file in files:
 
-            if file.endswith(exts):
+def on_exit(e=None):
+    w, h = conf.root.winfo_width(), conf.root.winfo_height()
+    x, y = conf.root.winfo_x(), conf.root.winfo_y()
 
-                file_no_ext = normalize_name(file)
+    conf.root_w = w
+    conf.root_h = h
+    conf.root_x = x
+    conf.root_y = y
 
-                if src_file_no_ext in file_no_ext:
-                    images.append(os.path.join(root, file))
+    conf.write_cfg()
 
-                elif file_no_ext in src_file_no_ext and len(file_no_ext) > 5:
-                    images.append(os.path.join(root, file))
-    if images:
-        return images
-    else:
-        return False
+    conf.flag = False
+    quit()
+
+
+def create_dir(title=None):
+    coll = conf.curr_coll
+    if coll == "all":
+        coll = "All collections"
+
+    dest = os.path.join(
+        os.path.expanduser('~'), "Downloads", conf.app_name, coll
+        )
+
+    if title:
+        dest = os.path.join(dest, title)
+
+    if not os.path.exists(dest):
+        os.makedirs(dest, exist_ok=True)
+
+    return dest
 
 
 def get_coll_name(src: str):
@@ -135,6 +159,44 @@ def place_center():
 
     win.geometry(f'+{xx}+{yy}')
 
+
+def reveal_coll(coll_name):
+    if coll_name != conf.all_colls:
+        coll_path = os.path.join(conf.coll_folder, coll_name)
+    else:
+        coll_path = conf.coll_folder
+
+    try:
+        subprocess.check_output(["/usr/bin/open", coll_path])
+    except subprocess.CalledProcessError:
+        subprocess.check_output(["/usr/bin/open", conf.coll_folder])
+
+
+def paste_search():
+    try:
+        pasted = conf.root.clipboard_get().strip()
+        Globals.search_var.set(pasted)
+    except tkinter.TclError:
+        print("no clipboard")
+
+
+def copy_text(path):
+    conf.root.clipboard_clear()
+    conf.root.clipboard_append(path)
+
+
+def focus_last_win():
+    for k, v in conf.root.children.items():
+        if v.widgetName == "toplevel":
+            v.focus_force()
+            v.grab_set_global()
+            return
+    conf.root.focus_force()
+
+
+
+
+# ********************image utils********************
 
 def resize_image(img, widget_w, widget_h, thumbnail: bool):
     h, w = img.shape[:2]
@@ -208,160 +270,96 @@ def crop_image(img):
     return cropped[0:conf.thumb_size, 0:conf.thumb_size]
 
 
-def smb_check():
-    def task():
-        if not os.path.exists(conf.coll_folder):
-            try:
-                cmd = f"mount volume \"{conf.smb_ip}\""
-                subprocess.call(["osascript", "-e", cmd], timeout=3)
-            except subprocess.TimeoutExpired:
-                print("timeout 3 sec, utils.py, smb_check")
-
-    run_thread(task)
-    return bool(os.path.exists(conf.coll_folder))
 
 
-def smb_ip():
-    df = subprocess.Popen(['df', conf.coll_folder], stdout=subprocess.PIPE)
-    try:
-        outputLine = df.stdout.readlines()[1]
-        unc_path = str(outputLine.split()[0])
-        return "smb://" + unc_path.split("@")[-1][:-1]
-    except IndexError:
-        return None
+# ********************finder utils********************
+
+def find_tiffs(src: str):
+    path, filename = os.path.split(src)
+    src_file_no_ext = normalize_name(filename)
+    exts = (".tiff", ".TIFF", ".psd", ".PSD", ".psb", ".PSB", ".tif", ".TIF")
+    images = []
+
+    for root, dirs, files in os.walk(path):
+        for file in files:
+
+            if file.endswith(exts):
+
+                file_no_ext = normalize_name(file)
+
+                if src_file_no_ext in file_no_ext:
+                    images.append(os.path.join(root, file))
+
+                elif file_no_ext in src_file_no_ext and len(file_no_ext) > 5:
+                    images.append(os.path.join(root, file))
+    if images:
+        return images
+    else:
+        return False
 
 
-def on_exit(e=None):
-    w, h = conf.root.winfo_width(), conf.root.winfo_height()
-    x, y = conf.root.winfo_x(), conf.root.winfo_y()
-
-    conf.root_w = w
-    conf.root_h = h
-    conf.root_x = x
-    conf.root_y = y
-
-    conf.write_cfg()
-
-    conf.flag = False
-    quit()
-
-
-def run_applescript(applescript: str):
-    args = [
-        item
-        for x in [("-e",l.strip())
-        for l in applescript.split('\n')
-        if l.strip() != ''] for item in x]
-    subprocess.call(["osascript"] + args)
-
-
-def create_dir(title=None):
-    coll = conf.curr_coll
-    if coll == "all":
-        coll = "All collections"
-
-    dest = os.path.join(
-        os.path.expanduser('~'), "Downloads", conf.app_name, coll
-        )
-
-    if title:
-        dest = os.path.join(dest, title)
-
-    if not os.path.exists(dest):
-        os.makedirs(dest, exist_ok=True)
-
-    return dest
-
-
-def download_files(title, paths_list: list):
-    dest = create_dir(title)
-    ln_paths = len(paths_list)
+def reveal_tiffs(list_paths: list):
+    wait_thread()
 
     def task():
-        for num, imgpath in enumerate(paths_list, 1):
-            t = f"{conf.lang.live_copying} {num} {conf.lang.live_from} {ln_paths}"
-            Globals.topbar_text(t)
+        paths = (
+            f"\"{i}\" as POSIX file"
+            for i in list_paths
+            )
 
-            filename = imgpath.split("/")[-1]
-            shutil.copy(imgpath, os.path.join(dest, filename))
+        paths = ", ".join(paths)
 
-        subprocess.Popen(["open", dest])
-    
-    run_thread(task)
-    Globals.topbar_default()
+        applescript = f"""
+            tell application \"Finder\"
+            reveal {{{paths}}}
+            activate
+            end tell
+            """
 
+        run_applescript(applescript)
 
-def download_onefile(src):
-    Globals.topbar_text(conf.lang.live_copying)
-    dest = create_dir()
-    dest = os.path.join(dest, src.split("/")[-1])
-
-    def task():
-        shutil.copy(src, dest)
-        subprocess.Popen(["open", "-R", dest])
-
-    run_thread(task)
-    Globals.topbar_default()
+    if list_paths:
+        Globals.topbar_text(conf.lang.live_wait)
+        run_thread(task)
+        Globals.topbar_default()
+    else:
+        Globals.topbar_text(conf.lang.live_notiff)
 
 
 def download_tiffs(src):
+    wait_thread()
+
+
+    def task(parrent, tiffs, ln_tiffs):
+        for num, tiff in enumerate(tiffs, 1):
+
+            if not conf.flag:
+                return
+
+            t = (
+                f"{conf.lang.live_copying} "
+                f"{num} {conf.lang.live_from} {ln_tiffs}"
+                )
+            Globals.topbar_text(t)
+            shutil.copy(tiff, os.path.join(parrent, tiff.split("/")[-1]))
+
+        subprocess.Popen(["open", parrent])
+
+
     Globals.topbar_text(conf.lang.live_wait)
     tiffs = find_tiffs(src)
 
     if tiffs:
+        conf.flag = True
+        ln_tiffs = len(tiffs)
         parrent = create_dir()
 
-        def task():
-            ln_tiffs = len(tiffs)
-            for num, tiff in enumerate(tiffs, 1):
-                t = (
-                    f"{conf.lang.live_copying} "
-                    f"{num} {conf.lang.live_from} {ln_tiffs}"
-                    )
-                Globals.topbar_text(t)
-                shutil.copy(tiff, os.path.join(parrent, tiff.split("/")[-1]))
-            subprocess.Popen(["open", parrent])
-
-        run_thread(task)
+        run_thread(task, [parrent, tiffs, ln_tiffs])
         Globals.topbar_default()
-    
+
     else:
         Globals.topbar_text(conf.lang.live_notiff)
         Globals.topbar_default()
-
-
-def focus_last_win():
-    for k, v in conf.root.children.items():
-        if v.widgetName == "toplevel":
-            v.focus_force()
-            v.grab_set_global()
-            return
-    conf.root.focus_force()
-
-
-def reveal_coll(coll_name):
-    if coll_name != conf.all_colls:
-        coll_path = os.path.join(conf.coll_folder, coll_name)
-    else:
-        coll_path = conf.coll_folder
-
-    try:
-        subprocess.check_output(["/usr/bin/open", coll_path])
-    except subprocess.CalledProcessError:
-        subprocess.check_output(["/usr/bin/open", conf.coll_folder])
-
-
-def paste_search():
-    try:
-        pasted = conf.root.clipboard_get().strip()
-        Globals.search_var.set(pasted)
-    except tkinter.TclError:
-        print("no clipboard")
-
-
-def copy_text(path):
-    conf.root.clipboard_clear()
-    conf.root.clipboard_append(path)
 
 
 def copy_tiffs_paths(path):
@@ -373,3 +371,63 @@ def copy_tiffs_paths(path):
     else:
         Globals.topbar_text(conf.lang.live_notiff)
         Globals.topbar_default()
+
+
+def reveal_jpg(src: str):
+    wait_thread()
+
+    def task():
+        subprocess.call(["open", "-R", src])
+
+
+    Globals.topbar_text(conf.lang.live_wait)
+    run_thread(task)
+    Globals.topbar_default()
+
+
+def download_group_jpeg(title, paths_list: list):
+    wait_thread()
+
+
+    def task(dest, ln_paths):
+        for num, imgpath in enumerate(paths_list, 1):
+
+            if not conf.flag:
+                return
+
+            t = (
+                f"{conf.lang.live_copying} {num} "
+                f"{conf.lang.live_from} {ln_paths}"
+                )
+
+            Globals.topbar_text(t)
+
+            filename = imgpath.split("/")[-1]
+            shutil.copy(imgpath, os.path.join(dest, filename))
+
+        subprocess.Popen(["open", dest])
+
+
+    conf.flag = True
+    dest = create_dir(title)
+    ln_paths = len(paths_list)
+    run_thread(task, [dest, ln_paths])
+    Globals.topbar_default()
+    conf.flag = False
+
+
+def download_one_jpeg(src):
+    wait_thread()
+
+
+    def task(dest):
+        shutil.copy(src, dest)
+        subprocess.Popen(["open", "-R", dest])
+
+
+    Globals.topbar_text(conf.lang.live_copying)
+    dest = create_dir()
+    dest = os.path.join(dest, src.split("/")[-1])
+
+    run_thread(task, [dest])
+    Globals.topbar_default()

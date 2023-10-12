@@ -253,7 +253,7 @@ class Context(tkinter.Menu):
                 f"\"{e.widget.title}\" "
                 f"{conf.lang.context_downloads}"
                 ),
-            command=lambda: download_files(e.widget.title, e.widget.paths_list)
+            command=lambda: download_group_jpeg(e.widget.title, e.widget.paths_list)
         )
 
     def cont_download_onefile(self, e: tkinter.Event):
@@ -263,7 +263,7 @@ class Context(tkinter.Menu):
                 "jpeg "
                 f"{conf.lang.context_downloads}"
                 ),
-            command=lambda: download_onefile(e.widget.src)
+            command=lambda: download_one_jpeg(e.widget.src)
         )
 
     def cont_download_tiffs(self, e: tkinter.Event):
