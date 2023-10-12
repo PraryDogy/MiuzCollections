@@ -452,10 +452,17 @@ class Thumbnails(CFrame, ThumbsPrepare):
         self.sframe['canvas'].yview_moveto('0.0')
 
     def topbar_text(self, text):
-        self.topbar.configure(text=text, bg=conf.sel_color)
+        try:
+            self.topbar.configure(text=text, bg=conf.topbar_color)
+        except tkinter.TclError:
+            print("thumbnails > topbar text error")
+
 
     def topbar_default(self):
-        conf.root.after(
-            1500,
-            lambda: self.topbar.configure(text="▲", bg=conf.bg_color)
-            )
+        try:
+            conf.root.after(
+                2000,
+                lambda: self.topbar.configure(text="▲", bg=conf.bg_color)
+                )
+        except tkinter.TclError:
+            print("thumbnails > topbar default error")

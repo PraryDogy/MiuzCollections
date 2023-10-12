@@ -14,40 +14,40 @@ from cfg import conf
 from .globals import Globals
 
 __all__ = (
-    "get_coll_name",
-    "place_center",
-    "encode_image",
-    "decode_image",
     "convert_to_rgb",
+    "copy_text",
+    "copy_tiffs_paths",
     "crop_image",
-    "resize_image",
-    "smb_check",
-    "on_exit",
-    "replace_bg",
-    "smb_ip",
-    "run_applescript",
+    "decode_image",
     "download_group_jpeg",
     "download_one_jpeg",
     "download_tiffs",
+    "encode_image",
+    "find_tiffs",
     "focus_last_win",
-    "reveal_coll",
-    "paste_search",
-    "copy_text",
-    "copy_tiffs_paths",
-    "run_thread",
+    "get_coll_name",
     "normalize_name",
+    "on_exit",
+    "paste_search",
+    "place_center",
+    "replace_bg",
+    "resize_image",
+    "reveal_coll",
     "reveal_jpg",
     "reveal_tiffs",
-    "find_tiffs",
+    "run_applescript",
+    "run_thread",
+    "smb_check",
+    "smb_ip",
     )
-
-
-utils_task = threading.Thread
 
 
 
 
 # ********************system utils********************
+
+utils_task = threading.Thread
+
 
 def run_thread(fn, args=[]):
     global utils_task
@@ -124,7 +124,7 @@ def on_exit(e=None):
 def create_dir(title=None):
     coll = conf.curr_coll
     if coll == "all":
-        coll = "All collections"
+        coll = conf.lang.all_colls
 
     dest = os.path.join(
         os.path.expanduser('~'), "Downloads", conf.app_name, coll
@@ -324,6 +324,7 @@ def reveal_tiffs(list_paths: list):
         Globals.topbar_default()
     else:
         Globals.topbar_text(conf.lang.live_notiff)
+        Globals.topbar_default()
 
 
 def download_tiffs(src):
