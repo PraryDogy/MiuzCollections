@@ -31,6 +31,7 @@ __all__ = (
     "on_exit",
     "paste_search",
     "place_center",
+    "topbar_default_thread",
     "replace_bg",
     "resize_image",
     "reveal_coll",

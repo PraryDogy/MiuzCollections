@@ -14,7 +14,7 @@ __all__ = (
 class Config:
     def __init__(self):
         self.app_name = 'MiuzCollections'
-        self.app_ver = '3.8.7'
+        self.app_ver = '3.8.8'
         self.db_name = "db.db"
         self.thumb_err = "thumb.jpg"
 
