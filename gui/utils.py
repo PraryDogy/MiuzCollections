@@ -330,6 +330,7 @@ def reveal_tiffs(list_paths: list):
 
     if list_paths:
         Globals.topbar_text(conf.lang.live_wait)
+        wait_thread()
         run_thread(task)
         topbar_default_thread()
     else:
@@ -366,6 +367,7 @@ def download_tiffs(src):
         parrent = create_dir()
 
         run_thread(task, [parrent, tiffs, ln_tiffs])
+        wait_thread()
         topbar_default_thread()
 
     else:
@@ -395,6 +397,7 @@ def reveal_jpg(src: str):
 
     Globals.topbar_text(conf.lang.live_wait)
     run_thread(task)
+    wait_thread()
     topbar_default_thread()
 
 
@@ -425,6 +428,7 @@ def download_group_jpeg(title, paths_list: list):
     dest = create_dir(title)
     ln_paths = len(paths_list)
     run_thread(task, [dest, ln_paths])
+    wait_thread()
     topbar_default_thread()
     conf.flag = False
 
@@ -443,4 +447,5 @@ def download_one_jpeg(src):
     dest = os.path.join(dest, src.split("/")[-1])
 
     run_thread(task, [dest])
+    wait_thread()
     topbar_default_thread()
