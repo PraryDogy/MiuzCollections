@@ -4,6 +4,7 @@ import string
 import subprocess
 import threading
 import tkinter
+from time import sleep
 
 import cv2
 import numpy
@@ -54,13 +55,21 @@ def run_thread(fn, args=[]):
     utils_task = threading.Thread(target=fn, args=args, daemon=True)
     utils_task.start()
 
-    while utils_task.is_alive():
-        conf.root.update()
-
 
 def wait_thread():
     while utils_task.is_alive():
         conf.root.update()
+
+
+def topbar_default_thread():
+    global utils_task
+
+    def task():
+        sleep(2)
+        Globals.topbar_default()
+
+
+    run_thread(task)
 
 
 def run_applescript(applescript: str):
@@ -321,10 +330,10 @@ def reveal_tiffs(list_paths: list):
     if list_paths:
         Globals.topbar_text(conf.lang.live_wait)
         run_thread(task)
-        Globals.topbar_default()
+        topbar_default_thread()
     else:
         Globals.topbar_text(conf.lang.live_notiff)
-        Globals.topbar_default()
+        topbar_default_thread()
 
 
 def download_tiffs(src):
@@ -356,22 +365,24 @@ def download_tiffs(src):
         parrent = create_dir()
 
         run_thread(task, [parrent, tiffs, ln_tiffs])
-        Globals.topbar_default()
+        topbar_default_thread()
 
     else:
         Globals.topbar_text(conf.lang.live_notiff)
-        Globals.topbar_default()
+        topbar_default_thread()
 
 
 def copy_tiffs_paths(path):
+    wait_thread()
+
     Globals.topbar_text(conf.lang.live_wait)
     tiffs = find_tiffs(path)
     if tiffs:
         copy_text("\n".join(tiffs))
-        Globals.topbar_default()
+        topbar_default_thread()
     else:
         Globals.topbar_text(conf.lang.live_notiff)
-        Globals.topbar_default()
+        topbar_default_thread()
 
 
 def reveal_jpg(src: str):
@@ -383,7 +394,7 @@ def reveal_jpg(src: str):
 
     Globals.topbar_text(conf.lang.live_wait)
     run_thread(task)
-    Globals.topbar_default()
+    topbar_default_thread()
 
 
 def download_group_jpeg(title, paths_list: list):
@@ -413,7 +424,7 @@ def download_group_jpeg(title, paths_list: list):
     dest = create_dir(title)
     ln_paths = len(paths_list)
     run_thread(task, [dest, ln_paths])
-    Globals.topbar_default()
+    topbar_default_thread()
     conf.flag = False
 
 
@@ -431,4 +442,4 @@ def download_one_jpeg(src):
     dest = os.path.join(dest, src.split("/")[-1])
 
     run_thread(task, [dest])
-    Globals.topbar_default()
+    topbar_default_thread()
