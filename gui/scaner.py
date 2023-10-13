@@ -7,6 +7,8 @@ from database import Dbase, Thumbs
 
 from .globals import Globals
 from .utils import *
+import threading
+
 
 __all__ = (
     "scaner",
@@ -37,7 +39,11 @@ class Scaner:
             bg=conf.topbar_color
             )
 
-        run_thread(self.__update_db)
+        task = threading.Thread(target=self.__update_db, daemon=True)
+        task.start()
+        while task.is_alive():
+            conf.root.update()
+
         self.__change_live_text("")
 
         if self.need_update:
@@ -204,6 +210,7 @@ class Scaner:
                     Thumbs.modified == sqlalchemy.bindparam("b_modified")
                     )
                 Dbase.conn.execute(q, vals)
+
 
     def __change_live_text(self, text):
         conf.live_text = text
