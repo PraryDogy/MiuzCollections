@@ -454,11 +454,12 @@ class Thumbnails(CFrame, ThumbsPrepare):
     def topbar_text(self, text):
         try:
             self.topbar.configure(text=text, bg=conf.topbar_color)
-        except tkinter.TclError:
+        except RuntimeError:
             print("thumbnails > topbar text error")
+            conf.root.after(1000, lambda: self.topbar_text(text))
 
     def topbar_default(self):
         try:
             self.topbar.configure(text="▲", bg=conf.bg_color)
-        except tkinter.TclError:
+        except RuntimeError:
             print("thumbnails > topbar default error")

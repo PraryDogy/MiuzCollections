@@ -332,9 +332,11 @@ def reveal_tiffs(list_paths: list):
         Globals.topbar_text(conf.lang.live_wait)
         wait_thread()
         run_thread(task)
+        wait_thread()
         topbar_default_thread()
     else:
         Globals.topbar_text(conf.lang.live_notiff)
+        wait_thread()
         topbar_default_thread()
 
 
