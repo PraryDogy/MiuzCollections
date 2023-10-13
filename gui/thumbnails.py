@@ -456,7 +456,6 @@ class Thumbnails(CFrame, ThumbsPrepare):
             self.topbar.configure(text=text, bg=conf.topbar_color)
         except RuntimeError:
             print("thumbnails > topbar text error")
-            conf.root.after(1000, lambda: self.topbar_text(text))
 
     def topbar_default(self):
         try:
