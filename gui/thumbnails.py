@@ -108,8 +108,6 @@ class ThumbsSearch(CFrame):
 
 class ThumbsPrepare:
     def thumbs_prepare(self):
-        self.clmns_count = self.get_clmns_count()
-
         self.thumbs_lbls = Dbase.conn.execute(self.get_query()).fetchall()
         self.thumbs_lbls = self.decode_thumbs()
         self.thumbs_lbls = self.create_thumbs_dict()
@@ -261,6 +259,7 @@ class Thumbnails(CFrame, ThumbsPrepare):
 
     def load_thumbs(self):
         self.thumbs_prepare()
+        self.clmns_count = self.get_clmns_count()
 
         self.thumbs_frame = CFrame(self.sframe)
 
@@ -360,11 +359,13 @@ class Thumbnails(CFrame, ThumbsPrepare):
                 img_lbl = CLabel(self.thumbs_frame, image=img)
                 img_lbl.pack(anchor="w")
                 img_lbl.image_names = img
-                img_lbl.name = (date_key, chunk)
+
                 img_lbl.coords = coords
                 img_lbl.all_src = all_src
+
                 img_lbl.bind('<ButtonRelease-1>', self.click)
                 img_lbl.bind("<ButtonRelease-2>", self.r_click)
+                img_lbl.bind("<Command-ButtonRelease-2>", self.r_cmd_click)
 
         if not self.thumbs_lbls:
             str_var = Globals.search_var.get()
@@ -433,23 +434,26 @@ class Thumbnails(CFrame, ThumbsPrepare):
         clmns = (cnf.root_w - cnf.menu_w) // cnf.thumb_size
         return 1 if clmns == 0 else clmns
 
-    def click(self, e: tkinter.Event):
-        try:
-            clmn, row = e.x//self.thumb_size, e.y//self.thumb_size
-            src = e.widget.coords[(clmn, row)]
-        except KeyError:
-            return
-
-        ImgViewer(src, e.widget.all_src)
-
-    def r_click(self, e: tkinter.Event):
+    def get_coords(self, e: tkinter.Event):
         try:
             clmn, row = e.x//self.thumb_size, e.y//self.thumb_size
             e.widget.src = e.widget.coords[(clmn, row)]
-        except KeyError:
-            return
+            return True
 
-        ContextThumbs(e)
+        except KeyError:
+            return False
+
+    def click(self, e: tkinter.Event):
+        if self.get_coords(e):
+            ImgViewer(e.widget.src, e.widget.all_src)
+
+    def r_cmd_click(self, e: tkinter.Event):
+        if self.get_coords(e):
+            print(e.widget.src)
+
+    def r_click(self, e: tkinter.Event):
+        if self.get_coords(e):
+            ContextThumbs(e)
 
     def scroll_up(self, e=None):
         self.sframe['canvas'].yview_moveto('0.0')
