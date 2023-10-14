@@ -378,6 +378,9 @@ class Thumbnails(CFrame, ThumbsPrepare):
 
         if not self.thumbs_lbls:
             str_var = Globals.search_var.get()
+
+            noimg_t = cnf.lang.thumbs_nophoto
+
             if str_var:
                 noimg_t = (
                     f"{cnf.lang.thumbs_nophoto}"

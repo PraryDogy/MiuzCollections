@@ -6,6 +6,8 @@ from .menu import Menu
 from .stbar import StBar
 from .thumbnails import Thumbnails
 from .widgets import *
+import os
+
 
 __all__ = (
     "Application",
@@ -14,6 +16,9 @@ __all__ = (
 
 class Application:
     def __init__(self):
+        if not os.path.exists(os.path.join(cnf.coll_folder, cnf.curr_coll)):
+            cnf.curr_coll = cnf.all_colls
+
         cnf.root.title(cnf.app_name)
         cnf.root.configure(bg=cnf.bg_color)
         cnf.root.deiconify()
