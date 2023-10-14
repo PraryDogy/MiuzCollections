@@ -69,8 +69,11 @@ def topbar_default_thread():
         sleep(2)
         Globals.topbar_default()
 
-
-    run_thread(task)
+    try:
+        run_thread(task)
+    except RuntimeError:
+        print("utils > topbar_default_thread runtime err")
+        conf.root.after(2000, topbar_default_thread)
 
 
 def run_applescript(applescript: str):
