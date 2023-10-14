@@ -127,6 +127,7 @@ class Eng:
         # context copy to downloads
         self.context_copy = "Copy"
         self.context_downloads = "to Downloads"
+        self.context_copyall = "Copy all"
 
         # context advanced
         self.remove_fromapp = "Remove from app"

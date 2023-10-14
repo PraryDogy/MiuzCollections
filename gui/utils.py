@@ -20,6 +20,7 @@ __all__ = (
     "convert_to_rgb",
     "copy_jpeg_path",
     "copy_tiffs_paths",
+    "copy_text",
     "crop_image",
     "db_remove_img",
     "decode_image",
@@ -548,3 +549,8 @@ def db_remove_img(src):
             ))
     Dbase.conn.execute(q)
     Globals.reload_thumbs()
+
+
+def copy_text(text):
+    cnf.root.clipboard_clear()
+    cnf.root.clipboard_append(text)

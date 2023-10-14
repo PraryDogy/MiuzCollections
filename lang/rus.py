@@ -128,6 +128,7 @@ class Rus:
         # context copy to downloads
         self.context_copy = "Копировать"
         self.context_downloads = "в загрузки"
+        self.context_copyall = "Копировать все"
 
         # context advanced
         self.remove_fromapp = "Удалить из приложения"

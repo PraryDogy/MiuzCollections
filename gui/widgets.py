@@ -1,9 +1,6 @@
 import os
 import sys
 import tkinter
-from datetime import datetime
-
-from PIL import Image
 
 from cfg import cnf
 
@@ -17,7 +14,6 @@ __all__ = (
     "CLabel",
     "CWindow",
     "SmbAlert",
-    "ImageInfo",
     "MacMenu",
     "Context",
     )
@@ -66,7 +62,7 @@ class CWindow(tkinter.Toplevel):
 
         self.protocol("WM_DELETE_WINDOW", self.close_win)
         self.bind('<Escape>', self.close_win)
-
+        self.bind('<Command-w>', self.close_win)
         self.bind('<Command-q>', on_exit)
 
         self.resizable(0,0)
@@ -101,80 +97,6 @@ class SmbAlert(CWindow):
         self.grab_set_global()
 
     def btn_cmd(self, e=None):
-        self.destroy()
-        focus_last_win()
-
-
-class ImageInfo(CWindow):
-    def __init__(self, src: str):
-        under_win = None
-
-        for k, v in cnf.root.children.items():
-            if isinstance(v, CWindow):
-                under_win = v
-
-        if not under_win:
-            under_win = cnf.root
-
-        super().__init__()
-
-        self.title(cnf.lang.info)
-        self.geometry("400x110")
-        self.minsize(400, 110)
-        self.maxsize(800, 150)
-        self.configure(padx=5, pady=5)
-        self.resizable(1, 1)
-
-        name = src.split(os.sep)[-1]
-        filemod = datetime.fromtimestamp(os.path.getmtime(src))
-        filemod = filemod.strftime("%d-%m-%Y, %H:%M:%S")
-        w, h = Image.open(src).size
-        filesize = round(os.path.getsize(src)/(1024*1024), 2)
-
-        frame = CFrame(self)
-        frame.pack(expand=True, fill="both")
-
-        labels = {
-            cnf.lang.info_collection: get_coll_name(src),
-            cnf.lang.info_filename: name,
-            cnf.lang.info_chanded: filemod,
-            cnf.lang.info_resolution: f"{w}x{h}",
-            cnf.lang.info_size: f"{filesize}мб",
-            cnf.lang.info_path: src,
-            }
-
-        left_lbl = CLabel(
-            frame,
-            text = "\n".join(i for i in labels.keys()),
-            justify = tkinter.RIGHT,
-            anchor = tkinter.E,
-            )
-        left_lbl.pack(anchor=tkinter.CENTER, side=tkinter.LEFT)
-
-        right_lbl = CLabel(
-            frame,
-            text = "\n".join(i for i in labels.values()),
-            justify = tkinter.LEFT,
-            anchor = tkinter.W,
-            )
-        right_lbl.pack(anchor=tkinter.CENTER, side=tkinter.LEFT)
-
-        self.protocol("WM_DELETE_WINDOW", self.close_win)
-        self.bind('<Escape>', self.close_win)
-
-        cnf.root.update_idletasks()
-
-        x, y = under_win.winfo_x(), under_win.winfo_y()
-        xx = x + under_win.winfo_width()//2 - self.winfo_width()//2
-        yy = y + under_win.winfo_height()//2 - self.winfo_height()//2
-
-        self.geometry(f'+{xx}+{yy}')
-
-        self.deiconify()
-        self.wait_visibility()
-        self.grab_set_global()
-
-    def close_win(self, e=None):
         self.destroy()
         focus_last_win()
 
@@ -217,6 +139,7 @@ class Context(tkinter.Menu):
             )
 
     def cont_imginfo(self, e: tkinter.Event):
+        from .img_info import ImageInfo
         self.add_command(
             label=cnf.lang.info,
             command=lambda: ImageInfo(e.widget.src)
@@ -314,4 +237,16 @@ class Context(tkinter.Menu):
                 f"{cnf.lang.context_downloads}"
                 ),
             command=lambda: download_group_tiff(e.widget.title, e.widget.paths_list)
+            )
+        
+    def cont_copy_text(self, e: tkinter.Event):
+        self.add_command(
+            label=cnf.lang.context_copy,
+            command=lambda: copy_text(e.widget.copy)
+            )
+
+    def cont_copy_all(self, e:tkinter.Event):
+        self.add_command(
+            label=cnf.lang.context_copyall,
+            command=lambda: copy_text(e.widget.get("1.0",tkinter.END))
             )
