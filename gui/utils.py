@@ -8,9 +8,11 @@ from time import sleep
 
 import cv2
 import numpy
+import sqlalchemy
 from PIL import Image
 
 from cfg import cnf
+from database import *
 
 from .globals import Globals
 
@@ -19,8 +21,10 @@ __all__ = (
     "copy_jpeg_path",
     "copy_tiffs_paths",
     "crop_image",
+    "db_remove_img",
     "decode_image",
     "download_group_jpeg",
+    "download_group_tiff",
     "download_one_jpeg",
     "download_tiffs",
     "encode_image",
@@ -73,7 +77,7 @@ def topbar_default_thread():
         run_thread(task)
     except RuntimeError:
         print("utils > topbar_default_thread runtime err")
-        cnf.root.after(2000, topbar_default_thread)
+        topbar_default_thread()
 
 
 def run_applescript(applescript: str):
@@ -106,6 +110,7 @@ def smb_check():
                 print("timeout 3 sec, utils.py, smb_check")
 
     run_thread(task)
+    wait_thread()
     return bool(os.path.exists(cnf.coll_folder))
 
 
@@ -310,6 +315,12 @@ def reveal_tiffs(list_paths: list):
     wait_thread()
 
     def task():
+        if not list_paths:
+            Globals.topbar_text(cnf.lang.live_notiff)
+            return
+
+        Globals.topbar_text(cnf.lang.live_wait)
+
         paths = (
             f"\"{i}\" as POSIX file"
             for i in list_paths
@@ -326,23 +337,30 @@ def reveal_tiffs(list_paths: list):
 
         run_applescript(applescript)
 
-    if list_paths:
-        Globals.topbar_text(cnf.lang.live_wait)
-        wait_thread()
-        run_thread(task)
-        wait_thread()
-        topbar_default_thread()
-    else:
-        Globals.topbar_text(cnf.lang.live_notiff)
-        wait_thread()
-        topbar_default_thread()
+
+    run_thread(task)
+    wait_thread()
+    topbar_default_thread()
 
 
 def download_tiffs(src):
     wait_thread()
 
 
-    def task(parrent, tiffs, ln_tiffs):
+    def task():
+        cnf.flag = True
+
+        Globals.topbar_text(cnf.lang.live_wait)
+        tiffs = find_tiffs(src)
+
+        if not tiffs:
+            Globals.topbar_text(cnf.lang.live_notiff)
+            cnf.flag = False
+            return
+
+        ln_tiffs = len(tiffs)
+        parrent = create_dir()
+
         for num, tiff in enumerate(tiffs, 1):
 
             if not cnf.flag:
@@ -353,26 +371,17 @@ def download_tiffs(src):
                 f"{num} {cnf.lang.live_from} {ln_tiffs}"
                 )
             Globals.topbar_text(t)
-            shutil.copy(tiff, os.path.join(parrent, tiff.split("/")[-1]))
+            try:
+                shutil.copy(tiff, os.path.join(parrent, tiff.split("/")[-1]))
+            except FileNotFoundError:
+                print(f"utils > download tiffs > not found {tiff}")
 
         subprocess.Popen(["open", parrent])
 
 
-    Globals.topbar_text(cnf.lang.live_wait)
-    tiffs = find_tiffs(src)
-
-    if tiffs:
-        cnf.flag = True
-        ln_tiffs = len(tiffs)
-        parrent = create_dir()
-
-        run_thread(task, [parrent, tiffs, ln_tiffs])
-        wait_thread()
-        topbar_default_thread()
-
-    else:
-        Globals.topbar_text(cnf.lang.live_notiff)
-        topbar_default_thread()
+    run_thread(task)
+    wait_thread()
+    topbar_default_thread()
 
 
 def copy_tiffs_paths(path):
@@ -384,10 +393,10 @@ def copy_tiffs_paths(path):
     if tiffs:
         cnf.root.clipboard_clear()
         cnf.root.clipboard_append("\n".join(tiffs))
-        topbar_default_thread()
     else:
         Globals.topbar_text(cnf.lang.live_notiff)
-        topbar_default_thread()
+
+    topbar_default_thread()
 
 
 def copy_jpeg_path(path):
@@ -396,21 +405,24 @@ def copy_jpeg_path(path):
         cnf.root.clipboard_append(path)
     else:
         Globals.topbar_text(cnf.lang.live_nojpeg)
-        topbar_default_thread()
+
+    topbar_default_thread()
 
 
 def reveal_jpg(src: str):
     wait_thread()
 
+
     def task():
+        if not os.path.exists(src):
+            Globals.topbar_text(cnf.lang.live_nojpeg)
+            return
+
+        Globals.topbar_text(cnf.lang.live_wait)
         subprocess.call(["open", "-R", src])
 
-    if os.path.exists(src):
-        Globals.topbar_text(cnf.lang.live_wait)
-        run_thread(task)
-    else:
-        Globals.topbar_text(cnf.lang.live_nojpeg)
 
+    run_thread(task)
     wait_thread()
     topbar_default_thread()
 
@@ -419,7 +431,11 @@ def download_group_jpeg(title, paths_list: list):
     wait_thread()
 
 
-    def task(dest, ln_paths):
+    def task():
+        cnf.flag = True
+        dest = create_dir(title)
+        ln_paths = len(paths_list)
+
         for num, imgpath in enumerate(paths_list, 1):
 
             if not cnf.flag:
@@ -433,40 +449,106 @@ def download_group_jpeg(title, paths_list: list):
             Globals.topbar_text(t)
 
             filename = imgpath.split("/")[-1]
-            shutil.copy(imgpath, os.path.join(dest, filename))
+
+            try:
+                shutil.copy(imgpath, os.path.join(dest, filename))
+            except FileNotFoundError:
+                print(f"utils > copy group jpeg > not found {imgpath}")
 
         subprocess.Popen(["open", dest])
+        cnf.flag = False
 
-    for i in paths_list:
-        if not os.path.exists(i):
-            Globals.topbar_text(cnf.lang.live_nojpeg)
-            topbar_default_thread()
-            return
 
-    cnf.flag = True
-    dest = create_dir(title)
-    ln_paths = len(paths_list)
-    run_thread(task, [dest, ln_paths])
+    run_thread(task)
     wait_thread()
     topbar_default_thread()
-    cnf.flag = False
+
+
+def download_group_tiff(title, paths_list):
+    wait_thread()
+
+
+    def task():
+        cnf.flag = True
+        tiffs = []
+
+        for i in paths_list:
+
+            if not cnf.flag:
+                return
+
+            found_tiffs = find_tiffs(i)
+
+            if found_tiffs:
+                tiffs = tiffs + found_tiffs
+
+        if not tiffs:
+            Globals.topbar_text(cnf.lang.live_notiff)
+            topbar_default_thread()
+            cnf.flag = False
+            return
+
+        ln_tiffs = len(tiffs)
+        dest = create_dir(title)
+
+
+        for num, imgpath in enumerate(tiffs, 1):
+
+            if not cnf.flag:
+                return
+
+            t = (
+                f"{cnf.lang.live_copying} {num} "
+                f"{cnf.lang.live_from} {ln_tiffs}"
+                )
+
+            Globals.topbar_text(t)
+
+            filename = imgpath.split("/")[-1]
+
+            try:
+                shutil.copy(imgpath, os.path.join(dest, filename))
+            except FileNotFoundError:
+                print(f"utils > copy group tiff > not found {imgpath}")
+
+        subprocess.Popen(["open", dest])
+        cnf.flag = False
+
+
+    run_thread(task)
+    wait_thread()
+    topbar_default_thread()
 
 
 def download_one_jpeg(src):
     wait_thread()
 
 
-    def task(dest):
-        shutil.copy(src, dest)
-        subprocess.Popen(["open", "-R", dest])
+    def task():
+        if not os.path.exists(src):
+            Globals.topbar_text(cnf.lang.live_nojpeg)
+            return
 
-    if os.path.exists(src):
         Globals.topbar_text(cnf.lang.live_copying)
         dest = create_dir()
         dest = os.path.join(dest, src.split("/")[-1])
-        run_thread(task, [dest])
-    else:
-        Globals.topbar_text(cnf.lang.live_nojpeg)
 
+        try:
+            shutil.copy(src, dest)
+            subprocess.Popen(["open", "-R", dest])
+        except FileNotFoundError:
+            print(f"utils > download one jpeg > not found {src}")
+
+
+    run_thread(task)
     wait_thread()
     topbar_default_thread()
+
+
+def db_remove_img(src):
+    q = (
+        sqlalchemy.delete(Thumbs).filter(
+            Thumbs.src==src
+            ))
+    Dbase.conn.execute(q)
+    Globals.reload_thumbs()

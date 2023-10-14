@@ -129,6 +129,9 @@ class Rus:
         self.context_copy = "Копировать"
         self.context_downloads = "в загрузки"
 
+        # context advanced
+        self.remove_fromapp = "Удалить из приложения"
+
         self.months_p = {
             1: "января",
             2: "февраля",

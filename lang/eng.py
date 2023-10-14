@@ -128,6 +128,9 @@ class Eng:
         self.context_copy = "Copy"
         self.context_downloads = "to Downloads"
 
+        # context advanced
+        self.remove_fromapp = "Remove from app"
+
         self.months_p = {
             1: "january",
             2: "february",

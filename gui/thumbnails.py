@@ -25,6 +25,15 @@ class ContextTitles(Context):
     def __init__(self, e: tkinter.Event):
         super().__init__()
         self.cont_download_group(e)
+        self.cont_sep()
+        self.cont_download_group_tiffs(e)
+        self.do_popup(e)
+
+
+class ContextAdvanced(Context):
+    def __init__(self, e: tkinter.Event):
+        super().__init__()
+        self.cont_db_remove_img(e)
         self.do_popup(e)
 
 
@@ -449,7 +458,8 @@ class Thumbnails(CFrame, ThumbsPrepare):
 
     def r_cmd_click(self, e: tkinter.Event):
         if self.get_coords(e):
-            print(e.widget.src)
+            # print(e.widget.src)
+            ContextAdvanced(e)
 
     def r_click(self, e: tkinter.Event):
         if self.get_coords(e):

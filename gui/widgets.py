@@ -246,16 +246,6 @@ class Context(tkinter.Menu):
             command=lambda: Globals.search_var.set("")
             )
 
-    def cont_download_group(self, e: tkinter.Event):
-        self.add_command(
-            label=(
-                f"{cnf.lang.context_copy} "
-                f"\"{e.widget.title}\" "
-                f"{cnf.lang.context_downloads}"
-                ),
-            command=lambda: download_group_jpeg(e.widget.title, e.widget.paths_list)
-        )
-
     def cont_download_onefile(self, e: tkinter.Event):
         self.add_command(
             label=(
@@ -297,5 +287,31 @@ class Context(tkinter.Menu):
     def cont_copy_jpeg_path(self, e: tkinter.Event):
         self.add_command(
             label=cnf.lang.copy_jpeg_path,
-            command=lambda: copy_jpeg_path(e.widget.src)
+            command=lambda: copy_jpeg_path(e.widget.src),
+            )
+
+    def cont_db_remove_img(self, e: tkinter.Event):
+        self.add_command(
+            label=cnf.lang.remove_fromapp,
+            command=lambda: db_remove_img(e.widget.src)
+            )
+
+    def cont_download_group(self, e: tkinter.Event):
+        self.add_command(
+            label=(
+                f"{cnf.lang.context_copy} jpeg\n"
+                f"{cnf.lang.live_from} \"{e.widget.title}\" "
+                f"{cnf.lang.context_downloads}"
+                ),
+            command=lambda: download_group_jpeg(e.widget.title, e.widget.paths_list)
+        )
+
+    def cont_download_group_tiffs(self, e: tkinter.Event):
+        self.add_command(
+            label=(
+                f"{cnf.lang.context_copy} tiff\n"
+                f"{cnf.lang.live_from} \"{e.widget.title}\" "
+                f"{cnf.lang.context_downloads}"
+                ),
+            command=lambda: download_group_tiff(e.widget.title, e.widget.paths_list)
             )
