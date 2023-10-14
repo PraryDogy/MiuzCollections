@@ -80,10 +80,6 @@ class Config:
         self.models_name = "Model IMG"
         self.json_lang = "English"
 
-        self.stopwords = [
-            "preview", "1x1", "1х1", "crop", "копия", "copy"
-            ]
-
     def load_cfg(self):
         with open(file=self.json_dir, encoding="utf8", mode="r") as file:
             data = json.loads(file.read())

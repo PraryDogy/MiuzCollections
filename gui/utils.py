@@ -93,10 +93,6 @@ def run_applescript(applescript: str):
 def normalize_name(name: str):
     name, ext = os.path.splitext(name)
     name = name.translate(str.maketrans("", "", string.punctuation))
-
-    for i in cnf.stopwords:
-        name = name.replace(i, "")
-
     return name.replace(" ", "")
 
 
