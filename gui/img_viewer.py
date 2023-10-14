@@ -29,13 +29,13 @@ class ContextViewer(Context):
         self.cont_sep()
 
         self.cont_sep()
-        self.cont_reveal_jpg(e)
         self.cont_copy_jpeg_path(e)
+        self.cont_reveal_jpg(e)
         self.cont_download_onefile(e)
 
         self.cont_sep()
-        self.cont_reveal_tiffs(e)
         self.cont_copy_tiffs_paths(e)
+        self.cont_reveal_tiffs(e)
         self.cont_download_tiffs(e)
 
         self.do_popup(e)

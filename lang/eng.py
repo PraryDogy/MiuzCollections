@@ -121,7 +121,8 @@ class Eng:
         self.live_finish = "Finishing"
         self.live_updating = "Updating"
         self.live_wait = "Please, wait"
-        self.live_notiff = "Cant't find tiff"
+        self.live_notiff = "Can't find tiff"
+        self.live_nojpeg = "Can't find jpeg"
 
         # context copy to downloads
         self.context_copy = "Copy"

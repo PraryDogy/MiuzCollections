@@ -20,9 +20,9 @@ class Application:
 
         # conf.root.bind('<Command-w>', self.minim)
         # conf.root.protocol("WM_DELETE_WINDOW", self.minim)
-        conf.root.createcommand("tk::mac::Quit", on_exit)
-        # conf.root.createcommand('tk::mac::ReopenApplication', conf.root.deiconify)
+        # conf.root.createcommand('tk::mac::ReopenApplication' , conf.root.deiconify)
 
+        conf.root.createcommand("tk::mac::Quit", on_exit)
         conf.root.bind('<Command-w>', lambda e: conf.root.withdraw())
         conf.root.protocol("WM_DELETE_WINDOW", conf.root.withdraw)
         conf.root.createcommand('tk::mac::ReopenApplication', conf.root.deiconify)

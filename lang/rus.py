@@ -123,6 +123,7 @@ class Rus:
         self.live_updating = "Обновление"
         self.live_wait = "Пожалуйста, подождите"
         self.live_notiff = "Не могу найти tiff"
+        self.live_nojpeg = "Не могу найти jpeg"
 
         # context copy to downloads
         self.context_copy = "Копировать"

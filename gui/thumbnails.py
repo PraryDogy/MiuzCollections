@@ -35,13 +35,13 @@ class ContextThumbs(Context):
         self.cont_imginfo(e)
 
         self.cont_sep()
-        self.cont_reveal_jpg(e)
         self.cont_copy_jpeg_path(e)
+        self.cont_reveal_jpg(e)
         self.cont_download_onefile(e)
 
         self.cont_sep()
-        self.cont_reveal_tiffs(e)
         self.cont_copy_tiffs_paths(e)
+        self.cont_reveal_tiffs(e)
         self.cont_download_tiffs(e)
 
         self.do_popup(e)
@@ -303,7 +303,7 @@ class Thumbnails(CFrame, ThumbsPrepare):
         btn_filter = CButton(title_frame, text=conf.lang.thumbs_filters)
         btn_filter.pack()
         if any((Globals.start, Globals.end)):
-            btn_filter.configure(bg=conf.sel_color)
+            btn_filter.configure(bg=conf.topbar_color)
         btn_filter.cmd(lambda e: Filter())
 
         search = ThumbsSearch(title_frame)

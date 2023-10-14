@@ -297,5 +297,5 @@ class Context(tkinter.Menu):
     def cont_copy_jpeg_path(self, e: tkinter.Event):
         self.add_command(
             label=conf.lang.copy_jpeg_path,
-            command=lambda: copy_text(e.widget.src)
+            command=lambda: copy_jpeg_path(e.widget.src)
             )

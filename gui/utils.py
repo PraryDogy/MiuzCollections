@@ -16,7 +16,7 @@ from .globals import Globals
 
 __all__ = (
     "convert_to_rgb",
-    "copy_text",
+    "copy_jpeg_path",
     "copy_tiffs_paths",
     "crop_image",
     "decode_image",
@@ -188,11 +188,6 @@ def paste_search():
         Globals.search_var.set(pasted)
     except tkinter.TclError:
         print("no clipboard")
-
-
-def copy_text(path):
-    conf.root.clipboard_clear()
-    conf.root.clipboard_append(path)
 
 
 def focus_last_win():
@@ -382,11 +377,22 @@ def copy_tiffs_paths(path):
 
     Globals.topbar_text(conf.lang.live_wait)
     tiffs = find_tiffs(path)
+
     if tiffs:
-        copy_text("\n".join(tiffs))
+        conf.root.clipboard_clear()
+        conf.root.clipboard_append("\n".join(tiffs))
         topbar_default_thread()
     else:
         Globals.topbar_text(conf.lang.live_notiff)
+        topbar_default_thread()
+
+
+def copy_jpeg_path(path):
+    if os.path.exists(path):
+        conf.root.clipboard_clear()
+        conf.root.clipboard_append(path)
+    else:
+        Globals.topbar_text(conf.lang.live_nojpeg)
         topbar_default_thread()
 
 
@@ -396,9 +402,12 @@ def reveal_jpg(src: str):
     def task():
         subprocess.call(["open", "-R", src])
 
+    if os.path.exists(src):
+        Globals.topbar_text(conf.lang.live_wait)
+        run_thread(task)
+    else:
+        Globals.topbar_text(conf.lang.live_nojpeg)
 
-    Globals.topbar_text(conf.lang.live_wait)
-    run_thread(task)
     wait_thread()
     topbar_default_thread()
 
@@ -425,6 +434,11 @@ def download_group_jpeg(title, paths_list: list):
 
         subprocess.Popen(["open", dest])
 
+    for i in paths_list:
+        if not os.path.exists(i):
+            Globals.topbar_text(conf.lang.live_nojpeg)
+            topbar_default_thread()
+            return
 
     conf.flag = True
     dest = create_dir(title)
@@ -443,11 +457,13 @@ def download_one_jpeg(src):
         shutil.copy(src, dest)
         subprocess.Popen(["open", "-R", dest])
 
+    if os.path.exists(src):
+        Globals.topbar_text(conf.lang.live_copying)
+        dest = create_dir()
+        dest = os.path.join(dest, src.split("/")[-1])
+        run_thread(task, [dest])
+    else:
+        Globals.topbar_text(conf.lang.live_nojpeg)
 
-    Globals.topbar_text(conf.lang.live_copying)
-    dest = create_dir()
-    dest = os.path.join(dest, src.split("/")[-1])
-
-    run_thread(task, [dest])
     wait_thread()
     topbar_default_thread()
