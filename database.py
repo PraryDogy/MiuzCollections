@@ -3,7 +3,7 @@ import os
 import sqlalchemy
 import sqlalchemy.ext.declarative
 
-from cfg import conf
+from cfg import cnf
 
 __all__ = (
     "Dbase",
@@ -13,7 +13,7 @@ __all__ = (
 
 class Dbase():
     __engine = sqlalchemy.create_engine(
-        'sqlite:////' + conf.db_dir,
+        'sqlite:////' + cnf.db_dir,
         connect_args = {'check_same_thread': False},
         echo = False
         )

@@ -5,7 +5,7 @@ import cv2
 import sqlalchemy
 from PIL import ImageTk
 
-from cfg import conf
+from cfg import cnf
 from database import Dbase, Thumbs
 from .utils import *
 from .utils import place_center
@@ -53,7 +53,7 @@ class ImgViewer(CWindow):
         self.set_title()
         self["bg"] = "black"
 
-        self.geometry(f'{conf.imgview_w}x{conf.imgview_h}')
+        self.geometry(f'{cnf.imgview_w}x{cnf.imgview_h}')
         self.minsize(500, 300)
 
         self.configure(pady=0, padx=0)
@@ -62,14 +62,14 @@ class ImgViewer(CWindow):
         self.img_frame = self.img_widget()
         self.img_frame.pack()
 
-        conf.root.update_idletasks()
+        cnf.root.update_idletasks()
 
-        self.img_frame['width'] = conf.imgview_w
-        self.img_frame['height'] = conf.imgview_h
+        self.img_frame['width'] = cnf.imgview_w
+        self.img_frame['height'] = cnf.imgview_h
 
-        self.thumb_place(conf.imgview_w, conf.imgview_h)
-        self.task = conf.root.after(
-            250, lambda: self.img_place(conf.imgview_w, conf.imgview_h))
+        self.thumb_place(cnf.imgview_w, cnf.imgview_h)
+        self.task = cnf.root.after(
+            250, lambda: self.img_place(cnf.imgview_w, cnf.imgview_h))
 
         place_center()
         self.deiconify()
@@ -87,8 +87,8 @@ class ImgViewer(CWindow):
 
     def decect_resize(self, e):
         if self.resize_task:
-            conf.root.after_cancel(self.resize_task)
-        self.resize_task = conf.root.after(250, lambda: self.resize_win())
+            cnf.root.after_cancel(self.resize_task)
+        self.resize_task = cnf.root.after(250, lambda: self.resize_win())
 
     def resize_win(self):
         try:
@@ -97,17 +97,17 @@ class ImgViewer(CWindow):
             print("no win")
             return
 
-        if new_w != conf.imgview_w or new_h != conf.imgview_h:
-            conf.imgview_h = new_h
-            conf.imgview_w = new_w
+        if new_w != cnf.imgview_w or new_h != cnf.imgview_h:
+            cnf.imgview_h = new_h
+            cnf.imgview_w = new_w
 
-            self.img_frame['width'] = conf.imgview_w
-            self.img_frame['height'] = conf.imgview_h
+            self.img_frame['width'] = cnf.imgview_w
+            self.img_frame['height'] = cnf.imgview_h
 
-            self.thumb_place(conf.imgview_w, conf.imgview_h)
-            conf.root.after(
+            self.thumb_place(cnf.imgview_w, cnf.imgview_h)
+            cnf.root.after(
                 500,
-                lambda: self.img_place(conf.imgview_w, conf.imgview_h)
+                lambda: self.img_place(cnf.imgview_w, cnf.imgview_h)
                 )
 
     def img_widget(self):
@@ -121,7 +121,7 @@ class ImgViewer(CWindow):
     def switch_img(self, ind: int):
         global src
 
-        conf.root.after_cancel(self.task)
+        cnf.root.after_cancel(self.task)
         try:
             src = all_src[ind]
             self.set_title()
@@ -129,10 +129,10 @@ class ImgViewer(CWindow):
             src = all_src[0]
             self.set_title()
 
-        self.thumb_place(conf.imgview_w, conf.imgview_h)
-        self.task = conf.root.after(
+        self.thumb_place(cnf.imgview_w, cnf.imgview_h)
+        self.task = cnf.root.after(
             500,
-            lambda: self.img_place(conf.imgview_w, conf.imgview_h)
+            lambda: self.img_place(cnf.imgview_w, cnf.imgview_h)
             )
 
     def img_ind(self):
@@ -144,9 +144,9 @@ class ImgViewer(CWindow):
         self.img_frame.image_names = img_tk
 
     def img_click(self, e: tkinter.Event):
-        if conf.imgview_w == self.winfo_width():
+        if cnf.imgview_w == self.winfo_width():
 
-            if e.x <= conf.imgview_w//2:
+            if e.x <= cnf.imgview_w//2:
                 index = self.img_ind() - 1
             else:
                 index = self.img_ind() + 1
@@ -169,7 +169,7 @@ class ImgViewer(CWindow):
             img_read = cv2.imread(src, cv2.IMREAD_UNCHANGED)
             
             if src.endswith(("png", "PNG")):
-                img_read = replace_bg(img_read, conf.bg_color)
+                img_read = replace_bg(img_read, cnf.bg_color)
 
             resized = resize_image(img_read, width, height, False)
             img_rgb = convert_to_rgb(resized)

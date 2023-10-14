@@ -1,7 +1,7 @@
 import tkinter
 from tkinter import filedialog
 
-from cfg import conf
+from cfg import cnf
 from .scaner import scaner
 from .utils import *
 
@@ -19,17 +19,17 @@ class Settings(CWindow):
         self.protocol("WM_DELETE_WINDOW", self.cancel_cmd)
         self.bind('<Escape>', self.cancel_cmd)
         self.bind("<Return>", self.save_cmd)
-        self.title(conf.lang.settings_title)
+        self.title(cnf.lang.settings_title)
         self.geometry("400x310")
 
         self.changed_lang = False
         self.scan_again = False
-        self.old_curr_coll = conf.curr_coll
+        self.old_curr_coll = cnf.curr_coll
 
         self.main_wid = self.main_widget()
         self.main_wid.pack(expand=True, fill="both")
 
-        conf.root.update_idletasks()
+        cnf.root.update_idletasks()
 
         place_center()
         self.deiconify()
@@ -41,25 +41,25 @@ class Settings(CWindow):
 
         path_name = CLabel(
             frame,
-            text=conf.lang.settings_label,
+            text=cnf.lang.settings_label,
             anchor="w",
             justify="left"
             )
         path_name.pack(anchor="w")
-        conf.lang_sett.append(path_name)
+        cnf.lang_sett.append(path_name)
 
         self.path_widget = CLabel(
             frame,
-            text=f"{conf.coll_folder}",
+            text=f"{cnf.coll_folder}",
             anchor="w",
             justify="left"
             )
         self.path_widget.pack(anchor="w")
 
-        select_path = CButton(frame, text=conf.lang.settings_browse)
+        select_path = CButton(frame, text=cnf.lang.settings_browse)
         select_path.cmd(self.select_path_cmd)
         select_path.pack(pady=(5, 0))
-        conf.lang_sett.append(select_path)
+        cnf.lang_sett.append(select_path)
 
         asklang_frame = CFrame(frame)
         asklang_frame.pack(pady=(15, 0))
@@ -68,96 +68,96 @@ class Settings(CWindow):
         self.lang_btn.pack(side="left", padx=(0, 15))
         self.lang_btn.cmd(self.lang_cmd)
 
-        if conf.json_lang == "Russian":
+        if cnf.json_lang == "Russian":
             self.lang_btn.configure(text="Русский")
         else:
             self.lang_btn.configure(text="English")
 
-        self.reset_btn = CButton(asklang_frame, text=conf.lang.settings_reset)
+        self.reset_btn = CButton(asklang_frame, text=cnf.lang.settings_reset)
         self.reset_btn.cmd(self.default_cmd)
         self.reset_btn.pack(side="left")
-        conf.lang_sett.append(self.reset_btn)
+        cnf.lang_sett.append(self.reset_btn)
 
         autoscan_frame = CFrame(frame)
         autoscan_frame.pack(pady=(15, 0))
 
         self.autoscan_min = CButton(autoscan_frame, text="<")
-        self.autoscan_min.configure(width=1, bg=conf.bg_color)
+        self.autoscan_min.configure(width=1, bg=cnf.bg_color)
         self.autoscan_min.pack(side="left", pady=(0, 2))
         self.autoscan_min.cmd(self.change_mins_cmd)
 
-        conf.lang.autoscan_time = conf.autoscan_time
-        self.temp_mins = conf.autoscan_time
-        conf.lang.update_autoscan()
+        cnf.lang.autoscan_time = cnf.autoscan_time
+        self.temp_mins = cnf.autoscan_time
+        cnf.lang.update_autoscan()
 
         self.autoupd_wid = CLabel(
             autoscan_frame,
-            text=conf.lang.sett_autoscan,
+            text=cnf.lang.sett_autoscan,
             width=30
             )
         self.autoupd_wid.pack(side="left")
-        conf.lang_sett.append(self.autoupd_wid)
+        cnf.lang_sett.append(self.autoupd_wid)
 
         self.autoscan_max = CButton(autoscan_frame, text=">")
-        self.autoscan_max.configure(width=1, bg=conf.bg_color)
+        self.autoscan_max.configure(width=1, bg=cnf.bg_color)
         self.autoscan_max.pack(side="left", pady=(0, 2))
         self.autoscan_max.cmd(self.change_mins_cmd)
 
-        t = conf.lang.settings_descr
+        t = cnf.lang.settings_descr
         self.sett_desc = CLabel(frame, text=t, anchor="w", justify="left")
         self.sett_desc.pack(anchor="w", pady=(15, 0))
-        conf.lang_sett.append(self.sett_desc)
+        cnf.lang_sett.append(self.sett_desc)
 
         cancel_frame = CFrame(frame)
         cancel_frame.pack(expand=True)
 
         CSep(cancel_frame).pack(pady=15, fill=tkinter.X)
 
-        save_btn = CButton(cancel_frame, text=conf.lang.ok)
+        save_btn = CButton(cancel_frame, text=cnf.lang.ok)
         save_btn.cmd(self.save_cmd)
         save_btn.pack(padx=(0, 15), side="left")
-        conf.lang_sett.append(save_btn)
+        cnf.lang_sett.append(save_btn)
 
-        cancel_btn = CButton(cancel_frame, text=conf.lang.cancel)
+        cancel_btn = CButton(cancel_frame, text=cnf.lang.cancel)
         cancel_btn.cmd(self.cancel_cmd)
         cancel_btn.pack(side="left")
-        conf.lang_sett.append(cancel_btn)
+        cnf.lang_sett.append(cancel_btn)
 
         return frame
 
     def change_mins_cmd(self, e=None):
         t = e.widget["text"]
         times = {1: 5, 2: 10, 3: 30, 4: 60}
-        key = [k for k, v in times.items() if v == conf.autoscan_time][0]
+        key = [k for k, v in times.items() if v == cnf.autoscan_time][0]
 
         if t == "<":
             try:
-                conf.autoscan_time = times[key-1]
+                cnf.autoscan_time = times[key-1]
             except KeyError:
-                conf.autoscan_time = times[4]
+                cnf.autoscan_time = times[4]
         else:
             try:
-                conf.autoscan_time = times[key+1]
+                cnf.autoscan_time = times[key+1]
             except KeyError:
-                conf.autoscan_time = times[1]
+                cnf.autoscan_time = times[1]
 
-        conf.lang.autoscan_time = conf.autoscan_time
-        conf.lang.update_autoscan()
-        self.autoupd_wid.configure(text=conf.lang.sett_autoscan)
+        cnf.lang.autoscan_time = cnf.autoscan_time
+        cnf.lang.update_autoscan()
+        self.autoupd_wid.configure(text=cnf.lang.sett_autoscan)
 
     def change_lang(self):
-        conf.lang.autoscan_time = conf.autoscan_time
-        conf.lang.update_autoscan()
-        self.autoupd_wid.configure(text=conf.lang.sett_autoscan)
+        cnf.lang.autoscan_time = cnf.autoscan_time
+        cnf.lang.update_autoscan()
+        self.autoupd_wid.configure(text=cnf.lang.sett_autoscan)
 
-        wids = conf.lang_menu + conf.lang_sett
-        wids = wids + conf.lang_stbar + conf.lang_thumbs
+        wids = cnf.lang_menu + cnf.lang_sett
+        wids = wids + cnf.lang_stbar + cnf.lang_thumbs
 
         for wid in (wids):
             for k, v in self.old_lang.__dict__.items():
                 try:
                     if wid["text"] == v:
-                        wid["text"] = conf.lang.__dict__[k]
+                        wid["text"] = cnf.lang.__dict__[k]
                 except tkinter.TclError:
                     print("change lang widget err", wid.widgetName)
                     print(wid.__dict__)
@@ -171,8 +171,8 @@ class Settings(CWindow):
             self.lang_btn["text"] = "Русский"
             self.title("Настройки")
 
-            self.old_lang = conf.lang
-            conf.lang = Rus()
+            self.old_lang = cnf.lang
+            cnf.lang = Rus()
 
             self.change_lang()
 
@@ -180,13 +180,13 @@ class Settings(CWindow):
             self.lang_btn["text"] = "English"
             self.title("Settings")
 
-            self.old_lang = conf.lang
-            conf.lang = Eng()
+            self.old_lang = cnf.lang
+            cnf.lang = Eng()
 
             self.change_lang()
 
     def select_path_cmd(self, e=None):
-        path = filedialog.askdirectory(initialdir=conf.coll_folder)
+        path = filedialog.askdirectory(initialdir=cnf.coll_folder)
 
         if len(path) == 0:
             return
@@ -196,7 +196,7 @@ class Settings(CWindow):
             self.scan_again = True
 
     def default_cmd(self, e=None):
-        default = conf.get_defaults()
+        default = cnf.get_defaults()
         self.path_widget['text'] = default.coll_folder
         self.scan_again = True
 
@@ -204,28 +204,28 @@ class Settings(CWindow):
         if self.changed_lang:
             self.lang_cmd()
 
-        conf.lang_sett.clear()
-        conf.autoscan_time = self.temp_mins
+        cnf.lang_sett.clear()
+        cnf.autoscan_time = self.temp_mins
 
         self.destroy()
-        conf.root.focus_force()
+        cnf.root.focus_force()
 
     def save_cmd(self, e=None):
-        conf.lang_sett.clear()
-        conf.coll_folder = self.path_widget['text']
-        conf.smb_ip = smb_ip()
+        cnf.lang_sett.clear()
+        cnf.coll_folder = self.path_widget['text']
+        cnf.smb_ip = smb_ip()
 
         if self.lang_btn["text"] == "English":
-            conf.json_lang = "English"
+            cnf.json_lang = "English"
         else:
-            conf.json_lang = "Russian"
+            cnf.json_lang = "Russian"
 
-        conf.write_cfg()
+        cnf.write_cfg()
         self.destroy()
-        conf.root.focus_force()
+        cnf.root.focus_force()
 
         if self.scan_again:
-            conf.curr_coll = conf.all_colls
+            cnf.curr_coll = cnf.all_colls
             self.scan_again = False
             if smb_check():
                 scaner.scaner_start()

@@ -2,7 +2,7 @@ import calendar
 import tkinter
 from datetime import datetime
 
-from cfg import conf
+from cfg import cnf
 from .utils import *
 
 from .globals import Globals
@@ -12,12 +12,12 @@ from .widgets import *
 class CCalendarEntry(CWindow):
     def cust_date_win(self, e=None):
         self.win_cust = CWindow()
-        self.win_cust.title(conf.lang.cust_title)
+        self.win_cust.title(cnf.lang.cust_title)
         self.win_cust.protocol("WM_DELETE_WINDOW", self.cust_can_cmd)
         self.win_cust.bind('<Escape>', self.cust_can_cmd)
         self.bind('<Command-q>', on_exit)
 
-        cust_l = CLabel(self.win_cust, text=conf.lang.cust_l)
+        cust_l = CLabel(self.win_cust, text=cnf.lang.cust_l)
         cust_l.pack(pady=(0, 5))
 
         var_t = f"{self.dd}.{self.mm}.{self.yy}"
@@ -26,12 +26,12 @@ class CCalendarEntry(CWindow):
             self.win_cust,
             width=15,
             textvariable=var,
-            bg=conf.ent_color,
+            bg=cnf.ent_color,
             insertbackground="white",
-            fg=conf.fg_color,
+            fg=cnf.fg_color,
             highlightthickness=0,
             justify="center",
-            selectbackground=conf.btn_color,
+            selectbackground=cnf.btn_color,
             border=1
             )
         self.cust_ent.pack(ipady=2)
@@ -42,15 +42,15 @@ class CCalendarEntry(CWindow):
         btns = CFrame(self.win_cust)
         btns.pack(pady=(15, 0))
 
-        self.ok = CButton(btns, text=conf.lang.ok)
-        self.ok.configure(fg=conf.hov_color)
+        self.ok = CButton(btns, text=cnf.lang.ok)
+        self.ok.configure(fg=cnf.hov_color)
         self.ok.pack(side="left", padx=(0, 15))
 
-        self.cancel = CButton(btns, text=conf.lang.cancel)
+        self.cancel = CButton(btns, text=cnf.lang.cancel)
         self.cancel.pack(side="left")
         self.cancel.bind("<ButtonRelease-1>", self.cust_can_cmd)
 
-        conf.root.update_idletasks()
+        cnf.root.update_idletasks()
 
         under_win = self.winfo_toplevel()
         x, y = under_win.winfo_x(), under_win.winfo_y()
@@ -67,11 +67,11 @@ class CCalendarEntry(CWindow):
         t = e.get()
         try:
             self.cust_date = datetime.strptime(t, '%d.%m.%Y')
-            self.ok.configure(fg=conf.fg_color)
+            self.ok.configure(fg=cnf.fg_color)
             self.ok.bind("<ButtonRelease-1>", self.cust_ok_cmd)
             self.win_cust.bind("<Return>", self.cust_ok_cmd)
         except ValueError:
-            self.ok.configure(fg=conf.hov_color)
+            self.ok.configure(fg=cnf.hov_color)
             self.ok.unbind("<ButtonRelease-1>")
             self.win_cust.unbind("<Return>")
 
@@ -125,7 +125,7 @@ class CCalendar(CFrame, CCalendarEntry):
         titles.pack(pady=5)
 
         prev_m = CButton(titles, text="<")
-        prev_m.configure(width=6, font=f, bg=conf.bg_color)
+        prev_m.configure(width=6, font=f, bg=cnf.bg_color)
         prev_m.pack(side="left")
         prev_m.cmd(self.switch_month)
         self.all_btns.append(prev_m)
@@ -141,7 +141,7 @@ class CCalendar(CFrame, CCalendarEntry):
         self.all_btns.append(self.title)
 
         next_m = CButton(titles, text=">")
-        next_m.configure(width=6, font=f, bg=conf.bg_color)
+        next_m.configure(width=6, font=f, bg=cnf.bg_color)
         next_m.pack(side="left")
         next_m.cmd(self.switch_month)
         self.all_btns.append(next_m)
@@ -149,14 +149,14 @@ class CCalendar(CFrame, CCalendarEntry):
         row = CFrame(parrent)
         row.pack()
 
-        for i in conf.lang.calendar_days:
+        for i in cnf.lang.calendar_days:
             lbl = CButton(row, text = i)
             lbl.configure(width=4, height=2)
             lbl.pack(side="left")
             self.all_btns.append(lbl)
 
         sep = CSep(parrent)
-        sep.configure(bg=conf.bg_color, height=2)
+        sep.configure(bg=cnf.bg_color, height=2)
         sep.pack(fill="x")
 
         row = CFrame(parrent)
@@ -192,17 +192,17 @@ class CCalendar(CFrame, CCalendarEntry):
     def fill_days(self):
         for day, btn in zip(self.create_days(), self.btns):
             if day:
-                btn.configure(text=day, bg=conf.btn_color)
+                btn.configure(text=day, bg=cnf.btn_color)
             else:
-                btn.configure(text="", bg=conf.bg_color)
+                btn.configure(text="", bg=cnf.bg_color)
             if btn["text"] == self.dd:
-                btn.configure(bg=conf.sel_color)
+                btn.configure(bg=cnf.sel_color)
                 self.curr_btn = btn
 
     def change_title(self):
         mtitle_t = (
             f"{self.dd} "
-            f"{conf.lang.months_p[self.mm]} "
+            f"{cnf.lang.months_p[self.mm]} "
             f"{self.yy}"
             )
         self.title.configure(text=mtitle_t)
@@ -218,9 +218,9 @@ class CCalendar(CFrame, CCalendarEntry):
 
     def switch_day(self, e=None):
         if e.widget["text"]:
-            self.curr_btn.configure(bg=conf.btn_color)
+            self.curr_btn.configure(bg=cnf.btn_color)
             self.curr_btn = e.widget
-            self.curr_btn.configure(bg=conf.sel_color)
+            self.curr_btn.configure(bg=cnf.sel_color)
             self.dd = int(e.widget["text"])
             self.set_my_date()
             self.change_title()
@@ -258,7 +258,7 @@ class Filter(CWindow):
     def __init__(self):
         super().__init__()
         self.bind("<Return>", self.ok_cmd)
-        self.title(conf.lang.filter_title)
+        self.title(cnf.lang.filter_title)
         f = ("San Francisco Pro", 17, "bold")
         self.reseted = False
         self.date_changed = False
@@ -269,7 +269,7 @@ class Filter(CWindow):
         left_frame = CFrame(calendar_frames)
         left_frame.pack(side="left", padx=(0, 15))
 
-        left_title = CLabel(left_frame, text=conf.lang.filter_start)
+        left_title = CLabel(left_frame, text=cnf.lang.filter_start)
         left_title["font"] = f
         left_title.pack()
 
@@ -279,7 +279,7 @@ class Filter(CWindow):
         right_frame = CFrame(calendar_frames)
         right_frame.pack(side="left")
 
-        right_title = CLabel(right_frame, text=conf.lang.filter_end)
+        right_title = CLabel(right_frame, text=cnf.lang.filter_end)
         right_title["font"] = f
         right_title.pack()
 
@@ -289,12 +289,12 @@ class Filter(CWindow):
         if any((Globals.start, Globals.end)):
             cals_t = f"{Globals.named_start} - {Globals.named_end}"
         else:
-            cals_t = conf.lang.filter_notselected
+            cals_t = cnf.lang.filter_notselected
         self.cals_titles = CLabel(self, text=cals_t)
         self.cals_titles.configure(font=f)
         self.cals_titles.pack()
 
-        cals_reset = CButton(self, text=conf.lang.settings_reset)
+        cals_reset = CButton(self, text=cnf.lang.settings_reset)
         cals_reset.pack(pady=(15, 0))
         cals_reset.cmd(self.cals_titles_reset)
 
@@ -303,28 +303,28 @@ class Filter(CWindow):
         grop_frame = CFrame(self)
         grop_frame.pack()
 
-        self.product = CButton(grop_frame, text=conf.lang.filter_product)
-        if conf.product:
-            self.product.configure(bg=conf.sel_color)
+        self.product = CButton(grop_frame, text=cnf.lang.filter_product)
+        if cnf.product:
+            self.product.configure(bg=cnf.sel_color)
         self.product.pack(side="left")
         self.product.cmd(self.product_cmd)
 
-        self.models = CButton(grop_frame, text=conf.lang.filter_models)
-        if conf.models:
-            self.models.configure(bg=conf.sel_color)
+        self.models = CButton(grop_frame, text=cnf.lang.filter_models)
+        if cnf.models:
+            self.models.configure(bg=cnf.sel_color)
         self.models.pack(side="left", padx=15)
         self.models.cmd(self.models_cmd)
 
-        self.catalog = CButton(grop_frame, text=conf.lang.filter_catalog)
-        if conf.catalog:
-            self.catalog.configure(bg=conf.sel_color)
+        self.catalog = CButton(grop_frame, text=cnf.lang.filter_catalog)
+        if cnf.catalog:
+            self.catalog.configure(bg=cnf.sel_color)
         self.catalog.pack(side="left")
         self.catalog.cmd(self.catalog_cmd)
 
-        if conf.sort_modified:
-            sort_btn_t = conf.lang.filter_changed
+        if cnf.sort_modified:
+            sort_btn_t = cnf.lang.filter_changed
         else:
-            sort_btn_t = conf.lang.filter_created
+            sort_btn_t = cnf.lang.filter_created
 
         self.btn_sort = CButton(self, text=sort_btn_t)
         self.btn_sort.configure(width=13)
@@ -332,7 +332,7 @@ class Filter(CWindow):
         self.btn_sort.cmd(self.sort_btn_cmd)
 
         marketing_lbl = CLabel(
-            self, text="\n".join(conf.lang.filter_descr),
+            self, text="\n".join(cnf.lang.filter_descr),
             anchor="w", justify="left")
         marketing_lbl.pack(anchor="w", pady=(15, 0))
 
@@ -341,15 +341,15 @@ class Filter(CWindow):
         btns_frame = CFrame(self)
         btns_frame.pack(pady=(15, 0))
 
-        ok_btn = CButton(btns_frame, text=conf.lang.ok)
+        ok_btn = CButton(btns_frame, text=cnf.lang.ok)
         ok_btn.pack(side="left", padx=15)
         ok_btn.cmd(self.ok_cmd)
 
-        cancel_btn = CButton(btns_frame, text=conf.lang.cancel)
+        cancel_btn = CButton(btns_frame, text=cnf.lang.cancel)
         cancel_btn.pack(side="left")
         cancel_btn.cmd(lambda e: self.cancel())
 
-        conf.root.update_idletasks()
+        cnf.root.update_idletasks()
 
         place_center()
         self.deiconify()
@@ -359,7 +359,7 @@ class Filter(CWindow):
 
     def named_date(self, date: datetime):
         day = f"{date.day} "
-        month = f"{conf.lang.months_p[date.month]} "
+        month = f"{cnf.lang.months_p[date.month]} "
         year = f"{date.year}"
         return day + month + year
 
@@ -375,31 +375,31 @@ class Filter(CWindow):
             i.reset_cal()
         self.reseted = True
         self.date_changed = False
-        self.cals_titles.configure(text=conf.lang.filter_notselected)
+        self.cals_titles.configure(text=cnf.lang.filter_notselected)
 
     def sort_btn_cmd(self, e):
-        if self.btn_sort["text"] == conf.lang.filter_changed:
-            self.btn_sort.configure(text=conf.lang.filter_created)
+        if self.btn_sort["text"] == cnf.lang.filter_changed:
+            self.btn_sort.configure(text=cnf.lang.filter_created)
         else:
-            self.btn_sort.configure(text=conf.lang.filter_changed)
+            self.btn_sort.configure(text=cnf.lang.filter_changed)
 
     def product_cmd(self, e=None):
-        if self.product["bg"] == conf.sel_color:
-            self.product.configure(bg=conf.btn_color)
+        if self.product["bg"] == cnf.sel_color:
+            self.product.configure(bg=cnf.btn_color)
         else:
-            self.product.configure(bg=conf.sel_color)
+            self.product.configure(bg=cnf.sel_color)
 
     def catalog_cmd(self, e=None):
-        if self.catalog["bg"] == conf.sel_color:
-            self.catalog.configure(bg=conf.btn_color)
+        if self.catalog["bg"] == cnf.sel_color:
+            self.catalog.configure(bg=cnf.btn_color)
         else:
-            self.catalog.configure(bg=conf.sel_color)
+            self.catalog.configure(bg=cnf.sel_color)
 
     def models_cmd(self, e=None):
-        if self.models["bg"] == conf.sel_color:
-            self.models.configure(bg=conf.btn_color)
+        if self.models["bg"] == cnf.sel_color:
+            self.models.configure(bg=cnf.btn_color)
         else:
-            self.models.configure(bg=conf.sel_color)
+            self.models.configure(bg=cnf.sel_color)
 
     def ok_cmd(self, e=None):
         if self.date_changed:
@@ -412,36 +412,36 @@ class Filter(CWindow):
             Globals.start = None
             Globals.end = None
 
-        if self.product["bg"] == conf.sel_color:
-            conf.product = True
+        if self.product["bg"] == cnf.sel_color:
+            cnf.product = True
         else:
-            conf.product = False
+            cnf.product = False
 
-        if self.models["bg"] == conf.sel_color:
-            conf.models = True
+        if self.models["bg"] == cnf.sel_color:
+            cnf.models = True
         else:
-            conf.models = False
+            cnf.models = False
 
-        if self.catalog["bg"] == conf.sel_color:
-            conf.catalog = True
+        if self.catalog["bg"] == cnf.sel_color:
+            cnf.catalog = True
         else:
-            conf.catalog = False
+            cnf.catalog = False
 
-        if not any((conf.product, conf.models, conf.catalog)):
-            conf.product = True
-            conf.models = True
-            conf.catalog = True
+        if not any((cnf.product, cnf.models, cnf.catalog)):
+            cnf.product = True
+            cnf.models = True
+            cnf.catalog = True
 
-        if self.btn_sort["text"] == conf.lang.filter_created:
-            conf.sort_modified = False
+        if self.btn_sort["text"] == cnf.lang.filter_created:
+            cnf.sort_modified = False
         else:
-            conf.sort_modified = True
+            cnf.sort_modified = True
 
         self.destroy()
-        conf.root.focus_force()
+        cnf.root.focus_force()
         Globals.search_var.set("")
         Globals.reload_scroll()
 
     def cancel(self):
         self.destroy()
-        conf.root.focus_force()
+        cnf.root.focus_force()

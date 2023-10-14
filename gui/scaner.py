@@ -2,7 +2,7 @@ import os
 
 import sqlalchemy
 
-from cfg import conf
+from cfg import cnf
 from database import Dbase, Thumbs
 
 from .globals import Globals
@@ -22,27 +22,27 @@ class Scaner:
     def scaner_start(self):
         self.__scaner_cancel()
         self.__scaner()
-        ms = conf.autoscan_time*60000
-        conf.root.after(ms, self.scaner_start)
+        ms = cnf.autoscan_time*60000
+        cnf.root.after(ms, self.scaner_start)
 
     def __scaner_cancel(self):
-        conf.flag = False
-        if conf.scaner_task:
-            while conf.scaner_task.is_alive():
-                conf.root.update()
+        cnf.flag = False
+        if cnf.scaner_task:
+            while cnf.scaner_task.is_alive():
+                cnf.root.update()
         return True
 
     def __scaner(self):
-        conf.flag = True
+        cnf.flag = True
         Globals.stbar_btn.configure(
-            text=conf.lang.live_updating,
-            bg=conf.topbar_color
+            text=cnf.lang.live_updating,
+            bg=cnf.topbar_color
             )
 
         task = threading.Thread(target=self.__update_db, daemon=True)
         task.start()
         while task.is_alive():
-            conf.root.update()
+            cnf.root.update()
 
         self.__change_live_text("")
 
@@ -51,11 +51,11 @@ class Scaner:
             Globals.reload_menu()
             self.need_update = False
 
-        conf.flag = False
-        Globals.stbar_btn.configure(text=conf.lang.upd_btn, bg=conf.btn_color)
+        cnf.flag = False
+        Globals.stbar_btn.configure(text=cnf.lang.upd_btn, bg=cnf.btn_color)
 
     def __update_db(self):
-        self.__change_live_text(conf.lang.scaner_prepare)
+        self.__change_live_text(cnf.lang.scaner_prepare)
 
         db_images = Dbase.conn.execute(
             sqlalchemy.select(
@@ -66,8 +66,8 @@ class Scaner:
         exts = (".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG")
 
         collections = [
-            os.path.join(conf.coll_folder, i)
-            for i in os.listdir(conf.coll_folder)
+            os.path.join(cnf.coll_folder, i)
+            for i in os.listdir(cnf.coll_folder)
             if not i.startswith((".", "_"))
             ]
 
@@ -78,11 +78,11 @@ class Scaner:
 
         for x, collection in enumerate(collections, 1):
             self.__change_live_text(
-                    f"{conf.lang.live_scan} "
+                    f"{cnf.lang.live_scan} "
                     f"{x} "
-                    f"{conf.lang.live_from} "
+                    f"{cnf.lang.live_from} "
                     f"{ln} "
-                    f"{conf.lang.live_collections}."
+                    f"{cnf.lang.live_collections}."
                     )
 
             if not os.path.isdir(collection):
@@ -100,12 +100,12 @@ class Scaner:
 
             for root, dirs, files in os.walk(collection):
 
-                if not conf.flag:
+                if not cnf.flag:
                     return
 
                 for file in files:
 
-                    if not conf.flag:
+                    if not cnf.flag:
                         return
 
                     if file.endswith(exts):
@@ -134,15 +134,15 @@ class Scaner:
                 "b_modified": modified,
                 "b_collection": get_coll_name(src),
                 "temp": self.__change_live_text(
-                        f"{conf.lang.live_added} "
+                        f"{cnf.lang.live_added} "
                         f"{x} "
-                        f"{conf.lang.live_from} "
+                        f"{cnf.lang.live_from} "
                         f"{ln} "
-                        f"{conf.lang.live_newphoto}."
+                        f"{cnf.lang.live_newphoto}."
                         )
                     }
                 for x, (src, size, created, modified) in enumerate(new_images, 1)
-                if conf.flag
+                if cnf.flag
                 ]
 
             limit = 300
@@ -153,7 +153,7 @@ class Scaner:
 
             for vals in values:
                 
-                if not conf.flag:
+                if not cnf.flag:
                     return
 
                 q = sqlalchemy.insert(Thumbs).values(
@@ -170,7 +170,7 @@ class Scaner:
         remove_images = []
 
         for src, size, created, modified in db_images:
-            if not conf.flag:
+            if not cnf.flag:
                 return
 
             if (src, size, created, modified) not in found_images:
@@ -178,7 +178,7 @@ class Scaner:
 
         if remove_images:
 
-            self.__change_live_text(conf.lang.live_finish)
+            self.__change_live_text(cnf.lang.live_finish)
             self.need_update = True
 
             values = [
@@ -189,7 +189,7 @@ class Scaner:
                 "b_modified": modified,
                 }
                 for src, size, created, modified in remove_images
-                if conf.flag
+                if cnf.flag
                 ]
 
             limit = 300
@@ -200,7 +200,7 @@ class Scaner:
 
             for vals in values:
 
-                if not conf.flag:
+                if not cnf.flag:
                     return
 
                 q = sqlalchemy.delete(Thumbs).filter(
@@ -213,7 +213,7 @@ class Scaner:
 
 
     def __change_live_text(self, text):
-        conf.live_text = text
+        cnf.live_text = text
 
 
 scaner = Scaner()

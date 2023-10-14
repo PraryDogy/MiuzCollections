@@ -6,7 +6,7 @@ import tkinter
 import sqlalchemy
 import tkmacosx
 
-from cfg import conf
+from cfg import cnf
 from database import Dbase, Thumbs
 
 from .globals import Globals
@@ -33,9 +33,9 @@ class Menu(tkmacosx.SFrame):
 
         super().__init__(
             master,
-            bg = conf.bg_color,
+            bg = cnf.bg_color,
             scrollbarwidth = 7,
-            width = conf.menu_w
+            width = cnf.menu_w
             )
 
         self.menu_frame = self.load_menu_buttons()
@@ -53,10 +53,10 @@ class Menu(tkmacosx.SFrame):
     def load_menu_buttons(self):
         frame = CFrame(self)
 
-        title = CLabel(frame, text=conf.lang.menu_title)
+        title = CLabel(frame, text=cnf.lang.menu_title)
         title.configure(font=('San Francisco Pro', 22, 'bold'))
         title.pack(pady=(0,15))
-        conf.lang_menu.append(title)
+        cnf.lang_menu.append(title)
 
         colls_list = Dbase.conn.execute(
             sqlalchemy.select(Thumbs.collection)
@@ -76,14 +76,14 @@ class Menu(tkmacosx.SFrame):
             for fake_name in sort_keys
             }
 
-        last = CButton(frame, text=conf.lang.all_colls)
+        last = CButton(frame, text=cnf.lang.all_colls)
         last.configure(width=13, pady=5, anchor=tkinter.W, padx=10)
-        last.coll_name = conf.all_colls
+        last.coll_name = cnf.all_colls
         last.cmd(self.show_coll)
         last.pack(pady=(0, 15))
         last.bind("<Button-2>", ContextMenu)
 
-        conf.lang_menu.append(last)
+        cnf.lang_menu.append(last)
 
         sep = CSep(frame)
         sep['bg'] = '#272727'
@@ -97,34 +97,34 @@ class Menu(tkmacosx.SFrame):
             btn.pack()
             btn.bind("<Button-2>", ContextMenu)
 
-            if coll_name == conf.curr_coll:
-                btn.configure(bg=conf.sel_color)
+            if coll_name == cnf.curr_coll:
+                btn.configure(bg=cnf.sel_color)
                 self.sel_btn = btn
 
             sep = CSep(frame)
             sep['bg'] = '#272727'
             sep.pack(fill=tkinter.X)
     
-        if conf.curr_coll == conf.all_colls:
-            last.configure(bg=conf.sel_color)
+        if cnf.curr_coll == cnf.all_colls:
+            last.configure(bg=cnf.sel_color)
             self.sel_btn = last
 
         return frame
 
     def reload_menu(self):
-        conf.lang_menu.clear()
+        cnf.lang_menu.clear()
         self.menu_frame.destroy()
         self.menu_frame = self.load_menu_buttons()
         self.menu_frame.pack()
         return
     
     def show_coll(self, e):
-        conf.limit = 150
+        cnf.limit = 150
 
-        self.sel_btn.configure(bg=conf.btn_color)
-        e.widget.configure(bg=conf.sel_color)
+        self.sel_btn.configure(bg=cnf.btn_color)
+        e.widget.configure(bg=cnf.sel_color)
         self.sel_btn = e.widget
-        conf.curr_coll = e.widget.coll_name
+        cnf.curr_coll = e.widget.coll_name
 
         Globals.start, Globals.end = None, None
         Globals.search_var.set("")

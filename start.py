@@ -2,11 +2,11 @@ try:
     import sys
     import traceback
 
-    from cfg import conf
+    from cfg import cnf
     from gui import Application
 
     Application()
-    conf.root.mainloop()
+    cnf.root.mainloop()
 
 except Exception as e:
     import os

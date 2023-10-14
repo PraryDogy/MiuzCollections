@@ -11,7 +11,7 @@ import subprocess
 import icnsutil
 from setuptools import setup
 
-from cfg import conf
+from cfg import cnf
 
 packages = [
     'cffi',
@@ -37,16 +37,16 @@ img.write(f'icon.icns')
 APP = ['start.py']
 
 DATA_FILES = [
-    conf.db_name, conf.thumb_err
+    cnf.db_name, cnf.thumb_err
     ]
 
 OPTIONS = {
     'iconfile': 'icon.icns',
     'plist': {
-        'CFBundleName': conf.app_name,
-        'CFBundleShortVersionString': conf.app_ver,
-        'CFBundleVersion': conf.app_ver,
-        'CFBundleIdentifier':f'com.evlosh.{conf.app_name}',
+        'CFBundleName': cnf.app_name,
+        'CFBundleShortVersionString': cnf.app_ver,
+        'CFBundleVersion': cnf.app_ver,
+        'CFBundleIdentifier':f'com.evlosh.{cnf.app_name}',
         'NSHumanReadableCopyright': (
             'Created by Evgeny Loshkarev'
             '\nCopyright © 2023 MIUZ Diamonds.'
@@ -57,7 +57,7 @@ OPTIONS = {
 
 setup(
     app = APP,
-    name = conf.app_name,
+    name = cnf.app_name,
     data_files = DATA_FILES,
     options = {'py2app': OPTIONS},
     setup_requires = ['py2app'],
@@ -71,12 +71,12 @@ folders = "tcl8", "tcl8.6", "tk8.6"
 for i in folders:
     shutil.copytree(
         os.path.join(lib_src, i),
-        os.path.join(f"dist/{conf.app_name}.app/Contents/lib", i)
+        os.path.join(f"dist/{cnf.app_name}.app/Contents/lib", i)
         )
 
-dest = os.path.expanduser(f"~/Desktop/{conf.app_name}.app")
+dest = os.path.expanduser(f"~/Desktop/{cnf.app_name}.app")
 
-shutil.move(f"dist/{conf.app_name}.app", dest)
+shutil.move(f"dist/{cnf.app_name}.app", dest)
 
 shutil.rmtree('build')
 shutil.rmtree('.eggs')

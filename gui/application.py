@@ -1,4 +1,4 @@
-from cfg import conf
+from cfg import cnf
 from .scaner import scaner
 from .utils import on_exit, run_applescript, smb_check
 
@@ -14,21 +14,21 @@ __all__ = (
 
 class Application:
     def __init__(self):
-        conf.root.title(conf.app_name)
-        conf.root.configure(bg=conf.bg_color)
-        conf.root.deiconify()
+        cnf.root.title(cnf.app_name)
+        cnf.root.configure(bg=cnf.bg_color)
+        cnf.root.deiconify()
 
-        # conf.root.bind('<Command-w>', self.minim)
-        # conf.root.protocol("WM_DELETE_WINDOW", self.minim)
-        # conf.root.createcommand('tk::mac::ReopenApplication' , conf.root.deiconify)
+        # cnf.root.bind('<Command-w>', self.minim)
+        # cnf.root.protocol("WM_DELETE_WINDOW", self.minim)
+        # cnf.root.createcommand('tk::mac::ReopenApplication' , cnf.root.deiconify)
 
-        conf.root.createcommand("tk::mac::Quit", on_exit)
-        conf.root.bind('<Command-w>', lambda e: conf.root.withdraw())
-        conf.root.protocol("WM_DELETE_WINDOW", conf.root.withdraw)
-        conf.root.createcommand('tk::mac::ReopenApplication', conf.root.deiconify)
+        cnf.root.createcommand("tk::mac::Quit", on_exit)
+        cnf.root.bind('<Command-w>', lambda e: cnf.root.withdraw())
+        cnf.root.protocol("WM_DELETE_WINDOW", cnf.root.withdraw)
+        cnf.root.createcommand('tk::mac::ReopenApplication', cnf.root.deiconify)
 
-        menu = Menu(conf.root)
-        r_frame = CFrame(conf.root)
+        menu = Menu(cnf.root)
+        r_frame = CFrame(cnf.root)
         thumbnails = Thumbnails(r_frame)
         sep = CSep(r_frame)
         stbar = StBar(r_frame)
@@ -41,15 +41,15 @@ class Application:
 
         MacMenu()
 
-        if conf.root_w < 50 or conf.root_h < 50:
-            conf.root_w, conf.root_h = 700, 500
+        if cnf.root_w < 50 or cnf.root_h < 50:
+            cnf.root_w, cnf.root_h = 700, 500
 
-        conf.root.geometry(
-            (f"{conf.root_w}x{conf.root_h}"
-            f"+{conf.root_x}+{conf.root_y}")
+        cnf.root.geometry(
+            (f"{cnf.root_w}x{cnf.root_h}"
+            f"+{cnf.root_x}+{cnf.root_y}")
             )
 
-        conf.root.minsize(870, 500)
+        cnf.root.minsize(870, 500)
 
         if smb_check():
             scaner.scaner_start()
@@ -58,7 +58,7 @@ class Application:
 
     def minim(self, e=None):
         applescript = f"""
-            set appName to "{conf.app_name}"
+            set appName to "{cnf.app_name}"
             tell application "System Events"
                 set visible of application process appName to false
             end tell
@@ -68,10 +68,10 @@ class Application:
 
     def maxim(self, e=None):
         applescript = f"""
-            set appName to "{conf.app_name}"
+            set appName to "{cnf.app_name}"
             tell application appName to activate 
             end tell
             """
 
         run_applescript(applescript)
-        conf.root.focus_force()
+        cnf.root.focus_force()

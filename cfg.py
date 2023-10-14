@@ -7,7 +7,7 @@ from lang import Rus, Eng
 import subprocess
 
 __all__ = (
-    "conf",
+    "cnf",
     )
 
 
@@ -130,6 +130,6 @@ class Config:
         return self.__class__()
 
 
-conf = Config()
-conf.check_dir()
-conf.load_cfg()
+cnf = Config()
+cnf.check_dir()
+cnf.load_cfg()

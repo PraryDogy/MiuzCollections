@@ -10,7 +10,7 @@ import cv2
 import numpy
 from PIL import Image
 
-from cfg import conf
+from cfg import cnf
 
 from .globals import Globals
 
@@ -59,7 +59,7 @@ def run_thread(fn, args=[]):
 
 def wait_thread():
     while utils_task.is_alive():
-        conf.root.update()
+        cnf.root.update()
 
 
 def topbar_default_thread():
@@ -73,7 +73,7 @@ def topbar_default_thread():
         run_thread(task)
     except RuntimeError:
         print("utils > topbar_default_thread runtime err")
-        conf.root.after(2000, topbar_default_thread)
+        cnf.root.after(2000, topbar_default_thread)
 
 
 def run_applescript(applescript: str):
@@ -90,7 +90,7 @@ def normalize_name(name: str):
     name, ext = os.path.splitext(name)
     name = name.translate(str.maketrans("", "", string.punctuation))
 
-    for i in conf.stopwords:
+    for i in cnf.stopwords:
         name = name.replace(i, "")
 
     return name.replace(" ", "")
@@ -98,19 +98,19 @@ def normalize_name(name: str):
 
 def smb_check():
     def task():
-        if not os.path.exists(conf.coll_folder):
+        if not os.path.exists(cnf.coll_folder):
             try:
-                cmd = f"mount volume \"{conf.smb_ip}\""
+                cmd = f"mount volume \"{cnf.smb_ip}\""
                 subprocess.call(["osascript", "-e", cmd], timeout=3)
             except subprocess.TimeoutExpired:
                 print("timeout 3 sec, utils.py, smb_check")
 
     run_thread(task)
-    return bool(os.path.exists(conf.coll_folder))
+    return bool(os.path.exists(cnf.coll_folder))
 
 
 def smb_ip():
-    df = subprocess.Popen(['df', conf.coll_folder], stdout=subprocess.PIPE)
+    df = subprocess.Popen(['df', cnf.coll_folder], stdout=subprocess.PIPE)
     try:
         outputLine = df.stdout.readlines()[1]
         unc_path = str(outputLine.split()[0])
@@ -120,27 +120,27 @@ def smb_ip():
 
 
 def on_exit(e=None):
-    w, h = conf.root.winfo_width(), conf.root.winfo_height()
-    x, y = conf.root.winfo_x(), conf.root.winfo_y()
+    w, h = cnf.root.winfo_width(), cnf.root.winfo_height()
+    x, y = cnf.root.winfo_x(), cnf.root.winfo_y()
 
-    conf.root_w = w
-    conf.root_h = h
-    conf.root_x = x
-    conf.root_y = y
+    cnf.root_w = w
+    cnf.root_h = h
+    cnf.root_x = x
+    cnf.root_y = y
 
-    conf.write_cfg()
+    cnf.write_cfg()
 
-    conf.flag = False
+    cnf.flag = False
     quit()
 
 
 def create_dir(title=None):
-    coll = conf.curr_coll
+    coll = cnf.curr_coll
     if coll == "all":
-        coll = conf.lang.all_colls
+        coll = cnf.lang.all_colls
 
     dest = os.path.join(
-        os.path.expanduser('~'), "Downloads", conf.app_name, coll
+        os.path.expanduser('~'), "Downloads", cnf.app_name, coll
         )
 
     if title:
@@ -153,53 +153,53 @@ def create_dir(title=None):
 
 
 def get_coll_name(src: str):
-    coll = src.replace(conf.coll_folder, "").strip(os.sep).split(os.sep)
+    coll = src.replace(cnf.coll_folder, "").strip(os.sep).split(os.sep)
 
     if len(coll) > 1:
         return coll[0]
     else:
-        return conf.coll_folder.strip(os.sep).split(os.sep)[-1]
+        return cnf.coll_folder.strip(os.sep).split(os.sep)[-1]
 
 
 def place_center():
     win: tkinter.Toplevel = [
-        i for i in conf.root.winfo_children()
+        i for i in cnf.root.winfo_children()
         if isinstance(i, tkinter.Toplevel)][-1]
 
-    x, y = conf.root.winfo_x(), conf.root.winfo_y()
-    xx = x + conf.root.winfo_width()//2 - win.winfo_width()//2
-    yy = y + conf.root.winfo_height()//2 - win.winfo_height()//2
+    x, y = cnf.root.winfo_x(), cnf.root.winfo_y()
+    xx = x + cnf.root.winfo_width()//2 - win.winfo_width()//2
+    yy = y + cnf.root.winfo_height()//2 - win.winfo_height()//2
 
     win.geometry(f'+{xx}+{yy}')
 
 
 def reveal_coll(coll_name):
-    if coll_name != conf.all_colls:
-        coll_path = os.path.join(conf.coll_folder, coll_name)
+    if coll_name != cnf.all_colls:
+        coll_path = os.path.join(cnf.coll_folder, coll_name)
     else:
-        coll_path = conf.coll_folder
+        coll_path = cnf.coll_folder
 
     try:
         subprocess.check_output(["/usr/bin/open", coll_path])
     except subprocess.CalledProcessError:
-        subprocess.check_output(["/usr/bin/open", conf.coll_folder])
+        subprocess.check_output(["/usr/bin/open", cnf.coll_folder])
 
 
 def paste_search():
     try:
-        pasted = conf.root.clipboard_get().strip()
+        pasted = cnf.root.clipboard_get().strip()
         Globals.search_var.set(pasted)
     except tkinter.TclError:
         print("no clipboard")
 
 
 def focus_last_win():
-    for k, v in conf.root.children.items():
+    for k, v in cnf.root.children.items():
         if v.widgetName == "toplevel":
             v.focus_force()
             v.grab_set_global()
             return
-    conf.root.focus_force()
+    cnf.root.focus_force()
 
 
 
@@ -241,9 +241,9 @@ def encode_image(src):
     image = cv2.imread(src, cv2.IMREAD_UNCHANGED)
 
     if src.endswith((".png", ".PNG")):
-        image = replace_bg(image, conf.bg_color)
+        image = replace_bg(image, cnf.bg_color)
 
-    resized = resize_image(image, conf.thumb_size, conf.thumb_size, True)
+    resized = resize_image(image, cnf.thumb_size, cnf.thumb_size, True)
 
     try:
         return cv2.imencode('.jpg', resized)[1].tobytes()
@@ -257,7 +257,7 @@ def decode_image(image):
         return cv2.imdecode(nparr, cv2.IMREAD_ANYCOLOR)
     except TypeError:
         print("utils.py decode_image NoneType instead bytes like img")
-        return decode_image(encode_image(conf.thumb_err))
+        return decode_image(encode_image(cnf.thumb_err))
 
 
 def convert_to_rgb(image):
@@ -275,7 +275,7 @@ def crop_image(img):
     else:
         delta = (width-height)//2
         cropped = img[0:height, delta:width-delta]
-    return cropped[0:conf.thumb_size, 0:conf.thumb_size]
+    return cropped[0:cnf.thumb_size, 0:cnf.thumb_size]
 
 
 
@@ -327,13 +327,13 @@ def reveal_tiffs(list_paths: list):
         run_applescript(applescript)
 
     if list_paths:
-        Globals.topbar_text(conf.lang.live_wait)
+        Globals.topbar_text(cnf.lang.live_wait)
         wait_thread()
         run_thread(task)
         wait_thread()
         topbar_default_thread()
     else:
-        Globals.topbar_text(conf.lang.live_notiff)
+        Globals.topbar_text(cnf.lang.live_notiff)
         wait_thread()
         topbar_default_thread()
 
@@ -345,12 +345,12 @@ def download_tiffs(src):
     def task(parrent, tiffs, ln_tiffs):
         for num, tiff in enumerate(tiffs, 1):
 
-            if not conf.flag:
+            if not cnf.flag:
                 return
 
             t = (
-                f"{conf.lang.live_copying} "
-                f"{num} {conf.lang.live_from} {ln_tiffs}"
+                f"{cnf.lang.live_copying} "
+                f"{num} {cnf.lang.live_from} {ln_tiffs}"
                 )
             Globals.topbar_text(t)
             shutil.copy(tiff, os.path.join(parrent, tiff.split("/")[-1]))
@@ -358,11 +358,11 @@ def download_tiffs(src):
         subprocess.Popen(["open", parrent])
 
 
-    Globals.topbar_text(conf.lang.live_wait)
+    Globals.topbar_text(cnf.lang.live_wait)
     tiffs = find_tiffs(src)
 
     if tiffs:
-        conf.flag = True
+        cnf.flag = True
         ln_tiffs = len(tiffs)
         parrent = create_dir()
 
@@ -371,31 +371,31 @@ def download_tiffs(src):
         topbar_default_thread()
 
     else:
-        Globals.topbar_text(conf.lang.live_notiff)
+        Globals.topbar_text(cnf.lang.live_notiff)
         topbar_default_thread()
 
 
 def copy_tiffs_paths(path):
     wait_thread()
 
-    Globals.topbar_text(conf.lang.live_wait)
+    Globals.topbar_text(cnf.lang.live_wait)
     tiffs = find_tiffs(path)
 
     if tiffs:
-        conf.root.clipboard_clear()
-        conf.root.clipboard_append("\n".join(tiffs))
+        cnf.root.clipboard_clear()
+        cnf.root.clipboard_append("\n".join(tiffs))
         topbar_default_thread()
     else:
-        Globals.topbar_text(conf.lang.live_notiff)
+        Globals.topbar_text(cnf.lang.live_notiff)
         topbar_default_thread()
 
 
 def copy_jpeg_path(path):
     if os.path.exists(path):
-        conf.root.clipboard_clear()
-        conf.root.clipboard_append(path)
+        cnf.root.clipboard_clear()
+        cnf.root.clipboard_append(path)
     else:
-        Globals.topbar_text(conf.lang.live_nojpeg)
+        Globals.topbar_text(cnf.lang.live_nojpeg)
         topbar_default_thread()
 
 
@@ -406,10 +406,10 @@ def reveal_jpg(src: str):
         subprocess.call(["open", "-R", src])
 
     if os.path.exists(src):
-        Globals.topbar_text(conf.lang.live_wait)
+        Globals.topbar_text(cnf.lang.live_wait)
         run_thread(task)
     else:
-        Globals.topbar_text(conf.lang.live_nojpeg)
+        Globals.topbar_text(cnf.lang.live_nojpeg)
 
     wait_thread()
     topbar_default_thread()
@@ -422,12 +422,12 @@ def download_group_jpeg(title, paths_list: list):
     def task(dest, ln_paths):
         for num, imgpath in enumerate(paths_list, 1):
 
-            if not conf.flag:
+            if not cnf.flag:
                 return
 
             t = (
-                f"{conf.lang.live_copying} {num} "
-                f"{conf.lang.live_from} {ln_paths}"
+                f"{cnf.lang.live_copying} {num} "
+                f"{cnf.lang.live_from} {ln_paths}"
                 )
 
             Globals.topbar_text(t)
@@ -439,17 +439,17 @@ def download_group_jpeg(title, paths_list: list):
 
     for i in paths_list:
         if not os.path.exists(i):
-            Globals.topbar_text(conf.lang.live_nojpeg)
+            Globals.topbar_text(cnf.lang.live_nojpeg)
             topbar_default_thread()
             return
 
-    conf.flag = True
+    cnf.flag = True
     dest = create_dir(title)
     ln_paths = len(paths_list)
     run_thread(task, [dest, ln_paths])
     wait_thread()
     topbar_default_thread()
-    conf.flag = False
+    cnf.flag = False
 
 
 def download_one_jpeg(src):
@@ -461,12 +461,12 @@ def download_one_jpeg(src):
         subprocess.Popen(["open", "-R", dest])
 
     if os.path.exists(src):
-        Globals.topbar_text(conf.lang.live_copying)
+        Globals.topbar_text(cnf.lang.live_copying)
         dest = create_dir()
         dest = os.path.join(dest, src.split("/")[-1])
         run_thread(task, [dest])
     else:
-        Globals.topbar_text(conf.lang.live_nojpeg)
+        Globals.topbar_text(cnf.lang.live_nojpeg)
 
     wait_thread()
     topbar_default_thread()
