@@ -64,6 +64,7 @@ class Eng:
             '\nTelegram: evlosh'
             )
 
+
         self.please_wait = "Please, wait"
         self.no_tiff = "Can't find tiff"
         self.no_jpg = "Can't find jpg"
