@@ -94,6 +94,10 @@ def run_applescript(applescript: str):
 def normalize_name(name: str):
     name, ext = os.path.splitext(name)
     name = name.translate(str.maketrans("", "", string.punctuation))
+
+    for i in ("preview", "1x1", "1х1", "crop", "копия", "copy", "small"):
+        name = name.replace(i, "")
+
     return name.replace(" ", "")
 
 
