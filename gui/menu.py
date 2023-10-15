@@ -51,7 +51,7 @@ class Menu(tkmacosx.SFrame):
     def load_menu_buttons(self):
         frame = CFrame(self)
 
-        title = CLabel(frame, text=cnf.lang.menu_title)
+        title = CLabel(frame, text=cnf.lang.menu)
         title.configure(font=('San Francisco Pro', 22, 'bold'))
         title.pack(pady=(0,15))
         cnf.lang_menu.append(title)

@@ -1,77 +1,51 @@
 class Rus:
     def __init__(self):
-        # main
+        self.up = "Наверх"
         self.ok = "Ок"
         self.cancel = "Отмена"
         self.all_colls = "Все коллекции"
         self.close = "Закрыть"
-
-
-
-        # search_context
-        self.search_paste = "Вставить"
-        self.search_clear = "Очистить"
-        self.search_search = "Поиск"
-
-        # context menu
+        self.paste = "Вставить"
+        self.clear = "Очистить"
+        self.search = "Поиск"
         self.view = "Просмотр"
         self.info = "Инфо"
-        self.show_jpeg = "Найти jpeg"
-        self.show_tiff = "Найти tiff"
-        self.show_coll = "Открыть папку"
-        self.copy_tiff_path = "Скопировать путь к tiff"
-        self.copy_jpeg_path = "Скопировать путь к jpeg"
+        self.menu = "Меню"
+        self.settings = "Настройки"
+        self.browse = "Обзор"
+        self.exit = "Выход"
+        self.reset = "Сброс"
+        self.mins = "мин."
+        self.product = "Имиджи"
+        self.models = "Модели"
+        self.catalog = "Каталог"
+        self.updating = "Обновление"
+        self.update = "Обновить"
+        self.filter = "Фильтр"
+        self.filters = "Фильтры"
+        self.sort = "Сортировка"
+        self.photo = "Фото"
+        self.total = "Всего"
+        self.start = "Начало"
+        self.end = "Конец"
+        self.go_out = "Выйти"
+        self.preparing = "Подготовка"
+        self.scaning = "Сканирую"
+        self.copying = "Копирую"
+        self.from_pretext = "из"
+        self.added = "Добавлено"
+        self.finishing = "Завершаю"
+        self.copy = "Копировать"
+        self.resolution = "Разрешение"
+        self.file_size = "Размер"
+        self.file_path = "Расположение"
+        self.collection = "Коллеция"
 
-        # menu
-        self.menu_title = "Меню"
-
-        # settings
-        self.settings_title = "Настройки"
-        self.settings_label = "Расположение коллекций"
-        self.settings_browse = "Обзор"
-        self.settings_askexit = "Выход"
-        self.settings_reset = "Сброс"
-        self.settings_descr = (
+        self.sett_descr = (
             "Если имя коллекции начинается с _ или ."
             "\nпрограмма проигнорирует ее."
             )
-        self.autoscan_time = "X"
-        self.sett_autoscan = f"Обновлять коллекции каждые {self.autoscan_time} мин."
 
-        # status bar
-        self.scaner_title = "Обновление"
-        self.upd_btn = "Обновить"
-
-        # thumbnails
-        self.thumbs_product = "Имиджи"
-        self.thumbs_models = "Модели"
-        self.thumbs_catalog = "Каталог"
-
-        self.thumbs_alltime = "За все время"
-        self.thumbs_changed = "По дате изменения"
-        self.thumbs_created = "По дате создания"
-        self.thumbs_filter = "Фильтр"
-        self.thumbs_sort = "Сортировка"
-        self.thumbs_photo = "Фото"
-        self.thumbs_filters = "Фильтры"
-        self.thumbs_reset = "Сброс дат"
-        self.thumbs_showmore = "Позазать еще"
-        self.thumbs_total = "Всего"
-        self.thumbs_nophoto = "Нет фотографий"
-        self.thumbs_withname = "с именем"
-
-        # filter window
-        self.filter_title = "Фильтр"
-        self.filter_start = "Начало"
-        self.filter_end = "Конец"
-        self.filter_notselected = "Даты не выбраны"
-
-        self.filter_product = "Имиджи"
-        self.filter_models = "Модели"
-        self.filter_catalog = "Каталог"
-
-        self.filter_changed = "Дата изменения"
-        self.filter_created = "Дата создания"
         self.filter_descr = (
             "Имиджи - показывать предметные фото.",
             "Модели - показывать модельные фото.",
@@ -79,15 +53,6 @@ class Rus:
             "Сортировка - по дате изменения или по дате создания.",
             )
 
-        # custom date
-        self.cust_title = "Введите дату"
-        self.cust_l = "день.месяц.год"
-
-        # ask exit
-        self.askexit_exit = "Выйти"
-
-        # smb alert
-        self.smb_title = "Нет подключения."
         self.smb_descr = (
             '- Проверьте подключение к интернету.'
             '\n- Откройте любую папку на сетевом диске,'
@@ -97,43 +62,44 @@ class Rus:
             '\n\nПоддержка: loshkarev@miuz.ru'
             '\nTelegram: evlosh'
             )
-        
-        # info widget
-        self.info_collection = "Коллеция "
-        self.info_filename = "Имя файла "
-        self.info_chanded = "Дата изменения "
-        self.info_resolution = "Разрешение "
-        self.info_size = "Размер "
-        self.info_path = "Расположение "
 
-        # calendar
-        self.calendar_days = ("Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс")
 
-        # scaner
-        self.scaner_prepare = "Подготовка"
-
-        # live text
-        self.live_scan = "Сканирую"
-        self.live_copying = "Копирую"
-        self.live_from = "из"
-        self.live_collections = "коллекций"
-        self.live_added = "Добавлено"
-        self.live_newphoto = "новых фото"
-        self.live_finish = "Завершаю"
-        self.live_updating = "Обновление"
-        self.live_wait = "Пожалуйста, подождите"
-        self.live_notiff = "Не могу найти tiff"
-        self.live_nojpeg = "Не могу найти jpeg"
-
-        # context copy to downloads
-        self.context_copy = "Копировать"
-        self.context_downloads = "в загрузки"
-        self.context_copyall = "Копировать все"
-
-        # context advanced
+        self.please_wait = "Пожалуйста, подождите"
+        self.no_tiff = "Не могу найти tiff"
+        self.no_jpg = "Не могу найти jpg"
+        self.to_downloads = "в загрузки"
+        self.copy_all = "Копировать все"
+        self.find_jpg = "Найти jpg"
+        self.find_tiff = "Найти tiff"
+        self.copy_path_tiff = "Скопировать путь к tiff"
+        self.copy_path_jpg = "Скопировать путь к jpg"
+        self.reveal_coll = "Открыть папку"
+        self.colls_path = "Расположение коллекций"
+        self.scan_time = "x"
+        self.update_every = f"Обновлять коллекции каждые"
+        self.show_more = "Позазать еще"
+        self.no_photo = "Нет фотографий"
+        self.with_name = "с именем"
+        self.for_all_time = "За все время"
+        self.date_changed_by = "По дате изменения"
+        self.date_created_by = "По дате создания"
+        self.date_changed = "Дата изменения"
+        self.date_created = "Дата создания"
+        self.reset_dates = "Сброс дат"
+        self.dates_not_sel = "Даты не выбраны"
+        self.enter_date = "Введите дату"
+        self.d_m_y = "день.месяц.год"
+        self.no_connection = "Нет подключения."
+        self.file_name = "Имя файла"
         self.remove_fromapp = "Удалить из приложения"
 
-        self.months_p = {
+
+        self.colls_case = "коллекций"
+        self.new_photo_case = "новых фото"
+
+
+        self.calendar_days = ("Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс")
+        self.months_case = {
             1: "января",
             2: "февраля",
             3: "марта",
@@ -160,6 +126,3 @@ class Rus:
             10: "Октябрь",
             11: "Ноябрь",
             12: "Декабрь"}
-        
-    def update_autoscan(self):
-        self.sett_autoscan = f"Обновлять коллекции каждые {self.autoscan_time} мин."

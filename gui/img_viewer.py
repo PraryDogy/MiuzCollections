@@ -29,7 +29,7 @@ class ContextViewer(Context):
         self.cont_sep()
 
         self.cont_sep()
-        self.cont_copy_jpeg_path(e)
+        self.cont_copy_jpg_path(e)
         self.cont_reveal_jpg(e)
         self.cont_download_onefile(e)
 

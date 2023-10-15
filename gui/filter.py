@@ -12,12 +12,12 @@ from .widgets import *
 class CCalendarEntry(CWindow):
     def cust_date_win(self, e=None):
         self.win_cust = CWindow()
-        self.win_cust.title(cnf.lang.cust_title)
+        self.win_cust.title(cnf.lang.enter_date)
         self.win_cust.protocol("WM_DELETE_WINDOW", self.cust_can_cmd)
         self.win_cust.bind('<Escape>', self.cust_can_cmd)
         self.bind('<Command-q>', on_exit)
 
-        cust_l = CLabel(self.win_cust, text=cnf.lang.cust_l)
+        cust_l = CLabel(self.win_cust, text=cnf.lang.d_m_y)
         cust_l.pack(pady=(0, 5))
 
         var_t = f"{self.dd}.{self.mm}.{self.yy}"
@@ -202,7 +202,7 @@ class CCalendar(CFrame, CCalendarEntry):
     def change_title(self):
         mtitle_t = (
             f"{self.dd} "
-            f"{cnf.lang.months_p[self.mm]} "
+            f"{cnf.lang.months_case[self.mm]} "
             f"{self.yy}"
             )
         self.title.configure(text=mtitle_t)
@@ -258,7 +258,7 @@ class Filter(CWindow):
     def __init__(self):
         super().__init__()
         self.bind("<Return>", self.ok_cmd)
-        self.title(cnf.lang.filter_title)
+        self.title(cnf.lang.filter)
         f = ("San Francisco Pro", 17, "bold")
         self.reseted = False
         self.date_changed = False
@@ -269,7 +269,7 @@ class Filter(CWindow):
         left_frame = CFrame(calendar_frames)
         left_frame.pack(side="left", padx=(0, 15))
 
-        left_title = CLabel(left_frame, text=cnf.lang.filter_start)
+        left_title = CLabel(left_frame, text=cnf.lang.start)
         left_title["font"] = f
         left_title.pack()
 
@@ -279,7 +279,7 @@ class Filter(CWindow):
         right_frame = CFrame(calendar_frames)
         right_frame.pack(side="left")
 
-        right_title = CLabel(right_frame, text=cnf.lang.filter_end)
+        right_title = CLabel(right_frame, text=cnf.lang.end)
         right_title["font"] = f
         right_title.pack()
 
@@ -289,12 +289,12 @@ class Filter(CWindow):
         if any((Globals.start, Globals.end)):
             cals_t = f"{Globals.named_start} - {Globals.named_end}"
         else:
-            cals_t = cnf.lang.filter_notselected
+            cals_t = cnf.lang.dates_not_sel
         self.cals_titles = CLabel(self, text=cals_t)
         self.cals_titles.configure(font=f)
         self.cals_titles.pack()
 
-        cals_reset = CButton(self, text=cnf.lang.settings_reset)
+        cals_reset = CButton(self, text=cnf.lang.reset)
         cals_reset.pack(pady=(15, 0))
         cals_reset.cmd(self.cals_titles_reset)
 
@@ -303,28 +303,28 @@ class Filter(CWindow):
         grop_frame = CFrame(self)
         grop_frame.pack()
 
-        self.product = CButton(grop_frame, text=cnf.lang.filter_product)
+        self.product = CButton(grop_frame, text=cnf.lang.product)
         if cnf.product:
             self.product.configure(bg=cnf.sel_color)
         self.product.pack(side="left")
         self.product.cmd(self.product_cmd)
 
-        self.models = CButton(grop_frame, text=cnf.lang.filter_models)
+        self.models = CButton(grop_frame, text=cnf.lang.models)
         if cnf.models:
             self.models.configure(bg=cnf.sel_color)
         self.models.pack(side="left", padx=15)
         self.models.cmd(self.models_cmd)
 
-        self.catalog = CButton(grop_frame, text=cnf.lang.filter_catalog)
+        self.catalog = CButton(grop_frame, text=cnf.lang.catalog)
         if cnf.catalog:
             self.catalog.configure(bg=cnf.sel_color)
         self.catalog.pack(side="left")
         self.catalog.cmd(self.catalog_cmd)
 
         if cnf.sort_modified:
-            sort_btn_t = cnf.lang.filter_changed
+            sort_btn_t = cnf.lang.date_changed
         else:
-            sort_btn_t = cnf.lang.filter_created
+            sort_btn_t = cnf.lang.date_created
 
         self.btn_sort = CButton(self, text=sort_btn_t)
         self.btn_sort.configure(width=13)
@@ -359,7 +359,7 @@ class Filter(CWindow):
 
     def named_date(self, date: datetime):
         day = f"{date.day} "
-        month = f"{cnf.lang.months_p[date.month]} "
+        month = f"{cnf.lang.months_case[date.month]} "
         year = f"{date.year}"
         return day + month + year
 
@@ -375,13 +375,13 @@ class Filter(CWindow):
             i.reset_cal()
         self.reseted = True
         self.date_changed = False
-        self.cals_titles.configure(text=cnf.lang.filter_notselected)
+        self.cals_titles.configure(text=cnf.lang.dates_not_sel)
 
     def sort_btn_cmd(self, e):
-        if self.btn_sort["text"] == cnf.lang.filter_changed:
-            self.btn_sort.configure(text=cnf.lang.filter_created)
+        if self.btn_sort["text"] == cnf.lang.date_changed:
+            self.btn_sort.configure(text=cnf.lang.date_created)
         else:
-            self.btn_sort.configure(text=cnf.lang.filter_changed)
+            self.btn_sort.configure(text=cnf.lang.date_changed)
 
     def product_cmd(self, e=None):
         if self.product["bg"] == cnf.sel_color:
@@ -432,7 +432,7 @@ class Filter(CWindow):
             cnf.models = True
             cnf.catalog = True
 
-        if self.btn_sort["text"] == cnf.lang.filter_created:
+        if self.btn_sort["text"] == cnf.lang.date_created:
             cnf.sort_modified = False
         else:
             cnf.sort_modified = True

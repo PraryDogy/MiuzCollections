@@ -22,7 +22,7 @@ class Scaner:
     def scaner_start(self):
         self.__scaner_cancel()
         self.__scaner()
-        ms = cnf.autoscan_time*60000
+        ms = cnf.scan_time*60000
         cnf.root.after(ms, self.scaner_start)
 
     def __scaner_cancel(self):
@@ -35,7 +35,7 @@ class Scaner:
     def __scaner(self):
         cnf.flag = True
         Globals.stbar_btn.configure(
-            text=cnf.lang.live_updating,
+            text=cnf.lang.updating,
             bg=cnf.topbar_color
             )
 
@@ -52,10 +52,10 @@ class Scaner:
             self.need_update = False
 
         cnf.flag = False
-        Globals.stbar_btn.configure(text=cnf.lang.upd_btn, bg=cnf.btn_color)
+        Globals.stbar_btn.configure(text=cnf.lang.update, bg=cnf.btn_color)
 
     def __update_db(self):
-        self.__change_live_text(cnf.lang.scaner_prepare)
+        self.__change_live_text(cnf.lang.preparing)
 
         db_images = Dbase.conn.execute(
             sqlalchemy.select(
@@ -78,11 +78,11 @@ class Scaner:
 
         for x, collection in enumerate(collections, 1):
             self.__change_live_text(
-                    f"{cnf.lang.live_scan} "
+                    f"{cnf.lang.scaning} "
                     f"{x} "
-                    f"{cnf.lang.live_from} "
+                    f"{cnf.lang.from_pretext} "
                     f"{ln} "
-                    f"{cnf.lang.live_collections}."
+                    f"{cnf.lang.colls_case}."
                     )
 
             if not os.path.isdir(collection):
@@ -134,11 +134,11 @@ class Scaner:
                 "b_modified": modified,
                 "b_collection": get_coll_name(src),
                 "temp": self.__change_live_text(
-                        f"{cnf.lang.live_added} "
+                        f"{cnf.lang.added} "
                         f"{x} "
-                        f"{cnf.lang.live_from} "
+                        f"{cnf.lang.from_pretext} "
                         f"{ln} "
-                        f"{cnf.lang.live_newphoto}."
+                        f"{cnf.lang.new_photo_case}."
                         )
                     }
                 for x, (src, size, created, modified) in enumerate(new_images, 1)
@@ -178,7 +178,7 @@ class Scaner:
 
         if remove_images:
 
-            self.__change_live_text(cnf.lang.live_finish)
+            self.__change_live_text(cnf.lang.finishing)
             self.need_update = True
 
             values = [

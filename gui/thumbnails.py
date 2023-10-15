@@ -44,7 +44,7 @@ class ContextThumbs(Context):
         self.cont_imginfo(e)
 
         self.cont_sep()
-        self.cont_copy_jpeg_path(e)
+        self.cont_copy_jpg_path(e)
         self.cont_reveal_jpg(e)
         self.cont_download_onefile(e)
 
@@ -89,14 +89,14 @@ class ThumbsSearch(CFrame):
         btns_frame = CFrame(self)
         btns_frame.pack(pady=(10, 0))
 
-        self.btn_search = CButton(btns_frame, text=cnf.lang.search_search)
+        self.btn_search = CButton(btns_frame, text=cnf.lang.search)
         self.btn_search.pack(side=tkinter.LEFT, padx=(0, 10))
         self.btn_search.cmd(self.search_go)
 
         if Globals.search_var.get():
             self.btn_search.configure(bg=cnf.topbar_color)
 
-        self.btn_clear = CButton(btns_frame, text=cnf.lang.search_clear)
+        self.btn_clear = CButton(btns_frame, text=cnf.lang.clear)
         self.btn_clear.pack(side=tkinter.LEFT)
         self.btn_clear.cmd(self.search_clear)
 
@@ -131,19 +131,19 @@ class ThumbsPrepare:
         filter_row = []
 
         if cnf.product:
-            filter_row.append(cnf.lang.thumbs_product)
+            filter_row.append(cnf.lang.product)
         if cnf.models:
-            filter_row.append(cnf.lang.thumbs_models)
+            filter_row.append(cnf.lang.models)
         if cnf.catalog:
-            filter_row.append(cnf.lang.thumbs_catalog)
+            filter_row.append(cnf.lang.catalog)
 
         filter_row = ", ".join(filter_row)
         self.filter_row = filter_row.lower().capitalize()
 
         if cnf.sort_modified:
-            self.sort_text = cnf.lang.thumbs_changed
+            self.sort_text = cnf.lang.date_changed_by
         else:
-            self.sort_text = cnf.lang.thumbs_created
+            self.sort_text = cnf.lang.date_created_by
 
     def decode_thumbs(self):
         result = []
@@ -230,7 +230,7 @@ class Thumbnails(CFrame, ThumbsPrepare):
     def __init__(self, master):
         super().__init__(master)
 
-        self.topbar = CButton(self, text="▲")
+        self.topbar = CButton(self, text=f"▲")
         self.topbar.configure(
             font=('San Francisco Pro', 13, 'normal'),
             bg=cnf.bg_color,
@@ -286,8 +286,8 @@ class Thumbnails(CFrame, ThumbsPrepare):
         sub_font=('San Francisco Pro', 13, 'normal')
 
         l_subtitle_t = (
-            f"{cnf.lang.thumbs_filter}"
-            f"\n{cnf.lang.thumbs_sort}"
+            f"{cnf.lang.filter}"
+            f"\n{cnf.lang.sort}"
             )
         l_subtitle = CLabel(main_sub_frame, text=l_subtitle_t)
         l_subtitle.configure(
@@ -311,7 +311,7 @@ class Thumbnails(CFrame, ThumbsPrepare):
             )
         r_subtitle.pack(side="right")
 
-        btn_filter = CButton(title_frame, text=cnf.lang.thumbs_filters)
+        btn_filter = CButton(title_frame, text=cnf.lang.filters)
         btn_filter.pack()
         if any((Globals.start, Globals.end)):
             btn_filter.configure(bg=cnf.topbar_color)
@@ -329,7 +329,7 @@ class Thumbnails(CFrame, ThumbsPrepare):
                 for i in range(0, len(img_list), limit)
                 ]
 
-            t = f"{date_key}, {cnf.lang.thumbs_total}: {len(img_list)}"
+            t = f"{date_key}, {cnf.lang.total}: {len(img_list)}"
             chunk_title = CLabel(self.thumbs_frame, text=t)
             chunk_title.configure(font=('San Francisco Pro', 18, 'bold'))
             chunk_title.pack(anchor="w", pady=(30, 0), padx=2)
@@ -379,18 +379,17 @@ class Thumbnails(CFrame, ThumbsPrepare):
         if not self.thumbs_lbls:
             str_var = Globals.search_var.get()
 
-            noimg_t = cnf.lang.thumbs_nophoto
+            noimg_t = cnf.lang.no_photo
 
             if str_var:
                 noimg_t = (
-                    f"{cnf.lang.thumbs_nophoto}"
-                    f"{cnf.lang.thumbs_withname}"
+                    f"{cnf.lang.no_photo} {cnf.lang.with_name}"
                     f"\n\"{str_var}\""
                     )
 
             elif any((Globals.start, Globals.end)):
                 noimg_t=(
-                    f"{cnf.lang.thumbs_nophoto}"
+                    f"{cnf.lang.no_photo}"
                     f"\n{Globals.named_start} - {Globals.named_end}"
                     )
 
@@ -400,7 +399,7 @@ class Thumbnails(CFrame, ThumbsPrepare):
 
         more_btn = CButton(
             self.thumbs_frame,
-            text=cnf.lang.thumbs_showmore
+            text=cnf.lang.show_more
             )
         more_btn.cmd(lambda e: self.show_more_cmd())
         more_btn.pack(pady=(15, 0))
@@ -479,6 +478,6 @@ class Thumbnails(CFrame, ThumbsPrepare):
 
     def topbar_default(self):
         try:
-            self.topbar.configure(text="▲", bg=cnf.bg_color)
+            self.topbar.configure(text=f"▲", bg=cnf.bg_color)
         except RuntimeError:
             print("thumbnails > topbar default error")

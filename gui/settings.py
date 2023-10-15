@@ -19,7 +19,7 @@ class Settings(CWindow):
         self.protocol("WM_DELETE_WINDOW", self.cancel_cmd)
         self.bind('<Escape>', self.cancel_cmd)
         self.bind("<Return>", self.save_cmd)
-        self.title(cnf.lang.settings_title)
+        self.title(cnf.lang.settings)
         self.geometry("400x310")
 
         self.changed_lang = False
@@ -41,7 +41,7 @@ class Settings(CWindow):
 
         path_name = CLabel(
             frame,
-            text=cnf.lang.settings_label,
+            text=cnf.lang.colls_path,
             anchor="w",
             justify="left"
             )
@@ -56,7 +56,7 @@ class Settings(CWindow):
             )
         self.path_widget.pack(anchor="w")
 
-        select_path = CButton(frame, text=cnf.lang.settings_browse)
+        select_path = CButton(frame, text=cnf.lang.browse)
         select_path.cmd(self.select_path_cmd)
         select_path.pack(pady=(5, 0))
         cnf.lang_sett.append(select_path)
@@ -73,38 +73,36 @@ class Settings(CWindow):
         else:
             self.lang_btn.configure(text="English")
 
-        self.reset_btn = CButton(asklang_frame, text=cnf.lang.settings_reset)
+        self.reset_btn = CButton(asklang_frame, text=cnf.lang.reset)
         self.reset_btn.cmd(self.default_cmd)
         self.reset_btn.pack(side="left")
         cnf.lang_sett.append(self.reset_btn)
 
-        autoscan_frame = CFrame(frame)
-        autoscan_frame.pack(pady=(15, 0))
+        scan_frame = CFrame(frame)
+        scan_frame.pack(pady=(15, 0))
 
-        self.autoscan_min = CButton(autoscan_frame, text="<")
-        self.autoscan_min.configure(width=1, bg=cnf.bg_color)
-        self.autoscan_min.pack(side="left", pady=(0, 2))
-        self.autoscan_min.cmd(self.change_mins_cmd)
+        self.scan_min = CButton(scan_frame, text="<")
+        self.scan_min.configure(width=1, bg=cnf.bg_color)
+        self.scan_min.pack(side="left", pady=(0, 2))
+        self.scan_min.cmd(self.change_mins_cmd)
 
-        cnf.lang.autoscan_time = cnf.autoscan_time
-        self.temp_mins = cnf.autoscan_time
-        cnf.lang.update_autoscan()
-
+        self.temp_time = cnf.scan_time
         self.autoupd_wid = CLabel(
-            autoscan_frame,
-            text=cnf.lang.sett_autoscan,
+            scan_frame,
+            text=f"{cnf.lang.update_every} {cnf.scan_time} {cnf.lang.mins}",
             width=30
             )
         self.autoupd_wid.pack(side="left")
         cnf.lang_sett.append(self.autoupd_wid)
 
-        self.autoscan_max = CButton(autoscan_frame, text=">")
-        self.autoscan_max.configure(width=1, bg=cnf.bg_color)
-        self.autoscan_max.pack(side="left", pady=(0, 2))
-        self.autoscan_max.cmd(self.change_mins_cmd)
+        self.scan_max = CButton(scan_frame, text=">")
+        self.scan_max.configure(width=1, bg=cnf.bg_color)
+        self.scan_max.pack(side="left", pady=(0, 2))
+        self.scan_max.cmd(self.change_mins_cmd)
 
-        t = cnf.lang.settings_descr
-        self.sett_desc = CLabel(frame, text=t, anchor="w", justify="left")
+        self.sett_desc = CLabel(
+            frame, text=cnf.lang.sett_descr, anchor="w", justify="left"
+            )
         self.sett_desc.pack(anchor="w", pady=(15, 0))
         cnf.lang_sett.append(self.sett_desc)
 
@@ -128,27 +126,27 @@ class Settings(CWindow):
     def change_mins_cmd(self, e=None):
         t = e.widget["text"]
         times = {1: 5, 2: 10, 3: 30, 4: 60}
-        key = [k for k, v in times.items() if v == cnf.autoscan_time][0]
+        key = [k for k, v in times.items() if v == cnf.scan_time][0]
 
         if t == "<":
             try:
-                cnf.autoscan_time = times[key-1]
+                cnf.scan_time = times[key-1]
             except KeyError:
-                cnf.autoscan_time = times[4]
+                cnf.scan_time = times[4]
         else:
             try:
-                cnf.autoscan_time = times[key+1]
+                cnf.scan_time = times[key+1]
             except KeyError:
-                cnf.autoscan_time = times[1]
+                cnf.scan_time = times[1]
 
-        cnf.lang.autoscan_time = cnf.autoscan_time
-        cnf.lang.update_autoscan()
-        self.autoupd_wid.configure(text=cnf.lang.sett_autoscan)
+        self.autoupd_wid.configure(
+            text=f"{cnf.lang.update_every} {cnf.scan_time} {cnf.lang.mins}"
+            )
 
     def change_lang(self):
-        cnf.lang.autoscan_time = cnf.autoscan_time
-        cnf.lang.update_autoscan()
-        self.autoupd_wid.configure(text=cnf.lang.sett_autoscan)
+        self.autoupd_wid.configure(
+            text=f"{cnf.lang.update_every} {cnf.scan_time} {cnf.lang.mins}"
+            )
 
         wids = cnf.lang_menu + cnf.lang_sett
         wids = wids + cnf.lang_stbar + cnf.lang_thumbs
@@ -205,7 +203,7 @@ class Settings(CWindow):
             self.lang_cmd()
 
         cnf.lang_sett.clear()
-        cnf.autoscan_time = self.temp_mins
+        cnf.scan_time = self.temp_time
 
         self.destroy()
         cnf.root.focus_force()

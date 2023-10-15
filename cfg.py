@@ -70,7 +70,7 @@ class Config:
         self.imgview_w = 700
         self.imgview_h = 500
 
-        self.autoscan_time = 10
+        self.scan_time = 10
 
         self.sort_modified = True
         self.catalog = False

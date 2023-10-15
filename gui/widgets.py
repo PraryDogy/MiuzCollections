@@ -77,7 +77,7 @@ class SmbAlert(CWindow):
     def __init__(self):
         super().__init__()
 
-        txt = cnf.lang.smb_title
+        txt = cnf.lang.no_connection
         title_lbl = CLabel(self, text=txt)
         title_lbl.configure(font=('San Francisco Pro', 22, 'bold'))
         title_lbl.pack()
@@ -147,51 +147,47 @@ class Context(tkinter.Menu):
 
     def cont_reveal_jpg(self, e: tkinter.Event):
         self.add_command(
-            label=cnf.lang.show_jpeg,
+            label=cnf.lang.find_jpg,
             command=lambda: reveal_jpg(e.widget.src)
             )
 
     def cont_reveal_tiffs(self, e: tkinter.Event):
         self.add_command(
-            label=cnf.lang.show_tiff,
+            label=cnf.lang.find_tiff,
             command=lambda: reveal_tiffs(find_tiffs(e.widget.src))
             )
 
     def cont_pastesearch(self):
         self.add_command(
-            label=cnf.lang.search_paste,
+            label=cnf.lang.paste,
             command=paste_search
             )
 
     def cont_clear(self):
         self.add_command(
-            label=cnf.lang.search_clear,
+            label=cnf.lang.clear,
             command=lambda: Globals.search_var.set("")
             )
 
     def cont_download_onefile(self, e: tkinter.Event):
         self.add_command(
             label=(
-                f"{cnf.lang.context_copy} "
-                "jpeg "
-                f"{cnf.lang.context_downloads}"
+                f"{cnf.lang.copy} jpg {cnf.lang.to_downloads}"
                 ),
-            command=lambda: download_one_jpeg(e.widget.src)
+            command=lambda: download_one_jpg(e.widget.src)
         )
 
     def cont_download_tiffs(self, e: tkinter.Event):
         self.add_command(
             label=(
-                f"{cnf.lang.context_copy} "
-                "tiff "
-                f"{cnf.lang.context_downloads}"
+                f"{cnf.lang.copy} tiff {cnf.lang.to_downloads}"
                 ),
             command=lambda: download_tiffs(e.widget.src)
         )
 
     def cont_reveal_coll(self, e: tkinter.Event):
         self.add_command(
-            label=cnf.lang.show_coll,
+            label=cnf.lang.reveal_coll,
             command=lambda: reveal_coll(e.widget.coll_name)
             )
 
@@ -203,14 +199,14 @@ class Context(tkinter.Menu):
         
     def cont_copy_tiffs_paths(self, e: tkinter.Event):
         self.add_command(
-            label=cnf.lang.copy_tiff_path,
+            label=cnf.lang.copy_path_tiff,
             command=lambda: copy_tiffs_paths(e.widget.src)
             )
         
-    def cont_copy_jpeg_path(self, e: tkinter.Event):
+    def cont_copy_jpg_path(self, e: tkinter.Event):
         self.add_command(
-            label=cnf.lang.copy_jpeg_path,
-            command=lambda: copy_jpeg_path(e.widget.src),
+            label=cnf.lang.copy_path_jpg,
+            command=lambda: copy_jpg_path(e.widget.src),
             )
 
     def cont_db_remove_img(self, e: tkinter.Event):
@@ -222,31 +218,31 @@ class Context(tkinter.Menu):
     def cont_download_group(self, e: tkinter.Event):
         self.add_command(
             label=(
-                f"{cnf.lang.context_copy} jpeg\n"
-                f"{cnf.lang.live_from} \"{e.widget.title}\" "
-                f"{cnf.lang.context_downloads}"
+                f"{cnf.lang.copy} jpg\n"
+                f"{cnf.lang.from_pretext} \"{e.widget.title}\" "
+                f"{cnf.lang.to_downloads}"
                 ),
-            command=lambda: download_group_jpeg(e.widget.title, e.widget.paths_list)
+            command=lambda: download_group_jpg(e.widget.title, e.widget.paths_list)
         )
 
     def cont_download_group_tiffs(self, e: tkinter.Event):
         self.add_command(
             label=(
-                f"{cnf.lang.context_copy} tiff\n"
-                f"{cnf.lang.live_from} \"{e.widget.title}\" "
-                f"{cnf.lang.context_downloads}"
+                f"{cnf.lang.copy} tiff\n"
+                f"{cnf.lang.from_pretext} \"{e.widget.title}\" "
+                f"{cnf.lang.to_downloads}"
                 ),
             command=lambda: download_group_tiff(e.widget.title, e.widget.paths_list)
             )
         
     def cont_copy_text(self, e: tkinter.Event):
         self.add_command(
-            label=cnf.lang.context_copy,
+            label=cnf.lang.copy,
             command=lambda: copy_text(e.widget.copy)
             )
 
     def cont_copy_all(self, e:tkinter.Event):
         self.add_command(
-            label=cnf.lang.context_copyall,
+            label=cnf.lang.copy_all,
             command=lambda: copy_text(e.widget.get("1.0",tkinter.END))
             )

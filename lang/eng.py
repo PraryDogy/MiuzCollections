@@ -1,76 +1,52 @@
 class Eng:
     def __init__(self):
-        # main
+        self.up = "Up"
         self.ok = "Ok"
         self.cancel = "Cancel"
         self.all_colls = "All collections"
         self.close = "Close"
-
-        # search_context
-        self.search_paste = "Paste"
-        self.search_clear = "Clear"
-        self.search_search = "Search"
-
-        # context menu
+        self.paste = "Paste"
+        self.clear = "Clear"
+        self.search = "Search"
         self.view = "View"
         self.info = "Info"
-        self.show_jpeg = "Find jpeg"
-        self.show_tiff = "Find tiff"
-        self.show_coll = "Open folder"
-        self.copy_tiff_path = "Copy path to tiff"
-        self.copy_jpeg_path = "Copy path to jpeg"
+        self.menu = "Menu"
+        self.settings = "Settings"
+        self.browse = "Browse"
+        self.exit = "Exit"
+        self.reset = "Reset"
+        self.mins = "mins."
+        self.product = "Product"
+        self.models = "Models"
+        self.catalog = "Catalog"
+        self.updating = "Updating"
+        self.update = "Update"
+        self.filter = "Filter"
+        self.filters = "Filters"
+        self.sort = "Sort"
+        self.photo = "Photo"
+        self.total = "Total"
+        self.start = "Start"
+        self.end = "End"
+        self.go_out = "Go out"
+        self.preparing = "Preparing"
+        self.scaning = "Scaning"
+        self.copying = "Copying"
+        self.from_pretext = "from"
+        self.added = "Added"
+        self.finishing = "Finishing"
+        self.copy = "Copy"
+        self.resolution = "Resolution"
+        self.file_size = "Size"
+        self.file_path = "Location"
+        self.collection = "Collection"
 
-        # menu
-        self.menu_title = "Menu"
 
-        # settings
-        self.settings_title = "Settings"
-        self.settings_label = "Collections location"
-        self.settings_browse = "Browse"
-        self.settings_askexit = "Ask on exit"
-        self.settings_reset = "Reset"
-        self.settings_descr = (
+        self.sett_descr = (
             "If the collection name starts with _ or ."
             "\nMiuzCollections app will ignore it."
             )
-        
-        self.autoscan_time = "X"
-        self.sett_autoscan = f"Update collections every {self.autoscan_time} mins"
 
-        # status bar
-        self.scaner_title = "Updating"
-        self.upd_btn = "Update"
-
-        # thumbnails
-        self.thumbs_product = "Procuct"
-        self.thumbs_models = "Models"
-        self.thumbs_catalog = "Catalog"
-
-        self.thumbs_alltime = "All time"
-        self.thumbs_changed = "By date modified"
-        self.thumbs_created = "By date created"
-        self.thumbs_filter = "Filter"
-        self.thumbs_sort = "Sort"
-        self.thumbs_photo = "Photos"
-        self.thumbs_filters = "Filters"
-        self.thumbs_reset = "Reset date"
-        self.thumbs_showmore = "Show more"
-        self.thumbs_total = "Total"
-        self.thumbs_nophoto = "No photos"
-        self.thumbs_withname = "with name"
-
-        # filter window
-        self.filter_title = "Filter"
-        self.filter_start = "Start"
-        self.filter_end = "End"
-        self.filter_notselected = "Dates not selected"
-
-        self.filter_product = "Product"
-        self.filter_models = "Models"
-        self.filter_catalog = "Catalog"
-
-        self.filter_changed = "Date modified"
-        self.filter_created = "Date created"
         self.filter_descr = (
             "Product - show procuct photos created by marketing department.",
             "Models - show model photos created by marketing department.",
@@ -78,15 +54,6 @@ class Eng:
             "Sort - by date mofidied or date created.",
             )
 
-        # custom date
-        self.cust_title = "Enter the date"
-        self.cust_l = "day.month.year"
-
-        # ask exit
-        self.askexit_exit = "Exit"
-
-        # smb alert
-        self.smb_title = "No connection."
         self.smb_descr = (
             '- Check internet connection.'
             '\n- Try to open any Miuz network folder.'
@@ -96,60 +63,57 @@ class Eng:
             '\nSupport: loshkarev@miuz.ru'
             '\nTelegram: evlosh'
             )
-        
-        # info widget
-        self.info_collection = "Collection "
-        self.info_filename = "File name "
-        self.info_chanded = "Date modified "
-        self.info_resolution = "Resolution "
-        self.info_size = "Size "
-        self.info_path = "Path "
 
-        # calendar
-        self.calendar_days = ("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
-
-        # scaner
-        self.scaner_prepare = "Preparing"
-
-        # live text
-        self.live_scan = "Scaning"
-        self.live_copying = "Copying"
-        self.live_from = "from"
-        self.live_collections = "collections"
-        self.live_added = "Added"
-        self.live_newphoto = "new photos"
-        self.live_finish = "Finishing"
-        self.live_updating = "Updating"
-        self.live_wait = "Please, wait"
-        self.live_notiff = "Can't find tiff"
-        self.live_nojpeg = "Can't find jpeg"
-
-        # context copy to downloads
-        self.context_copy = "Copy"
-        self.context_downloads = "to Downloads"
-        self.context_copyall = "Copy all"
-
-        # context advanced
+        self.please_wait = "Please, wait"
+        self.no_tiff = "Can't find tiff"
+        self.no_jpg = "Can't find jpg"
+        self.to_downloads = "to downloads"
+        self.copy_all = "Copy all"
+        self.find_jpg = "Find jpg"
+        self.find_tiff = "Find tiff"
+        self.copy_path_tiff = "Copy tiff location"
+        self.copy_path_jpg = "Copy jpg location"
+        self.reveal_coll = "Reveal collection"
+        self.colls_path = "Collections location"
+        self.scan_time = "x"
+        self.update_every = f"Update collections every"
+        self.show_more = "Show more"
+        self.no_photo = "No photos"
+        self.with_name = "with name"
+        self.for_all_time = "For all time"
+        self.date_changed_by = "By date changed"
+        self.date_created_by = "By date created"
+        self.date_changed = "Date changed"
+        self.date_created = "Date created"
+        self.reset_dates = "Dates reset"
+        self.dates_not_sel = "No dates selected"
+        self.enter_date = "Enter date"
+        self.d_m_y = "day.month.year"
+        self.no_connection = "No connection"
+        self.file_name = "Filename"
         self.remove_fromapp = "Remove from app"
 
-        self.months_p = {
-            1: "january",
-            2: "february",
-            3: "march",
-            4: "april",
-            5: "may",
-            6: "june",
-            7: "july",
-            8: "august",
-            9: "september",
-            10: "october",
-            11: "november",
-            12: "december"}
 
+        self.colls_case = "collections"
+        self.new_photo_case = "new_photos"
+
+
+        self.calendar_days = ("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
         self.months = {
-            k: v.capitalize()
-            for k, v in self.months_p.items()
-            }
+            1: "January",
+            2: "February",
+            3: "March",
+            4: "April",
+            5: "May",
+            6: "June",
+            7: "July",
+            8: "August",
+            9: "September",
+            10: "October",
+            11: "November",
+            12: "December"}
 
-    def update_autoscan(self):
-        self.sett_autoscan = f"Update collections every {self.autoscan_time} mins"
+        self.months_case = {
+            k: v.lower()
+            for k, v in self.months.items()
+            }
