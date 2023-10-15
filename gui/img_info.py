@@ -1,4 +1,5 @@
 import os
+import re
 import tkinter
 from datetime import datetime
 
@@ -46,15 +47,14 @@ class ImageInfo(CWindow):
 
         max_ln = 40
 
-        r_name = "".join(
-            [name[i:i+max_ln]+"\n" for i in range(0, len(name), max_ln)]
-            ).strip()
+        r_name = '\n'.join(
+            re.findall(r".{1,%i}" % max_ln, name)
+            )
         l_name = cnf.lang.info_filename + "\n"*r_name.count("\n")
 
-        r_path = os.path.split(src)[0]
-        r_path = "".join(
-            [r_path[i:i+max_ln]+"\n" for i in range(0, len(r_path), max_ln)]
-            ).strip()
+        r_path = '\n'.join(
+            re.findall(r".{1,%i}" % max_ln, os.path.split(src)[0])
+            )
         l_path = cnf.lang.info_path + "\n"*r_path.count("\n")
 
         labels = {
