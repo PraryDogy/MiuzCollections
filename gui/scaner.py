@@ -39,9 +39,9 @@ class Scaner:
             bg=cnf.topbar_color
             )
 
-        task = threading.Thread(target=self.__update_db, daemon=True)
-        task.start()
-        while task.is_alive():
+        cnf.scaner_task = threading.Thread(target=self.__update_db, daemon=True)
+        cnf.scaner_task.start()
+        while cnf.scaner_task.is_alive():
             cnf.root.update()
 
         self.__change_live_text("")
