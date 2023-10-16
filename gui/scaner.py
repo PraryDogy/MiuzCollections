@@ -28,7 +28,7 @@ class Scaner:
             )
 
         cnf.scaner_task = threading.Thread(
-            target=self.__update_db, daemon=True
+            target=self.task, daemon=True
             )
         cnf.scaner_task.start()
 
@@ -49,7 +49,7 @@ class Scaner:
         cnf.root.after(ms, self.scaner_start)
 
 
-    def __update_db(self):
+    def task(self):
         self.__change_live_text(cnf.lang.preparing)
 
         db_images = Dbase.conn.execute(
