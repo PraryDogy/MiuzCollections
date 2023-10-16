@@ -19,28 +19,19 @@ class Scaner:
     def __init__(self) -> None:
         self.need_update = False
 
+
     def scaner_start(self):
-        self.__scaner_cancel()
-        self.__scaner()
-        ms = cnf.scan_time*60000
-        cnf.root.after(ms, self.scaner_start)
-
-    def __scaner_cancel(self):
-        cnf.flag = False
-        if cnf.scaner_task:
-            while cnf.scaner_task.is_alive():
-                cnf.root.update()
-        return True
-
-    def __scaner(self):
         cnf.flag = True
         Globals.stbar_btn.configure(
             text=cnf.lang.updating,
             bg=cnf.topbar_color
             )
 
-        cnf.scaner_task = threading.Thread(target=self.__update_db, daemon=True)
+        cnf.scaner_task = threading.Thread(
+            target=self.__update_db, daemon=True
+            )
         cnf.scaner_task.start()
+
         while cnf.scaner_task.is_alive():
             cnf.root.update()
 
@@ -53,6 +44,10 @@ class Scaner:
 
         cnf.flag = False
         Globals.stbar_btn.configure(text=cnf.lang.update, bg=cnf.btn_color)
+
+        ms = cnf.scan_time*60000
+        cnf.root.after(ms, self.scaner_start)
+
 
     def __update_db(self):
         self.__change_live_text(cnf.lang.preparing)

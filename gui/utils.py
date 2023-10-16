@@ -54,6 +54,7 @@ __all__ = (
 # ********************system utils********************
 
 utils_task = threading.Thread
+flag = False
 
 
 def run_thread(fn, args=[]):
@@ -126,6 +127,7 @@ def smb_ip():
 
 
 def on_exit(e=None):
+    global flag
     w, h = cnf.root.winfo_width(), cnf.root.winfo_height()
     x, y = cnf.root.winfo_x(), cnf.root.winfo_y()
 
@@ -136,6 +138,7 @@ def on_exit(e=None):
 
     cnf.write_cfg()
 
+    flag = False
     cnf.flag = False
     quit()
 
@@ -349,14 +352,15 @@ def download_tiffs(src):
 
 
     def task():
-        cnf.flag = True
+        global flag
+        flag = True
 
         Globals.topbar_text(cnf.lang.please_wait)
         tiffs = find_tiffs(src)
 
         if not tiffs:
             Globals.topbar_text(cnf.lang.no_tiff)
-            cnf.flag = False
+            flag = False
             return
 
         ln_tiffs = len(tiffs)
@@ -364,7 +368,7 @@ def download_tiffs(src):
 
         for num, tiff in enumerate(tiffs, 1):
 
-            if not cnf.flag:
+            if not flag:
                 return
 
             t = (
@@ -433,13 +437,14 @@ def download_group_jpg(title, paths_list: list):
 
 
     def task():
-        cnf.flag = True
+        global flag
+        flag = True
         dest = create_dir(title)
         ln_paths = len(paths_list)
 
         for num, imgpath in enumerate(paths_list, 1):
 
-            if not cnf.flag:
+            if not flag:
                 return
 
             t = (
@@ -457,7 +462,7 @@ def download_group_jpg(title, paths_list: list):
                 print(f"utils > copy group jpg > not found {imgpath}")
 
         subprocess.Popen(["open", dest])
-        cnf.flag = False
+        flag = False
 
 
     run_thread(task)
@@ -470,12 +475,13 @@ def download_group_tiff(title, paths_list):
 
 
     def task():
-        cnf.flag = True
+        global flag
+        flag = True
         tiffs = []
 
         for i in paths_list:
 
-            if not cnf.flag:
+            if not flag:
                 return
 
             found_tiffs = find_tiffs(i)
@@ -486,7 +492,7 @@ def download_group_tiff(title, paths_list):
         if not tiffs:
             Globals.topbar_text(cnf.lang.no_tiff)
             topbar_default_thread()
-            cnf.flag = False
+            flag = False
             return
 
         ln_tiffs = len(tiffs)
@@ -495,7 +501,7 @@ def download_group_tiff(title, paths_list):
 
         for num, imgpath in enumerate(tiffs, 1):
 
-            if not cnf.flag:
+            if not flag:
                 return
 
             t = (
@@ -513,7 +519,7 @@ def download_group_tiff(title, paths_list):
                 print(f"utils > copy group tiff > not found {imgpath}")
 
         subprocess.Popen(["open", dest])
-        cnf.flag = False
+        flag = False
 
 
     run_thread(task)
