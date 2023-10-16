@@ -60,6 +60,7 @@ class Application:
             scaner.scaner_start()
         else:
             SmbAlert()
+        smb_check()
 
     def minim(self, e=None):
         applescript = f"""

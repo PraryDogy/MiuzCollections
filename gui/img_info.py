@@ -37,10 +37,16 @@ class ImageInfo(CWindow):
         self.configure(padx=10, pady=10)
 
         name = src.split(os.sep)[-1]
-        filemod = datetime.fromtimestamp(os.path.getmtime(src))
-        filemod = filemod.strftime("%d-%m-%Y, %H:%M:%S")
-        w, h = Image.open(src).size
-        filesize = round(os.path.getsize(src)/(1024*1024), 2)
+        try:
+            filemod = datetime.fromtimestamp(os.path.getmtime(src))
+            filemod = filemod.strftime("%d-%m-%Y, %H:%M:%S")
+            w, h = Image.open(src).size
+            filesize = round(os.path.getsize(src)/(1024*1024), 2)
+        except FileNotFoundError:
+            filemod = ""
+            filemod = ""
+            w, h = "", ""
+            filesize = ""
 
         frame = CFrame(self)
         frame.pack(expand=True, fill="both")

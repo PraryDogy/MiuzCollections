@@ -53,7 +53,8 @@ __all__ = (
 
 # ********************system utils********************
 
-utils_task = threading.Thread
+utils_task: threading.Thread = None
+smb_task: threading.Thread = None
 flag = False
 
 
@@ -64,8 +65,13 @@ def run_thread(fn, args=[]):
 
 
 def wait_thread():
-    while utils_task.is_alive():
-        cnf.root.update()
+    if smb_task:
+        while smb_task.is_alive():
+            cnf.root.update()
+
+    if utils_task:
+        while utils_task.is_alive():
+            cnf.root.update()
 
 
 def topbar_default_thread():
@@ -103,6 +109,9 @@ def normalize_name(name: str):
 
 
 def smb_check():
+    global smb_task
+
+
     def task():
         if not os.path.exists(cnf.coll_folder):
             try:
@@ -111,8 +120,12 @@ def smb_check():
             except subprocess.TimeoutExpired:
                 print("timeout 3 sec, utils.py, smb_check")
 
-    run_thread(task)
-    wait_thread()
+
+    smb_task = threading.Thread(target=task, daemon=True)
+    smb_task.start()
+    while smb_task.is_alive():
+        cnf.root.update()
+
     return bool(os.path.exists(cnf.coll_folder))
 
 
@@ -438,6 +451,14 @@ def download_group_jpg(title, paths_list: list):
 
     def task():
         global flag
+
+        check = [i for i in paths_list if os.path.exists(i)]
+        if not check:
+            flag = False
+            Globals.topbar_text(cnf.lang.no_jpg)
+            topbar_default_thread()
+            return
+
         flag = True
         dest = create_dir(title)
         ln_paths = len(paths_list)
@@ -476,6 +497,14 @@ def download_group_tiff(title, paths_list):
 
     def task():
         global flag
+
+        check = [i for i in paths_list if os.path.exists(i)]
+        if not check:
+            flag = False
+            Globals.topbar_text(cnf.lang.no_tiff)
+            topbar_default_thread()
+            return
+
         flag = True
         tiffs = []
 
