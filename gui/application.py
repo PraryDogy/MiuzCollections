@@ -1,13 +1,14 @@
+import os
+import platform
+
 from cfg import cnf
-from .scaner import scaner
-from .utils import on_exit, run_applescript, smb_check
 
 from .menu import Menu
+from .scaner import scaner
 from .stbar import StBar
 from .thumbnails import Thumbnails
+from .utils import on_exit, run_applescript, smb_check
 from .widgets import *
-import os
-
 
 __all__ = (
     "Application",
@@ -23,14 +24,22 @@ class Application:
         cnf.root.configure(bg=cnf.bg_color)
         cnf.root.deiconify()
 
-        # cnf.root.bind('<Command-w>', self.minim)
-        # cnf.root.protocol("WM_DELETE_WINDOW", self.minim)
-        # cnf.root.createcommand('tk::mac::ReopenApplication' , cnf.root.deiconify)
-
         cnf.root.createcommand("tk::mac::Quit", on_exit)
-        cnf.root.bind('<Command-w>', lambda e: cnf.root.withdraw())
-        cnf.root.protocol("WM_DELETE_WINDOW", cnf.root.withdraw)
-        cnf.root.createcommand('tk::mac::ReopenApplication', cnf.root.deiconify)
+
+        mac_ver, _, _ = platform.mac_ver()
+        mac_ver = float('.'.join(mac_ver.split('.')[:2]))
+
+        if mac_ver > 12:
+            cnf.root.bind('<Command-w>', self.minim)
+            cnf.root.protocol("WM_DELETE_WINDOW", self.minim)
+            cnf.root.createcommand('tk::mac::ReopenApplication', self.maxim)
+
+        else:
+            cnf.root.bind('<Command-w>', lambda e: cnf.root.withdraw())
+            cnf.root.protocol("WM_DELETE_WINDOW", cnf.root.withdraw)
+            cnf.root.createcommand(
+                'tk::mac::ReopenApplication', cnf.root.deiconify
+                )
 
         menu = Menu(cnf.root)
         r_frame = CFrame(cnf.root)
