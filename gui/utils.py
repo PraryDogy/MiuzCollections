@@ -77,11 +77,12 @@ def wait_thread():
 
 
 def topbar_default():
-    global utils_task
+
 
     def task():
         sleep(2)
         Globals.topbar_default()
+
 
     try:
         run_thread(task)
@@ -392,6 +393,7 @@ def download_tiffs(src):
                 shutil.copy(tiff, os.path.join(parrent, tiff.split("/")[-1]))
             except FileNotFoundError:
                 print(f"utils > download tiffs > not found {tiff}")
+                continue
 
         subprocess.Popen(["open", parrent])
 
@@ -475,6 +477,7 @@ def download_group_jpg(title, paths_list: list):
                 shutil.copy(imgpath, os.path.join(dest, filename))
             except FileNotFoundError:
                 print(f"utils > copy group jpg > not found {imgpath}")
+                continue
 
         subprocess.Popen(["open", dest])
 
@@ -531,6 +534,7 @@ def download_group_tiff(title, paths_list):
                 shutil.copy(imgpath, os.path.join(dest, filename))
             except FileNotFoundError:
                 print(f"utils > copy group tiff > not found {imgpath}")
+                continue
 
         subprocess.Popen(["open", dest])
 
@@ -604,8 +608,12 @@ def download_fullsize(src):
                 )
             Globals.topbar_text(t)
 
-            img = Image.open(img_path)
-            img = img.convert("RGB")
+            try:
+                img = Image.open(img_path)
+                img = img.convert("RGB")
+            except Exception:
+                print(f"utils > download fullsize > cant open or convert {img_path}")
+                continue
 
             filename = img_path.split(os.sep)[-1].split(".")[0]
             dest = os.path.join(parrent, filename + ".jpg")
@@ -617,6 +625,7 @@ def download_fullsize(src):
                 img.save(dest)
             except Exception:
                 print(f"utils > download fullsize > not found {img_path}")
+                continue
 
         subprocess.Popen(["open", parrent])
 
@@ -665,8 +674,12 @@ def download_group_fullsize(title, paths_list):
                 )
             Globals.topbar_text(t)
 
-            img = Image.open(img_path)
-            img = img.convert("RGB")
+            try:
+                img = Image.open(img_path)
+                img = img.convert("RGB")
+            except Exception:
+                print(f"utils > download fullsize > cant open or convert {img_path}")
+                continue
 
             filename = img_path.split(os.sep)[-1].split(".")[0]
             dest = os.path.join(parrent, filename + ".jpg")
@@ -678,6 +691,7 @@ def download_group_fullsize(title, paths_list):
                 img.save(dest)
             except Exception:
                 print(f"utils > download fullsize > not found {img_path}")
+                continue
 
         subprocess.Popen(["open", parrent])
 
