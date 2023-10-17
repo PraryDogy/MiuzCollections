@@ -24,6 +24,8 @@ __all__ = (
     "crop_image",
     "db_remove_img",
     "decode_image",
+    "download_fullsize",
+    "download_group_fullsize",
     "download_group_jpg",
     "download_group_tiff",
     "download_one_jpg",
@@ -55,7 +57,7 @@ __all__ = (
 
 utils_task: threading.Thread = None
 smb_task: threading.Thread = None
-flag = False
+flag = True
 
 
 def run_thread(fn, args=[]):
@@ -365,19 +367,16 @@ def download_tiffs(src):
 
 
     def task():
-        global flag
-        flag = True
-
         Globals.topbar_text(cnf.lang.please_wait)
         tiffs = find_tiffs(src)
 
         if not tiffs:
             Globals.topbar_text(cnf.lang.no_tiff)
-            flag = False
             return
 
         ln_tiffs = len(tiffs)
         parrent = create_dir()
+        
 
         for num, tiff in enumerate(tiffs, 1):
 
@@ -450,16 +449,11 @@ def download_group_jpg(title, paths_list: list):
 
 
     def task():
-        global flag
-
         check = [i for i in paths_list if os.path.exists(i)]
         if not check:
-            flag = False
             Globals.topbar_text(cnf.lang.no_jpg)
-            topbar_default()
             return
 
-        flag = True
         dest = create_dir(title)
         ln_paths = len(paths_list)
 
@@ -483,7 +477,6 @@ def download_group_jpg(title, paths_list: list):
                 print(f"utils > copy group jpg > not found {imgpath}")
 
         subprocess.Popen(["open", dest])
-        flag = False
 
 
     run_thread(task)
@@ -496,16 +489,11 @@ def download_group_tiff(title, paths_list):
 
 
     def task():
-        global flag
-
         check = [i for i in paths_list if os.path.exists(i)]
         if not check:
-            flag = False
             Globals.topbar_text(cnf.lang.no_tiff)
-            topbar_default()
             return
 
-        flag = True
         tiffs = []
 
         for i in paths_list:
@@ -520,13 +508,10 @@ def download_group_tiff(title, paths_list):
 
         if not tiffs:
             Globals.topbar_text(cnf.lang.no_tiff)
-            topbar_default()
-            flag = False
             return
 
         ln_tiffs = len(tiffs)
         dest = create_dir(title)
-
 
         for num, imgpath in enumerate(tiffs, 1):
 
@@ -548,8 +533,6 @@ def download_group_tiff(title, paths_list):
                 print(f"utils > copy group tiff > not found {imgpath}")
 
         subprocess.Popen(["open", dest])
-        flag = False
-
 
     run_thread(task)
     wait_thread()
@@ -593,3 +576,111 @@ def db_remove_img(src):
 def copy_text(text):
     cnf.root.clipboard_clear()
     cnf.root.clipboard_append(text)
+
+
+def download_fullsize(src):
+    wait_thread()
+
+
+    def task():
+        Globals.topbar_text(cnf.lang.please_wait)
+        tiffs = find_tiffs(src)
+
+        if not tiffs:
+            Globals.topbar_text(cnf.lang.no_tiff)
+            return
+        
+        ln_tiffs = len(tiffs)
+        parrent = create_dir()
+        
+
+        for num, img_path in enumerate(tiffs, 1):
+            if not flag:
+                return
+
+            t = (
+                f"{cnf.lang.copying} "
+                f"{num} {cnf.lang.from_pretext} {ln_tiffs}"
+                )
+            Globals.topbar_text(t)
+
+            img = Image.open(img_path)
+            img = img.convert("RGB")
+
+            filename = img_path.split(os.sep)[-1].split(".")[0]
+            dest = os.path.join(parrent, filename + ".jpg")
+
+            if os.path.exists(dest):
+                dest = os.path.join(parrent, filename + " 2" + ".jpg")
+
+            try:
+                img.save(dest)
+            except Exception:
+                print(f"utils > download fullsize > not found {img_path}")
+
+        subprocess.Popen(["open", parrent])
+
+
+    run_thread(task)
+    wait_thread()
+    topbar_default()
+
+
+def download_group_fullsize(title, paths_list):
+    wait_thread()
+
+
+    def task():
+        check = [i for i in paths_list if os.path.exists(i)]
+        if not check:
+            Globals.topbar_text(cnf.lang.no_tiff)
+            return
+
+        tiffs = []
+
+        for i in paths_list:
+
+            if not flag:
+                return
+
+            found_tiffs = find_tiffs(i)
+
+            if found_tiffs:
+                tiffs = tiffs + found_tiffs
+
+        if not tiffs:
+            Globals.topbar_text(cnf.lang.no_tiff)
+            return
+
+        ln_tiffs = len(tiffs)
+        parrent = create_dir(title)
+
+        for num, img_path in enumerate(tiffs, 1):
+            if not flag:
+                return
+
+            t = (
+                f"{cnf.lang.copying} "
+                f"{num} {cnf.lang.from_pretext} {ln_tiffs}"
+                )
+            Globals.topbar_text(t)
+
+            img = Image.open(img_path)
+            img = img.convert("RGB")
+
+            filename = img_path.split(os.sep)[-1].split(".")[0]
+            dest = os.path.join(parrent, filename + ".jpg")
+
+            if os.path.exists(dest):
+                dest = os.path.join(parrent, filename + " 2" + ".jpg")
+
+            try:
+                img.save(dest)
+            except Exception:
+                print(f"utils > download fullsize > not found {img_path}")
+
+        subprocess.Popen(["open", parrent])
+
+    run_thread(task)
+    wait_thread()
+    topbar_default()

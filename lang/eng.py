@@ -93,7 +93,8 @@ class Eng:
         self.no_connection = "No connection"
         self.file_name = "Filename"
         self.remove_fromapp = "Remove from app"
-
+        self.fullsize = "Download fullsize jpg"
+        self.group_fullsize = "Download fullsize jpg"
 
         self.colls_case = "collections"
         self.new_photo_case = "new_photos"

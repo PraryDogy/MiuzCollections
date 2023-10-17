@@ -18,9 +18,9 @@ __all__ = (
 class ContextMenu(Context):
     def __init__(self, e: tkinter.Event):
         super().__init__()
-        self.cont_show_coll(e)
-        self.cont_sep()
-        self.cont_reveal_coll(e)
+        self.show_coll(e)
+        self.sep()
+        self.reveal_coll(e)
         self.do_popup(e)
 
 

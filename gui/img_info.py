@@ -14,9 +14,9 @@ from .widgets import *
 class ContextInfo(Context):
     def __init__(self, e: tkinter.Event):
         super().__init__()
-        self.cont_copy_text(e)
+        self.copy_text(e)
         self.add_separator()
-        self.cont_copy_all(e)
+        self.copy_all(e)
         self.do_popup(e)
 
 

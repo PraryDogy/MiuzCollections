@@ -25,18 +25,21 @@ win = tkinter.Toplevel
 class ContextViewer(Context):
     def __init__(self, e: tkinter.Event):
         super().__init__()
-        self.cont_imginfo(e)
-        self.cont_sep()
+        self.imginfo(e)
+        self.sep()
 
-        self.cont_sep()
-        self.cont_copy_jpg_path(e)
-        self.cont_reveal_jpg(e)
-        self.cont_download_onefile(e)
+        self.sep()
+        self.copy_jpg_path(e)
+        self.reveal_jpg(e)
+        self.download_onefile(e)
 
-        self.cont_sep()
-        self.cont_copy_tiffs_paths(e)
-        self.cont_reveal_tiffs(e)
-        self.cont_download_tiffs(e)
+        self.sep()
+        self.copy_tiffs_paths(e)
+        self.reveal_tiffs(e)
+        self.download_tiffs(e)
+
+        self.sep()
+        self.download_fullsize(e)
 
         self.do_popup(e)
 

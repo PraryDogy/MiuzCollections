@@ -122,7 +122,7 @@ class Context(tkinter.Menu):
     def __init__(self):
         super().__init__()
 
-    def cont_sep(self):
+    def sep(self):
         self.add_separator()
 
     def do_popup(self, e: tkinter.Event):
@@ -131,45 +131,45 @@ class Context(tkinter.Menu):
         finally:
             self.grab_release()
 
-    def cont_imgview(self, e: tkinter.Event):
+    def imgview(self, e: tkinter.Event):
         from .img_viewer import ImgViewer
         self.add_command(
             label=cnf.lang.view,
             command=lambda: ImgViewer(e.widget.src, e.widget.all_src)
             )
 
-    def cont_imginfo(self, e: tkinter.Event):
+    def imginfo(self, e: tkinter.Event):
         from .img_info import ImageInfo
         self.add_command(
             label=cnf.lang.info,
             command=lambda: ImageInfo(e.widget.src)
             )
 
-    def cont_reveal_jpg(self, e: tkinter.Event):
+    def reveal_jpg(self, e: tkinter.Event):
         self.add_command(
             label=cnf.lang.find_jpg,
             command=lambda: reveal_jpg(e.widget.src)
             )
 
-    def cont_reveal_tiffs(self, e: tkinter.Event):
+    def reveal_tiffs(self, e: tkinter.Event):
         self.add_command(
             label=cnf.lang.find_tiff,
             command=lambda: reveal_tiffs(find_tiffs(e.widget.src))
             )
 
-    def cont_pastesearch(self):
+    def pastesearch(self):
         self.add_command(
             label=cnf.lang.paste,
             command=paste_search
             )
 
-    def cont_clear(self):
+    def clear(self):
         self.add_command(
             label=cnf.lang.clear,
             command=lambda: Globals.search_var.set("")
             )
 
-    def cont_download_onefile(self, e: tkinter.Event):
+    def download_onefile(self, e: tkinter.Event):
         self.add_command(
             label=(
                 f"{cnf.lang.copy} jpg {cnf.lang.to_downloads}"
@@ -177,7 +177,7 @@ class Context(tkinter.Menu):
             command=lambda: download_one_jpg(e.widget.src)
         )
 
-    def cont_download_tiffs(self, e: tkinter.Event):
+    def download_tiffs(self, e: tkinter.Event):
         self.add_command(
             label=(
                 f"{cnf.lang.copy} tiff {cnf.lang.to_downloads}"
@@ -185,37 +185,37 @@ class Context(tkinter.Menu):
             command=lambda: download_tiffs(e.widget.src)
         )
 
-    def cont_reveal_coll(self, e: tkinter.Event):
+    def reveal_coll(self, e: tkinter.Event):
         self.add_command(
             label=cnf.lang.reveal_coll,
             command=lambda: reveal_coll(e.widget.coll_name)
             )
 
-    def cont_show_coll(self, e: tkinter.Event):
+    def show_coll(self, e: tkinter.Event):
         self.add_command(
             label=cnf.lang.view,
             command=lambda: Globals.show_coll(e)
             )
         
-    def cont_copy_tiffs_paths(self, e: tkinter.Event):
+    def copy_tiffs_paths(self, e: tkinter.Event):
         self.add_command(
             label=cnf.lang.copy_path_tiff,
             command=lambda: copy_tiffs_paths(e.widget.src)
             )
         
-    def cont_copy_jpg_path(self, e: tkinter.Event):
+    def copy_jpg_path(self, e: tkinter.Event):
         self.add_command(
             label=cnf.lang.copy_path_jpg,
             command=lambda: copy_jpg_path(e.widget.src),
             )
 
-    def cont_db_remove_img(self, e: tkinter.Event):
+    def db_remove_img(self, e: tkinter.Event):
         self.add_command(
             label=cnf.lang.remove_fromapp,
             command=lambda: db_remove_img(e.widget.src)
             )
 
-    def cont_download_group(self, e: tkinter.Event):
+    def download_group(self, e: tkinter.Event):
         self.add_command(
             label=(
                 f"{cnf.lang.copy} jpg\n"
@@ -225,7 +225,7 @@ class Context(tkinter.Menu):
             command=lambda: download_group_jpg(e.widget.title, e.widget.paths_list)
         )
 
-    def cont_download_group_tiffs(self, e: tkinter.Event):
+    def download_group_tiffs(self, e: tkinter.Event):
         self.add_command(
             label=(
                 f"{cnf.lang.copy} tiff\n"
@@ -235,14 +235,32 @@ class Context(tkinter.Menu):
             command=lambda: download_group_tiff(e.widget.title, e.widget.paths_list)
             )
         
-    def cont_copy_text(self, e: tkinter.Event):
+    def copy_text(self, e: tkinter.Event):
         self.add_command(
             label=cnf.lang.copy,
             command=lambda: copy_text(e.widget.copy)
             )
 
-    def cont_copy_all(self, e:tkinter.Event):
+    def copy_all(self, e:tkinter.Event):
         self.add_command(
             label=cnf.lang.copy_all,
             command=lambda: copy_text(e.widget.get("1.0",tkinter.END))
+            )
+
+    def download_fullsize(self, e:tkinter.Event):
+        self.add_command(
+            label=cnf.lang.fullsize,
+            command=lambda: download_fullsize(e.widget.src)
+            )
+
+    def download_group_fullsize(self, e:tkinter.Event):
+        self.add_command(
+            label=(
+                f"{cnf.lang.group_fullsize}\n"
+                f"{cnf.lang.from_pretext} \"{e.widget.title}\" "
+                f"{cnf.lang.to_downloads}"
+                ),
+            command=lambda: download_group_fullsize(
+                e.widget.title, e.widget.paths_list
+                )
             )

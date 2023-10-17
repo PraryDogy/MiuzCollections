@@ -93,6 +93,8 @@ class Rus:
         self.no_connection = "Нет подключения."
         self.file_name = "Имя файла"
         self.remove_fromapp = "Удалить из приложения"
+        self.fullsize = "Скачать полноразмерный jpg"
+        self.group_fullsize = "Скачать полноразмерные jpg"
 
 
         self.colls_case = "коллекций"
