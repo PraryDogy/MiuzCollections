@@ -88,14 +88,14 @@ def topbar_default():
 
 
 def default_thread(task):
-    wait_thread()
-
-
     def wrapper(*args):
+        wait_thread()
+
         run_thread(task, args)
+
         wait_thread()
         topbar_default()
-        return task
+    
     return wrapper
 
 
