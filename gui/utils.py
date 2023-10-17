@@ -36,7 +36,7 @@ __all__ = (
     "on_exit",
     "paste_search",
     "place_center",
-    "topbar_default_thread",
+    "topbar_default",
     "replace_bg",
     "resize_image",
     "reveal_coll",
@@ -74,7 +74,7 @@ def wait_thread():
             cnf.root.update()
 
 
-def topbar_default_thread():
+def topbar_default():
     global utils_task
 
     def task():
@@ -85,7 +85,7 @@ def topbar_default_thread():
         run_thread(task)
     except RuntimeError:
         print("utils > topbar_default_thread runtime err")
-        topbar_default_thread()
+        topbar_default()
 
 
 def run_applescript(applescript: str):
@@ -357,7 +357,7 @@ def reveal_tiffs(list_paths: list):
 
     run_thread(task)
     wait_thread()
-    topbar_default_thread()
+    topbar_default()
 
 
 def download_tiffs(src):
@@ -399,7 +399,7 @@ def download_tiffs(src):
 
     run_thread(task)
     wait_thread()
-    topbar_default_thread()
+    topbar_default()
 
 
 def copy_tiffs_paths(path):
@@ -414,7 +414,7 @@ def copy_tiffs_paths(path):
     else:
         Globals.topbar_text(cnf.lang.no_tiff)
 
-    topbar_default_thread()
+    topbar_default()
 
 
 def copy_jpg_path(path):
@@ -424,7 +424,7 @@ def copy_jpg_path(path):
     else:
         Globals.topbar_text(cnf.lang.no_jpg)
 
-    topbar_default_thread()
+    topbar_default()
 
 
 def reveal_jpg(src: str):
@@ -442,7 +442,7 @@ def reveal_jpg(src: str):
 
     run_thread(task)
     wait_thread()
-    topbar_default_thread()
+    topbar_default()
 
 
 def download_group_jpg(title, paths_list: list):
@@ -456,7 +456,7 @@ def download_group_jpg(title, paths_list: list):
         if not check:
             flag = False
             Globals.topbar_text(cnf.lang.no_jpg)
-            topbar_default_thread()
+            topbar_default()
             return
 
         flag = True
@@ -488,7 +488,7 @@ def download_group_jpg(title, paths_list: list):
 
     run_thread(task)
     wait_thread()
-    topbar_default_thread()
+    topbar_default()
 
 
 def download_group_tiff(title, paths_list):
@@ -502,7 +502,7 @@ def download_group_tiff(title, paths_list):
         if not check:
             flag = False
             Globals.topbar_text(cnf.lang.no_tiff)
-            topbar_default_thread()
+            topbar_default()
             return
 
         flag = True
@@ -520,7 +520,7 @@ def download_group_tiff(title, paths_list):
 
         if not tiffs:
             Globals.topbar_text(cnf.lang.no_tiff)
-            topbar_default_thread()
+            topbar_default()
             flag = False
             return
 
@@ -553,7 +553,7 @@ def download_group_tiff(title, paths_list):
 
     run_thread(task)
     wait_thread()
-    topbar_default_thread()
+    topbar_default()
 
 
 def download_one_jpg(src):
@@ -578,7 +578,7 @@ def download_one_jpg(src):
 
     run_thread(task)
     wait_thread()
-    topbar_default_thread()
+    topbar_default()
 
 
 def db_remove_img(src):

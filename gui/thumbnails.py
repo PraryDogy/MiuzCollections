@@ -472,13 +472,15 @@ class Thumbnails(CFrame, ThumbsPrepare):
 
     def topbar_text(self, text):
         try:
-            self.topbar.configure(text=text, bg=cnf.topbar_color)
+            if not cnf.first_load:
+                self.topbar.configure(text=text, bg=cnf.topbar_color)
         except RuntimeError:
             print("thumbnails > topbar text error")
 
     def topbar_default(self):
         try:
-            self.topbar.configure(text=f"▲", bg=cnf.bg_color)
+            if not cnf.first_load:
+                self.topbar.configure(text=f"▲", bg=cnf.bg_color)
         except RuntimeError:
             print("thumbnails > topbar default error")
 

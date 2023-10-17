@@ -48,6 +48,7 @@ class Config:
         self.lang_thumbs = []
         self.lang_sett = []
 
+        self.first_load = True
         self.flag = False
         self.live_text = ""
         self.scaner_task: threading.Thread = None
