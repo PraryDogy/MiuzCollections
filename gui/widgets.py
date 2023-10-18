@@ -264,3 +264,9 @@ class Context(tkinter.Menu):
                 e.widget.title, e.widget.paths_list
                 )
             )
+        
+    def apply_filter(self, label, str):
+        self.add_command(
+            label=label,
+            command=lambda: apply_filter(str)
+            )

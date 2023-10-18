@@ -19,8 +19,13 @@ class ContextMenu(Context):
     def __init__(self, e: tkinter.Event):
         super().__init__()
         self.show_coll(e)
-        self.sep()
         self.reveal_coll(e)
+        self.sep()
+
+        self.apply_filter(cnf.lang.show_product, "product")
+        self.apply_filter(cnf.lang.show_models, "models")
+        self.apply_filter(cnf.lang.show_catalog, "catalog")
+        self.apply_filter(cnf.lang.show_all, None)
         self.do_popup(e)
 
 

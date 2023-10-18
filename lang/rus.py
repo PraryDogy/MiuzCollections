@@ -72,8 +72,8 @@ class Rus:
         self.copy_all = "Копировать все"
         self.find_jpg = "Найти jpg"
         self.find_tiff = "Найти tiff"
-        self.copy_path_tiff = "Скопировать путь к tiff"
-        self.copy_path_jpg = "Скопировать путь к jpg"
+        self.copy_path_tiff = "Копировать путь к tiff"
+        self.copy_path_jpg = "Копировать путь к jpg"
         self.reveal_coll = "Открыть папку"
         self.colls_path = "Расположение коллекций"
         self.scan_time = "x"
@@ -95,6 +95,11 @@ class Rus:
         self.remove_fromapp = "Удалить из приложения"
         self.fullsize = "Скачать полноразмерный jpg"
         self.group_fullsize = "Скачать полноразмерные jpg"
+
+        self.show_product = "Показать имиджи"
+        self.show_models = "Показать модели"
+        self.show_catalog = "Показать каталог"
+        self.show_all = "Показать все"
 
 
         self.colls_case = "коллекций"

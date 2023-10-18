@@ -28,7 +28,12 @@ class ContextTitles(Context):
         self.sep()
         self.download_group_tiffs(e)
         self.sep()
-        self.download_group_fullsize(e)
+        self.apply_filter(cnf.lang.show_product, "product")
+        self.apply_filter(cnf.lang.show_models, "models")
+        self.apply_filter(cnf.lang.show_catalog, "catalog")
+        self.apply_filter(cnf.lang.show_all, None)
+
+        # self.download_group_fullsize(e)
         self.do_popup(e)
 
 
@@ -56,7 +61,13 @@ class ContextThumbs(Context):
         self.download_tiffs(e)
 
         self.sep()
-        self.download_fullsize(e)
+        self.apply_filter(cnf.lang.show_product, "product")
+        self.apply_filter(cnf.lang.show_models, "models")
+        self.apply_filter(cnf.lang.show_catalog, "catalog")
+        self.apply_filter(cnf.lang.show_all, None)
+
+        # self.sep()
+        # self.download_fullsize(e)
 
         self.do_popup(e)
 
@@ -67,11 +78,6 @@ class ContextSearch(Context):
         self.clear()
         self.pastesearch()
         self.do_popup(e)
-
-
-class TopBar(CFrame):
-    def __init__(self, master: tkinter):
-        super().__init__(master)
 
 
 class ThumbsSearch(CFrame):

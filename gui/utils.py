@@ -17,6 +17,7 @@ from database import *
 from .globals import Globals
 
 __all__ = (
+    "apply_filter",
     "convert_to_rgb",
     "copy_jpg_path",
     "copy_tiffs_paths",
@@ -646,3 +647,24 @@ def download_group_fullsize(title, paths_list):
             continue
 
     subprocess.Popen(["open", parrent])
+
+
+def apply_filter(str):
+    if str == "product":
+        cnf.product = True
+        cnf.models = False
+        cnf.catalog = False
+    elif str == "models":
+        cnf.product = False
+        cnf.models = True
+        cnf.catalog = False
+    elif str == "catalog":
+        cnf.product = False
+        cnf.models = False
+        cnf.catalog = True
+    else:
+        cnf.product = True
+        cnf.models = True
+        cnf.catalog = True
+
+    Globals.reload_scroll()
