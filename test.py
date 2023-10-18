@@ -8,7 +8,7 @@ src = "/Volumes/Shares/Marketing/Photo/_Collections/10 Brilliance/1 IMG/2023-10-
 dest = "/Users/Loshkarev/Downloads/new.jpg"
 
 src = "/Users/Morkowik/Downloads/E2018-ICE-0010_R2018-ICE-0009.psd"
-# src = "/Users/Morkowik/Downloads/2023-10-09 22-06-29_E01-SS-35613.tif"
+src = "/Users/Morkowik/Downloads/2023-10-09 22-06-29_E01-SS-35613.tif"
 dest = "/Users/Morkowik/Downloads/new.jpg"
 
 if src.endswith((".psd", ".PSD")):
@@ -17,6 +17,5 @@ if src.endswith((".psd", ".PSD")):
 else:
     img = tifffile.imread(src)
     img = img[:,:,:3]
-    b,g,r = cv2.split(img)
-    img = cv2.merge([r, g, b])
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     cv2.imwrite(dest, img)
