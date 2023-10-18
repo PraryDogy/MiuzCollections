@@ -265,8 +265,8 @@ class Context(tkinter.Menu):
                 )
             )
         
-    def apply_filter(self, label, str):
+    def apply_filter(self, label, str, e=None):
         self.add_command(
             label=label,
-            command=lambda: apply_filter(str)
+            command=lambda: apply_filter(str, e)
             )

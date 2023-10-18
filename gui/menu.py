@@ -22,10 +22,10 @@ class ContextMenu(Context):
         self.reveal_coll(e)
         self.sep()
 
-        self.apply_filter(cnf.lang.show_product, "product")
-        self.apply_filter(cnf.lang.show_models, "models")
-        self.apply_filter(cnf.lang.show_catalog, "catalog")
-        self.apply_filter(cnf.lang.show_all, None)
+        self.apply_filter(cnf.lang.show_product, "product", e)
+        self.apply_filter(cnf.lang.show_models, "models", e)
+        self.apply_filter(cnf.lang.show_catalog, "catalog", e)
+        self.apply_filter(cnf.lang.show_all, None, e)
         self.do_popup(e)
 
 

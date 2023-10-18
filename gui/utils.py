@@ -676,7 +676,7 @@ def download_group_fullsize(title, paths_list):
     subprocess.Popen(["open", parrent])
 
 
-def apply_filter(str):
+def apply_filter(str, e=None):
     if str == "product":
         cnf.product = True
         cnf.models = False
@@ -694,4 +694,7 @@ def apply_filter(str):
         cnf.models = True
         cnf.catalog = True
 
-    Globals.reload_scroll()
+    if e:
+        Globals.show_coll(e)
+    else:
+        Globals.reload_scroll()
