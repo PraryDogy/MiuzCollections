@@ -52,6 +52,9 @@ class Scaner:
     def task(self):
         self.__change_live_text(cnf.lang.preparing)
 
+        import time
+        time.sleep(4)
+
         db_images = Dbase.conn.execute(
             sqlalchemy.select(
             Thumbs.src, Thumbs.size, Thumbs.created, Thumbs.modified

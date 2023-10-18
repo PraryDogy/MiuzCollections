@@ -17,7 +17,7 @@ class ScanerGui(CWindow):
     def __init__(self):
         super().__init__()
         self.title(cnf.lang.updating)
-        self.geometry("300x50")
+        self.geometry("300x90")
 
         self.live_lbl = CLabel(
             self,
@@ -26,6 +26,10 @@ class ScanerGui(CWindow):
             justify = tkinter.LEFT,
             )
         self.live_lbl.pack(expand=True, fill="both")
+
+        self.can_btn = CButton(self, text=cnf.lang.cancel)
+        self.can_btn.pack(pady=(10, 0))
+        self.can_btn.cmd(self.cancel)
 
         cnf.root.update_idletasks()
 
@@ -36,6 +40,15 @@ class ScanerGui(CWindow):
 
         self.live_task = False
         self.update_livelbl()
+
+    def cancel(self, e=None):
+        cnf.flag = False
+        cnf.root.after_cancel(self.live_task)
+        self.live_lbl.configure(text=cnf.lang.please_wait)
+        while cnf.scaner_task.is_alive():
+            cnf.root.update()
+        self.destroy()
+        focus_last_win()
 
     def update_livelbl(self):
 
