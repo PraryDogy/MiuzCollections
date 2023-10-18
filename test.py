@@ -14,8 +14,6 @@ if src.split("/")[-1].split(".")[-1] in ("psd", "PSD"):
     img = PSDImage.open(src)
     img = img.composite().save(dest)
 else:
-    # img = tifffile.TiffFile(src)
-    # tifffile.imsave(dest, src, compression = "jpeg")
-    # img = iio.imread(src)
-    # img = iio.imwrite(dest, src, compression="jpeg")
-    im = np.asarray(Image.open(src))
+    with open(src, "rb") as image:
+        f = image.read()
+        b = bytearray(f)
