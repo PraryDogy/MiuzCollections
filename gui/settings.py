@@ -52,7 +52,8 @@ class Settings(CWindow):
             frame,
             text=f"{cnf.coll_folder}",
             anchor="w",
-            justify="left"
+            justify="left",
+            wraplength = 350,
             )
         self.path_widget.pack(anchor="w")
 

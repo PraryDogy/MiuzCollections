@@ -4,6 +4,7 @@ import string
 import subprocess
 import threading
 import tkinter
+import traceback
 from time import sleep
 
 import cv2
@@ -108,6 +109,24 @@ def run_applescript(applescript: str):
         if l.strip() != ''] for item in x]
     subprocess.call(["osascript"] + args)
 
+
+def write_err():
+    if not os.path.exists(cnf.cfg_dir):
+        os.mkdir(cnf.cfg_dir)
+
+    file = os.path.join(cnf.cfg_dir, 'err.txt')
+
+    if not os.path.exists(file):
+        with open(file, 'w') as err_file:
+            pass
+
+    with open(file, 'r') as err_file:
+        data = err_file.read()
+
+    data = f'{data}\n\n{traceback.format_exc()}'
+
+    with open(file, 'w') as err_file:
+        print(data, file=err_file)
 
 
 def normalize_name(name: str):
@@ -392,6 +411,7 @@ def download_tiffs(src):
             shutil.copy(tiff, os.path.join(parrent, tiff.split("/")[-1]))
         except FileNotFoundError:
             print(f"utils > download tiffs > not found {tiff}")
+            write_err()
             continue
 
     subprocess.Popen(["open", parrent])
@@ -461,6 +481,7 @@ def download_group_jpg(title, paths_list: list):
             shutil.copy(imgpath, os.path.join(dest, filename))
         except FileNotFoundError:
             print(f"utils > copy group jpg > not found {imgpath}")
+            write_err()
             continue
 
     subprocess.Popen(["open", dest])
@@ -510,6 +531,7 @@ def download_group_tiff(title, paths_list):
             shutil.copy(imgpath, os.path.join(dest, filename))
         except FileNotFoundError:
             print(f"utils > copy group tiff > not found {imgpath}")
+            write_err()
             continue
 
     subprocess.Popen(["open", dest])
@@ -530,6 +552,7 @@ def download_one_jpg(src):
         subprocess.Popen(["open", "-R", dest])
     except FileNotFoundError:
         print(f"utils > download one jpg > not found {src}")
+        write_err()
 
 
 def db_remove_img(src):
@@ -574,6 +597,7 @@ def download_fullsize(src):
             img = img.convert("RGB")
         except Exception:
             print(f"utils > download fullsize > cant open or convert {img_path}")
+            write_err()
             continue
 
         filename = img_path.split(os.sep)[-1].split(".")[0]
@@ -586,6 +610,7 @@ def download_fullsize(src):
             img.save(dest)
         except Exception:
             print(f"utils > download fullsize > not found {img_path}")
+            write_err()
             continue
 
     subprocess.Popen(["open", parrent])
@@ -632,6 +657,7 @@ def download_group_fullsize(title, paths_list):
             img = img.convert("RGB")
         except Exception:
             print(f"utils > download fullsize > cant open or convert {img_path}")
+            write_err()
             continue
 
         filename = img_path.split(os.sep)[-1].split(".")[0]
@@ -644,6 +670,7 @@ def download_group_fullsize(title, paths_list):
             img.save(dest)
         except Exception:
             print(f"utils > download fullsize > not found {img_path}")
+            write_err()
             continue
 
     subprocess.Popen(["open", parrent])
