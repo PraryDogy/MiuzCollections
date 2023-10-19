@@ -76,6 +76,7 @@ class Eng:
         self.copy_path_jpg = "Copy jpg location"
         self.reveal_coll = "Reveal collection"
         self.colls_path = "Collections location"
+        self.down_path = "Downloads folder"
         self.scan_time = "x"
         self.update_every = f"Update collections every"
         self.show_more = "Show more"

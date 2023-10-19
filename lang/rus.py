@@ -76,6 +76,7 @@ class Rus:
         self.copy_path_jpg = "Копировать путь к jpg"
         self.reveal_coll = "Открыть папку"
         self.colls_path = "Расположение коллекций"
+        self.down_path = "Папка загрузок"
         self.scan_time = "x"
         self.update_every = f"Обновлять коллекции каждые"
         self.show_more = "Позазать еще"

@@ -20,7 +20,7 @@ class Settings(CWindow):
         self.bind('<Escape>', self.cancel_cmd)
         self.bind("<Return>", self.save_cmd)
         self.title(cnf.lang.settings)
-        self.geometry("400x310")
+        self.minsize(400, 300)
 
         self.changed_lang = False
         self.scan_again = False
@@ -59,11 +59,38 @@ class Settings(CWindow):
 
         select_path = CButton(frame, text=cnf.lang.browse)
         select_path.cmd(self.select_path_cmd)
-        select_path.pack(pady=(5, 0))
+        select_path.pack(pady=(10, 0))
         cnf.lang_sett.append(select_path)
 
+        CSep(frame).pack(pady=15, padx=50, fill=tkinter.X)
+
+        down_title = CLabel(
+            frame,
+            text=cnf.lang.down_path,
+            anchor="w",
+            justify="left"
+            )
+        down_title.pack(anchor="w")
+        cnf.lang_sett.append(down_title)
+
+        self.down_widget = CLabel(
+            frame,
+            text=f"{cnf.down_folder}",
+            anchor="w",
+            justify="left",
+            wraplength = 350,
+            )
+        self.down_widget.pack(anchor="w")
+
+        select_down = CButton(frame, text=cnf.lang.browse)
+        select_down.cmd(self.select_down_cmd)
+        select_down.pack(pady=(10, 0))
+        cnf.lang_sett.append(select_down)
+
+        CSep(frame).pack(pady=15, padx=50, fill=tkinter.X)
+
         asklang_frame = CFrame(frame)
-        asklang_frame.pack(pady=(15, 0))
+        asklang_frame.pack()
 
         self.lang_btn = CButton(asklang_frame)
         self.lang_btn.pack(side="left", padx=(0, 15))
@@ -194,9 +221,19 @@ class Settings(CWindow):
             self.path_widget['text'] = path
             self.scan_again = True
 
+    def select_down_cmd(self, e=None):
+        path = filedialog.askdirectory(initialdir=cnf.down_folder)
+
+        if len(path) == 0:
+            return
+
+        if self.down_widget["text"] != path:
+            self.down_widget['text'] = path
+
     def default_cmd(self, e=None):
         default = cnf.get_defaults()
         self.path_widget['text'] = default.coll_folder
+        self.down_widget["text"] = default.down_folder
         self.scan_again = True
 
     def cancel_cmd(self, e=None):
@@ -212,6 +249,7 @@ class Settings(CWindow):
     def save_cmd(self, e=None):
         cnf.lang_sett.clear()
         cnf.coll_folder = self.path_widget['text']
+        cnf.down_folder = self.down_widget["text"]
         cnf.smb_ip = smb_ip()
 
         if self.lang_btn["text"] == "English":

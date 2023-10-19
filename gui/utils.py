@@ -194,9 +194,7 @@ def create_dir(title=None):
     if coll == "all":
         coll = cnf.lang.all_colls
 
-    dest = os.path.join(
-        os.path.expanduser('~'), "Downloads", cnf.app_name, coll
-        )
+    dest = os.path.join(cnf.down_folder, cnf.app_name, coll)
 
     if title:
         dest = os.path.join(dest, title)
