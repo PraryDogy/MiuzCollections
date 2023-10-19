@@ -12,7 +12,7 @@ import numpy
 import psd_tools
 import sqlalchemy
 import tifffile
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 
 from cfg import cnf
 from database import *
@@ -601,40 +601,20 @@ def download_fullsize(src):
             dest = os.path.join(parrent, filename + " 2" + ".jpg")
 
         if img_path.endswith((".psd", ".PSD")):
-            print("psd")
-            print(img_path)
-            img = psd_tools.PSDImage.open(img_path)
-            img.composite().save(dest)
+            try:
+                img = Image.open(img_path)
+            except (UnidentifiedImageError, OSError, OverflowError):
+                print(f"\n\n\n{img_path}\n\n\n")
+                img = psd_tools.PSDImage.open(img_path, color_mode="RGB")
+                img = img.composite()
+
+            img = img.convert("RGB")
+            img.save(dest)
+
         else:
             img = tifffile.imread(img_path)
             img = img[:,:,:3]
-
-            cv2.imshow("win", img)
-            cv2.waitKey(0)
-            return
-            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-            cv2.imwrite(dest, img)
-
-        # try:
-        #     img = Image.open(img_path)
-        #     img = img.convert("RGB")
-        # except Exception:
-        #     print(f"utils > download fullsize > cant open or convert {img_path}")
-        #     write_err()
-        #     continue
-
-        # filename = img_path.split(os.sep)[-1].split(".")[0]
-        # dest = os.path.join(parrent, filename + ".jpg")
-
-        # if os.path.exists(dest):
-        #     dest = os.path.join(parrent, filename + " 2" + ".jpg")
-
-        # try:
-        #     img.save(dest)
-        # except Exception:
-        #     print(f"utils > download fullsize > not found {img_path}")
-        #     write_err()
-        #     continue
+            tifffile.imwrite(dest, img)
 
     subprocess.Popen(["open", parrent])
 
@@ -675,32 +655,27 @@ def download_group_fullsize(title, paths_list):
             )
         Globals.topbar_text(t)
 
-        # try:
-        if img_path.endswith((".psd", ".PSD")):
-            img = psd_tools.PSDImage.open(img_path)
-            img.composite().save(dest)
-        else:
-            img = tifffile.imread(img_path)
-            img = img[:,:,:3]
-            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-            cv2.imwrite(dest, img)
-        # except FileExistsError:
-            # print(f"utils > download fullsize > cant open or convert {img_path}")
-            # write_err()
-            # continue
-
         filename = img_path.split(os.sep)[-1].split(".")[0]
         dest = os.path.join(parrent, filename + ".jpg")
 
         if os.path.exists(dest):
             dest = os.path.join(parrent, filename + " 2" + ".jpg")
 
-        try:
+        if img_path.endswith((".psd", ".PSD")):
+            try:
+                img = Image.open(img_path)
+            except (UnidentifiedImageError, OSError):
+                print(f"\n\n\n{img_path}\n\n\n")
+                img = psd_tools.PSDImage.open(img_path, color_mode="RGB")
+                img = img.composite()
+
+            img = img.convert("RGB")
             img.save(dest)
-        except Exception:
-            print(f"utils > download fullsize > not found {img_path}")
-            write_err()
-            continue
+
+        else:
+            img = tifffile.imread(img_path)
+            img = img[:,:,:3]
+            tifffile.imwrite(dest, img)
 
     subprocess.Popen(["open", parrent])
 
