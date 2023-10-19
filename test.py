@@ -4,7 +4,7 @@ import cv2
 import tifffile
 
 
-# src = "/Volumes/Shares/Marketing/Photo/_Collections/10 Brilliance/1 IMG/2023-10-09 22-06-29_E01-SS-35613.tif" # 15
+src = "/Volumes/Shares/Marketing/Photo/_Collections/10 Brilliance/1 IMG/2023-10-09 22-06-29_E01-SS-35613.tif" # 15
 src = "/Users/Loshkarev/Downloads/DSC0499.tif" #3 chanels but wrong save
 # src = "/Users/Loshkarev/Downloads/2023-10-17 16-43-44.tif" #3
 
