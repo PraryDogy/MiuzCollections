@@ -5,7 +5,7 @@ import tifffile
 
 
 # src = "/Volumes/Shares/Marketing/Photo/_Collections/10 Brilliance/1 IMG/2023-10-09 22-06-29_E01-SS-35613.tif" # 15
-src = "/Users/Loshkarev/Downloads/DSC0499.tif" #15
+src = "/Users/Loshkarev/Downloads/DSC0499.tif" #3 chanels but wrong save
 # src = "/Users/Loshkarev/Downloads/2023-10-17 16-43-44.tif" #3
 
 dest = "/Users/Loshkarev/Downloads/new.jpg"
@@ -22,9 +22,8 @@ else:
     channels = cv2.split(img)
 
     if len(channels) > 3:
-        # img = img[:,:,::-1]
-        print("more")
-        img = img[:3]
+        img = img[:,:,:3]
+        print("more than 3 channels")
 
     # cv2.imshow("1", img)
     # img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
