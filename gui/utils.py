@@ -608,9 +608,24 @@ def download_fullsize(src):
                 img = Image.open(img_path)
 
             try:
-                img = img.convert("RGB").save(dest)
+                img = img.convert("RGB", colors=8).save(dest)
             except Exception:
                 print(f"utils > download fsize > save {img_path}")
+                write_err()
+                continue
+
+        else:
+            try:
+                img = tifffile.imread(img_path)[:,:,:3]
+
+                if str(img.dtype) == "uint16":
+                    img = (img/256).astype('uint8')
+
+                img = Image.fromarray(img.astype('uint8'), 'RGB')
+                img.save(dest)
+
+            except Exception:
+                print(f"utils > download group fsize > tiff save {img_path}")
                 write_err()
                 continue
 
@@ -670,15 +685,26 @@ def download_group_fullsize(title, paths_list):
                 img = Image.open(img_path)
 
             try:
-                img = img.convert("RGB").save(dest)
+                img = img.convert("RGB", colors=8).save(dest)
             except Exception:
                 print(f"utils > download group fsize > save {img_path}")
                 write_err()
                 continue
 
         else:
-            img = tifffile.imread(img_path)[:,:,:3]
-            tifffile.imwrite(dest, img)
+            try:
+                img = tifffile.imread(img_path)[:,:,:3]
+
+                if str(img.dtype) == "uint16":
+                    img = (img/256).astype('uint8')
+
+                img = Image.fromarray(img.astype('uint8'), 'RGB')
+                img.save(dest)
+
+            except Exception:
+                print(f"utils > download group fsize > tiff save {img_path}")
+                write_err()
+                continue
 
     subprocess.Popen(["open", parrent])
 
