@@ -1,26 +1,23 @@
 from PIL import Image, UnidentifiedImageError
-from psd_tools import PSDImage
+import psd_tools
 import cv2
 import tifffile
 import numpy as np
 
 
 
-src = "/Users/Loshkarev/Downloads/2023-10-12 18-08-57_R4192-SA2984R-EM.psd"
-dest = "/Users/Loshkarev/Downloads/new.jpg"
+img_path = "/Users/Loshkarev/Downloads/2023-10-12 18-08-57_R4192-SA2984R-EM.psd"
+img_path = "/Users/Morkowik/Downloads/1.psb"
+dest = "/Users/Morkowik/Downloads/new.jpg"
 
 
-
-if src.endswith((".psd", ".PSD")):
+if img_path.endswith((".psd", ".PSD", ".psb", ".PSB")):
     try:
-
-    except (UnidentifiedImageError, OverflowError):
-        print("err")
-        img = PSDImage.open(src)
+        img = psd_tools.PSDImage.open(img_path)
         img = img.composite()
-    
+    except (UnidentifiedImageError, OSError, OverflowError, ValueError):
+        print(f"{img_path}")
+        img = Image.open(img_path)
 
-img = PSDImage.open(src)
-img = img.composite()
-img = img.convert("RGB")
-img.save(dest)
+    img = img.convert("RGB")
+    img.save(dest)

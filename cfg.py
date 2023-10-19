@@ -53,6 +53,10 @@ class Config:
         self.live_text = ""
         self.scaner_task: threading.Thread = None
 
+        self.product_name = "IMG"
+        self.catalog_name = "Обтравка"
+        self.models_name = "Model IMG"
+
         # root
         self.root = tkinter.Tk()
         self.root.withdraw()
@@ -77,8 +81,6 @@ class Config:
         self.catalog = False
         self.product = True
         self.models = True
-        self.catalog_name = "Обтравка"
-        self.models_name = "Model IMG"
         self.json_lang = "English"
 
     def load_cfg(self):

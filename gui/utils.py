@@ -600,21 +600,21 @@ def download_fullsize(src):
         if os.path.exists(dest):
             dest = os.path.join(parrent, filename + " 2" + ".jpg")
 
-        if img_path.endswith((".psd", ".PSD")):
+        if img_path.endswith((".psd", ".PSD", ".psb", ".PSB")):
             try:
-                img = psd_tools.PSDImage.open(img_path, color_mode="RGB")
-                img = img.composite()
-            except (UnidentifiedImageError, OSError, OverflowError):
-                print(f"\n\n\n{img_path}\n\n\n")
+                img = psd_tools.PSDImage.open(img_path).composite()
+
+            except (
+                UnidentifiedImageError, OSError, OverflowError, ValueError
+                ):
                 img = Image.open(img_path)
 
-            img = img.convert("RGB")
-            img.save(dest)
-
-        else:
-            img = tifffile.imread(img_path)
-            img = img[:,:,:3]
-            tifffile.imwrite(dest, img)
+            try:
+                img = img.convert("RGB").save(dest)
+            except Exception:
+                print(f"utils > download fsize > save {img_path}")
+                write_err()
+                continue
 
     subprocess.Popen(["open", parrent])
 
@@ -661,20 +661,25 @@ def download_group_fullsize(title, paths_list):
         if os.path.exists(dest):
             dest = os.path.join(parrent, filename + " 2" + ".jpg")
 
-        if img_path.endswith((".psd", ".PSD")):
+        if img_path.endswith((".psd", ".PSD", ".psb", ".PSB")):
             try:
-                img = psd_tools.PSDImage.open(img_path, color_mode="RGB")
+                img = psd_tools.PSDImage.open(img_path)
                 img = img.composite()
-            except (UnidentifiedImageError, OSError, OverflowError):
-                print(f"\n\n\n{img_path}\n\n\n")
+
+            except (
+                UnidentifiedImageError, OSError, OverflowError, ValueError
+                ):
                 img = Image.open(img_path)
 
-            img = img.convert("RGB")
-            img.save(dest)
+            try:
+                img = img.convert("RGB").save(dest)
+            except Exception:
+                print(f"utils > download group fsize > save {img_path}")
+                write_err()
+                continue
 
         else:
-            img = tifffile.imread(img_path)
-            img = img[:,:,:3]
+            img = tifffile.imread(img_path)[:,:,:3]
             tifffile.imwrite(dest, img)
 
     subprocess.Popen(["open", parrent])
