@@ -602,11 +602,11 @@ def download_fullsize(src):
 
         if img_path.endswith((".psd", ".PSD")):
             try:
-                img = Image.open(img_path)
-            except (UnidentifiedImageError, OSError, OverflowError):
-                print(f"\n\n\n{img_path}\n\n\n")
                 img = psd_tools.PSDImage.open(img_path, color_mode="RGB")
                 img = img.composite()
+            except (UnidentifiedImageError, OSError, OverflowError):
+                print(f"\n\n\n{img_path}\n\n\n")
+                img = Image.open(img_path)
 
             img = img.convert("RGB")
             img.save(dest)
@@ -663,11 +663,11 @@ def download_group_fullsize(title, paths_list):
 
         if img_path.endswith((".psd", ".PSD")):
             try:
-                img = Image.open(img_path)
-            except (UnidentifiedImageError, OSError, OverflowError):
-                print(f"\n\n\n{img_path}\n\n\n")
                 img = psd_tools.PSDImage.open(img_path, color_mode="RGB")
                 img = img.composite()
+            except (UnidentifiedImageError, OSError, OverflowError):
+                print(f"\n\n\n{img_path}\n\n\n")
+                img = Image.open(img_path)
 
             img = img.convert("RGB")
             img.save(dest)
