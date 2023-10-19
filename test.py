@@ -4,15 +4,12 @@ import cv2
 import tifffile
 
 
-src = "/Volumes/Shares/Marketing/Photo/_Collections/10 Brilliance/1 IMG/2023-10-09 22-06-29_E01-SS-35613.tif" # 15
-src = "/Users/Loshkarev/Downloads/DSC0499.tif" #3 chanels but wrong save
-# src = "/Users/Loshkarev/Downloads/2023-10-17 16-43-44.tif" #3
+# src = "/Users/Loshkarev/Downloads/15ch16bit.tif"
+# src = "/Users/Loshkarev/Downloads/15ch8bit.tif"
+src = "/Users/Loshkarev/Downloads/3ch16bit.tif"
 
 dest = "/Users/Loshkarev/Downloads/new.jpg"
 
-# src = "/Users/Morkowik/Downloads/E2018-ICE-0010_R2018-ICE-0009.psd"
-# src = "/Users/Morkowik/Downloads/2023-10-09 22-06-29_E01-SS-35613.tif"
-# dest = "/Users/Morkowik/Downloads/new.jpg"
 
 if src.endswith((".psd", ".PSD")):
     img = PSDImage.open(src)
@@ -22,11 +19,15 @@ else:
     channels = cv2.split(img)
 
     if len(channels) > 3:
-        img = img[:,:,:3]
         print("more than 3 channels")
+        img = img[:,:,:3]
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        cv2.imwrite(dest, img)
+    else:
+        img.shape
+        img.dtype
+        img.imsave(dest, img)
 
     # cv2.imshow("1", img)
-    # img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     # cv2.waitKey(0) 
 
-    cv2.imwrite(dest, img)
