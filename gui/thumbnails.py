@@ -25,15 +25,12 @@ class ContextTitles(Context):
     def __init__(self, e: tkinter.Event):
         super().__init__()
         self.download_group(e)
+
         self.sep()
         self.download_group_tiffs(e)
-        self.sep()
-        self.apply_filter(cnf.lang.show_product, "product")
-        self.apply_filter(cnf.lang.show_models, "models")
-        self.apply_filter(cnf.lang.show_catalog, "catalog")
-        self.apply_filter(cnf.lang.show_all, None)
 
-        # self.download_group_fullsize(e)
+        self.sep()
+        self.download_group_fullsize(e)
         self.do_popup(e)
 
 
@@ -61,13 +58,7 @@ class ContextThumbs(Context):
         self.download_tiffs(e)
 
         self.sep()
-        self.apply_filter(cnf.lang.show_product, "product")
-        self.apply_filter(cnf.lang.show_models, "models")
-        self.apply_filter(cnf.lang.show_catalog, "catalog")
-        self.apply_filter(cnf.lang.show_all, None)
-
-        # self.sep()
-        # self.download_fullsize(e)
+        self.download_fullsize(e)
 
         self.do_popup(e)
 

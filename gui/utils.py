@@ -9,7 +9,9 @@ from time import sleep
 
 import cv2
 import numpy
+import psd_tools
 import sqlalchemy
+import tifffile
 from PIL import Image
 
 from cfg import cnf
@@ -592,26 +594,47 @@ def download_fullsize(src):
             )
         Globals.topbar_text(t)
 
-        try:
-            img = Image.open(img_path)
-            img = img.convert("RGB")
-        except Exception:
-            print(f"utils > download fullsize > cant open or convert {img_path}")
-            write_err()
-            continue
-
         filename = img_path.split(os.sep)[-1].split(".")[0]
         dest = os.path.join(parrent, filename + ".jpg")
 
         if os.path.exists(dest):
             dest = os.path.join(parrent, filename + " 2" + ".jpg")
 
-        try:
-            img.save(dest)
-        except Exception:
-            print(f"utils > download fullsize > not found {img_path}")
-            write_err()
-            continue
+        if img_path.endswith((".psd", ".PSD")):
+            print("psd")
+            print(img_path)
+            img = psd_tools.PSDImage.open(img_path)
+            img.composite().save(dest)
+        else:
+            img = tifffile.imread(img_path)
+            img = img[:,:,:3]
+
+            cv2.imshow("win", img)
+            cv2.waitKey(0)
+            return
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            cv2.imwrite(dest, img)
+
+        # try:
+        #     img = Image.open(img_path)
+        #     img = img.convert("RGB")
+        # except Exception:
+        #     print(f"utils > download fullsize > cant open or convert {img_path}")
+        #     write_err()
+        #     continue
+
+        # filename = img_path.split(os.sep)[-1].split(".")[0]
+        # dest = os.path.join(parrent, filename + ".jpg")
+
+        # if os.path.exists(dest):
+        #     dest = os.path.join(parrent, filename + " 2" + ".jpg")
+
+        # try:
+        #     img.save(dest)
+        # except Exception:
+        #     print(f"utils > download fullsize > not found {img_path}")
+        #     write_err()
+        #     continue
 
     subprocess.Popen(["open", parrent])
 
@@ -652,13 +675,19 @@ def download_group_fullsize(title, paths_list):
             )
         Globals.topbar_text(t)
 
-        try:
-            img = Image.open(img_path)
-            img = img.convert("RGB")
-        except Exception:
-            print(f"utils > download fullsize > cant open or convert {img_path}")
-            write_err()
-            continue
+        # try:
+        if img_path.endswith((".psd", ".PSD")):
+            img = psd_tools.PSDImage.open(img_path)
+            img.composite().save(dest)
+        else:
+            img = tifffile.imread(img_path)
+            img = img[:,:,:3]
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            cv2.imwrite(dest, img)
+        # except FileExistsError:
+            # print(f"utils > download fullsize > cant open or convert {img_path}")
+            # write_err()
+            # continue
 
         filename = img_path.split(os.sep)[-1].split(".")[0]
         dest = os.path.join(parrent, filename + ".jpg")
