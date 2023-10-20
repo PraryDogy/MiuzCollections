@@ -93,12 +93,11 @@ def topbar_default():
 def default_thread(task):
     def wrapper(*args):
         wait_thread()
-
         run_thread(task, args)
-
         wait_thread()
         topbar_default()
-    
+        wait_thread()
+        cnf.topbar_flag = True
     return wrapper
 
 
@@ -189,7 +188,7 @@ def on_exit(e=None):
 
 def create_dir(title=None):
     coll = cnf.curr_coll
-    if coll == "all":
+    if coll == cnf.all_colls:
         coll = cnf.lang.all_colls
 
     dest = os.path.join(cnf.down_folder, cnf.app_name, coll)
@@ -415,7 +414,7 @@ def download_tiffs(src):
     subprocess.Popen(["open", parrent])
 
 
-
+# @default_thread
 def copy_tiffs_paths(path):
     wait_thread()
 
@@ -472,7 +471,6 @@ def download_group_jpg(title, paths_list: list):
             )
 
         Globals.topbar_text(t)
-
         filename = imgpath.split("/")[-1]
 
         try:
@@ -497,6 +495,7 @@ def download_group_tiff(title, paths_list):
     for i in paths_list:
 
         if not cnf.topbar_flag:
+            print(1)
             return
 
         found_tiffs = find_tiffs(i)

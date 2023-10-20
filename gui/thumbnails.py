@@ -231,14 +231,21 @@ class ThumbsPrepare:
 class Thumbnails(CFrame, ThumbsPrepare):
     def __init__(self, master):
         super().__init__(master)
+        self.topbar_frame = CFrame(self)
+        self.topbar_frame.pack(fill=tkinter.X)
 
-        self.topbar = CButton(self, text=f"▲")
+        self.topbar = CButton(self.topbar_frame, text=f"▲")
         self.topbar.configure(
             font=('San Francisco Pro', 13, 'normal'),
             bg=cnf.bg_color,
             pady=1,
             )
-        self.topbar.pack(fill=tkinter.X, pady=(5, 0), padx=10)
+        self.topbar.pack(
+            pady=(5, 0), padx=(10, 1),
+            side=tkinter.LEFT,
+            fill=tkinter.X,
+            expand=1
+            )
         self.topbar.cmd(self.scroll_up)
 
         sep = CSep(self)
@@ -475,15 +482,30 @@ class Thumbnails(CFrame, ThumbsPrepare):
     def topbar_text(self, text):
         try:
             if not cnf.first_load:
+
                 self.topbar.configure(text=text, bg=cnf.topbar_color)
+
+                if len(self.topbar_frame.children) < 2:
+
+                    self.topbar_can = CButton(self.topbar_frame, text="Cancel")
+                    self.topbar_can.configure(bg=cnf.topbar_color, pady=1)
+                    self.topbar_can.cmd(lambda e: self.topbar_default())
+                    self.topbar_can.pack(
+                        side=tkinter.LEFT,
+                        pady=(5, 0), padx=(0, 10)
+                        )
+
         except RuntimeError:
             print("thumbnails > topbar text error")
 
     def topbar_default(self):
         try:
-            if not cnf.first_load:
-                self.topbar.configure(text=f"▲", bg=cnf.bg_color)
+            cnf.topbar_flag = False
+            self.topbar_can.destroy()
+            self.topbar.configure(text=f"▲", bg=cnf.bg_color)
+
         except RuntimeError:
             print("thumbnails > topbar default error")
 
+            cnf.topbar_flag = False
             self.topbar_default()
