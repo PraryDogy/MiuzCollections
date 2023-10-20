@@ -13,8 +13,8 @@ __all__ = (
 
 class Config:
     def __init__(self):
-        self.app_name = 'MiuzCollections'
-        self.app_ver = '3.9.1'
+        self.app_name = "MiuzCollections"
+        self.app_ver = "3.9.1"
         self.db_name = "db.db"
         self.thumb_err = "thumb.jpg"
 
@@ -28,9 +28,9 @@ class Config:
         self.fg_color = "#E2E2E2"
         self.bg_color = "#19191B"
         self.btn_color = "#2A2A2D"
-        self.topbar_color = '#0056D9'
+        self.topbar_color = "#0056D9"
         self.sel_color = "#4B4B4B"
-        self.hov_color = '#3A3A3E'
+        self.hov_color = "#3A3A3E"
         self.ent_color = "#141416"
 
         self.thumb_size = 150
@@ -39,18 +39,18 @@ class Config:
         self.thumb_pad = 3
         self.all_colls = "all"
 
-        # dynamic variables for gui
-        self.lang = None
-
         # list stores widgets for dynamicaly language change
         self.lang_menu = []
         self.lang_stbar = []
         self.lang_thumbs = []
         self.lang_sett = []
 
+        # dynamic variables for gui
+        self.lang = None
         self.first_load = True
-        self.flag = False
-        self.live_text = ""
+        self.scan_flag = False
+        self.topbar_flag = True
+        self.scan_win_txt = ""
         self.scaner_task: threading.Thread = None
 
         self.product_name = "IMG"
@@ -64,7 +64,7 @@ class Config:
         # user settings for json
         self.coll_folder = "/Volumes/Shares/Marketing/Photo/_Collections"
         self.smb_ip = "smb://192.168.10.105/Shares/"
-        self.down_folder = f"{os.path.expanduser('~')}/{'Downloads'}"
+        self.down_folder = f"{os.path.expanduser('~')}/'Downloads'"
 
         self.curr_coll = self.all_colls
 
@@ -104,7 +104,7 @@ class Config:
 
         data = {i: self.__dict__[i] for i in slice_keys}
 
-        with open(file=self.json_dir, encoding='utf8', mode="w") as file:
+        with open(file=self.json_dir, encoding="utf8", mode="w") as file:
             json.dump(data, file, indent=4, ensure_ascii=False)
 
     def check_dir(self):

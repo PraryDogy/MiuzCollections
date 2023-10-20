@@ -61,7 +61,6 @@ __all__ = (
 
 utils_task: threading.Thread = None
 smb_task: threading.Thread = None
-flag = True
 
 
 def run_thread(fn, args=[]):
@@ -173,7 +172,6 @@ def smb_ip():
 
 
 def on_exit(e=None):
-    global flag
     w, h = cnf.root.winfo_width(), cnf.root.winfo_height()
     x, y = cnf.root.winfo_x(), cnf.root.winfo_y()
 
@@ -184,8 +182,8 @@ def on_exit(e=None):
 
     cnf.write_cfg()
 
-    flag = False
-    cnf.flag = False
+    cnf.topbar_flag = False
+    cnf.scan_flag = False
     quit()
 
 
@@ -399,7 +397,7 @@ def download_tiffs(src):
 
     for num, tiff in enumerate(tiffs, 1):
 
-        if not flag:
+        if not cnf.topbar_flag:
             return
 
         t = (
@@ -465,7 +463,7 @@ def download_group_jpg(title, paths_list: list):
 
     for num, imgpath in enumerate(paths_list, 1):
 
-        if not flag:
+        if not cnf.topbar_flag:
             return
 
         t = (
@@ -498,7 +496,7 @@ def download_group_tiff(title, paths_list):
 
     for i in paths_list:
 
-        if not flag:
+        if not cnf.topbar_flag:
             return
 
         found_tiffs = find_tiffs(i)
@@ -515,7 +513,7 @@ def download_group_tiff(title, paths_list):
 
     for num, imgpath in enumerate(tiffs, 1):
 
-        if not flag:
+        if not cnf.topbar_flag:
             return
 
         t = (
@@ -583,7 +581,7 @@ def download_fullsize(src):
     
 
     for num, img_path in enumerate(tiffs, 1):
-        if not flag:
+        if not cnf.topbar_flag:
             return
 
         t = (
@@ -643,7 +641,7 @@ def download_group_fullsize(title, paths_list):
 
     for i in paths_list:
 
-        if not flag:
+        if not cnf.topbar_flag:
             return
 
         found_tiffs = find_tiffs(i)
@@ -659,7 +657,7 @@ def download_group_fullsize(title, paths_list):
     parrent = create_dir(title)
 
     for num, img_path in enumerate(tiffs, 1):
-        if not flag:
+        if not cnf.topbar_flag:
             return
 
         t = (

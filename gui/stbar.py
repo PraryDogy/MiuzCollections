@@ -21,7 +21,7 @@ class ScanerGui(CWindow):
 
         self.live_lbl = CLabel(
             self,
-            text = cnf.live_text,
+            text = cnf.scan_win_txt,
             anchor = tkinter.W,
             justify = tkinter.LEFT,
             )
@@ -53,10 +53,10 @@ class ScanerGui(CWindow):
     def update_livelbl(self):
 
         if self.winfo_exists():
-            self.live_lbl["text"] = cnf.live_text
+            self.live_lbl["text"] = cnf.scan_win_txt
             self.live_task = cnf.root.after(100, self.update_livelbl)
 
-        if not cnf.live_text:
+        if not cnf.scan_win_txt:
             cnf.root.after_cancel(self.live_task)
             self.destroy()
             focus_last_win()

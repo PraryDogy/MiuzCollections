@@ -21,7 +21,7 @@ class Scaner:
 
 
     def scaner_start(self):
-        cnf.flag = True
+        cnf.scan_flag = True
         Globals.stbar_btn.configure(
             text=cnf.lang.updating,
             bg=cnf.topbar_color
@@ -42,7 +42,7 @@ class Scaner:
             Globals.reload_menu()
             self.need_update = False
 
-        cnf.flag = False
+        cnf.scan_flag = False
         Globals.stbar_btn.configure(text=cnf.lang.update, bg=cnf.btn_color)
 
         ms = cnf.scan_time*60000
@@ -95,12 +95,12 @@ class Scaner:
 
             for root, dirs, files in os.walk(collection):
 
-                if not cnf.flag:
+                if not cnf.scan_flag:
                     return
 
                 for file in files:
 
-                    if not cnf.flag:
+                    if not cnf.scan_flag:
                         return
 
                     if file.endswith(exts):
@@ -137,7 +137,7 @@ class Scaner:
                         )
                     }
                 for x, (src, size, created, modified) in enumerate(new_images, 1)
-                if cnf.flag
+                if cnf.scan_flag
                 ]
 
             limit = 300
@@ -148,7 +148,7 @@ class Scaner:
 
             for vals in values:
                 
-                if not cnf.flag:
+                if not cnf.scan_flag:
                     return
 
                 q = sqlalchemy.insert(Thumbs).values(
@@ -165,7 +165,7 @@ class Scaner:
         remove_images = []
 
         for src, size, created, modified in db_images:
-            if not cnf.flag:
+            if not cnf.scan_flag:
                 return
 
             if (src, size, created, modified) not in found_images:
@@ -184,7 +184,7 @@ class Scaner:
                 "b_modified": modified,
                 }
                 for src, size, created, modified in remove_images
-                if cnf.flag
+                if cnf.scan_flag
                 ]
 
             limit = 300
@@ -195,7 +195,7 @@ class Scaner:
 
             for vals in values:
 
-                if not cnf.flag:
+                if not cnf.scan_flag:
                     return
 
                 q = sqlalchemy.delete(Thumbs).filter(
@@ -208,7 +208,7 @@ class Scaner:
 
 
     def __change_live_text(self, text):
-        cnf.live_text = text
+        cnf.scan_win_txt = text
 
 
 scaner = Scaner()
