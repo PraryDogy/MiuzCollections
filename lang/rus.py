@@ -19,7 +19,7 @@ class Rus:
         self.product = "Имиджи"
         self.models = "Модели"
         self.catalog = "Каталог"
-        self.updating = "Обновление"
+        self.updating = "Обновляю"
         self.update = "Обновить"
         self.filter = "Фильтр"
         self.filters = "Фильтры"

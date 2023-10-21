@@ -148,13 +148,15 @@ class Context(tkinter.Menu):
     def reveal_jpg(self, e: tkinter.Event):
         self.add_command(
             label=cnf.lang.find_jpg,
-            command=lambda: reveal_jpg(e.widget.src)
+            command=lambda: finder_actions(e.widget.src, reveal=True),
+            
             )
 
     def reveal_tiffs(self, e: tkinter.Event):
         self.add_command(
             label=cnf.lang.find_tiff,
-            command=lambda: reveal_tiffs(find_tiffs(e.widget.src))
+            command=lambda: finder_actions(e.widget.src, tiff=True, reveal=True),
+            
             )
 
     def pastesearch(self):
@@ -174,7 +176,8 @@ class Context(tkinter.Menu):
             label=(
                 f"{cnf.lang.copy} jpg {cnf.lang.to_downloads}"
                 ),
-            command=lambda: download_one_jpg(e.widget.src)
+            command=lambda: finder_actions(e.widget.src, download=True),
+            
         )
 
     def download_tiffs(self, e: tkinter.Event):
@@ -182,7 +185,8 @@ class Context(tkinter.Menu):
             label=(
                 f"{cnf.lang.copy} tiff {cnf.lang.to_downloads}"
                 ),
-            command=lambda: download_tiffs(e.widget.src)
+            command=lambda: finder_actions(e.widget.src, tiff=True, download=True),
+            
         )
 
     def reveal_coll(self, e: tkinter.Event):
@@ -200,13 +204,15 @@ class Context(tkinter.Menu):
     def copy_tiffs_paths(self, e: tkinter.Event):
         self.add_command(
             label=cnf.lang.copy_path_tiff,
-            command=lambda: copy_tiffs_paths(e.widget.src)
+            command=lambda: finder_actions(e.widget.src, tiff=True, copy_path=True),
+            
             )
         
     def copy_jpg_path(self, e: tkinter.Event):
         self.add_command(
             label=cnf.lang.copy_path_jpg,
-            command=lambda: copy_jpg_path(e.widget.src),
+            command=lambda: finder_actions(e.widget.src, copy_path=True),
+            
             )
 
     def db_remove_img(self, e: tkinter.Event):
@@ -222,7 +228,8 @@ class Context(tkinter.Menu):
                 f"{cnf.lang.from_pretext} \"{e.widget.title}\" "
                 f"{cnf.lang.to_downloads}"
                 ),
-            command=lambda: download_group_jpg(e.widget.title, e.widget.paths_list)
+            command=lambda: finder_actions(e.widget.paths_list, download=True),
+            
         )
 
     def download_group_tiffs(self, e: tkinter.Event):
@@ -232,7 +239,8 @@ class Context(tkinter.Menu):
                 f"{cnf.lang.from_pretext} \"{e.widget.title}\" "
                 f"{cnf.lang.to_downloads}"
                 ),
-            command=lambda: download_group_tiff(e.widget.title, e.widget.paths_list)
+            command=lambda: finder_actions(e.widget.paths_list, tiff=True, download=True),
+            
             )
         
     def copy_text(self, e: tkinter.Event):
@@ -250,7 +258,8 @@ class Context(tkinter.Menu):
     def download_fullsize(self, e:tkinter.Event):
         self.add_command(
             label=cnf.lang.fullsize,
-            command=lambda: download_fullsize(e.widget.src)
+            command=lambda: finder_actions(e.widget.src, tiff=True, fullsize=True),
+            
             )
 
     def download_group_fullsize(self, e:tkinter.Event):
@@ -260,9 +269,7 @@ class Context(tkinter.Menu):
                 f"{cnf.lang.from_pretext} \"{e.widget.title}\" "
                 f"{cnf.lang.to_downloads}"
                 ),
-            command=lambda: download_group_fullsize(
-                e.widget.title, e.widget.paths_list
-                )
+            command=lambda: finder_actions(e.widget.paths_list, tiff=True, fullsize=True),
             )
         
     def apply_filter(self, label, str, e=None):
@@ -270,3 +277,11 @@ class Context(tkinter.Menu):
             label=label,
             command=lambda: apply_filter(str, e)
             )
+        
+    def please_wait(self):
+        self.add_command(
+            label=(
+                f"{cnf.lang.please_wait}"
+                f"\n{cnf.lang.updating} {cnf.lang.all_colls.lower()}"
+                ),
+        )

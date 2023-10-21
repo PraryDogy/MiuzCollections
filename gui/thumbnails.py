@@ -24,13 +24,19 @@ __all__ = (
 class ContextTitles(Context):
     def __init__(self, e: tkinter.Event):
         super().__init__()
-        self.download_group(e)
 
-        self.sep()
-        self.download_group_tiffs(e)
+        if cnf.first_load:
+            self.please_wait()
 
-        self.sep()
-        self.download_group_fullsize(e)
+        else:
+            self.download_group(e)
+
+            self.sep()
+            self.download_group_tiffs(e)
+
+            self.sep()
+            self.download_group_fullsize(e)
+
         self.do_popup(e)
 
 
@@ -44,21 +50,26 @@ class ContextAdvanced(Context):
 class ContextThumbs(Context):
     def __init__(self, e: tkinter.Event):
         super().__init__()
-        self.imgview(e)
-        self.imginfo(e)
 
-        self.sep()
-        self.copy_jpg_path(e)
-        self.reveal_jpg(e)
-        self.download_onefile(e)
+        if cnf.first_load:
+            self.please_wait()
 
-        self.sep()
-        self.copy_tiffs_paths(e)
-        self.reveal_tiffs(e)
-        self.download_tiffs(e)
+        else:
+            self.imgview(e)
+            self.imginfo(e)
 
-        self.sep()
-        self.download_fullsize(e)
+            self.sep()
+            self.copy_jpg_path(e)
+            self.reveal_jpg(e)
+            self.download_onefile(e)
+
+            self.sep()
+            self.copy_tiffs_paths(e)
+            self.reveal_tiffs(e)
+            self.download_tiffs(e)
+
+            self.sep()
+            self.download_fullsize(e)
 
         self.do_popup(e)
 
@@ -481,19 +492,17 @@ class Thumbnails(CFrame, ThumbsPrepare):
 
     def topbar_text(self, text):
         try:
-            if not cnf.first_load:
+            self.topbar.configure(text=text, bg=cnf.topbar_color)
 
-                self.topbar.configure(text=text, bg=cnf.topbar_color)
+            if len(self.topbar_frame.children) < 2:
 
-                if len(self.topbar_frame.children) < 2:
-
-                    self.topbar_can = CButton(self.topbar_frame, text="Cancel")
-                    self.topbar_can.configure(bg=cnf.topbar_color, pady=1)
-                    self.topbar_can.cmd(lambda e: self.topbar_default())
-                    self.topbar_can.pack(
-                        side=tkinter.LEFT,
-                        pady=(5, 0), padx=(0, 10)
-                        )
+                self.topbar_can = CButton(self.topbar_frame, text="Cancel")
+                self.topbar_can.configure(bg=cnf.topbar_color, pady=1)
+                self.topbar_can.cmd(lambda e: self.topbar_default())
+                self.topbar_can.pack(
+                    side=tkinter.LEFT,
+                    pady=(5, 0), padx=(0, 10)
+                    )
 
         except RuntimeError:
             print("thumbnails > topbar text error")
@@ -506,6 +515,4 @@ class Thumbnails(CFrame, ThumbsPrepare):
 
         except RuntimeError:
             print("thumbnails > topbar default error")
-
-            cnf.topbar_flag = False
             self.topbar_default()
