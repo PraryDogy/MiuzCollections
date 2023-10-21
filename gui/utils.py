@@ -34,7 +34,6 @@ __all__ = (
     "on_exit",
     "paste_search",
     "place_center",
-    "topbar_default",
     "replace_bg",
     "resize_image",
     "reveal_coll",
@@ -54,7 +53,9 @@ utils_task = threading.Thread(target=None)
 
 def run_thread(fn, args=[], kwargs={}):
     global utils_task
-    utils_task = threading.Thread(target=fn, args=args, kwargs=kwargs, daemon=True)
+    utils_task = threading.Thread(
+        target=fn, args=args, kwargs=kwargs, daemon=True
+        )
     utils_task.start()
 
 
@@ -63,34 +64,33 @@ def wait_thread():
         cnf.root.update()
 
 
-def topbar_default():
-    def task():
-        sleep(2)
-        Globals.topbar_default()
-    try:
-        run_thread(task)
-    except RuntimeError:
-        print("utils > topbar_default_thread runtime err")
-        topbar_default()
+def delay():
+    sleep(2)
 
 
-def default_thread(task):
+def threaded(task):
     def wrapper(*args, **kwargs):
         wait_thread()
         run_thread(task, args, kwargs)
         wait_thread()
-        topbar_default()
+        Globals.topbar_default()
         wait_thread()
         cnf.topbar_flag = True
     return wrapper
 
 
 def run_applescript(applescript: str):
+    # args = [
+    #     item
+    #     for x in [("-e",l.strip())
+    #     for l in applescript.split('\n')
+    #     if l.strip() != ''] for item in x]
+
     args = [
-        item
-        for x in [("-e",l.strip())
-        for l in applescript.split('\n')
-        if l.strip() != ''] for item in x]
+        arg for row in applescript.split("\n")
+        for arg in ("-e", row.strip())
+        if row.strip()
+        ]
     subprocess.call(["osascript"] + args)
 
 
@@ -141,22 +141,6 @@ def on_exit(e=None):
     cnf.topbar_flag = False
     cnf.scan_flag = False
     quit()
-
-
-def create_dir(title=None):
-    coll = cnf.curr_coll
-    if coll == cnf.all_colls:
-        coll = cnf.lang.all_colls
-
-    dest = os.path.join(cnf.down_folder, cnf.app_name, coll)
-
-    if title:
-        dest = os.path.join(dest, title)
-
-    if not os.path.exists(dest):
-        os.makedirs(dest, exist_ok=True)
-
-    return dest
 
 
 def get_coll_name(src: str):
@@ -371,7 +355,7 @@ def apply_filter(str, e=None):
         Globals.reload_scroll()
 
 
-@default_thread
+@threaded
 def finder_actions(
     src, tiff=False, reveal=False, copy_path=False, download=False, 
     fullsize=False
@@ -382,6 +366,7 @@ def finder_actions(
 
     if not [i for i in src if os.path.exists(i)]:
         Globals.topbar_text(cnf.lang.no_jpg)
+        delay()
         return
 
     if tiff:
@@ -401,17 +386,20 @@ def finder_actions(
         src = tiffs.copy()
         if not tiffs:
             Globals.topbar_text(cnf.lang.no_tiff)
+            delay()
             return
 
     if reveal:
         Globals.topbar_text(cnf.lang.please_wait)
         reveal_files(src)
+        delay()
         return
     
     if copy_path:
         Globals.topbar_text(cnf.lang.please_wait)
         cnf.root.clipboard_clear()
         cnf.root.clipboard_append("\n".join(src))
+        delay()
         return
 
     if download or fullsize:
