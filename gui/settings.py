@@ -62,6 +62,12 @@ class Settings(CWindow):
         select_path.pack(pady=(10, 0))
         cnf.lang_sett.append(select_path)
 
+        self.sett_desc = CLabel(
+            frame, text=cnf.lang.sett_descr, anchor="w", justify="left"
+            )
+        self.sett_desc.pack(anchor="w", pady=(15, 0))
+        cnf.lang_sett.append(self.sett_desc)
+
         CSep(frame).pack(pady=15, padx=50, fill=tkinter.X)
 
         down_title = CLabel(
@@ -89,25 +95,8 @@ class Settings(CWindow):
 
         CSep(frame).pack(pady=15, padx=50, fill=tkinter.X)
 
-        asklang_frame = CFrame(frame)
-        asklang_frame.pack()
-
-        self.lang_btn = CButton(asklang_frame)
-        self.lang_btn.pack(side="left", padx=(0, 15))
-        self.lang_btn.cmd(self.lang_cmd)
-
-        if cnf.json_lang == "Russian":
-            self.lang_btn.configure(text="Русский")
-        else:
-            self.lang_btn.configure(text="English")
-
-        self.reset_btn = CButton(asklang_frame, text=cnf.lang.reset)
-        self.reset_btn.cmd(self.default_cmd)
-        self.reset_btn.pack(side="left")
-        cnf.lang_sett.append(self.reset_btn)
-
         scan_frame = CFrame(frame)
-        scan_frame.pack(pady=(15, 0))
+        scan_frame.pack()
 
         self.scan_min = CButton(scan_frame, text="<")
         self.scan_min.configure(width=1, bg=cnf.bg_color)
@@ -128,11 +117,21 @@ class Settings(CWindow):
         self.scan_max.pack(side="left", pady=(0, 2))
         self.scan_max.cmd(self.change_mins_cmd)
 
-        self.sett_desc = CLabel(
-            frame, text=cnf.lang.sett_descr, anchor="w", justify="left"
+        CSep(frame).pack(pady=15, padx=50, fill=tkinter.X)
+
+        lang_lbl = CLabel(
+            frame,
+            text=cnf.lang.lang_label,
+            anchor="w",
+            justify="left",
+            wraplength = 350,
             )
-        self.sett_desc.pack(anchor="w", pady=(15, 0))
-        cnf.lang_sett.append(self.sett_desc)
+        lang_lbl.pack(anchor="w")
+        cnf.lang_sett.append(lang_lbl)
+
+        self.lang_btn = CButton(frame, text=cnf.lang.language)
+        self.lang_btn.pack(pady=(10, 0))
+        self.lang_btn.cmd(self.lang_cmd)
 
         cancel_frame = CFrame(frame)
         cancel_frame.pack(expand=True)
@@ -230,12 +229,6 @@ class Settings(CWindow):
         if self.down_widget["text"] != path:
             self.down_widget['text'] = path
 
-    def default_cmd(self, e=None):
-        default = cnf.get_defaults()
-        self.path_widget['text'] = default.coll_folder
-        self.down_widget["text"] = default.down_folder
-        self.scan_again = True
-
     def cancel_cmd(self, e=None):
         if self.changed_lang:
             self.lang_cmd()
@@ -250,7 +243,6 @@ class Settings(CWindow):
         cnf.lang_sett.clear()
         cnf.coll_folder = self.path_widget['text']
         cnf.down_folder = self.down_widget["text"]
-        cnf.smb_ip = smb_ip()
 
         if self.lang_btn["text"] == "English":
             cnf.json_lang = "English"

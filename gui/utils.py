@@ -41,7 +41,6 @@ __all__ = (
     "run_applescript",
     "run_thread",
     "smb_check",
-    "smb_ip",
     "finder_actions"
     )
 
@@ -50,8 +49,7 @@ __all__ = (
 
 # ********************system utils********************
 
-utils_task: threading.Thread = None
-smb_task: threading.Thread = None
+utils_task = threading.Thread(target=None)
 
 
 def run_thread(fn, args=[], kwargs={}):
@@ -61,13 +59,8 @@ def run_thread(fn, args=[], kwargs={}):
 
 
 def wait_thread():
-    if smb_task:
-        while smb_task.is_alive():
-            cnf.root.update()
-
-    if utils_task:
-        while utils_task.is_alive():
-            cnf.root.update()
+    while utils_task.is_alive():
+        cnf.root.update()
 
 
 def topbar_default():
@@ -131,34 +124,7 @@ def normalize_name(name: str):
 
 
 def smb_check():
-    global smb_task
-
-
-    def task():
-        if not os.path.exists(cnf.coll_folder):
-            try:
-                cmd = f"mount volume \"{cnf.smb_ip}\""
-                subprocess.call(["osascript", "-e", cmd], timeout=3)
-            except subprocess.TimeoutExpired:
-                print("timeout 3 sec, utils.py, smb_check")
-
-
-    smb_task = threading.Thread(target=task, daemon=True)
-    smb_task.start()
-    while smb_task.is_alive():
-        cnf.root.update()
-
     return bool(os.path.exists(cnf.coll_folder))
-
-
-def smb_ip():
-    df = subprocess.Popen(['df', cnf.coll_folder], stdout=subprocess.PIPE)
-    try:
-        outputLine = df.stdout.readlines()[1]
-        unc_path = str(outputLine.split()[0])
-        return "smb://" + unc_path.split("@")[-1][:-1]
-    except IndexError:
-        return None
 
 
 def on_exit(e=None):

@@ -63,8 +63,7 @@ class Config:
 
         # user settings for json
         self.coll_folder = "/Volumes/Shares/Marketing/Photo/_Collections"
-        self.smb_ip = "smb://192.168.10.105/Shares/"
-        self.down_folder = f"{os.path.expanduser('~')}/'Downloads'"
+        self.down_folder = f"{os.path.expanduser('~')}/Downloads"
 
         self.curr_coll = self.all_colls
 
@@ -125,9 +124,6 @@ class Config:
 
         if not os.path.exists(self.db_dir):
             shutil.copyfile(self.db_name, self.db_dir)
-
-    def get_defaults(self):
-        return self.__class__()
 
 
 cnf = Config()

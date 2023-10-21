@@ -1,5 +1,7 @@
 class Rus:
     def __init__(self):
+        self.language = "Русский"
+        self.lang_label = "Язык/Language"
         self.up = "Наверх"
         self.ok = "Ок"
         self.cancel = "Отмена"

@@ -1,5 +1,7 @@
 class Eng:
     def __init__(self):
+        self.language = "English"
+        self.lang_label = "Language/Язык"
         self.up = "Up"
         self.ok = "Ok"
         self.cancel = "Cancel"

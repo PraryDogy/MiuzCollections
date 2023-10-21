@@ -504,15 +504,23 @@ class Thumbnails(CFrame, ThumbsPrepare):
                     pady=(5, 0), padx=(0, 10)
                     )
 
-        except RuntimeError:
+        except RuntimeError as e:
             print("thumbnails > topbar text error")
+            print(e)
+
 
     def topbar_default(self):
-        try:
-            cnf.topbar_flag = False
-            self.topbar_can.destroy()
-            self.topbar.configure(text=f"▲", bg=cnf.bg_color)
+        cnf.topbar_flag = False
 
-        except RuntimeError:
-            print("thumbnails > topbar default error")
-            self.topbar_default()
+        try:
+            self.topbar_can.destroy()
+        except AttributeError as e:
+            print("thumbnails > no topbar cancel button")
+            print(e)
+
+
+        try:
+            self.topbar.configure(text=f"▲", bg=cnf.bg_color)
+        except RuntimeError as e:
+            print("thumbnails > can't configure topbar to default")
+            print(e)
