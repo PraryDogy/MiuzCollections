@@ -42,7 +42,7 @@ class ScanerGui(CWindow):
         self.update_livelbl()
 
     def cancel(self, e=None):
-        cnf.flag = False
+        cnf.scan_flag = False
         cnf.root.after_cancel(self.live_task)
         self.live_lbl.configure(text=cnf.lang.please_wait)
         while cnf.scaner_task.is_alive():
@@ -90,7 +90,7 @@ class StBar(CFrame):
         Settings()
 
     def update_cmd(self, btn: CButton):
-        if not cnf.flag:
+        if not cnf.scan_flag:
             if smb_check():
                 scaner.scaner_start()
             else:

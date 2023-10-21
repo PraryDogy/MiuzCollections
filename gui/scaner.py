@@ -22,14 +22,9 @@ class Scaner:
 
     def scaner_start(self):
         cnf.scan_flag = True
-        Globals.stbar_btn.configure(
-            text=cnf.lang.updating,
-            bg=cnf.topbar_color
-            )
+        Globals.stbar_btn.configure(text=cnf.lang.updating,bg=cnf.topbar_color)
 
-        cnf.scaner_task = threading.Thread(
-            target=self.task, daemon=True
-            )
+        cnf.scaner_task = threading.Thread(target=self.task, daemon=True)
         cnf.scaner_task.start()
 
         while cnf.scaner_task.is_alive():
