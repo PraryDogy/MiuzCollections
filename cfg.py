@@ -39,12 +39,6 @@ class Config:
         self.thumb_pad = 3
         self.all_colls = "all"
 
-        # list stores widgets for dynamicaly language change
-        self.lang_menu = []
-        self.lang_stbar = []
-        self.lang_thumbs = []
-        self.lang_sett = []
-
         # dynamic variables for gui
         self.lang = None
         self.first_load = True

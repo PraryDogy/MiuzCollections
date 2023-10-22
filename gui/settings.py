@@ -49,7 +49,6 @@ class Settings(CWindow):
             justify="left"
             )
         path_name.pack(anchor="w")
-        cnf.lang_sett.append(path_name)
 
         self.path_widget = CLabel(
             frame,
@@ -63,13 +62,11 @@ class Settings(CWindow):
         select_path = CButton(frame, text=cnf.lang.browse)
         select_path.cmd(self.select_path_cmd)
         select_path.pack(pady=(10, 0))
-        cnf.lang_sett.append(select_path)
 
         self.sett_desc = CLabel(
             frame, text=cnf.lang.sett_descr, anchor="w", justify="left"
             )
         self.sett_desc.pack(anchor="w", pady=(15, 0))
-        cnf.lang_sett.append(self.sett_desc)
 
 
 
@@ -82,7 +79,6 @@ class Settings(CWindow):
             justify="left"
             )
         down_title.pack(anchor="w")
-        cnf.lang_sett.append(down_title)
 
         self.down_widget = CLabel(
             frame,
@@ -96,7 +92,6 @@ class Settings(CWindow):
         select_down = CButton(frame, text=cnf.lang.browse)
         select_down.cmd(self.select_down_cmd)
         select_down.pack(pady=(10, 0))
-        cnf.lang_sett.append(select_down)
 
 
 
@@ -108,7 +103,6 @@ class Settings(CWindow):
             )
         self.scan_btn.configure(width=28)
         self.scan_btn.cmd(self.scan_time_cmd)
-        cnf.lang_sett.append(self.scan_btn)
         self.scan_btn.pack()
 
 
@@ -123,7 +117,6 @@ class Settings(CWindow):
             wraplength = 350,
             )
         lang_lbl.pack(anchor="w")
-        cnf.lang_sett.append(lang_lbl)
 
         self.lang_btn = CButton(frame, text=cnf.lang.language)
         self.lang_btn.pack(pady=(10, 0))
@@ -139,12 +132,10 @@ class Settings(CWindow):
         save_btn = CButton(cancel_frame, text=cnf.lang.ok)
         save_btn.cmd(self.save_cmd)
         save_btn.pack(padx=(0, 15), side="left")
-        cnf.lang_sett.append(save_btn)
 
         cancel_btn = CButton(cancel_frame, text=cnf.lang.cancel)
         cancel_btn.cmd(self.cancel_cmd)
         cancel_btn.pack(side="left")
-        cnf.lang_sett.append(cancel_btn)
 
         return frame
 
@@ -163,23 +154,6 @@ class Settings(CWindow):
         self.scan_btn.configure(
             text=f"{cnf.lang.update_every} {cnf.scan_time} {cnf.lang.mins}"
             )
-
-    def change_lang(self):
-        self.scan_btn.configure(
-            text=f"{cnf.lang.update_every} {cnf.scan_time} {cnf.lang.mins}"
-            )
-
-        wids = cnf.lang_menu + cnf.lang_sett
-        wids = wids + cnf.lang_stbar + cnf.lang_thumbs
-
-        for wid in (wids):
-            for k, v in self.old_lang.__dict__.items():
-                try:
-                    if wid["text"] == v:
-                        wid["text"] = cnf.lang.__dict__[k]
-                except tkinter.TclError:
-                    print("change lang widget err", wid.widgetName)
-                    print(wid.__dict__)
 
     def lang_cmd(self, e=None):
         from lang import Eng, Rus
@@ -227,14 +201,12 @@ class Settings(CWindow):
         if self.changed_lang:
             self.lang_cmd()
 
-        cnf.lang_sett.clear()
         cnf.scan_time = self.old_time
 
         self.destroy()
         cnf.root.focus_force()
 
     def save_cmd(self, e=None):
-        cnf.lang_sett.clear()
         cnf.coll_folder = self.path_widget['text']
         cnf.down_folder = self.down_widget["text"]
 

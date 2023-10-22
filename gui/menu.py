@@ -60,7 +60,6 @@ class Menu(tkmacosx.SFrame):
         title = CLabel(frame, text=cnf.lang.menu)
         title.configure(font=('San Francisco Pro', 22, 'bold'))
         title.pack(pady=(0,15))
-        cnf.lang_menu.append(title)
 
         colls_list = Dbase.conn.execute(
             sqlalchemy.select(Thumbs.collection)
@@ -86,8 +85,6 @@ class Menu(tkmacosx.SFrame):
         last.cmd(self.show_coll)
         last.pack(pady=(0, 15))
         last.bind("<Button-2>", ContextMenu)
-
-        cnf.lang_menu.append(last)
 
         sep = CSep(frame)
         sep['bg'] = '#272727'
@@ -116,7 +113,6 @@ class Menu(tkmacosx.SFrame):
         return frame
 
     def reload_menu(self):
-        cnf.lang_menu.clear()
         self.menu_frame.destroy()
         self.menu_frame = self.load_menu_buttons()
         self.menu_frame.pack()

@@ -298,7 +298,6 @@ class Thumbnails(CFrame, ThumbsPrepare):
         main_title = CLabel(title_frame, text=self.coll_title, width=30)
         main_title.configure(font=('San Francisco Pro', 30, 'bold'))
         main_title.pack(anchor="center")
-        cnf.lang_thumbs.append(main_title)
 
         main_sub_frame = CFrame(title_frame)
         main_sub_frame.pack(pady=(0, 15))
@@ -449,15 +448,12 @@ class Thumbnails(CFrame, ThumbsPrepare):
                 Globals.reload_thumbs()
 
     def reload_scroll(self):
-        cnf.lang_thumbs.clear()
-
         self.scroll_frame.destroy()
         self.thumbs_frame.destroy()
         self.load_scroll()
         self.load_thumbs()
 
     def reload_thumbs(self):
-        cnf.lang_thumbs.clear()
         self.thumbs_frame.destroy()
         self.load_thumbs()
 
