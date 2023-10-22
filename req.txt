@@ -8,3 +8,5 @@ SQLAlchemy==1.4.45
 tkmacosx==1.0.5
 psd-tools==1.9.28
 tifffile==2023.9.26
+pyproject-toml
+wheel
