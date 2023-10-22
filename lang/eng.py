@@ -1,5 +1,7 @@
 class Eng:
     def __init__(self):
+        self.name = "en"
+
         self.language = "English"
         self.lang_label = "Language/Язык"
         self.up = "Up"
@@ -65,6 +67,8 @@ class Eng:
             '\nSupport: loshkarev@miuz.ru'
             '\nTelegram: evlosh'
             )
+
+        self.lang_descr = "Press ok to change language"
 
 
         self.please_wait = "Please, wait"

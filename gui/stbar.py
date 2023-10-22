@@ -16,7 +16,7 @@ __all__ = (
 class ScanerGui(CWindow):
     def __init__(self):
         super().__init__()
-        self.title(cnf.lang.updating)
+        self.title(cnf.lng.updating)
         self.geometry("300x90")
 
         self.live_lbl = CLabel(
@@ -27,7 +27,7 @@ class ScanerGui(CWindow):
             )
         self.live_lbl.pack(expand=True, fill="both")
 
-        self.can_btn = CButton(self, text=cnf.lang.cancel)
+        self.can_btn = CButton(self, text=cnf.lng.cancel)
         self.can_btn.pack(pady=(10, 0))
         self.can_btn.cmd(self.cancel)
 
@@ -44,7 +44,7 @@ class ScanerGui(CWindow):
     def cancel(self, e=None):
         cnf.scan_flag = False
         cnf.root.after_cancel(self.live_task)
-        self.live_lbl.configure(text=cnf.lang.please_wait)
+        self.live_lbl.configure(text=cnf.lng.please_wait)
         while cnf.scaner_task.is_alive():
             cnf.root.update()
         self.destroy()
@@ -65,24 +65,34 @@ class ScanerGui(CWindow):
 class StBar(CFrame):
     def __init__(self, master):
         super().__init__(master)
-        self.normal_mode()
+
+        self.stbar = self.load_stbar()
+        self.stbar.pack(fill=tkinter.X)
+
         Globals.stbar_btn = self.upd_btn
+        Globals.reload_stbar = self.reload_stbar
 
-    def normal_mode(self):
-        widgets = tuple(v for k, v in self.children.items())
-        [i.destroy() for i in widgets]
+    def load_stbar(self):
+        frame = CFrame(self)
 
-        btn = CButton(self, text=cnf.lang.settings, padx=5)
+        btn = CButton(frame, text=cnf.lng.settings, padx=5)
         btn['width'] = 10
         btn.cmd(lambda e: self.settings_cmd(btn))
         btn.pack(side=tkinter.LEFT)
 
-        CSep(self).pack(fill=tkinter.Y, side=tkinter.LEFT, padx=15)
+        CSep(frame).pack(fill=tkinter.Y, side=tkinter.LEFT, padx=15)
 
-        self.upd_btn = CButton(self, text=cnf.lang.update, padx=5)
+        self.upd_btn = CButton(frame, text=cnf.lng.update, padx=5)
         self.upd_btn['width'] = 10
         self.upd_btn.cmd(lambda e: self.update_cmd(btn))
         self.upd_btn.pack(side=tkinter.LEFT)
+
+        return frame
+
+    def reload_stbar(self):
+        self.stbar.destroy()
+        self.stbar = self.load_stbar()
+        self.stbar.pack(fill=tkinter.X)
 
     def settings_cmd(self, btn: CButton):
         Settings()

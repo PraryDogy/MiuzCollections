@@ -22,10 +22,10 @@ class ContextMenu(Context):
         self.reveal_coll(e)
         self.sep()
 
-        self.apply_filter(cnf.lang.product, "product", e)
-        self.apply_filter(cnf.lang.models, "models", e)
-        self.apply_filter(cnf.lang.catalog, "catalog", e)
-        self.apply_filter(cnf.lang.show_all, None, e)
+        self.apply_filter(cnf.lng.product, "product", e)
+        self.apply_filter(cnf.lng.models, "models", e)
+        self.apply_filter(cnf.lng.catalog, "catalog", e)
+        self.apply_filter(cnf.lng.show_all, None, e)
 
         self.do_popup(e)
 
@@ -57,7 +57,7 @@ class Menu(tkmacosx.SFrame):
     def load_menu_buttons(self):
         frame = CFrame(self)
 
-        title = CLabel(frame, text=cnf.lang.menu)
+        title = CLabel(frame, text=cnf.lng.menu)
         title.configure(font=('San Francisco Pro', 22, 'bold'))
         title.pack(pady=(0,15))
 
@@ -79,7 +79,7 @@ class Menu(tkmacosx.SFrame):
             for fake_name in sort_keys
             }
 
-        last = CButton(frame, text=cnf.lang.all_colls)
+        last = CButton(frame, text=cnf.lng.all_colls)
         last.configure(width=13, pady=5, anchor=tkinter.W, padx=10)
         last.coll_name = cnf.all_colls
         last.cmd(self.show_coll)

@@ -15,6 +15,8 @@ class Globals:
     end: datetime.datetime
     named start, named end: datetime as readable text
     """
+
+    reload_stbar = None # menu > StBar().reload_stbar()
     reload_menu = None # menu > Menu().reload_menu()
     show_coll = None # menu > Menu().show_coll()
 

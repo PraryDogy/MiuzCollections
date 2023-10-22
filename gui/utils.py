@@ -323,7 +323,7 @@ def find_tiffs(src: str):
 
 
 def reveal_files(list_paths: list):
-    Globals.topbar_text(cnf.lang.please_wait)
+    Globals.topbar_text(cnf.lng.please_wait)
 
     paths = (
         f"\"{i}\" as POSIX file"
@@ -390,13 +390,13 @@ def finder_actions(
         src = [src]
 
     if not [i for i in src if os.path.exists(i)]:
-        Globals.topbar_text(cnf.lang.no_jpg)
+        Globals.topbar_text(cnf.lng.no_jpg)
         delay()
         return
 
     if tiff:
         tiffs = []
-        Globals.topbar_text(cnf.lang.please_wait)
+        Globals.topbar_text(cnf.lng.please_wait)
 
         for i in src:
     
@@ -410,18 +410,18 @@ def finder_actions(
     
         src = tiffs.copy()
         if not tiffs:
-            Globals.topbar_text(cnf.lang.no_tiff)
+            Globals.topbar_text(cnf.lng.no_tiff)
             delay()
             return
 
     if reveal:
-        Globals.topbar_text(cnf.lang.please_wait)
+        Globals.topbar_text(cnf.lng.please_wait)
         reveal_files(src)
         delay()
         return
     
     if copy_path:
-        Globals.topbar_text(cnf.lang.please_wait)
+        Globals.topbar_text(cnf.lng.please_wait)
         cnf.root.clipboard_clear()
         cnf.root.clipboard_append("\n".join(src))
         delay()

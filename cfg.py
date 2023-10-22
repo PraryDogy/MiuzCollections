@@ -40,7 +40,7 @@ class Config:
         self.all_colls = "all"
 
         # dynamic variables for gui
-        self.lang = None
+        self.lng = Rus()
         self.first_load = True
         self.scan_flag = False
         self.topbar_flag = True
@@ -70,7 +70,7 @@ class Config:
         self.catalog = False
         self.product = True
         self.models = True
-        self.json_lang = "English"
+        self.lang = self.lng.name
 
     def load_cfg(self):
         with open(file=self.json_dir, encoding="utf8", mode="r") as file:
@@ -80,12 +80,8 @@ class Config:
             if key in self.__dict__:
                 setattr(self, key, data[key])
 
-        if self.json_lang == "English":
-            self.lang = Eng()
-        else:
-            self.lang = Rus()
-
     def write_cfg(self):
+        self.lang = self.lng.name
         slice_keys = list(self.__dict__)
         start = slice_keys.index("coll_folder")
         slice_keys = slice_keys[start:]
@@ -105,9 +101,11 @@ class Config:
             l = subprocess.check_output(["osascript", "-e", cmd], text=True)
             l = l.split("\n")[0]
             if "ru_RU" == l:
-                self.json_lang = "Russian"
+                self.lng = Rus()
+                self.lang = self.lng.name
             else:
-                self.json_lang = "English"
+                self.lng = Eng()
+                self.lang = self.lng.name
 
             self.write_cfg()
 
@@ -118,3 +116,4 @@ class Config:
 cnf = Config()
 cnf.check_dir()
 cnf.load_cfg()
+cnf.write_cfg()

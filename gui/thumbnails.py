@@ -102,14 +102,14 @@ class ThumbsSearch(CFrame):
         btns_frame = CFrame(self)
         btns_frame.pack(pady=(10, 0))
 
-        self.btn_search = CButton(btns_frame, text=cnf.lang.search)
+        self.btn_search = CButton(btns_frame, text=cnf.lng.search)
         self.btn_search.pack(side=tkinter.LEFT, padx=(0, 10))
         self.btn_search.cmd(self.search_go)
 
         if Globals.search_var.get():
             self.btn_search.configure(bg=cnf.blue_color)
 
-        self.btn_clear = CButton(btns_frame, text=cnf.lang.clear)
+        self.btn_clear = CButton(btns_frame, text=cnf.lng.clear)
         self.btn_clear.pack(side=tkinter.LEFT)
         self.btn_clear.cmd(self.search_clear)
 
@@ -137,26 +137,26 @@ class ThumbsPrepare:
         self.thumb_size = cnf.thumb_size + cnf.thumb_pad
 
         if cnf.curr_coll == cnf.all_colls:
-            self.coll_title = cnf.lang.all_colls
+            self.coll_title = cnf.lng.all_colls
         else:
             self.coll_title = cnf.curr_coll
 
         filter_row = []
 
         if cnf.product:
-            filter_row.append(cnf.lang.product)
+            filter_row.append(cnf.lng.product)
         if cnf.models:
-            filter_row.append(cnf.lang.models)
+            filter_row.append(cnf.lng.models)
         if cnf.catalog:
-            filter_row.append(cnf.lang.catalog)
+            filter_row.append(cnf.lng.catalog)
 
         filter_row = ", ".join(filter_row)
         self.filter_row = filter_row.lower().capitalize()
 
         if cnf.sort_modified:
-            self.sort_text = cnf.lang.date_changed_by
+            self.sort_text = cnf.lng.date_changed_by
         else:
-            self.sort_text = cnf.lang.date_created_by
+            self.sort_text = cnf.lng.date_created_by
 
     def decode_thumbs(self):
         result = []
@@ -179,7 +179,7 @@ class ThumbsPrepare:
             date_key = datetime.fromtimestamp(modified).date()
 
             if not any((Globals.start, Globals.end)):
-                date_key = f"{cnf.lang.months[date_key.month]} {date_key.year}"
+                date_key = f"{cnf.lng.months[date_key.month]} {date_key.year}"
             else:
                 date_key = f"{Globals.named_start} - {Globals.named_end}"
 
@@ -305,8 +305,8 @@ class Thumbnails(CFrame, ThumbsPrepare):
         sub_font=('San Francisco Pro', 13, 'normal')
 
         l_subtitle_t = (
-            f"{cnf.lang.filter}"
-            f"\n{cnf.lang.sort}"
+            f"{cnf.lng.filter}"
+            f"\n{cnf.lng.sort}"
             )
         l_subtitle = CLabel(main_sub_frame, text=l_subtitle_t)
         l_subtitle.configure(
@@ -330,7 +330,7 @@ class Thumbnails(CFrame, ThumbsPrepare):
             )
         r_subtitle.pack(side="right")
 
-        btn_filter = CButton(title_frame, text=cnf.lang.filters)
+        btn_filter = CButton(title_frame, text=cnf.lng.filters)
         btn_filter.pack()
         if any((Globals.start, Globals.end)):
             btn_filter.configure(bg=cnf.blue_color)
@@ -348,7 +348,7 @@ class Thumbnails(CFrame, ThumbsPrepare):
                 for i in range(0, len(img_list), limit)
                 ]
 
-            t = f"{date_key}, {cnf.lang.total}: {len(img_list)}"
+            t = f"{date_key}, {cnf.lng.total}: {len(img_list)}"
             chunk_title = CLabel(self.thumbs_frame, text=t)
             chunk_title.configure(font=('San Francisco Pro', 18, 'bold'))
             chunk_title.pack(anchor="w", pady=(30, 0), padx=2)
@@ -398,17 +398,17 @@ class Thumbnails(CFrame, ThumbsPrepare):
         if not self.thumbs_lbls:
             str_var = Globals.search_var.get()
 
-            noimg_t = cnf.lang.no_photo
+            noimg_t = cnf.lng.no_photo
 
             if str_var:
                 noimg_t = (
-                    f"{cnf.lang.no_photo} {cnf.lang.with_name}"
+                    f"{cnf.lng.no_photo} {cnf.lng.with_name}"
                     f"\n\"{str_var}\""
                     )
 
             elif any((Globals.start, Globals.end)):
                 noimg_t=(
-                    f"{cnf.lang.no_photo}"
+                    f"{cnf.lng.no_photo}"
                     f"\n{Globals.named_start} - {Globals.named_end}"
                     )
 
@@ -418,7 +418,7 @@ class Thumbnails(CFrame, ThumbsPrepare):
 
         more_btn = CButton(
             self.thumbs_frame,
-            text=cnf.lang.show_more
+            text=cnf.lng.show_more
             )
         more_btn.cmd(lambda e: self.show_more_cmd())
         more_btn.pack(pady=(15, 0))

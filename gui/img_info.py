@@ -33,7 +33,7 @@ class ImageInfo(CWindow):
 
         super().__init__()
 
-        self.title(cnf.lang.info)
+        self.title(cnf.lng.info)
         self.configure(padx=10, pady=10)
 
         name = src.split(os.sep)[-1]
@@ -56,19 +56,19 @@ class ImageInfo(CWindow):
         r_name = '\n'.join(
             re.findall(r".{1,%i}" % max_ln, name)
             )
-        l_name = cnf.lang.file_name + "\n"*r_name.count("\n")
+        l_name = cnf.lng.file_name + "\n"*r_name.count("\n")
 
         r_path = '\n'.join(
             re.findall(r".{1,%i}" % max_ln, os.path.split(src)[0])
             )
-        l_path = cnf.lang.file_path + "\n"*r_path.count("\n")
+        l_path = cnf.lng.file_path + "\n"*r_path.count("\n")
 
         labels = {
-            cnf.lang.collection: get_coll_name(src),
+            cnf.lng.collection: get_coll_name(src),
             l_name: r_name,
-            cnf.lang.date_changed: filemod,
-            cnf.lang.resolution: f"{w}x{h}",
-            cnf.lang.file_size: f"{filesize}мб",
+            cnf.lng.date_changed: filemod,
+            cnf.lng.resolution: f"{w}x{h}",
+            cnf.lng.file_size: f"{filesize}мб",
             l_path: r_path,
             }
 

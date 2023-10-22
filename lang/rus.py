@@ -1,5 +1,7 @@
 class Rus:
     def __init__(self):
+        self.name = "ru"
+
         self.language = "Русский"
         self.lang_label = "Язык/Language"
         self.up = "Наверх"
@@ -65,6 +67,8 @@ class Rus:
             '\n\nПоддержка: loshkarev@miuz.ru'
             '\nTelegram: evlosh'
             )
+
+        self.lang_descr = "Нажмите ок для смены языка"
 
 
         self.please_wait = "Пожалуйста, подождите"
