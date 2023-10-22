@@ -61,7 +61,7 @@ class ImgViewer(CWindow):
         self.set_title()
         self["bg"] = "black"
 
-        self.geometry(f'{cnf.imgview_w}x{cnf.imgview_h}')
+        self.geometry(f'{cnf.imgview_g["w"]}x{cnf.imgview_g["h"]}')
         self.minsize(500, 300)
 
         self.configure(pady=0, padx=0)
@@ -72,12 +72,12 @@ class ImgViewer(CWindow):
 
         cnf.root.update_idletasks()
 
-        self.img_frame['width'] = cnf.imgview_w
-        self.img_frame['height'] = cnf.imgview_h
+        self.img_frame['width'] = cnf.imgview_g["w"]
+        self.img_frame['height'] = cnf.imgview_g["h"]
 
-        self.thumb_place(cnf.imgview_w, cnf.imgview_h)
+        self.thumb_place(cnf.imgview_g["w"], cnf.imgview_g["h"])
         self.task = cnf.root.after(
-            250, lambda: self.img_place(cnf.imgview_w, cnf.imgview_h))
+            250, lambda: self.img_place(cnf.imgview_g["w"], cnf.imgview_g["h"]))
 
         place_center()
         self.deiconify()
@@ -105,17 +105,17 @@ class ImgViewer(CWindow):
             print("no win")
             return
 
-        if new_w != cnf.imgview_w or new_h != cnf.imgview_h:
-            cnf.imgview_h = new_h
-            cnf.imgview_w = new_w
+        if new_w != cnf.imgview_g["w"] or new_h != cnf.imgview_g["h"]:
+            cnf.imgview_g["h"] = new_h
+            cnf.imgview_g["w"] = new_w
 
-            self.img_frame['width'] = cnf.imgview_w
-            self.img_frame['height'] = cnf.imgview_h
+            self.img_frame['width'] = cnf.imgview_g["w"]
+            self.img_frame['height'] = cnf.imgview_g["h"]
 
-            self.thumb_place(cnf.imgview_w, cnf.imgview_h)
+            self.thumb_place(cnf.imgview_g["w"], cnf.imgview_g["h"])
             cnf.root.after(
                 500,
-                lambda: self.img_place(cnf.imgview_w, cnf.imgview_h)
+                lambda: self.img_place(cnf.imgview_g["w"], cnf.imgview_g["h"])
                 )
 
     def img_widget(self):
@@ -137,10 +137,10 @@ class ImgViewer(CWindow):
             src = all_src[0]
             self.set_title()
 
-        self.thumb_place(cnf.imgview_w, cnf.imgview_h)
+        self.thumb_place(cnf.imgview_g["w"], cnf.imgview_g["h"])
         self.task = cnf.root.after(
             500,
-            lambda: self.img_place(cnf.imgview_w, cnf.imgview_h)
+            lambda: self.img_place(cnf.imgview_g["w"], cnf.imgview_g["h"])
             )
 
     def img_ind(self):
@@ -152,9 +152,9 @@ class ImgViewer(CWindow):
         self.img_frame.image_names = img_tk
 
     def img_click(self, e: tkinter.Event):
-        if cnf.imgview_w == self.winfo_width():
+        if cnf.imgview_g["w"] == self.winfo_width():
 
-            if e.x <= cnf.imgview_w//2:
+            if e.x <= cnf.imgview_g["w"]//2:
                 index = self.img_ind() - 1
             else:
                 index = self.img_ind() + 1

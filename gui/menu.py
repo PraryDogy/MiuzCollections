@@ -102,7 +102,7 @@ class Menu(tkmacosx.SFrame):
             btn.bind("<Button-2>", ContextMenu)
 
             if coll_name == cnf.curr_coll:
-                btn.configure(bg=cnf.sel_color)
+                btn.configure(bg=cnf.lgray_color)
                 self.sel_btn = btn
 
             sep = CSep(frame)
@@ -110,7 +110,7 @@ class Menu(tkmacosx.SFrame):
             sep.pack(fill=tkinter.X)
     
         if cnf.curr_coll == cnf.all_colls:
-            last.configure(bg=cnf.sel_color)
+            last.configure(bg=cnf.lgray_color)
             self.sel_btn = last
 
         return frame
@@ -126,7 +126,7 @@ class Menu(tkmacosx.SFrame):
         cnf.limit = 150
 
         self.sel_btn.configure(bg=cnf.btn_color)
-        e.widget.configure(bg=cnf.sel_color)
+        e.widget.configure(bg=cnf.lgray_color)
         self.sel_btn = e.widget
         cnf.curr_coll = e.widget.coll_name
 

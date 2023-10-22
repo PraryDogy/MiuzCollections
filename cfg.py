@@ -16,22 +16,22 @@ class Config:
         self.app_name = "MiuzCollections"
         self.app_ver = "3.9.2"
         self.db_name = "db.db"
+        self.cfg_name = "cfg.json"
         self.thumb_err = "thumb.jpg"
 
         self.cfg_dir = os.path.join(
             os.path.expanduser("~"),
             f"Library", "Application Support", self.app_name
             )
-        self.json_dir = os.path.join(self.cfg_dir, "cfg.json")
+        self.json_dir = os.path.join(self.cfg_dir, self.cfg_name)
         self.db_dir = os.path.join(self.cfg_dir, self.db_name)
 
         self.fg_color = "#E2E2E2"
         self.bg_color = "#19191B"
         self.btn_color = "#2A2A2D"
-        self.topbar_color = "#0056D9"
-        self.sel_color = "#4B4B4B"
-        self.hov_color = "#3A3A3E"
-        self.ent_color = "#141416"
+        self.blue_color = "#0056D9"
+        self.lgray_color = "#4B4B4B"
+        self.dgray_color = "#141416"
 
         self.thumb_size = 150
         self.menu_w = 180
@@ -67,13 +67,8 @@ class Config:
 
         self.curr_coll = self.all_colls
 
-        self.root_w = 700
-        self.root_h = 500
-        self.root_x = 100
-        self.root_y = 100
-
-        self.imgview_w = 700
-        self.imgview_h = 500
+        self.root_g = {"w": 700, "h": 500, "x": 100, "y": 100}
+        self.imgview_g = {"w": 700, "h": 500, "x": 100, "y": 100}
 
         self.scan_time = 10
 

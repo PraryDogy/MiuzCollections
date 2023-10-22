@@ -89,7 +89,7 @@ class ThumbsSearch(CFrame):
         self.search_wid = tkinter.Entry(
             self,
             textvariable=Globals.search_var,
-            bg=cnf.ent_color,
+            bg=cnf.dgray_color,
             insertbackground="white",
             fg=cnf.fg_color,
             justify="center",
@@ -107,7 +107,7 @@ class ThumbsSearch(CFrame):
         self.btn_search.cmd(self.search_go)
 
         if Globals.search_var.get():
-            self.btn_search.configure(bg=cnf.topbar_color)
+            self.btn_search.configure(bg=cnf.blue_color)
 
         self.btn_clear = CButton(btns_frame, text=cnf.lang.clear)
         self.btn_clear.pack(side=tkinter.LEFT)
@@ -334,7 +334,7 @@ class Thumbnails(CFrame, ThumbsPrepare):
         btn_filter = CButton(title_frame, text=cnf.lang.filters)
         btn_filter.pack()
         if any((Globals.start, Globals.end)):
-            btn_filter.configure(bg=cnf.topbar_color)
+            btn_filter.configure(bg=cnf.blue_color)
         btn_filter.cmd(lambda e: Filter())
 
         search = ThumbsSearch(title_frame)
@@ -436,15 +436,15 @@ class Thumbnails(CFrame, ThumbsPrepare):
         self.resize_task = cnf.root.after(500, self.frame_resize)
 
     def frame_resize(self):
-        old_w = cnf.root_w
+        old_w = cnf.root_g["w"]
         new_w = cnf.root.winfo_width()
 
         if new_w != old_w:
-            cnf.root_w = new_w
+            cnf.root_g["w"] = new_w
 
             if self.clmns_count != self.get_clmns_count():
                 w, h = cnf.root.winfo_width(), cnf.root.winfo_height()
-                cnf.root_w, cnf.root_h = w, h
+                cnf.root_g["w"], cnf.root_g["h"] = w, h
                 cnf.root.update_idletasks()
                 Globals.reload_thumbs()
 
@@ -462,7 +462,7 @@ class Thumbnails(CFrame, ThumbsPrepare):
         self.load_thumbs()
 
     def get_clmns_count(self):
-        clmns = (cnf.root_w - cnf.menu_w) // cnf.thumb_size
+        clmns = (cnf.root_g["w"] - cnf.menu_w) // cnf.thumb_size
         return 1 if clmns == 0 else clmns
 
     def get_coords(self, e: tkinter.Event):
@@ -492,12 +492,12 @@ class Thumbnails(CFrame, ThumbsPrepare):
 
     def topbar_text(self, text):
         try:
-            self.topbar.configure(text=text, bg=cnf.topbar_color)
+            self.topbar.configure(text=text, bg=cnf.blue_color)
 
             if len(self.topbar_frame.children) < 2:
 
                 self.topbar_can = CButton(self.topbar_frame, text="Cancel")
-                self.topbar_can.configure(bg=cnf.topbar_color, pady=1)
+                self.topbar_can.configure(bg=cnf.blue_color, pady=1)
                 self.topbar_can.cmd(lambda e: cancel_utils_task())
                 self.topbar_can.pack(
                     side=tkinter.LEFT,

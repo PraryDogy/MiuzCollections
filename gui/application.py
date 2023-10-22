@@ -55,12 +55,12 @@ class Application:
 
         MacMenu()
 
-        if cnf.root_w < 50 or cnf.root_h < 50:
-            cnf.root_w, cnf.root_h = 700, 500
+        if cnf.root_g["w"] < 50 or cnf.root_g["h"] < 50:
+            cnf.root_g["w"], cnf.root_g["h"] = 700, 500
 
         cnf.root.geometry(
-            (f"{cnf.root_w}x{cnf.root_h}"
-            f"+{cnf.root_x}+{cnf.root_y}")
+            (f'{cnf.root_g["w"]}x{cnf.root_g["h"]}'
+            f'+{cnf.root_g["x"]}+{cnf.root_g["y"]}')
             )
 
         cnf.root.minsize(870, 500)

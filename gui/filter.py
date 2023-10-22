@@ -27,7 +27,7 @@ class CCalendarEntry(CWindow):
             self.win_cust,
             width=15,
             textvariable=var,
-            bg=cnf.ent_color,
+            bg=cnf.dgray_color,
             insertbackground="white",
             fg=cnf.fg_color,
             highlightthickness=0,
@@ -44,7 +44,7 @@ class CCalendarEntry(CWindow):
         btns.pack(pady=(15, 0))
 
         self.ok = CButton(btns, text=cnf.lang.ok)
-        self.ok.configure(fg=cnf.hov_color)
+        self.ok.configure(fg=cnf.dgray_color)
         self.ok.pack(side="left", padx=(0, 15))
 
         self.cancel = CButton(btns, text=cnf.lang.cancel)
@@ -78,7 +78,7 @@ class CCalendarEntry(CWindow):
             self.ok.bind("<ButtonRelease-1>", self.cust_ok_cmd)
             self.win_cust.bind("<Return>", self.cust_ok_cmd)
         except ValueError:
-            self.ok.configure(fg=cnf.hov_color)
+            self.ok.configure(fg=cnf.dgray_color)
             self.ok.unbind("<ButtonRelease-1>")
             self.win_cust.unbind("<Return>")
 
@@ -145,7 +145,7 @@ class CCalendar(CFrame, CCalendarEntry):
         self.change_title()
         self.title.pack(side="left")
         self.title.bind("<ButtonRelease-1>", self.cust_date_win)
-        self.title.bind("<Enter>", lambda e: self.title.configure(bg=cnf.topbar_color))
+        self.title.bind("<Enter>", lambda e: self.title.configure(bg=cnf.blue_color))
         self.title.bind("<Leave>", lambda e: self.title.configure(bg=cnf.bg_color))
         self.all_btns.append(self.title)
 
@@ -205,7 +205,7 @@ class CCalendar(CFrame, CCalendarEntry):
             else:
                 btn.configure(text="", bg=cnf.bg_color)
             if btn["text"] == self.dd:
-                btn.configure(bg=cnf.sel_color)
+                btn.configure(bg=cnf.lgray_color)
                 self.curr_btn = btn
 
     def change_title(self):
@@ -229,7 +229,7 @@ class CCalendar(CFrame, CCalendarEntry):
         if e.widget["text"]:
             self.curr_btn.configure(bg=cnf.btn_color)
             self.curr_btn = e.widget
-            self.curr_btn.configure(bg=cnf.sel_color)
+            self.curr_btn.configure(bg=cnf.lgray_color)
             self.dd = int(e.widget["text"])
             self.set_my_date()
             self.change_title()
@@ -314,19 +314,19 @@ class Filter(CWindow):
 
         self.product = CButton(grop_frame, text=cnf.lang.product)
         if cnf.product:
-            self.product.configure(bg=cnf.sel_color)
+            self.product.configure(bg=cnf.lgray_color)
         self.product.pack(side="left")
         self.product.cmd(self.product_cmd)
 
         self.models = CButton(grop_frame, text=cnf.lang.models)
         if cnf.models:
-            self.models.configure(bg=cnf.sel_color)
+            self.models.configure(bg=cnf.lgray_color)
         self.models.pack(side="left", padx=15)
         self.models.cmd(self.models_cmd)
 
         self.catalog = CButton(grop_frame, text=cnf.lang.catalog)
         if cnf.catalog:
-            self.catalog.configure(bg=cnf.sel_color)
+            self.catalog.configure(bg=cnf.lgray_color)
         self.catalog.pack(side="left")
         self.catalog.cmd(self.catalog_cmd)
 
@@ -393,22 +393,22 @@ class Filter(CWindow):
             self.btn_sort.configure(text=cnf.lang.date_changed)
 
     def product_cmd(self, e=None):
-        if self.product["bg"] == cnf.sel_color:
+        if self.product["bg"] == cnf.lgray_color:
             self.product.configure(bg=cnf.btn_color)
         else:
-            self.product.configure(bg=cnf.sel_color)
+            self.product.configure(bg=cnf.lgray_color)
 
     def catalog_cmd(self, e=None):
-        if self.catalog["bg"] == cnf.sel_color:
+        if self.catalog["bg"] == cnf.lgray_color:
             self.catalog.configure(bg=cnf.btn_color)
         else:
-            self.catalog.configure(bg=cnf.sel_color)
+            self.catalog.configure(bg=cnf.lgray_color)
 
     def models_cmd(self, e=None):
-        if self.models["bg"] == cnf.sel_color:
+        if self.models["bg"] == cnf.lgray_color:
             self.models.configure(bg=cnf.btn_color)
         else:
-            self.models.configure(bg=cnf.sel_color)
+            self.models.configure(bg=cnf.lgray_color)
 
     def ok_cmd(self, e=None):
         if self.date_changed:
@@ -421,17 +421,17 @@ class Filter(CWindow):
             Globals.start = None
             Globals.end = None
 
-        if self.product["bg"] == cnf.sel_color:
+        if self.product["bg"] == cnf.lgray_color:
             cnf.product = True
         else:
             cnf.product = False
 
-        if self.models["bg"] == cnf.sel_color:
+        if self.models["bg"] == cnf.lgray_color:
             cnf.models = True
         else:
             cnf.models = False
 
-        if self.catalog["bg"] == cnf.sel_color:
+        if self.catalog["bg"] == cnf.lgray_color:
             cnf.catalog = True
         else:
             cnf.catalog = False

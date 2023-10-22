@@ -139,10 +139,10 @@ def on_exit(e=None):
     w, h = cnf.root.winfo_width(), cnf.root.winfo_height()
     x, y = cnf.root.winfo_x(), cnf.root.winfo_y()
 
-    cnf.root_w = w
-    cnf.root_h = h
-    cnf.root_x = x
-    cnf.root_y = y
+    cnf.root_g["w"] = w
+    cnf.root_g["h"] = h
+    cnf.root_g["x"] = x
+    cnf.root_g["y"] = y
 
     cnf.write_cfg()
 
