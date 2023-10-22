@@ -32,7 +32,6 @@ __all__ = (
     "find_tiffs",
     "focus_last_win",
     "get_coll_name",
-    "normalize_name",
     "on_exit",
     "paste_search",
     "place_center",
@@ -40,7 +39,6 @@ __all__ = (
     "resize_image",
     "reveal_coll",
     "run_applescript",
-    "run_utils_task",
     "smb_check",
     "finder_actions"
     )
@@ -357,22 +355,17 @@ def copy_text(text):
 
 
 def apply_filter(str, e=None):
-    if str == "product":
+    if str == cnf.lng.product:
         cnf.product = True
-        cnf.models = False
-        cnf.catalog = False
-    elif str == "models":
-        cnf.product = False
+        cnf.models = cnf.catalog = False
+    elif str == cnf.lng.models:
         cnf.models = True
-        cnf.catalog = False
-    elif str == "catalog":
-        cnf.product = False
-        cnf.models = False
+        cnf.product = cnf.catalog = False
+    elif str == cnf.lng.catalog:
         cnf.catalog = True
+        cnf.product = cnf.models = False
     else:
-        cnf.product = True
-        cnf.models = True
-        cnf.catalog = True
+        cnf.product = cnf.models = cnf.catalog = True
 
     if e:
         Globals.show_coll(e)
@@ -437,7 +430,7 @@ def finder_actions(
                 return
 
             Globals.topbar_text(
-                f"{cnf.lang.copying} {num} {cnf.lang.from_pretext} {ln_src}"
+                f"{cnf.lng.copying} {num} {cnf.lng.from_pretext} {ln_src}"
                 )
 
             name, ext = img_src.split("/")[-1].split(".")

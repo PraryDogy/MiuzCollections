@@ -272,10 +272,10 @@ class Context(tkinter.Menu):
             command=lambda: finder_actions(e.widget.paths_list, tiff=True, fullsize=True),
             )
         
-    def apply_filter(self, label, str, e=None):
+    def apply_filter(self, label, e=None):
         self.add_command(
             label=label,
-            command=lambda: apply_filter(str, e)
+            command=lambda: apply_filter(label, e)
             )
         
     def please_wait(self):
