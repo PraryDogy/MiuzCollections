@@ -458,7 +458,7 @@ def finder_actions(
                     try:
                         img = img.convert("RGB", colors=8)
                         img = black_borders(img)
-                        img.save(f"{downloads}/{name}.jpg")
+                        img.save(f"{downloads}/psd {name}.jpg")
 
                     except Exception as e:
                         print(f"utils > fullsize psd save > {img_src}")
@@ -474,7 +474,7 @@ def finder_actions(
 
                         img = Image.fromarray(img.astype("uint8"), "RGB")
                         img = black_borders(img)
-                        img.save(f"{downloads}/{name}.jpg")
+                        img.save(f"{downloads}/tiff {name}.jpg")
 
                     except Exception as e:
                         print(f"utils > fullsize tiff > {img_src}")
