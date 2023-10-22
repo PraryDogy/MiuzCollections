@@ -21,6 +21,7 @@ from .globals import Globals
 
 __all__ = (
     "apply_filter",
+    "black_borders",
     "cancel_utils_task",
     "convert_to_rgb",
     "copy_text",
@@ -276,6 +277,23 @@ def crop_image(img):
     return cropped[0:cnf.thumb_size, 0:cnf.thumb_size]
 
 
+def black_borders(img: Image):
+    try:
+        bg = Image.new(img.mode, img.size, img.getpixel((0,0)))
+        diff = ImageChops.difference(img, bg)
+        diff = ImageChops.add(diff, diff, 2.0, -100)
+        bbox = diff.getbbox()
+
+        if bbox:
+            img = img.crop(bbox)
+
+        return img
+
+    except Exception as e:
+        print("utils > black_borders > can't crop PSD")
+        print(e)
+        return img
+
 
 
 # ********************finder utils********************
@@ -446,19 +464,10 @@ def finder_actions(
                             continue
 
                     try:
-                        bg = Image.new(img.mode, img.size, img.getpixel((0,0)))
-                        diff = ImageChops.difference(img, bg)
-                        diff = ImageChops.add(diff, diff, 2.0, -100)
-                        bbox = diff.getbbox()
-                        if bbox:
-                            img = img.crop(bbox)
-                    except Exception as e:
-                        print("utils > can't crop PSD")
-                        print(e)
-
-                    try:
                         img = img.convert("RGB", colors=8)
+                        img = black_borders(img)
                         img.save(f"{downloads}/{name}.jpg")
+
                     except Exception as e:
                         print(f"utils > fullsize psd save > {img_src}")
                         print(e)
@@ -468,19 +477,11 @@ def finder_actions(
                     try:
                         img = tifffile.imread(img_src)[:,:,:3]
 
-                        if str(img.dtype) == "uint16":
-                            img = (img/256).astype('uint8')
+                        if str(img.dtype) != "uint8":
+                            img = (img/256).astype("uint8")
 
-                        gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-                        _, thresh = cv2.threshold(gray,1,255,cv2.THRESH_BINARY)
-                        contours, _ = cv2.findContours(
-                            thresh,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE
-                            )
-                        cnt = contours[0]
-                        x,y,w,h = cv2.boundingRect(cnt)
-                        img = img[y:y+h,x:x+w]
-
-                        img = Image.fromarray(img.astype('uint8'), 'RGB')
+                        img = Image.fromarray(img.astype("uint8"), "RGB")
+                        img = black_borders(img)
                         img.save(f"{downloads}/{name}.jpg")
 
                     except Exception as e:
