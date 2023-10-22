@@ -1,11 +1,12 @@
 import calendar
+import re
 import tkinter
 from datetime import datetime
 
 from cfg import cnf
-from .utils import *
 
 from .globals import Globals
+from .utils import *
 from .widgets import *
 
 
@@ -65,6 +66,12 @@ class CCalendarEntry(CWindow):
 
     def character_limit(self, e:tkinter.StringVar):
         t = e.get()
+
+        t_reg = re.match(r"\d{,2}\W\d{,2}\W\d{4}", t)
+        if t_reg:
+            t = re.sub("\W", ".", t_reg.group(0))
+            e.set(t)
+
         try:
             self.cust_date = datetime.strptime(t, '%d.%m.%Y')
             self.ok.configure(fg=cnf.fg_color)
@@ -138,6 +145,8 @@ class CCalendar(CFrame, CCalendarEntry):
         self.change_title()
         self.title.pack(side="left")
         self.title.bind("<ButtonRelease-1>", self.cust_date_win)
+        self.title.bind("<Enter>", lambda e: self.title.configure(bg=cnf.topbar_color))
+        self.title.bind("<Leave>", lambda e: self.title.configure(bg=cnf.bg_color))
         self.all_btns.append(self.title)
 
         next_m = CButton(titles, text=">")

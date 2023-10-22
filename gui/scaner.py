@@ -26,7 +26,6 @@ class Scaner:
         self.scaner_task = cnf.root.after(ms, self.scaner_start)
 
     def scaner_start(self):
-        print("scan")
         cnf.scan_flag = True
         Globals.stbar_btn.configure(text=cnf.lang.updating,bg=cnf.topbar_color)
 
