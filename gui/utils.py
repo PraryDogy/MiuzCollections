@@ -455,7 +455,6 @@ def finder_actions(
                     try:
                         img = psd_tools.PSDImage.open(img_src).composite()
                     except Exception as e:
-                        print(e)
                         try:
                             img = Image.open(img_src)
                         except Exception:
