@@ -498,7 +498,7 @@ class Thumbnails(CFrame, ThumbsPrepare):
 
                 self.topbar_can = CButton(self.topbar_frame, text="Cancel")
                 self.topbar_can.configure(bg=cnf.topbar_color, pady=1)
-                self.topbar_can.cmd(lambda e: self.topbar_default())
+                self.topbar_can.cmd(lambda e: cancel_utils_task())
                 self.topbar_can.pack(
                     side=tkinter.LEFT,
                     pady=(5, 0), padx=(0, 10)
@@ -510,14 +510,11 @@ class Thumbnails(CFrame, ThumbsPrepare):
 
 
     def topbar_default(self):
-        cnf.topbar_flag = False
-
         try:
             self.topbar_can.destroy()
         except AttributeError as e:
             print("thumbnails > no topbar cancel button")
             print(e)
-
 
         try:
             self.topbar.configure(text=f"▲", bg=cnf.bg_color)

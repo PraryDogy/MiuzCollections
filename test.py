@@ -1,31 +1,13 @@
 import subprocess
+from cfg import cnf
 
-
-
-paths = ["/Users/evlosh/Downloads/new.jpg", "/Users/evlosh/Downloads/15ch16bit.tif"]
-
-paths = (
-    f"\"{i}\" as POSIX file"
-    for i in paths
-    )
-
-paths = ", ".join(paths)
 
 applescript = f"""
-    tell application \"Finder\"
-    reveal {{{paths}}}
-    activate
+    set appName to "{cnf.app_name}"
+    tell application "System Events"
+        set visible of application process appName to false
     end tell
     """
-
-args = [
-    item
-    for x in [("-e",l.strip())
-    for l in applescript.split('\n')
-    if l.strip() != ''] for item in x
-    ]
-
-# print(args)
 
 args = []
 for row in applescript.split("\n"):

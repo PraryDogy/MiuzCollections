@@ -94,6 +94,7 @@ class StBar(CFrame):
             if smb_check():
                 scaner.scaner_start()
             else:
+                scaner.scaner_sheldue()
                 SmbAlert()
                 return
         else:

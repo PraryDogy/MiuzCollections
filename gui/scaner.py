@@ -18,9 +18,15 @@ __all__ = (
 class Scaner:
     def __init__(self) -> None:
         self.need_update = False
+        self.scaner_task = None
 
+    def scaner_sheldue(self):
+        cnf.root.after_cancel(self.task)
+        ms = cnf.scan_time*60000
+        self.scaner_task = cnf.root.after(ms, self.scaner_start)
 
     def scaner_start(self):
+        print("scan")
         cnf.scan_flag = True
         Globals.stbar_btn.configure(text=cnf.lang.updating,bg=cnf.topbar_color)
 
@@ -40,9 +46,7 @@ class Scaner:
         cnf.scan_flag = False
         Globals.stbar_btn.configure(text=cnf.lang.update, bg=cnf.btn_color)
 
-        ms = cnf.scan_time*60000
-        cnf.root.after(ms, self.scaner_start)
-
+        self.scaner_sheldue()
 
     def task(self):
         self.__change_live_text(cnf.lang.preparing)

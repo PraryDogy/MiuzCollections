@@ -21,6 +21,7 @@ from .globals import Globals
 
 __all__ = (
     "apply_filter",
+    "cancel_utils_task",
     "convert_to_rgb",
     "copy_text",
     "crop_image",
@@ -38,7 +39,7 @@ __all__ = (
     "resize_image",
     "reveal_coll",
     "run_applescript",
-    "run_thread",
+    "run_utils_task",
     "smb_check",
     "finder_actions"
     )
@@ -51,7 +52,7 @@ __all__ = (
 utils_task = threading.Thread(target=None)
 
 
-def run_thread(fn, args=[], kwargs={}):
+def run_utils_task(fn, args=[], kwargs={}):
     global utils_task
     utils_task = threading.Thread(
         target=fn, args=args, kwargs=kwargs, daemon=True
@@ -59,22 +60,28 @@ def run_thread(fn, args=[], kwargs={}):
     utils_task.start()
 
 
-def wait_thread():
+def wait_utils_task():
     while utils_task.is_alive():
         cnf.root.update()
+
+
+def cancel_utils_task():
+    cnf.topbar_flag = False
+    wait_utils_task()
+    Globals.topbar_default()
 
 
 def delay():
     sleep(2)
 
 
-def threaded(task):
+def dec_utils_task(task):
     def wrapper(*args, **kwargs):
-        wait_thread()
-        run_thread(task, args, kwargs)
-        wait_thread()
+        wait_utils_task()
+        run_utils_task(task, args, kwargs)
+        wait_utils_task()
         Globals.topbar_default()
-        wait_thread()
+        wait_utils_task()
         cnf.topbar_flag = True
     return wrapper
 
@@ -355,7 +362,7 @@ def apply_filter(str, e=None):
         Globals.reload_scroll()
 
 
-@threaded
+@dec_utils_task
 def finder_actions(
     src, tiff=False, reveal=False, copy_path=False, download=False, 
     fullsize=False
@@ -416,7 +423,7 @@ def finder_actions(
                 )
 
             name, ext = img_src.split("/")[-1].split(".")
-            
+
             if download:
                 try:
                     shutil.copy(img_src, f"{downloads}/{name}.{ext}")

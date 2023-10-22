@@ -68,8 +68,9 @@ class Application:
         if smb_check():
             scaner.scaner_start()
         else:
+            scaner.scaner_sheldue()
             SmbAlert()
-        smb_check()
+
 
         cnf.first_load = False
 

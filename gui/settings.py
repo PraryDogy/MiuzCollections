@@ -25,6 +25,7 @@ class Settings(CWindow):
         self.changed_lang = False
         self.scan_again = False
         self.old_curr_coll = cnf.curr_coll
+        self.old_time = cnf.scan_time
 
         self.main_wid = self.main_widget()
         self.main_wid.pack(expand=True, fill="both")
@@ -38,6 +39,8 @@ class Settings(CWindow):
 
     def main_widget(self):
         frame = CFrame(self)
+
+
 
         path_name = CLabel(
             frame,
@@ -68,6 +71,8 @@ class Settings(CWindow):
         self.sett_desc.pack(anchor="w", pady=(15, 0))
         cnf.lang_sett.append(self.sett_desc)
 
+
+
         CSep(frame).pack(pady=15, padx=50, fill=tkinter.X)
 
         down_title = CLabel(
@@ -93,29 +98,20 @@ class Settings(CWindow):
         select_down.pack(pady=(10, 0))
         cnf.lang_sett.append(select_down)
 
+
+
         CSep(frame).pack(pady=15, padx=50, fill=tkinter.X)
 
-        scan_frame = CFrame(frame)
-        scan_frame.pack()
-
-        self.scan_min = CButton(scan_frame, text="<")
-        self.scan_min.configure(width=1, bg=cnf.bg_color)
-        self.scan_min.pack(side="left", pady=(0, 2))
-        self.scan_min.cmd(self.change_mins_cmd)
-
-        self.temp_time = cnf.scan_time
-        self.autoupd_wid = CLabel(
-            scan_frame,
+        self.scan_btn = CButton(
+            frame,
             text=f"{cnf.lang.update_every} {cnf.scan_time} {cnf.lang.mins}",
-            width=30
             )
-        self.autoupd_wid.pack(side="left")
-        cnf.lang_sett.append(self.autoupd_wid)
+        self.scan_btn.configure(width=28)
+        self.scan_btn.cmd(self.scan_time_cmd)
+        cnf.lang_sett.append(self.scan_btn)
+        self.scan_btn.pack()
 
-        self.scan_max = CButton(scan_frame, text=">")
-        self.scan_max.configure(width=1, bg=cnf.bg_color)
-        self.scan_max.pack(side="left", pady=(0, 2))
-        self.scan_max.cmd(self.change_mins_cmd)
+
 
         CSep(frame).pack(pady=15, padx=50, fill=tkinter.X)
 
@@ -136,6 +132,8 @@ class Settings(CWindow):
         cancel_frame = CFrame(frame)
         cancel_frame.pack(expand=True)
 
+
+
         CSep(cancel_frame).pack(pady=15, fill=tkinter.X)
 
         save_btn = CButton(cancel_frame, text=cnf.lang.ok)
@@ -150,28 +148,24 @@ class Settings(CWindow):
 
         return frame
 
-    def change_mins_cmd(self, e=None):
-        t = e.widget["text"]
-        times = {1: 5, 2: 10, 3: 30, 4: 60}
-        key = [k for k, v in times.items() if v == cnf.scan_time][0]
+    def scan_time_cmd(self, e=None):
+        times = [5, 10, 30, 60]
+        try:
+            ind = times.index(cnf.scan_time)
+        except ValueError:
+            ind = -1
 
-        if t == "<":
-            try:
-                cnf.scan_time = times[key-1]
-            except KeyError:
-                cnf.scan_time = times[4]
-        else:
-            try:
-                cnf.scan_time = times[key+1]
-            except KeyError:
-                cnf.scan_time = times[1]
+        try:
+            cnf.scan_time = times[ind+1]
+        except IndexError:
+            cnf.scan_time = times[0]
 
-        self.autoupd_wid.configure(
+        self.scan_btn.configure(
             text=f"{cnf.lang.update_every} {cnf.scan_time} {cnf.lang.mins}"
             )
 
     def change_lang(self):
-        self.autoupd_wid.configure(
+        self.scan_btn.configure(
             text=f"{cnf.lang.update_every} {cnf.scan_time} {cnf.lang.mins}"
             )
 
@@ -234,7 +228,7 @@ class Settings(CWindow):
             self.lang_cmd()
 
         cnf.lang_sett.clear()
-        cnf.scan_time = self.temp_time
+        cnf.scan_time = self.old_time
 
         self.destroy()
         cnf.root.focus_force()
@@ -259,6 +253,7 @@ class Settings(CWindow):
             if smb_check():
                 scaner.scaner_start()
             else:
+                scaner.scaner_sheldue()
                 SmbAlert()
 
         if self.changed_lang:
