@@ -283,5 +283,5 @@ class Context(tkinter.Menu):
             label=(
                 f"{cnf.lang.please_wait}"
                 f"\n{cnf.lang.updating} {cnf.lang.all_colls.lower()}"
-                ),
-        )
+                )
+                )

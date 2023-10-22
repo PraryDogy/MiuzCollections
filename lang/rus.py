@@ -98,10 +98,6 @@ class Rus:
         self.remove_fromapp = "Удалить из приложения"
         self.fullsize = "Скачать полноразмерный jpg"
         self.group_fullsize = "Скачать полноразмерные jpg"
-
-        self.show_product = "Показать имиджи"
-        self.show_models = "Показать модели"
-        self.show_catalog = "Показать каталог"
         self.show_all = "Показать все"
 
 

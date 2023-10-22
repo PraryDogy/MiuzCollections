@@ -98,10 +98,6 @@ class Eng:
         self.remove_fromapp = "Remove from app"
         self.fullsize = "Download fullsize jpg"
         self.group_fullsize = "Download fullsize jpg"
-
-        self.show_product = "Show product"
-        self.show_models = "Show models"
-        self.show_catalog = "Show catalog"
         self.show_all = "Show all"
 
 
