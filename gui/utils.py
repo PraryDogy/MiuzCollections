@@ -86,12 +86,6 @@ def dec_utils_task(task):
 
 
 def run_applescript(applescript: str):
-    # args = [
-    #     item
-    #     for x in [("-e",l.strip())
-    #     for l in applescript.split('\n')
-    #     if l.strip() != ''] for item in x]
-
     args = [
         arg for row in applescript.split("\n")
         for arg in ("-e", row.strip())
@@ -433,7 +427,7 @@ def finder_actions(
                 f"{cnf.lng.copying} {num} {cnf.lng.from_pretext} {ln_src}"
                 )
 
-            name, ext = img_src.split("/")[-1].split(".")
+            name, ext = os.path.splitext(img_src.split("/")[-1])
 
             if download:
                 try:
@@ -457,7 +451,7 @@ def finder_actions(
 
                     try:
                         img = img.convert("RGB", colors=8)
-                        img = black_borders(img)
+                        # img = black_borders(img)
                         img.save(f"{downloads}/psd {name}.jpg")
 
                     except Exception as e:
@@ -473,7 +467,7 @@ def finder_actions(
                             img = (img/256).astype("uint8")
 
                         img = Image.fromarray(img.astype("uint8"), "RGB")
-                        img = black_borders(img)
+                        # img = black_borders(img)
                         img.save(f"{downloads}/tiff {name}.jpg")
 
                     except Exception as e:
