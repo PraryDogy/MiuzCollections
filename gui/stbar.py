@@ -67,7 +67,7 @@ class StBar(CFrame):
         super().__init__(master)
 
         self.stbar = self.load_stbar()
-        self.stbar.pack(fill=tkinter.X)
+        self.stbar.pack(fill=tkinter.X, padx=(0, 10))
 
         Globals.stbar_btn = self.upd_btn
         Globals.reload_stbar = self.reload_stbar

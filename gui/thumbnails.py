@@ -337,7 +337,7 @@ class Thumbnails(CFrame, ThumbsPrepare):
         btn_filter.cmd(lambda e: Filter())
 
         search = ThumbsSearch(title_frame)
-        search.pack(pady=(15, 0), ipady=2)
+        search.pack(pady=(15, 0), ipady=2, padx=(0, 5))
 
         all_src = []
         limit = 500

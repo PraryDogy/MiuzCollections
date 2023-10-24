@@ -63,7 +63,7 @@ class Application:
             f'+{cnf.root_g["x"]}+{cnf.root_g["y"]}')
             )
 
-        cnf.root.minsize(1050, 800)
+        cnf.root.minsize(500, 500)
 
         if smb_check():
             scaner.scaner_start()
