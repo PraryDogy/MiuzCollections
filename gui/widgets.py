@@ -83,7 +83,7 @@ class SmbAlert(CWindow):
         title_lbl.pack()
 
         txt2 = cnf.lng.smb_descr
-        descr_lbl = CLabel(self, text=txt2, justify=tkinter.LEFT)
+        descr_lbl = CLabel(self, text=txt2, justify="left")
         descr_lbl.pack(padx=15, pady=(0, 5))
 
         btn = CButton(self, text=cnf.lng.close)

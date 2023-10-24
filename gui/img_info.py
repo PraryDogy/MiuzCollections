@@ -75,16 +75,16 @@ class ImageInfo(CWindow):
         left_lbl = CLabel(
             frame,
             text = "\n".join(i for i in labels.keys()),
-            justify = tkinter.RIGHT,
-            anchor = tkinter.NE,
+            justify = "right",
+            anchor = "ne",
             )
-        left_lbl.pack(anchor=tkinter.N, side=tkinter.LEFT)
+        left_lbl.pack(anchor="n", side="left")
 
         fake = CLabel(
             frame,
             text = "\n".join(i for i in labels.values()),
-            justify = tkinter.LEFT,
-            anchor = tkinter.NW,
+            justify = "left",
+            anchor = "nw",
             )
 
         text_frame = CFrame(
@@ -92,7 +92,7 @@ class ImageInfo(CWindow):
             height=fake.winfo_reqheight(),
             width=fake.winfo_reqwidth()
             )
-        text_frame.pack(anchor=tkinter.N, side=tkinter.LEFT, pady=3)
+        text_frame.pack(anchor="n", side="left", pady=3)
         text_frame.pack_propagate(False)
 
         fake.destroy()
@@ -109,7 +109,7 @@ class ImageInfo(CWindow):
         right_lbl.bind("<ButtonRelease-2>", self.r_click)
 
         right_lbl.configure(state=tkinter.DISABLED)
-        right_lbl.pack(anchor=tkinter.N, side=tkinter.LEFT)
+        right_lbl.pack(anchor="n", side="left")
 
         self.protocol("WM_DELETE_WINDOW", self.close_win)
         self.bind('<Escape>', self.close_win)

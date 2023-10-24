@@ -80,7 +80,7 @@ class Menu(tkmacosx.SFrame):
             }
 
         last = CButton(frame, text=cnf.lng.all_colls)
-        last.configure(width=13, pady=5, anchor=tkinter.W, padx=10)
+        last.configure(width=13, pady=5, anchor="w", padx=10)
         last.coll_name = cnf.all_colls
         last.cmd(self.show_coll)
         last.pack(pady=(0, 15))
@@ -88,11 +88,11 @@ class Menu(tkmacosx.SFrame):
 
         sep = CSep(frame)
         sep['bg'] = '#272727'
-        sep.pack(fill=tkinter.X)
+        sep.pack(fill="x")
 
         for fake_name, coll_name in menus.items():
             btn = CButton(frame, text = fake_name)
-            btn.configure(width=13, pady=5, anchor=tkinter.W, padx=10)
+            btn.configure(width=13, pady=5, anchor="w", padx=10)
             btn.coll_name = coll_name
             btn.cmd(self.show_coll)
             btn.pack()
@@ -104,7 +104,7 @@ class Menu(tkmacosx.SFrame):
 
             sep = CSep(frame)
             sep['bg'] = '#272727'
-            sep.pack(fill=tkinter.X)
+            sep.pack(fill="x")
     
         if cnf.curr_coll == cnf.all_colls:
             last.configure(bg=cnf.lgray_color)

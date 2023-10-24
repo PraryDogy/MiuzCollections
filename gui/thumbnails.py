@@ -292,52 +292,47 @@ class Thumbnails(CFrame, ThumbsPrepare):
 
         self.thumbs_frame = CFrame(self.sframe)
 
-        title_frame = CFrame(self.thumbs_frame)
-        title_frame.pack()
+        title = CLabel(self.thumbs_frame, text=self.coll_title, width=30)
+        title.configure(font=('San Francisco Pro', 30, 'bold'))
+        title.pack(anchor="center")
 
-        main_title = CLabel(title_frame, text=self.coll_title, width=30)
-        main_title.configure(font=('San Francisco Pro', 30, 'bold'))
-        main_title.pack(anchor="center")
+        filtr_fr = CFrame(self.thumbs_frame)
+        filtr_fr.pack()
 
-        main_sub_frame = CFrame(title_frame)
-        main_sub_frame.pack(pady=(0, 15))
-
-        sub_font=('San Francisco Pro', 13, 'normal')
-
-        l_subtitle_t = (
-            f"{cnf.lng.filter}"
-            f"\n{cnf.lng.sort}"
-            )
-        l_subtitle = CLabel(main_sub_frame, text=l_subtitle_t)
-        l_subtitle.configure(
-            font=sub_font,
+        filtr_l = CLabel(filtr_fr)
+        filtr_l.configure(
+            text=(
+                f"{cnf.lng.filter}"
+                f"\n{cnf.lng.sort}"
+                ),
+            font=('San Francisco Pro', 13, 'normal'),
             justify="right",
             anchor="e",
-            width=35
+            width=20,
             )
-        l_subtitle.pack(side="left", padx=(90, 0))
+        filtr_l.pack(side="left")
 
-        r_subtitle_t = (
-            f"{self.filter_row}"
-            f"\n{self.sort_text}"
-            )
-        r_subtitle = CLabel(main_sub_frame, text=r_subtitle_t)
-        r_subtitle.configure(
-            font=sub_font,
+        filtr_r = CLabel(filtr_fr)
+        filtr_r.configure(
+            text=(
+                f"{self.filter_row}"
+                f"\n{self.sort_text}"
+                ),
+            font=('San Francisco Pro', 13, 'normal'),
             justify="left",
             anchor="w",
-            width=45
+            width=20
             )
-        r_subtitle.pack(side="right")
+        filtr_r.pack(side="right")
 
-        btn_filter = CButton(title_frame, text=cnf.lng.filters)
-        btn_filter.pack()
+        btn_filter = CButton(self.thumbs_frame, text=cnf.lng.filters)
+        btn_filter.pack(pady=(10, 0))
         if any((Globals.start, Globals.end)):
             btn_filter.configure(bg=cnf.blue_color)
         btn_filter.cmd(lambda e: Filter())
 
-        search = ThumbsSearch(title_frame)
-        search.pack(pady=(15, 0), ipady=2, padx=(0, 5))
+        search = ThumbsSearch(self.thumbs_frame)
+        search.pack(pady=(10, 0), ipady=2, padx=(0, 5))
 
         all_src = []
         limit = 500

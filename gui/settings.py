@@ -20,7 +20,7 @@ class Settings(CWindow):
         self.bind('<Escape>', self.cancel_cmd)
         self.bind("<Return>", self.save_cmd)
         self.title(cnf.lng.settings)
-        self.minsize(500, 450)
+        self.minsize(450, 450)
 
         self.scan_again = False
         self.old_time = cnf.scan_time
@@ -54,7 +54,7 @@ class Settings(CWindow):
 
 
 
-        CSep(self).pack(pady=15, padx=50, fill=tkinter.X)
+        CSep(self).pack(pady=15, padx=50, fill="x")
 
         down_title = CLabel(
             self,
@@ -79,7 +79,7 @@ class Settings(CWindow):
 
 
 
-        CSep(self).pack(pady=15, padx=50, fill=tkinter.X)
+        CSep(self).pack(pady=15, padx=50, fill="x")
 
         self.scan_btn = CButton(
             self,
@@ -91,7 +91,7 @@ class Settings(CWindow):
 
 
 
-        CSep(self).pack(pady=15, padx=50, fill=tkinter.X)
+        CSep(self).pack(pady=15, padx=50, fill="x")
 
         lang_lbl = CLabel(
             self,
@@ -116,7 +116,7 @@ class Settings(CWindow):
         cancel_frame = CFrame(self)
         cancel_frame.pack(expand=True)
 
-        CSep(cancel_frame).pack(pady=15, fill=tkinter.X)
+        CSep(cancel_frame).pack(pady=15, fill="x")
 
         save_btn = CButton(cancel_frame, text=cnf.lng.ok)
         save_btn.cmd(self.save_cmd)
