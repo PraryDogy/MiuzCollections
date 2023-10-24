@@ -415,7 +415,11 @@ class Thumbnails(CFrame, ThumbsPrepare):
         more_btn.cmd(lambda e: self.show_more_cmd())
         more_btn.pack(pady=(15, 0))
 
-        self.thumbs_frame.pack(expand=1, fill=tkinter.BOTH, padx=(7, 0))
+        self.thumbs_frame.pack(
+            expand=1,
+            fill=tkinter.BOTH,
+            padx=(self.sframe["scrollbarwidth"], 0)
+            )
 
     def show_more_cmd(self):
         cnf.limit += 150
