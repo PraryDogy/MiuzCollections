@@ -97,20 +97,22 @@ class ThumbsSearch(CFrame):
             border=1,
             highlightthickness=0,
             )
-        self.search_wid.pack(fill=tkinter.X)
+        self.search_wid.pack(fill="x", ipady=2, ipadx=2)
 
         btns_frame = CFrame(self)
         btns_frame.pack(pady=(10, 0))
 
         self.btn_search = CButton(btns_frame, text=cnf.lng.search)
-        self.btn_search.pack(side=tkinter.LEFT, padx=(0, 10))
+        self.btn_search.pack(side="left")
         self.btn_search.cmd(self.search_go)
+
+        CSep(btns_frame).pack(fill="y", side="left", padx=10)
 
         if Globals.search_var.get():
             self.btn_search.configure(bg=cnf.blue_color)
 
         self.btn_clear = CButton(btns_frame, text=cnf.lng.clear)
-        self.btn_clear.pack(side=tkinter.LEFT)
+        self.btn_clear.pack(side="left")
         self.btn_clear.cmd(self.search_clear)
 
         self.search_wid.bind("<Escape>", lambda e: cnf.root.focus_force())
@@ -243,7 +245,7 @@ class Thumbnails(CFrame, ThumbsPrepare):
     def __init__(self, master):
         super().__init__(master)
         self.topbar_frame = CFrame(self)
-        self.topbar_frame.pack(fill=tkinter.X)
+        self.topbar_frame.pack(fill="x")
 
         self.topbar = CButton(self.topbar_frame, text=f"▲")
         self.topbar.configure(
@@ -251,16 +253,11 @@ class Thumbnails(CFrame, ThumbsPrepare):
             bg=cnf.bg_color,
             pady=1,
             )
-        self.topbar.pack(
-            pady=(5, 0), padx=(10, 20),
-            side=tkinter.LEFT,
-            fill=tkinter.X,
-            expand=1
-            )
+        self.topbar.pack(pady=(5, 0), side="left", fill="x", expand=1)
         self.topbar.cmd(self.scroll_up)
 
         sep = CSep(self)
-        sep.pack(fill=tkinter.X, pady=5, padx=10)
+        sep.pack(fill="x", pady=5)
 
         self.clmns_count = 1
 
@@ -332,7 +329,7 @@ class Thumbnails(CFrame, ThumbsPrepare):
         btn_filter.cmd(lambda e: Filter())
 
         search = ThumbsSearch(self.thumbs_frame)
-        search.pack(pady=(10, 0), ipady=2, padx=(0, 5))
+        search.pack(pady=(10, 0))
 
         all_src = []
         limit = 500
@@ -418,7 +415,7 @@ class Thumbnails(CFrame, ThumbsPrepare):
         more_btn.cmd(lambda e: self.show_more_cmd())
         more_btn.pack(pady=(15, 0))
 
-        self.thumbs_frame.pack(expand=1, fill=tkinter.BOTH)
+        self.thumbs_frame.pack(expand=1, fill=tkinter.BOTH, padx=(7, 0))
 
     def show_more_cmd(self):
         cnf.limit += 150
@@ -491,7 +488,7 @@ class Thumbnails(CFrame, ThumbsPrepare):
                 self.topbar_can.configure(bg=cnf.blue_color, pady=1)
                 self.topbar_can.cmd(lambda e: cancel_utils_task())
                 self.topbar_can.pack(
-                    side=tkinter.LEFT,
+                    side="left",
                     pady=(5, 0), padx=(0, 10)
                     )
 

@@ -114,7 +114,7 @@ class Settings(CWindow):
 
 
         cancel_frame = CFrame(self)
-        cancel_frame.pack(expand=True)
+        cancel_frame.pack(expand=1)
 
         CSep(cancel_frame).pack(pady=15, fill="x")
 

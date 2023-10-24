@@ -91,7 +91,7 @@ class Menu(tkmacosx.SFrame):
         sep.pack(fill="x")
 
         for fake_name, coll_name in menus.items():
-            btn = CButton(frame, text = fake_name)
+            btn = CButton(frame, text=fake_name)
             btn.configure(width=13, pady=5, anchor="w", padx=10)
             btn.coll_name = coll_name
             btn.cmd(self.show_coll)

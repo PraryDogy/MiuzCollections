@@ -48,9 +48,9 @@ class Application:
         stbar = StBar(r_frame)
 
         menu.pack(side="left", fill="y", pady=10)
-        r_frame.pack(fill="both", expand=True)
-        thumbnails.pack(fill="both", expand=True, padx=10)
-        sep.pack(fill="x", pady=10, padx=15)
+        r_frame.pack(fill="both", expand=1, padx=15)
+        thumbnails.pack(fill="both", expand=1)
+        sep.pack(fill="x", pady=10)
         stbar.pack(pady=(0, 10))
 
         MacMenu()

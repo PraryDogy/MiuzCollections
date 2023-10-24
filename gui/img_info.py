@@ -49,7 +49,7 @@ class ImageInfo(CWindow):
             filesize = ""
 
         frame = CFrame(self)
-        frame.pack(expand=True, fill="both")
+        frame.pack(expand=1, fill="both")
 
         max_ln = 40
 
@@ -74,17 +74,17 @@ class ImageInfo(CWindow):
 
         left_lbl = CLabel(
             frame,
-            text = "\n".join(i for i in labels.keys()),
-            justify = "right",
-            anchor = "ne",
+            text="\n".join(i for i in labels.keys()),
+            justify="right",
+            anchor="ne",
             )
         left_lbl.pack(anchor="n", side="left")
 
         fake = CLabel(
             frame,
-            text = "\n".join(i for i in labels.values()),
-            justify = "left",
-            anchor = "nw",
+            text="\n".join(i for i in labels.values()),
+            justify="left",
+            anchor="nw",
             )
 
         text_frame = CFrame(

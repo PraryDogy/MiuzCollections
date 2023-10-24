@@ -21,11 +21,11 @@ class ScanerGui(CWindow):
 
         self.live_lbl = CLabel(
             self,
-            text = cnf.scan_win_txt,
-            anchor = "w",
-            justify = "left",
+            text=cnf.scan_win_txt,
+            anchor="w",
+            justify="left",
             )
-        self.live_lbl.pack(expand=True, fill="both")
+        self.live_lbl.pack(expand=1, fill="both")
 
         self.can_btn = CButton(self, text=cnf.lng.cancel)
         self.can_btn.pack(pady=(10, 0))
@@ -67,7 +67,7 @@ class StBar(CFrame):
         super().__init__(master)
 
         self.stbar = self.load_stbar()
-        self.stbar.pack(fill="x", padx=(0, 10))
+        self.stbar.pack(fill="x")
 
         Globals.stbar_btn = self.upd_btn
         Globals.reload_stbar = self.reload_stbar
@@ -75,14 +75,14 @@ class StBar(CFrame):
     def load_stbar(self):
         frame = CFrame(self)
 
-        btn = CButton(frame, text=cnf.lng.settings, padx=5)
+        btn = CButton(frame, text=cnf.lng.settings)
         btn['width'] = 10
         btn.cmd(lambda e: self.settings_cmd(btn))
         btn.pack(side="left")
 
-        CSep(frame).pack(fill="y", side="left", padx=15)
+        CSep(frame).pack(fill="y", side="left", padx=10)
 
-        self.upd_btn = CButton(frame, text=cnf.lng.update, padx=5)
+        self.upd_btn = CButton(frame, text=cnf.lng.update)
         self.upd_btn['width'] = 10
         self.upd_btn.cmd(lambda e: self.update_cmd(btn))
         self.upd_btn.pack(side="left")

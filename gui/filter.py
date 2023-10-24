@@ -159,7 +159,7 @@ class CCalendar(CFrame, CCalendarEntry):
         row.pack()
 
         for i in cnf.lng.calendar_days:
-            lbl = CButton(row, text = i)
+            lbl = CButton(row, text=i)
             lbl.configure(width=4, height=2)
             lbl.pack(side="left")
             self.all_btns.append(lbl)
