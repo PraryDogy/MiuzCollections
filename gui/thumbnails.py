@@ -252,7 +252,7 @@ class Thumbnails(CFrame, ThumbsPrepare):
             pady=1,
             )
         self.topbar.pack(
-            pady=(5, 0), padx=(10, 1),
+            pady=(5, 0), padx=(10, 20),
             side=tkinter.LEFT,
             fill=tkinter.X,
             expand=1
@@ -315,7 +315,7 @@ class Thumbnails(CFrame, ThumbsPrepare):
             anchor="e",
             width=35
             )
-        l_subtitle.pack(side="left", padx=(0, 10))
+        l_subtitle.pack(side="left", padx=(90, 0))
 
         r_subtitle_t = (
             f"{self.filter_row}"
