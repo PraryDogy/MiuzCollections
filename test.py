@@ -1,6 +1,19 @@
-name = "/Volumes/Shares/Marketing/Photo/_Collections/24 Estella/1 IMG/17.10.2023_E01-35701.jpg"
-import os
-e = name.split("/")[-1]
-e = os.path.splitext(e)
+import tkinter
 
-print(e)
+root = tkinter.Tk()
+
+class Btn(tkinter.Label):
+    def __init__(self, master, bg="blue", **kwargs) -> None:
+        super().__init__(master, kwargs, bg=bg)
+
+
+bt = Btn(
+    root,
+    # bg="red",
+    text="hello",
+    width=10,
+    height=10
+    )
+bt.pack()
+
+root.mainloop()
