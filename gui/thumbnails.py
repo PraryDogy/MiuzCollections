@@ -288,6 +288,7 @@ class Thumbnails(CFrame, ThumbsPrepare):
         self.clmns_count = self.get_clmns_count()
 
         self.thumbs_frame = CFrame(self.sframe)
+        # тут пустое место как я понимаю, для контекста
 
         title = CLabel(self.thumbs_frame, text=self.coll_title, width=30)
         title.configure(font=('San Francisco Pro', 30, 'bold'))
