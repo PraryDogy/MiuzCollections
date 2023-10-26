@@ -268,8 +268,7 @@ class Thumbnails(CFrame, ThumbsPrepare):
         self.topbar.pack(pady=(5, 0), side="left", fill="x", expand=1)
         self.topbar.cmd(self.scroll_up)
 
-        sep = CSep(self)
-        sep.pack(fill="x", pady=5)
+        CSep(self).pack(fill="x", pady=5)
 
         self.clmns_count = 1
 
@@ -334,7 +333,7 @@ class Thumbnails(CFrame, ThumbsPrepare):
             )
         filtr_r.pack(side="right")
 
-        for i in (cnf.root, self.thumbs_frame, title, filtr_l, filtr_r):
+        for i in (self.thumbs_frame, title, filtr_l, filtr_r):
             i.bind("<ButtonRelease-2>", ContextFilter)
 
         btn_filter = CButton(self.thumbs_frame, text=cnf.lng.filters)
@@ -508,7 +507,7 @@ class Thumbnails(CFrame, ThumbsPrepare):
                 self.topbar_can.cmd(lambda e: cancel_utils_task())
                 self.topbar_can.pack(
                     side="left",
-                    pady=(5, 0), padx=(0, 10)
+                    pady=(5, 0), padx=(1, 10)
                     )
 
         except RuntimeError as e:

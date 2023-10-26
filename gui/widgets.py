@@ -20,11 +20,8 @@ __all__ = (
 
 
 class CSep(tkinter.Frame):
-    def __init__(self, master: tkinter, **kw):
-        super().__init__(master, **kw)
-
-        if not kw:
-            self.configure(bg=cnf.btn_color, height=1)
+    def __init__(self, master: tkinter, bg=cnf.btn_color, height=1, **kw):
+        super().__init__(master, bg=bg, height=height, **kw)
 
 
 class CButton(tkinter.Label):

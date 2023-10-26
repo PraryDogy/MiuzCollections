@@ -164,8 +164,7 @@ class CCalendar(CFrame, CCalendarEntry):
             lbl.pack(side="left")
             self.all_btns.append(lbl)
 
-        sep = CSep(parrent)
-        sep.configure(bg=cnf.bg_color, height=2)
+        sep = CSep(parrent, bg=cnf.bg_color, height=2)
         sep.pack(fill="x")
 
         row = CFrame(parrent)

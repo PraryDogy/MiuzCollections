@@ -86,8 +86,7 @@ class Menu(tkmacosx.SFrame):
         last.pack(pady=(0, 15))
         last.bind("<Button-2>", ContextMenu)
 
-        sep = CSep(frame)
-        sep['bg'] = '#272727'
+        sep = CSep(frame, bg='#272727')
         sep.pack(fill="x")
 
         for fake_name, coll_name in menus.items():
@@ -102,8 +101,7 @@ class Menu(tkmacosx.SFrame):
                 btn.configure(bg=cnf.lgray_color)
                 self.sel_btn = btn
 
-            sep = CSep(frame)
-            sep['bg'] = '#272727'
+            sep = CSep(frame, bg='#272727')
             sep.pack(fill="x")
     
         if cnf.curr_coll == cnf.all_colls:
