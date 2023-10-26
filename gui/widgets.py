@@ -123,10 +123,17 @@ class Context(tkinter.Menu):
     def sep(self):
         self.add_separator()
 
-    def do_popup(self, e: tkinter.Event):
+    def do_popup(self, e: tkinter.Event, ismenu=None):
         try:
+            if ismenu:
+                e.widget.configure(bg=cnf.blue_color)
             self.tk_popup(e.x_root, e.y_root)
         finally:
+            if ismenu:
+                if e.widget.cget("text") in cnf.curr_coll:
+                    e.widget.configure(bg=cnf.lgray_color)
+                else:
+                    e.widget.configure(bg=cnf.btn_color)
             self.grab_release()
 
     def imgview(self, e: tkinter.Event):

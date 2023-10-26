@@ -27,7 +27,7 @@ class ContextMenu(Context):
         self.apply_filter(cnf.lng.catalog, e)
         self.apply_filter(cnf.lng.show_all, e)
 
-        self.do_popup(e)
+        self.do_popup(e, ismenu=True)
 
 
 class Menu(tkmacosx.SFrame):
