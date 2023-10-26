@@ -488,6 +488,8 @@ class Thumbnails(CFrame, ThumbsPrepare):
     def r_click(self, e: tkinter.Event):
         if self.get_coords(e):
             ContextThumbs(e)
+        else:
+            ContextFilter(e)
 
     def scroll_up(self, e=None):
         self.sframe["canvas"].yview_moveto("0.0")
