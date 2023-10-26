@@ -261,7 +261,7 @@ class Thumbnails(CFrame, ThumbsPrepare):
 
         self.topbar = CButton(
             self.topbar_frame, text=f"▲",
-            font=('San Francisco Pro', 13, 'normal'),
+            font=("San Francisco Pro", 13, "normal"),
             bg=cnf.bg_color, pady=1,
             )
         self.topbar.pack(pady=(5, 0), side="left", fill="x", expand=1)
@@ -276,7 +276,7 @@ class Thumbnails(CFrame, ThumbsPrepare):
         self.load_scroll()
         self.load_thumbs()
 
-        cnf.root.bind('<Configure>', self.decect_resize)
+        cnf.root.bind("<Configure>", self.decect_resize)
         self.resize_task = None
         self.search_task = None
 
@@ -301,7 +301,7 @@ class Thumbnails(CFrame, ThumbsPrepare):
 
         title = CLabel(
             self.thumbs_frame, text=self.coll_title, width=30,
-            font=('San Francisco Pro', 30, 'bold')
+            font=("San Francisco Pro", 30, "bold")
             )
         title.pack(anchor="center")
 
@@ -309,7 +309,7 @@ class Thumbnails(CFrame, ThumbsPrepare):
         filtr_fr.pack()
 
         filtr_l = CLabel(
-            filtr_fr, font=('San Francisco Pro', 13, 'normal'),
+            filtr_fr, font=("San Francisco Pro", 13, "normal"),
             justify="right", anchor="e", width=20,
             text=(
                 f"{cnf.lng.filter}"
@@ -319,7 +319,7 @@ class Thumbnails(CFrame, ThumbsPrepare):
         filtr_l.pack(side="left")
 
         filtr_r = CLabel(
-            filtr_fr, font=('San Francisco Pro', 13, 'normal'),
+            filtr_fr, font=("San Francisco Pro", 13, "normal"),
             justify="left", anchor="w", width=20,
             text=(
                 f"{self.filter_row}"
@@ -352,7 +352,7 @@ class Thumbnails(CFrame, ThumbsPrepare):
             t = f"{date_key}, {cnf.lng.total}: {len(img_list)}"
             chunk_title = CLabel(
                 self.thumbs_frame, text=t,
-                font=('San Francisco Pro', 18, 'bold')
+                font=("San Francisco Pro", 18, "bold")
                 )
             chunk_title.pack(anchor="w", pady=(30, 0), padx=2)
 
@@ -394,7 +394,7 @@ class Thumbnails(CFrame, ThumbsPrepare):
                 img_lbl.coords = coords
                 img_lbl.all_src = all_src
 
-                img_lbl.bind('<ButtonRelease-1>', self.click)
+                img_lbl.bind("<ButtonRelease-1>", self.click)
                 img_lbl.bind("<ButtonRelease-2>", self.r_click)
                 img_lbl.bind("<Command-ButtonRelease-2>", self.r_cmd_click)
 
@@ -417,7 +417,7 @@ class Thumbnails(CFrame, ThumbsPrepare):
 
             no_images = CLabel(
                 self.thumbs_frame, text=noimg_t,
-                font=('San Francisco Pro', 18, 'bold')
+                font=("San Francisco Pro", 18, "bold")
                 )
             no_images.pack(pady=(15, 0))
 
@@ -428,7 +428,7 @@ class Thumbnails(CFrame, ThumbsPrepare):
         self.thumbs_frame.pack(
             expand=1,
             fill=tkinter.BOTH,
-            padx=(self.sframe["scrollbarwidth"], 0)
+            padx=(self.sframe.cget("scrollbarwidth"), 0)
             )
 
     def show_more_cmd(self):
@@ -490,7 +490,7 @@ class Thumbnails(CFrame, ThumbsPrepare):
             ContextThumbs(e)
 
     def scroll_up(self, e=None):
-        self.sframe['canvas'].yview_moveto('0.0')
+        self.sframe["canvas"].yview_moveto("0.0")
 
     def topbar_text(self, text):
         try:

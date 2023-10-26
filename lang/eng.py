@@ -59,13 +59,13 @@ class Eng:
             )
 
         self.smb_descr = (
-            '- Check internet connection.'
-            '\n- Try to open any Miuz network folder.'
-            '\n- Open settings and select collections folder.'
-            '\n- Restart app.'
+            "- Check internet connection."
+            "\n- Try to open any Miuz network folder."
+            "\n- Open settings and select collections folder."
+            "\n- Restart app."
 
-            '\nSupport: loshkarev@miuz.ru'
-            '\nTelegram: evlosh'
+            "\nSupport: loshkarev@miuz.ru"
+            "\nTelegram: evlosh"
             )
 
         self.lang_descr = "Press ok to change language"

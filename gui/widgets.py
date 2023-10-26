@@ -36,7 +36,7 @@ class CButton(tkinter.Label):
             )
 
     def cmd(self, cmd):
-        self.bind('<ButtonRelease-1>', cmd)
+        self.bind("<ButtonRelease-1>", cmd)
 
 
 class CFrame(tkinter.Frame):
@@ -55,13 +55,13 @@ class CLabel(tkinter.Label):
 class CWindow(tkinter.Toplevel):
     def __init__(self, bg=cnf.bg_color, padx=15, pady=15):
         super().__init__(bg=bg, padx=padx, pady=pady)
-        cnf.root.eval(f'tk::PlaceWindow {self} center')
+        cnf.root.eval(f"tk::PlaceWindow {self} center")
         self.withdraw()
 
         self.protocol("WM_DELETE_WINDOW", self.close_win)
-        self.bind('<Escape>', self.close_win)
-        self.bind('<Command-w>', self.close_win)
-        self.bind('<Command-q>', on_exit)
+        self.bind("<Escape>", self.close_win)
+        self.bind("<Command-w>", self.close_win)
+        self.bind("<Command-q>", on_exit)
 
         self.resizable(0,0)
 
@@ -76,7 +76,7 @@ class SmbAlert(CWindow):
 
         txt = cnf.lng.no_connection
         title_lbl = CLabel(
-            self, text=txt, font=('San Francisco Pro', 22, 'bold')
+            self, text=txt, font=("San Francisco Pro", 22, "bold")
             )
         title_lbl.pack()
 
@@ -105,13 +105,13 @@ class MacMenu(tkinter.Menu):
         tkinter.Menu.__init__(self, menubar)
 
         if sys.version_info.minor < 10:
-            cnf.root.createcommand('tkAboutDialog', self.about_dialog)
+            cnf.root.createcommand("tkAboutDialog", self.about_dialog)
 
         cnf.root.configure(menu=menubar)
 
     def about_dialog(self):
         try:
-            cnf.root.tk.call('tk::mac::standardAboutPanel')
+            cnf.root.tk.call("tk::mac::standardAboutPanel")
         except Exception:
             print("no dialog panel")
 

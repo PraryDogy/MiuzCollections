@@ -13,8 +13,8 @@ __all__ = (
 
 class Dbase():
     __engine = sqlalchemy.create_engine(
-        'sqlite:////' + cnf.db_dir,
-        connect_args = {'check_same_thread': False},
+        "sqlite:////" + cnf.db_dir,
+        connect_args = {"check_same_thread": False},
         echo = False
         )
     conn = __engine.connect()
@@ -22,7 +22,7 @@ class Dbase():
 
 
 class Thumbs(Dbase.base):
-    __tablename__ = 'thumbs'
+    __tablename__ = "thumbs"
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
     img150 = sqlalchemy.Column(sqlalchemy.LargeBinary)
     src = sqlalchemy.Column(sqlalchemy.Text)

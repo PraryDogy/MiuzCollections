@@ -15,8 +15,8 @@ class CCalendarEntry(CWindow):
         self.win_cust = CWindow()
         self.win_cust.title(cnf.lng.enter_date)
         self.win_cust.protocol("WM_DELETE_WINDOW", self.cust_can_cmd)
-        self.win_cust.bind('<Escape>', self.cust_can_cmd)
-        self.bind('<Command-q>', on_exit)
+        self.win_cust.bind("<Escape>", self.cust_can_cmd)
+        self.bind("<Command-q>", on_exit)
 
         cust_l = CLabel(self.win_cust, text=cnf.lng.d_m_y)
         cust_l.pack(pady=(0, 5))
@@ -56,7 +56,7 @@ class CCalendarEntry(CWindow):
         x, y = under_win.winfo_x(), under_win.winfo_y()
         xx = x + under_win.winfo_width()//2 - self.win_cust.winfo_width()//2
         yy = y + under_win.winfo_height()//2 - self.win_cust.winfo_height()//2
-        self.win_cust.geometry(f'+{xx}+{yy}')
+        self.win_cust.geometry(f"+{xx}+{yy}")
 
         self.win_cust.deiconify()
         self.win_cust.wait_visibility()
@@ -72,7 +72,7 @@ class CCalendarEntry(CWindow):
             e.set(t)
 
         try:
-            self.cust_date = datetime.strptime(t, '%d.%m.%Y')
+            self.cust_date = datetime.strptime(t, "%d.%m.%Y")
             self.ok.configure(fg=cnf.fg_color)
             self.ok.bind("<ButtonRelease-1>", self.cust_ok_cmd)
             self.win_cust.bind("<Return>", self.cust_ok_cmd)
@@ -196,7 +196,7 @@ class CCalendar(CFrame, CCalendarEntry):
                 btn.configure(text=day, bg=cnf.btn_color)
             else:
                 btn.configure(text="", bg=cnf.bg_color)
-            if btn["text"] == self.dd:
+            if btn.cget("text") == self.dd:
                 btn.configure(bg=cnf.lgray_color)
                 self.curr_btn = btn
 
@@ -218,17 +218,17 @@ class CCalendar(CFrame, CCalendarEntry):
         self.yy, self.mm, self.dd = tuple(self.my_date.timetuple())[:3]
 
     def switch_day(self, e=None):
-        if e.widget["text"]:
+        if e.widget.cget("text"):
             self.curr_btn.configure(bg=cnf.btn_color)
             self.curr_btn = e.widget
             self.curr_btn.configure(bg=cnf.lgray_color)
-            self.dd = int(e.widget["text"])
+            self.dd = int(e.widget.cget("text"))
             self.set_my_date()
             self.change_title()
             Globals.set_calendar_title()
 
     def switch_month(self, e=None):
-        if e.widget["text"] != "<":
+        if e.widget.cget("text") != "<":
             self.mm += 1
         else:
             self.mm -= 1
@@ -376,25 +376,25 @@ class Filter(CWindow):
         self.cals_titles.configure(text=cnf.lng.dates_not_sel)
 
     def sort_btn_cmd(self, e):
-        if self.btn_sort["text"] == cnf.lng.date_changed:
+        if self.btn_sort.cget("text") == cnf.lng.date_changed:
             self.btn_sort.configure(text=cnf.lng.date_created)
         else:
             self.btn_sort.configure(text=cnf.lng.date_changed)
 
     def product_cmd(self, e=None):
-        if self.product["bg"] == cnf.lgray_color:
+        if self.product.cget("bg") == cnf.lgray_color:
             self.product.configure(bg=cnf.btn_color)
         else:
             self.product.configure(bg=cnf.lgray_color)
 
     def catalog_cmd(self, e=None):
-        if self.catalog["bg"] == cnf.lgray_color:
+        if self.catalog.cget("bg") == cnf.lgray_color:
             self.catalog.configure(bg=cnf.btn_color)
         else:
             self.catalog.configure(bg=cnf.lgray_color)
 
     def models_cmd(self, e=None):
-        if self.models["bg"] == cnf.lgray_color:
+        if self.models.cget("bg") == cnf.lgray_color:
             self.models.configure(bg=cnf.btn_color)
         else:
             self.models.configure(bg=cnf.lgray_color)
@@ -410,17 +410,17 @@ class Filter(CWindow):
             Globals.start = None
             Globals.end = None
 
-        if self.product["bg"] == cnf.lgray_color:
+        if self.product.cget("bg") == cnf.lgray_color:
             cnf.product = True
         else:
             cnf.product = False
 
-        if self.models["bg"] == cnf.lgray_color:
+        if self.models.cget("bg") == cnf.lgray_color:
             cnf.models = True
         else:
             cnf.models = False
 
-        if self.catalog["bg"] == cnf.lgray_color:
+        if self.catalog.cget("bg") == cnf.lgray_color:
             cnf.catalog = True
         else:
             cnf.catalog = False
@@ -430,7 +430,7 @@ class Filter(CWindow):
             cnf.models = True
             cnf.catalog = True
 
-        if self.btn_sort["text"] == cnf.lng.date_created:
+        if self.btn_sort.cget("text") == cnf.lng.date_created:
             cnf.sort_modified = False
         else:
             cnf.sort_modified = True

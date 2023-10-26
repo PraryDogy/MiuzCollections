@@ -52,12 +52,12 @@ class ImageInfo(CWindow):
 
         max_ln = 40
 
-        r_name = '\n'.join(
+        r_name = "\n".join(
             re.findall(r".{1,%i}" % max_ln, name)
             )
         l_name = cnf.lng.file_name + "\n"*r_name.count("\n")
 
-        r_path = '\n'.join(
+        r_path = "\n".join(
             re.findall(r".{1,%i}" % max_ln, os.path.split(src)[0])
             )
         l_path = cnf.lng.file_path + "\n"*r_path.count("\n")
@@ -111,7 +111,7 @@ class ImageInfo(CWindow):
         right_lbl.pack(anchor="n", side="left")
 
         self.protocol("WM_DELETE_WINDOW", self.close_win)
-        self.bind('<Escape>', self.close_win)
+        self.bind("<Escape>", self.close_win)
 
         cnf.root.update_idletasks()
 
@@ -119,7 +119,7 @@ class ImageInfo(CWindow):
         xx = x + under_win.winfo_width()//2 - self.winfo_width()//2
         yy = y + under_win.winfo_height()//2 - self.winfo_height()//2
 
-        self.geometry(f'+{xx}+{yy}')
+        self.geometry(f"+{xx}+{yy}")
 
         self.deiconify()
         self.wait_visibility()

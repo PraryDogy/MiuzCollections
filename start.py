@@ -17,21 +17,21 @@ except Exception as e:
        f"Library/Application Support/{'MiuzCollections'}"
         )
 
-    file = os.path.join(cfg_dir, 'err.txt')
+    file = os.path.join(cfg_dir, "err.txt")
 
     if not os.path.exists(cfg_dir):
         os.mkdir(cfg_dir)
 
     if not os.path.exists(file):
-        with open(file, 'w') as err_file:
+        with open(file, "w") as err_file:
             pass
 
-    with open(file, 'r') as err_file:
+    with open(file, "r") as err_file:
         data = err_file.read()
 
-    data = f'{data}\n\n{traceback.format_exc()}'
+    data = f"{data}\n\n{traceback.format_exc()}"
 
-    with open(file, 'w') as err_file:
+    with open(file, "w") as err_file:
         print(data, file=err_file)
 
     print(data)

@@ -59,9 +59,9 @@ class ImgViewer(CWindow):
         all_src = src_list
 
         self.set_title()
-        self["bg"] = "black"
+        self.configure(bg="black")
 
-        self.geometry(f'{cnf.imgview_g["w"]}x{cnf.imgview_g["h"]}')
+        self.geometry(f"{cnf.imgview_g['w']}x{cnf.imgview_g['h']}")
         self.minsize(500, 300)
 
         self.configure(pady=0, padx=0)
@@ -72,8 +72,9 @@ class ImgViewer(CWindow):
 
         cnf.root.update_idletasks()
 
-        self.img_frame['width'] = cnf.imgview_g["w"]
-        self.img_frame['height'] = cnf.imgview_g["h"]
+        self.img_frame.configure(
+            width=cnf.imgview_g["w"], height=cnf.imgview_g["h"]
+            )
 
         self.thumb_place(cnf.imgview_g["w"], cnf.imgview_g["h"])
         self.task = cnf.root.after(
@@ -84,7 +85,7 @@ class ImgViewer(CWindow):
         self.wait_visibility()
         self.grab_set_global()
 
-        self.bind('<Configure>', self.decect_resize)
+        self.bind("<Configure>", self.decect_resize)
         self.bind("<ButtonRelease-2>", self.r_click)
         self.resize_task = None
 
@@ -109,8 +110,10 @@ class ImgViewer(CWindow):
             cnf.imgview_g["h"] = new_h
             cnf.imgview_g["w"] = new_w
 
-            self.img_frame['width'] = cnf.imgview_g["w"]
-            self.img_frame['height'] = cnf.imgview_g["h"]
+            self.img_frame.configure(
+                width=cnf.imgview_g["w"],
+                height=cnf.imgview_g["h"]
+                )
 
             self.thumb_place(cnf.imgview_g["w"], cnf.imgview_g["h"])
             cnf.root.after(
@@ -120,9 +123,9 @@ class ImgViewer(CWindow):
 
     def img_widget(self):
         label = CLabel(self, bg="black")
-        label.bind('<ButtonRelease-1>', lambda e: self.img_click(e))
-        self.bind('<Left>', lambda e: self.switch_img(self.img_ind()-1))
-        self.bind('<Right>', lambda e: self.switch_img(self.img_ind()+1))
+        label.bind("<ButtonRelease-1>", lambda e: self.img_click(e))
+        self.bind("<Left>", lambda e: self.switch_img(self.img_ind()-1))
+        self.bind("<Right>", lambda e: self.switch_img(self.img_ind()+1))
         return label
 
     def switch_img(self, ind: int):

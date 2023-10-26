@@ -50,7 +50,7 @@ class ScanerGui(CWindow):
     def update_livelbl(self):
 
         if self.winfo_exists():
-            self.live_lbl["text"] = cnf.scan_win_txt
+            self.live_lbl.configure(text=cnf.scan_win_txt)
             self.live_task = cnf.root.after(100, self.update_livelbl)
 
         if not cnf.scan_win_txt:

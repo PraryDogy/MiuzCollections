@@ -17,7 +17,7 @@ class Settings(CWindow):
     def __init__(self):
         super().__init__()
         self.protocol("WM_DELETE_WINDOW", self.cancel_cmd)
-        self.bind('<Escape>', self.cancel_cmd)
+        self.bind("<Escape>", self.cancel_cmd)
         self.bind("<Return>", self.save_cmd)
         self.title(cnf.lng.settings)
         self.minsize(450, 450)
@@ -155,8 +155,8 @@ class Settings(CWindow):
         if len(path) == 0:
             return
 
-        if self.path_widget["text"] != path:
-            self.path_widget['text'] = path
+        if self.path_widget.cget("text") != path:
+            self.path_widget.configure(text=path)
             self.scan_again = True
 
     def select_down_cmd(self, e=None):
@@ -165,8 +165,8 @@ class Settings(CWindow):
         if len(path) == 0:
             return
 
-        if self.down_widget["text"] != path:
-            self.down_widget['text'] = path
+        if self.down_widget.cget("text") != path:
+            self.down_widget.configure(text=path)
 
     def cancel_cmd(self, e=None):
         cnf.scan_time = self.old_time
@@ -176,8 +176,8 @@ class Settings(CWindow):
         cnf.root.focus_force()
 
     def save_cmd(self, e=None):
-        cnf.coll_folder = self.path_widget['text']
-        cnf.down_folder = self.down_widget["text"]
+        cnf.coll_folder = self.path_widget.cget("text")
+        cnf.down_folder = self.down_widget.cget("text")
 
         cnf.write_cfg()
         self.destroy()

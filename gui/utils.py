@@ -98,18 +98,18 @@ def write_err():
     if not os.path.exists(cnf.cfg_dir):
         os.mkdir(cnf.cfg_dir)
 
-    file = os.path.join(cnf.cfg_dir, 'err.txt')
+    file = os.path.join(cnf.cfg_dir, "err.txt")
 
     if not os.path.exists(file):
-        with open(file, 'w') as err_file:
+        with open(file, "w") as err_file:
             pass
 
-    with open(file, 'r') as err_file:
+    with open(file, "r") as err_file:
         data = err_file.read()
 
-    data = f'{data}\n\n{traceback.format_exc()}'
+    data = f"{data}\n\n{traceback.format_exc()}"
 
-    with open(file, 'w') as err_file:
+    with open(file, "w") as err_file:
         print(data, file=err_file)
 
 
@@ -161,7 +161,7 @@ def place_center():
     xx = x + cnf.root.winfo_width()//2 - win.winfo_width()//2
     yy = y + cnf.root.winfo_height()//2 - win.winfo_height()//2
 
-    win.geometry(f'+{xx}+{yy}')
+    win.geometry(f"+{xx}+{yy}")
 
 
 def reveal_coll(coll_name):
@@ -237,7 +237,7 @@ def encode_image(src):
     resized = resize_image(image, cnf.thumb_size, cnf.thumb_size, True)
 
     try:
-        return cv2.imencode('.jpg', resized)[1].tobytes()
+        return cv2.imencode(".jpg", resized)[1].tobytes()
     except cv2.error:
         print("too big img")
 

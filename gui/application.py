@@ -27,18 +27,18 @@ class Application:
         cnf.root.createcommand("tk::mac::Quit", on_exit)
 
         mac_ver, _, _ = platform.mac_ver()
-        mac_ver = float('.'.join(mac_ver.split('.')[:2]))
+        mac_ver = float(".".join(mac_ver.split(".")[:2]))
 
         if mac_ver > 12:
-            cnf.root.bind('<Command-w>', self.minim)
+            cnf.root.bind("<Command-w>", self.minim)
             cnf.root.protocol("WM_DELETE_WINDOW", self.minim)
-            cnf.root.createcommand('tk::mac::ReopenApplication', self.maxim)
+            cnf.root.createcommand("tk::mac::ReopenApplication", self.maxim)
 
         else:
-            cnf.root.bind('<Command-w>', lambda e: cnf.root.withdraw())
+            cnf.root.bind("<Command-w>", lambda e: cnf.root.withdraw())
             cnf.root.protocol("WM_DELETE_WINDOW", cnf.root.withdraw)
             cnf.root.createcommand(
-                'tk::mac::ReopenApplication', cnf.root.deiconify
+                "tk::mac::ReopenApplication", cnf.root.deiconify
                 )
 
         menu = Menu(cnf.root)
@@ -59,8 +59,8 @@ class Application:
             cnf.root_g["w"], cnf.root_g["h"] = 700, 500
 
         cnf.root.geometry(
-            (f'{cnf.root_g["w"]}x{cnf.root_g["h"]}'
-            f'+{cnf.root_g["x"]}+{cnf.root_g["y"]}')
+            (f"{cnf.root_g['w']}x{cnf.root_g['h']}"
+            f"+{cnf.root_g['x']}+{cnf.root_g['y']}")
             )
 
         cnf.root.minsize(610, 300)
