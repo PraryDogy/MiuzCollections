@@ -21,6 +21,18 @@ __all__ = (
     )
 
 
+class ContextFilter(Context):
+    def __init__(self, e: tkinter.Event):
+        super().__init__()
+
+        self.apply_filter(cnf.lng.product)
+        self.apply_filter(cnf.lng.models)
+        self.apply_filter(cnf.lng.catalog)
+        self.apply_filter(cnf.lng.show_all)
+
+        self.do_popup(e)
+
+
 class ContextTitles(Context):
     def __init__(self, e: tkinter.Event):
         super().__init__()
@@ -288,7 +300,6 @@ class Thumbnails(CFrame, ThumbsPrepare):
         self.clmns_count = self.get_clmns_count()
 
         self.thumbs_frame = CFrame(self.sframe)
-        # тут пустое место как я понимаю, для контекста
 
         title = CLabel(self.thumbs_frame, text=self.coll_title, width=30)
         title.configure(font=('San Francisco Pro', 30, 'bold'))
@@ -322,6 +333,9 @@ class Thumbnails(CFrame, ThumbsPrepare):
             width=20
             )
         filtr_r.pack(side="right")
+
+        for i in (cnf.root, self.thumbs_frame, title, filtr_l, filtr_r):
+            i.bind("<ButtonRelease-2>", ContextFilter)
 
         btn_filter = CButton(self.thumbs_frame, text=cnf.lng.filters)
         btn_filter.pack(pady=(10, 0))
