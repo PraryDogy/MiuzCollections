@@ -57,8 +57,9 @@ class Menu(tkmacosx.SFrame):
     def load_menu_buttons(self):
         frame = CFrame(self)
 
-        title = CLabel(frame, text=cnf.lng.menu)
-        title.configure(font=('San Francisco Pro', 22, 'bold'))
+        title = CLabel(
+            frame, text=cnf.lng.menu, font=('San Francisco Pro', 22, 'bold')
+            )
         title.pack(pady=(0,15))
 
         colls_list = Dbase.conn.execute(
@@ -79,8 +80,10 @@ class Menu(tkmacosx.SFrame):
             for fake_name in sort_keys
             }
 
-        last = CButton(frame, text=cnf.lng.all_colls)
-        last.configure(width=13, pady=5, anchor="w", padx=10)
+        last = CButton(
+            frame, text=cnf.lng.all_colls, width=13, pady=5,
+            anchor="w", padx=10
+            )
         last.coll_name = cnf.all_colls
         last.cmd(self.show_coll)
         last.pack(pady=(0, 15))
@@ -90,8 +93,9 @@ class Menu(tkmacosx.SFrame):
         sep.pack(fill="x")
 
         for fake_name, coll_name in menus.items():
-            btn = CButton(frame, text=fake_name)
-            btn.configure(width=13, pady=5, anchor="w", padx=10)
+            btn = CButton(
+                frame, text=fake_name, width=13, pady=5, anchor="w", padx=10
+                )
             btn.coll_name = coll_name
             btn.cmd(self.show_coll)
             btn.pack()

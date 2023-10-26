@@ -43,8 +43,7 @@ class CCalendarEntry(CWindow):
         btns = CFrame(self.win_cust)
         btns.pack(pady=(15, 0))
 
-        self.ok = CButton(btns, text=cnf.lng.ok)
-        self.ok.configure(fg=cnf.dgray_color)
+        self.ok = CButton(btns, text=cnf.lng.ok, fg=cnf.dgray_color)
         self.ok.pack(side="left", padx=(0, 15))
 
         self.cancel = CButton(btns, text=cnf.lng.cancel)
@@ -131,16 +130,12 @@ class CCalendar(CFrame, CCalendarEntry):
         titles = CFrame(parrent)
         titles.pack(pady=5)
 
-        prev_m = CButton(titles, text="<")
-        prev_m.configure(width=6, font=f, bg=cnf.bg_color)
+        prev_m = CButton(titles, text="<", width=6, font=f, bg=cnf.bg_color)
         prev_m.pack(side="left")
         prev_m.cmd(self.switch_month)
         self.all_btns.append(prev_m)
 
-        self.title = CLabel(
-            titles,
-            name=str(self.my_date.month)
-            )
+        self.title = CLabel(titles, name=str(self.my_date.month))
         self.title.configure(width=13, font=f)
         self.change_title()
         self.title.pack(side="left")
@@ -149,8 +144,7 @@ class CCalendar(CFrame, CCalendarEntry):
         self.title.bind("<Leave>", lambda e: self.title.configure(bg=cnf.bg_color))
         self.all_btns.append(self.title)
 
-        next_m = CButton(titles, text=">")
-        next_m.configure(width=6, font=f, bg=cnf.bg_color)
+        next_m = CButton(titles, text=">", width=6, font=f, bg=cnf.bg_color)
         next_m.pack(side="left")
         next_m.cmd(self.switch_month)
         self.all_btns.append(next_m)
@@ -159,8 +153,7 @@ class CCalendar(CFrame, CCalendarEntry):
         row.pack()
 
         for i in cnf.lng.calendar_days:
-            lbl = CButton(row, text=i)
-            lbl.configure(width=4, height=2)
+            lbl = CButton(row, text=i, width=4, height=2)
             lbl.pack(side="left")
             self.all_btns.append(lbl)
 
@@ -171,8 +164,7 @@ class CCalendar(CFrame, CCalendarEntry):
         row.pack()
 
         for i in range(1, 43):
-            lbl = CButton(row)
-            lbl.configure(width=4, height=2)
+            lbl = CButton(row, width=4, height=2)
             lbl.pack(side="left")
             lbl.cmd(self.switch_day)
 
@@ -277,8 +269,7 @@ class Filter(CWindow):
         left_frame = CFrame(calendar_frames)
         left_frame.pack(side="left", padx=(0, 15))
 
-        left_title = CLabel(left_frame, text=cnf.lng.start)
-        left_title["font"] = f
+        left_title = CLabel(left_frame, text=cnf.lng.start, font=f)
         left_title.pack()
 
         self.l_calendar = CCalendar(left_frame, Globals.start)
@@ -287,8 +278,7 @@ class Filter(CWindow):
         right_frame = CFrame(calendar_frames)
         right_frame.pack(side="left")
 
-        right_title = CLabel(right_frame, text=cnf.lng.end)
-        right_title["font"] = f
+        right_title = CLabel(right_frame, text=cnf.lng.end, font=f)
         right_title.pack()
 
         self.r_calendar = CCalendar(right_frame, Globals.end)
@@ -298,8 +288,7 @@ class Filter(CWindow):
             cals_t = f"{Globals.named_start} - {Globals.named_end}"
         else:
             cals_t = cnf.lng.dates_not_sel
-        self.cals_titles = CLabel(self, text=cals_t)
-        self.cals_titles.configure(font=f)
+        self.cals_titles = CLabel(self, text=cals_t, font=f)
         self.cals_titles.pack()
 
         cals_reset = CButton(self, text=cnf.lng.reset)
@@ -334,14 +323,14 @@ class Filter(CWindow):
         else:
             sort_btn_t = cnf.lng.date_created
 
-        self.btn_sort = CButton(self, text=sort_btn_t)
-        self.btn_sort.configure(width=13)
+        self.btn_sort = CButton(self, text=sort_btn_t, width=13)
         self.btn_sort.pack(pady=(15, 0))
         self.btn_sort.cmd(self.sort_btn_cmd)
 
         marketing_lbl = CLabel(
             self, text="\n".join(cnf.lng.filter_descr),
-            anchor="w", justify="left")
+            anchor="w", justify="left"
+            )
         marketing_lbl.pack(anchor="w", pady=(15, 0))
 
         CSep(self).pack(fill="x", padx=150, pady=15)

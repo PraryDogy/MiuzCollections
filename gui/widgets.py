@@ -25,35 +25,38 @@ class CSep(tkinter.Frame):
 
 
 class CButton(tkinter.Label):
-    def __init__(self, master: tkinter, **kwargs):
-        super().__init__(master, **kwargs)
+    def __init__(
+            self, master: tkinter, bg=cnf.btn_color, fg=cnf.fg_color,
+            width=11, height=1, font=("San Francisco Pro", 13, "normal"),
+            **kwargs
+            ):
+        super().__init__(
+            master, bg=bg, fg=fg, width=width, height=height,
+            font=font, **kwargs
+            )
         self.configure(
-            bg=cnf.btn_color, fg=cnf.fg_color, width=11, height=1,
-            font=("San Francisco Pro", 13, "normal"))
+            )
 
     def cmd(self, cmd):
         self.bind('<ButtonRelease-1>', cmd)
 
 
 class CFrame(tkinter.Frame):
-    def __init__(self, master: tkinter, **kwargs):
-        super().__init__(master, **kwargs)
-        self.configure(bg=cnf.bg_color)
+    def __init__(self, master: tkinter, bg=cnf.bg_color, **kwargs):
+        super().__init__(master, bg=bg, **kwargs)
 
 
 class CLabel(tkinter.Label):
-    def __init__(self, master, **kwargs):
-        super().__init__(master, **kwargs)
-        self.configure(
-            bg=cnf.bg_color,
-            fg=cnf.fg_color,
-            font=("San Francisco Pro", 13, "normal"),
-            )
+    def __init__(
+            self, master, bg=cnf.bg_color, fg=cnf.fg_color,
+            font=("San Francisco Pro", 13, "normal"),**kwargs
+            ):
+        super().__init__(master, bg=bg, fg=fg, font=font, **kwargs)
 
 
 class CWindow(tkinter.Toplevel):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, bg=cnf.bg_color, padx=15, pady=15):
+        super().__init__(bg=bg, padx=padx, pady=pady)
         cnf.root.eval(f'tk::PlaceWindow {self} center')
         self.withdraw()
 
@@ -63,7 +66,6 @@ class CWindow(tkinter.Toplevel):
         self.bind('<Command-q>', on_exit)
 
         self.resizable(0,0)
-        self.configure(bg=cnf.bg_color, padx=15, pady=15)
 
     def close_win(self, e=None):
         self.destroy()

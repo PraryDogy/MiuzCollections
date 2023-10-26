@@ -259,11 +259,10 @@ class Thumbnails(CFrame, ThumbsPrepare):
         self.topbar_frame = CFrame(self)
         self.topbar_frame.pack(fill="x")
 
-        self.topbar = CButton(self.topbar_frame, text=f"▲")
-        self.topbar.configure(
+        self.topbar = CButton(
+            self.topbar_frame, text=f"▲",
             font=('San Francisco Pro', 13, 'normal'),
-            bg=cnf.bg_color,
-            pady=1,
+            bg=cnf.bg_color, pady=1,
             )
         self.topbar.pack(pady=(5, 0), side="left", fill="x", expand=1)
         self.topbar.cmd(self.scroll_up)
@@ -300,37 +299,33 @@ class Thumbnails(CFrame, ThumbsPrepare):
 
         self.thumbs_frame = CFrame(self.sframe)
 
-        title = CLabel(self.thumbs_frame, text=self.coll_title, width=30)
-        title.configure(font=('San Francisco Pro', 30, 'bold'))
+        title = CLabel(
+            self.thumbs_frame, text=self.coll_title, width=30,
+            font=('San Francisco Pro', 30, 'bold')
+            )
         title.pack(anchor="center")
 
         filtr_fr = CFrame(self.thumbs_frame)
         filtr_fr.pack()
 
-        filtr_l = CLabel(filtr_fr)
-        filtr_l.configure(
+        filtr_l = CLabel(
+            filtr_fr, font=('San Francisco Pro', 13, 'normal'),
+            justify="right", anchor="e", width=20,
             text=(
                 f"{cnf.lng.filter}"
                 f"\n{cnf.lng.sort}"
                 ),
-            font=('San Francisco Pro', 13, 'normal'),
-            justify="right",
-            anchor="e",
-            width=20,
-            )
+                )
         filtr_l.pack(side="left")
 
-        filtr_r = CLabel(filtr_fr)
-        filtr_r.configure(
+        filtr_r = CLabel(
+            filtr_fr, font=('San Francisco Pro', 13, 'normal'),
+            justify="left", anchor="w", width=20,
             text=(
                 f"{self.filter_row}"
                 f"\n{self.sort_text}"
                 ),
-            font=('San Francisco Pro', 13, 'normal'),
-            justify="left",
-            anchor="w",
-            width=20
-            )
+                )
         filtr_r.pack(side="right")
 
         for i in (self.thumbs_frame, title, filtr_l, filtr_r):
@@ -355,8 +350,10 @@ class Thumbnails(CFrame, ThumbsPrepare):
                 ]
 
             t = f"{date_key}, {cnf.lng.total}: {len(img_list)}"
-            chunk_title = CLabel(self.thumbs_frame, text=t)
-            chunk_title.configure(font=('San Francisco Pro', 18, 'bold'))
+            chunk_title = CLabel(
+                self.thumbs_frame, text=t,
+                font=('San Francisco Pro', 18, 'bold')
+                )
             chunk_title.pack(anchor="w", pady=(30, 0), padx=2)
 
             chunk_title.title = date_key
@@ -418,14 +415,13 @@ class Thumbnails(CFrame, ThumbsPrepare):
                     f"\n{Globals.named_start} - {Globals.named_end}"
                     )
 
-            no_images = CLabel(self.thumbs_frame, text=noimg_t)
-            no_images.configure(font=('San Francisco Pro', 18, 'bold'))
+            no_images = CLabel(
+                self.thumbs_frame, text=noimg_t,
+                font=('San Francisco Pro', 18, 'bold')
+                )
             no_images.pack(pady=(15, 0))
 
-        more_btn = CButton(
-            self.thumbs_frame,
-            text=cnf.lng.show_more
-            )
+        more_btn = CButton(self.thumbs_frame, text=cnf.lng.show_more)
         more_btn.cmd(lambda e: self.show_more_cmd())
         more_btn.pack(pady=(15, 0))
 
@@ -502,8 +498,11 @@ class Thumbnails(CFrame, ThumbsPrepare):
 
             if len(self.topbar_frame.children) < 2:
 
-                self.topbar_can = CButton(self.topbar_frame, text="Cancel")
-                self.topbar_can.configure(bg=cnf.blue_color, pady=1)
+                self.topbar_can = CButton(
+                    self.topbar_frame, text="Cancel", bg=cnf.blue_color,
+                    pady=1
+                    )
+                self.topbar_can.configure()
                 self.topbar_can.cmd(lambda e: cancel_utils_task())
                 self.topbar_can.pack(
                     side="left",

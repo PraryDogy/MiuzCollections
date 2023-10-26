@@ -20,10 +20,7 @@ class ScanerGui(CWindow):
         self.geometry("300x90")
 
         self.live_lbl = CLabel(
-            self,
-            text=cnf.scan_win_txt,
-            anchor="w",
-            justify="left",
+            self, text=cnf.scan_win_txt, anchor="w", justify="left",
             )
         self.live_lbl.pack(expand=1, fill="both")
 
@@ -76,14 +73,12 @@ class StBar(CFrame):
         frame = CFrame(self)
 
         btn = CButton(frame, text=cnf.lng.settings)
-        btn['width'] = 10
         btn.cmd(lambda e: self.settings_cmd(btn))
         btn.pack(side="left")
 
         CSep(frame).pack(fill="y", side="left", padx=10)
 
         self.upd_btn = CButton(frame, text=cnf.lng.update)
-        self.upd_btn['width'] = 10
         self.upd_btn.cmd(lambda e: self.update_cmd(btn))
         self.upd_btn.pack(side="left")
 
@@ -94,10 +89,10 @@ class StBar(CFrame):
         self.stbar = self.load_stbar()
         self.stbar.pack(fill="x")
 
-    def settings_cmd(self, btn: CButton):
+    def settings_cmd(self, e=None):
         Settings()
 
-    def update_cmd(self, btn: CButton):
+    def update_cmd(self, e=None):
         if not cnf.scan_flag:
             if smb_check():
                 scaner.scaner_start()

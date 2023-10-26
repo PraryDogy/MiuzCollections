@@ -27,18 +27,12 @@ class Settings(CWindow):
         self.old_lng = cnf.lng
 
         path_name = CLabel(
-            self,
-            text=cnf.lng.colls_path,
-            anchor="w",
-            justify="left"
+            self, text=cnf.lng.colls_path, anchor="w", justify="left"
             )
         path_name.pack(anchor="w")
 
         self.path_widget = CLabel(
-            self,
-            text=f"{cnf.coll_folder}",
-            anchor="w",
-            justify="left",
+            self, text=f"{cnf.coll_folder}", anchor="w", justify="left",
             wraplength = 400,
             )
         self.path_widget.pack(anchor="w")
@@ -57,18 +51,12 @@ class Settings(CWindow):
         CSep(self).pack(pady=15, padx=50, fill="x")
 
         down_title = CLabel(
-            self,
-            text=cnf.lng.down_path,
-            anchor="w",
-            justify="left"
+            self, text=cnf.lng.down_path, anchor="w", justify="left"
             )
         down_title.pack(anchor="w")
 
         self.down_widget = CLabel(
-            self,
-            text=f"{cnf.down_folder}",
-            anchor="w",
-            justify="left",
+            self, text=f"{cnf.down_folder}", anchor="w", justify="left",
             wraplength = 400,
             )
         self.down_widget.pack(anchor="w")
@@ -82,10 +70,9 @@ class Settings(CWindow):
         CSep(self).pack(pady=15, padx=50, fill="x")
 
         self.scan_btn = CButton(
-            self,
+            self, width=28,
             text=f"{cnf.lng.update_every} {cnf.scan_time} {cnf.lng.mins}",
             )
-        self.scan_btn.configure(width=28)
         self.scan_btn.cmd(self.scan_time_cmd)
         self.scan_btn.pack()
 

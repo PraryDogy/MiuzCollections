@@ -119,8 +119,7 @@ class ImgViewer(CWindow):
                 )
 
     def img_widget(self):
-        label = CLabel(self)
-        label['bg']='black'
+        label = CLabel(self, bg="black")
         label.bind('<ButtonRelease-1>', lambda e: self.img_click(e))
         self.bind('<Left>', lambda e: self.switch_img(self.img_ind()-1))
         self.bind('<Right>', lambda e: self.switch_img(self.img_ind()+1))

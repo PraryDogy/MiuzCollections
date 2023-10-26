@@ -34,7 +34,6 @@ class ImageInfo(CWindow):
         super().__init__()
 
         self.title(cnf.lng.info)
-        self.configure(padx=10, pady=10)
 
         name = src.split(os.sep)[-1]
         try:
