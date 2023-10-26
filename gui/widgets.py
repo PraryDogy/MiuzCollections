@@ -34,8 +34,6 @@ class CButton(tkinter.Label):
             master, bg=bg, fg=fg, width=width, height=height,
             font=font, **kwargs
             )
-        self.configure(
-            )
 
     def cmd(self, cmd):
         self.bind('<ButtonRelease-1>', cmd)
@@ -77,8 +75,9 @@ class SmbAlert(CWindow):
         super().__init__()
 
         txt = cnf.lng.no_connection
-        title_lbl = CLabel(self, text=txt)
-        title_lbl.configure(font=('San Francisco Pro', 22, 'bold'))
+        title_lbl = CLabel(
+            self, text=txt, font=('San Francisco Pro', 22, 'bold')
+            )
         title_lbl.pack()
 
         txt2 = cnf.lng.smb_descr

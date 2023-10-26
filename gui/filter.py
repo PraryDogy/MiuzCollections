@@ -135,8 +135,9 @@ class CCalendar(CFrame, CCalendarEntry):
         prev_m.cmd(self.switch_month)
         self.all_btns.append(prev_m)
 
-        self.title = CLabel(titles, name=str(self.my_date.month))
-        self.title.configure(width=13, font=f)
+        self.title = CLabel(
+            titles, name=str(self.my_date.month), width=13, font=f
+            )
         self.change_title()
         self.title.pack(side="left")
         self.title.bind("<ButtonRelease-1>", self.cust_date_win)
