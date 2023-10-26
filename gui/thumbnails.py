@@ -298,6 +298,11 @@ class Thumbnails(CFrame, ThumbsPrepare):
         self.clmns_count = self.get_clmns_count()
 
         self.thumbs_frame = CFrame(self.sframe)
+        self.thumbs_frame.pack(
+            expand=1,
+            fill=tkinter.BOTH,
+            padx=(self.sframe.cget("scrollbarwidth"), 0)
+            )
 
         title = CLabel(
             self.thumbs_frame, text=self.coll_title, width=30,
@@ -425,11 +430,7 @@ class Thumbnails(CFrame, ThumbsPrepare):
         more_btn.cmd(lambda e: self.show_more_cmd())
         more_btn.pack(pady=(15, 0))
 
-        self.thumbs_frame.pack(
-            expand=1,
-            fill=tkinter.BOTH,
-            padx=(self.sframe.cget("scrollbarwidth"), 0)
-            )
+
 
     def show_more_cmd(self):
         cnf.limit += 150
