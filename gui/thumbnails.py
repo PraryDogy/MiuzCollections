@@ -148,29 +148,7 @@ class ThumbsPrepare:
         self.thumbs_lbls = self.decode_thumbs()
         self.thumbs_lbls = self.create_thumbs_dict()
 
-        self.thumb_size = cnf.thumb_size + cnf.thumb_pad
 
-        if cnf.curr_coll == cnf.all_colls:
-            self.coll_title = cnf.lng.all_colls
-        else:
-            self.coll_title = cnf.curr_coll
-
-        filter_row = []
-
-        if cnf.product:
-            filter_row.append(cnf.lng.product)
-        if cnf.models:
-            filter_row.append(cnf.lng.models)
-        if cnf.catalog:
-            filter_row.append(cnf.lng.catalog)
-
-        filter_row = ", ".join(filter_row)
-        self.filter_row = filter_row.lower().capitalize()
-
-        if cnf.sort_modified:
-            self.sort_text = cnf.lng.date_changed_by
-        else:
-            self.sort_text = cnf.lng.date_created_by
 
     def decode_thumbs(self):
         result = []
@@ -296,6 +274,8 @@ class Thumbnails(CFrame, ThumbsPrepare):
     def load_thumbs(self):
         self.thumbs_prepare()
         self.clmns_count = self.get_clmns_count()
+        self.thumb_size = cnf.thumb_size + cnf.thumb_pad
+
 
         self.thumbs_frame = CFrame(self.sframe)
         self.thumbs_frame.pack(
@@ -304,8 +284,13 @@ class Thumbnails(CFrame, ThumbsPrepare):
             padx=(self.sframe.cget("scrollbarwidth"), 0)
             )
 
+        if cnf.curr_coll == cnf.all_colls:
+            coll_title = cnf.lng.all_colls
+        else:
+            coll_title = cnf.curr_coll
+
         title = CLabel(
-            self.thumbs_frame, text=self.coll_title, width=30,
+            self.thumbs_frame, text=coll_title, width=30,
             font=("San Francisco Pro", 30, "bold")
             )
         title.pack(anchor="center")
@@ -323,12 +308,26 @@ class Thumbnails(CFrame, ThumbsPrepare):
                 )
         filtr_l.pack(side="left")
 
+        filter_row = []
+        if cnf.product:
+            filter_row.append(cnf.lng.product)
+        if cnf.models:
+            filter_row.append(cnf.lng.models)
+        if cnf.catalog:
+            filter_row.append(cnf.lng.catalog)
+        filter_row = ", ".join(filter_row)
+
+        if cnf.sort_modified:
+            sort_text = cnf.lng.date_changed_by
+        else:
+            sort_text = cnf.lng.date_created_by
+
         filtr_r = CLabel(
             filtr_fr, font=("San Francisco Pro", 13, "normal"),
             justify="left", anchor="w", width=20,
             text=(
-                f"{self.filter_row}"
-                f"\n{self.sort_text}"
+                f"{filter_row}"
+                f"\n{sort_text}"
                 ),
                 )
         filtr_r.pack(side="right")
