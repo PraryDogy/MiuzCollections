@@ -509,7 +509,7 @@ class Thumbnails(CFrame, ThumbsPrepare):
                 self.topbar_can.cmd(lambda e: cancel_utils_task())
                 self.topbar_can.pack(
                     side="left",
-                    pady=(5, 0), padx=(1, 10)
+                    pady=(5, 0), padx=(1, 0)
                     )
 
         except RuntimeError as e:
