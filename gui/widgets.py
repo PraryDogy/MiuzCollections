@@ -47,14 +47,14 @@ class CFrame(tkinter.Frame):
 class CLabel(tkinter.Label):
     def __init__(
             self, master, bg=cnf.bg_color, fg=cnf.fg_color,
-            font=("San Francisco Pro", 13, "normal"),**kwargs
+            font=("San Francisco Pro", 13, "normal"), **kwargs
             ):
         super().__init__(master, bg=bg, fg=fg, font=font, **kwargs)
 
 
 class CWindow(tkinter.Toplevel):
-    def __init__(self, bg=cnf.bg_color, padx=15, pady=15):
-        super().__init__(bg=bg, padx=padx, pady=pady)
+    def __init__(self, bg=cnf.bg_color, padx=15, pady=15, **kwargs):
+        super().__init__(bg=bg, padx=padx, pady=pady, **kwargs)
         cnf.root.eval(f"tk::PlaceWindow {self} center")
         self.withdraw()
 
@@ -130,7 +130,7 @@ class Context(tkinter.Menu):
             self.tk_popup(e.x_root, e.y_root)
         finally:
             if ismenu:
-                if e.widget.cget("text") in cnf.curr_coll:
+                if e.widget.coll_name == cnf.curr_coll:
                     e.widget.configure(bg=cnf.lgray_color)
                 else:
                     e.widget.configure(bg=cnf.btn_color)
