@@ -143,16 +143,9 @@ class ThumbsSearch(CFrame):
 
 
 class ThumbsPrepare:
-    def thumbs_prepare(self):
-        self.thumbs_lbls = Dbase.conn.execute(self.get_query()).fetchall()
-        self.thumbs_lbls = self.decode_thumbs()
-        self.thumbs_lbls = self.create_thumbs_dict()
-
-
-
-    def decode_thumbs(self):
+    def decode_thumbs(self, thumbs_lbls):
         result = []
-        for blob, src, modified in self.thumbs_lbls:
+        for blob, src, modified in thumbs_lbls:
             try:
                 decoded = decode_image(blob)
                 cropped = crop_image(decoded)
@@ -164,10 +157,10 @@ class ThumbsPrepare:
 
         return result
 
-    def create_thumbs_dict(self):
+    def create_thumbs_dict(self, thumbs_lbls):
         thumbs_dict = {}
 
-        for img, src, modified in self.thumbs_lbls:
+        for img, src, modified in thumbs_lbls:
             date_key = datetime.fromtimestamp(modified).date()
 
             if not any((Globals.start, Globals.end)):
@@ -272,10 +265,12 @@ class Thumbnails(CFrame, ThumbsPrepare):
         self.sframe.pack(expand=1, fill=tkinter.BOTH)
 
     def load_thumbs(self):
-        self.thumbs_prepare()
         self.clmns_count = self.get_clmns_count()
         self.thumb_size = cnf.thumb_size + cnf.thumb_pad
 
+        thumbs_lbls = Dbase.conn.execute(self.get_query()).fetchall()
+        thumbs_lbls = self.decode_thumbs(thumbs_lbls)
+        thumbs_lbls = self.create_thumbs_dict(thumbs_lbls)
 
         self.thumbs_frame = CFrame(self.sframe)
         self.thumbs_frame.pack(
@@ -347,7 +342,7 @@ class Thumbnails(CFrame, ThumbsPrepare):
         all_src = []
         limit = 500
 
-        for date_key, img_list in self.thumbs_lbls.items():
+        for date_key, img_list in thumbs_lbls.items():
             chunks = [
                 img_list[i:i+limit]
                 for i in range(0, len(img_list), limit)
@@ -402,7 +397,7 @@ class Thumbnails(CFrame, ThumbsPrepare):
                 img_lbl.bind("<ButtonRelease-2>", self.r_click)
                 img_lbl.bind("<Command-ButtonRelease-2>", self.r_cmd_click)
 
-        if not self.thumbs_lbls:
+        if not thumbs_lbls:
             str_var = Globals.search_var.get()
 
             noimg_t = cnf.lng.no_photo
