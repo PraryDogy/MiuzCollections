@@ -70,7 +70,7 @@ class ImgViewer(CWindow):
         cnf.root.update_idletasks()
 
         self.load_thumb()
-        self.img_task = cnf.root.after(550, self.load_img)
+        self.img_task = cnf.root.after(300, self.load_img)
         self.resize_task = None
 
         place_center()
@@ -91,7 +91,7 @@ class ImgViewer(CWindow):
     def decect_resize(self, e: tkinter.Event):
         if self.resize_task:
             cnf.root.after_cancel(self.resize_task)
-        self.resize_task = cnf.root.after(550, lambda: self.resize_win(e))
+        self.resize_task = cnf.root.after(300, lambda: self.resize_win(e))
 
     def resize_win(self, e: tkinter.Event):
         try:
@@ -104,7 +104,7 @@ class ImgViewer(CWindow):
                     )
 
                 self.load_thumb()
-                cnf.root.after(550, self.load_img)
+                cnf.root.after(300, self.load_img)
         except Exception as ex:
             print("img viewer > resize win > no win")
             print(ex)

@@ -16,18 +16,18 @@ __all__ = (
 
 
 class ContextMenu(Context):
-    def __init__(self, e: tkinter.Event):
+    def __init__(self, e: tkinter.Event, collname):
         super().__init__()
-        self.show_coll(e)
-        self.reveal_coll(e)
+        self.show_coll(e, collname)
+        self.reveal_coll(collname)
         self.sep()
 
-        self.apply_filter(cnf.lng.product, e)
-        self.apply_filter(cnf.lng.models, e)
-        self.apply_filter(cnf.lng.catalog, e)
-        self.apply_filter(cnf.lng.show_all, e)
+        self.apply_filter(e, cnf.lng.product, collname)
+        self.apply_filter(e, cnf.lng.models, collname)
+        self.apply_filter(e, cnf.lng.catalog, collname)
+        self.apply_filter(e, cnf.lng.show_all, collname)
 
-        self.do_popup(e, ismenu=True)
+        self.do_popup_menu(e, collname)
 
 
 class Menu(tkmacosx.SFrame):
@@ -84,24 +84,24 @@ class Menu(tkmacosx.SFrame):
             frame, text=cnf.lng.all_colls, width=13, pady=5,
             anchor="w", padx=10
             )
-        last.coll_name = cnf.all_colls
-        last.cmd(self.show_coll)
+        last.cmd(lambda e: self.show_coll(e, cnf.all_colls))
+        last.bind("<Button-2>", lambda e: ContextMenu(e, cnf.all_colls))
         last.pack(pady=(0, 15))
-        last.bind("<Button-2>", ContextMenu)
 
         sep = CSep(frame, bg="#272727")
         sep.pack(fill="x")
 
-        for fake_name, coll_name in menus.items():
+        for fakename, collname in menus.items():
             btn = CButton(
-                frame, text=fake_name, width=13, pady=5, anchor="w", padx=10
+                frame, text=fakename, width=13, pady=5, anchor="w", padx=10
                 )
-            btn.coll_name = coll_name
-            btn.cmd(self.show_coll)
+            btn.cmd(lambda e: self.show_coll(e, collname))
             btn.pack()
-            btn.bind("<Button-2>", ContextMenu)
+            btn.bind("<Button-2>", (
+                lambda e, collname=collname: ContextMenu(e, collname)
+                ))
 
-            if coll_name == cnf.curr_coll:
+            if collname == cnf.curr_coll:
                 btn.configure(bg=cnf.lgray_color)
                 self.sel_btn = btn
 
@@ -120,13 +120,13 @@ class Menu(tkmacosx.SFrame):
         self.menu_frame.pack()
         return
     
-    def show_coll(self, e):
+    def show_coll(self, e: tkinter.Event, collname):
         cnf.limit = 150
 
         self.sel_btn.configure(bg=cnf.btn_color)
         e.widget.configure(bg=cnf.lgray_color)
         self.sel_btn = e.widget
-        cnf.curr_coll = e.widget.coll_name
+        cnf.curr_coll = collname
 
         Globals.start, Globals.end = None, None
         Globals.search_var.set("")

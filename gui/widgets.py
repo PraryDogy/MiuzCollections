@@ -125,15 +125,19 @@ class Context(tkinter.Menu):
 
     def do_popup(self, e: tkinter.Event, ismenu=None):
         try:
-            if ismenu:
-                e.widget.configure(bg=cnf.blue_color)
             self.tk_popup(e.x_root, e.y_root)
         finally:
-            if ismenu:
-                if e.widget.coll_name == cnf.curr_coll:
-                    e.widget.configure(bg=cnf.lgray_color)
-                else:
-                    e.widget.configure(bg=cnf.btn_color)
+            self.grab_release()
+        
+    def do_popup_menu(self, e: tkinter.Event, collname):
+        try:
+            e.widget.configure(bg=cnf.blue_color)
+            self.tk_popup(e.x_root, e.y_root)
+        finally:
+            if collname == cnf.curr_coll:
+                e.widget.configure(bg=cnf.lgray_color)
+            else:
+                e.widget.configure(bg=cnf.btn_color)
             self.grab_release()
 
     def imgview(self, img_src, all_src):
@@ -153,8 +157,7 @@ class Context(tkinter.Menu):
     def reveal_jpg(self, img_src):
         self.add_command(
             label=cnf.lng.find_jpg,
-            command=lambda: finder_actions(img_src, reveal=True),
-            
+            command=lambda: finder_actions(img_src, reveal=True)
             )
 
     def reveal_tiffs(self, img_src):
@@ -180,9 +183,8 @@ class Context(tkinter.Menu):
             label=(
                 f"{cnf.lng.copy} jpg {cnf.lng.to_downloads}"
                 ),
-            command=lambda: finder_actions(img_src, download=True),
-            
-        )
+            command=lambda: finder_actions(img_src, download=True)
+            )
 
     def download_tiffs(self, img_src):
         self.add_command(
@@ -192,16 +194,16 @@ class Context(tkinter.Menu):
             command=lambda: finder_actions(img_src, tiff=True, download=True)
             )
 
-    def reveal_coll(self, e: tkinter.Event):
+    def reveal_coll(self, collname):
         self.add_command(
             label=cnf.lng.reveal_coll,
-            command=lambda: reveal_coll(e.widget.coll_name)
+            command=lambda: reveal_coll(collname)
             )
 
-    def show_coll(self, e: tkinter.Event):
+    def show_coll(self, e: tkinter.Event, collname):
         self.add_command(
             label=cnf.lng.view,
-            command=lambda: Globals.show_coll(e)
+            command=lambda: Globals.show_coll(e, collname)
             )
         
     def copy_tiffs_paths(self, img_src):
@@ -223,27 +225,28 @@ class Context(tkinter.Menu):
             command=lambda: db_remove_img(img_src)
             )
 
-    def download_group(self, e: tkinter.Event):
+    def download_group(self, title, paths_list):
         self.add_command(
             label=(
                 f"{cnf.lng.copy} jpg\n"
-                f"{cnf.lng.from_pretext} \"{e.widget.title}\" "
+                f"{cnf.lng.from_pretext} \"{title}\" "
                 f"{cnf.lng.to_downloads}"
                 ),
-            command=lambda: finder_actions(e.widget.paths_list, download=True),
+            command=lambda: finder_actions(paths_list, download=True),
             
         )
 
-    def download_group_tiffs(self, e: tkinter.Event):
+    def download_group_tiffs(self, title, paths_list):
         self.add_command(
             label=(
                 f"{cnf.lng.copy} tiff\n"
-                f"{cnf.lng.from_pretext} \"{e.widget.title}\" "
+                f"{cnf.lng.from_pretext} \"{title}\" "
                 f"{cnf.lng.to_downloads}"
                 ),
-            command=lambda: finder_actions(e.widget.paths_list, tiff=True, download=True),
-            
-            )
+            command=(
+                lambda: finder_actions(paths_list, tiff=True, download=True)
+                )
+                )
         
     def copy_text(self, e: tkinter.Event):
         self.add_command(
@@ -263,20 +266,22 @@ class Context(tkinter.Menu):
             command=lambda: finder_actions(img_src, tiff=True, fullsize=True)
             )
 
-    def download_group_fullsize(self, e:tkinter.Event):
+    def download_group_fullsize(self, title, paths_list):
         self.add_command(
             label=(
                 f"{cnf.lng.group_fullsize}\n"
-                f"{cnf.lng.from_pretext} \"{e.widget.title}\" "
+                f"{cnf.lng.from_pretext} \"{title}\" "
                 f"{cnf.lng.to_downloads}"
                 ),
-            command=lambda: finder_actions(e.widget.paths_list, tiff=True, fullsize=True),
-            )
+            command=(
+                lambda: finder_actions(paths_list, tiff=True, fullsize=True)
+                )
+                )
         
-    def apply_filter(self, label, e=None):
+    def apply_filter(self, e: tkinter.Event, label, collname=None):
         self.add_command(
             label=label,
-            command=lambda: apply_filter(label, e)
+            command=lambda: apply_filter(e, label, collname)
             )
         
     def please_wait(self):

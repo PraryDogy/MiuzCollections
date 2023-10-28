@@ -26,29 +26,29 @@ class ContextFilter(Context):
     def __init__(self, e: tkinter.Event):
         super().__init__()
 
-        self.apply_filter(cnf.lng.product)
-        self.apply_filter(cnf.lng.models)
-        self.apply_filter(cnf.lng.catalog)
-        self.apply_filter(cnf.lng.show_all)
+        self.apply_filter(e, cnf.lng.product)
+        self.apply_filter(e, cnf.lng.models)
+        self.apply_filter(e, cnf.lng.catalog)
+        self.apply_filter(e, cnf.lng.show_all)
 
         self.do_popup(e)
 
 
 class ContextTitles(Context):
-    def __init__(self, e: tkinter.Event):
+    def __init__(self, e: tkinter.Event, title, paths_list):
         super().__init__()
 
         if cnf.first_load:
             self.please_wait()
 
         else:
-            self.download_group(e)
+            self.download_group(title, paths_list)
 
             self.sep()
-            self.download_group_tiffs(e)
+            self.download_group_tiffs(title, paths_list)
 
             self.sep()
-            self.download_group_fullsize(e)
+            self.download_group_fullsize(title, paths_list)
 
         self.do_popup(e)
 
@@ -355,9 +355,12 @@ class Thumbnails(CFrame, ThumbsPrepare):
                 )
             chunk_title.pack(anchor="w", pady=(30, 0), padx=2)
 
-            chunk_title.title = date_key
-            chunk_title.paths_list = [i[1] for i in img_list]
-            chunk_title.bind("<ButtonRelease-2>", ContextTitles)
+            chunk_title.bind(
+                "<ButtonRelease-2>", (
+                    lambda e, title=date_key,
+                    paths_list=[i[1] for i in img_list]: 
+                    ContextTitles(e, title, paths_list)
+                    ))
 
             for chunk in chunks:
 

@@ -348,21 +348,21 @@ def copy_text(text):
     cnf.root.clipboard_append(text)
 
 
-def apply_filter(str, e=None):
-    if str == cnf.lng.product:
+def apply_filter(e: tkinter.Event, label, collname=None):
+    if label == cnf.lng.product:
         cnf.product = True
         cnf.models = cnf.catalog = False
-    elif str == cnf.lng.models:
+    elif label == cnf.lng.models:
         cnf.models = True
         cnf.product = cnf.catalog = False
-    elif str == cnf.lng.catalog:
+    elif label == cnf.lng.catalog:
         cnf.catalog = True
         cnf.product = cnf.models = False
     else:
         cnf.product = cnf.models = cnf.catalog = True
 
-    if e:
-        Globals.show_coll(e)
+    if collname:
+        Globals.show_coll(e, collname)
     else:
         Globals.reload_scroll()
 
