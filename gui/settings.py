@@ -5,7 +5,6 @@ from cfg import cnf
 from .scaner import scaner
 from .utils import *
 
-from .globals import Globals
 from .widgets import *
 
 __all__ = (
@@ -191,6 +190,6 @@ class Settings(CWindow):
                 SmbAlert()
 
         if self.old_lng != cnf.lng:
-            Globals.reload_scroll()
-            Globals.reload_menu()
-            Globals.reload_stbar()
+            cnf.reload_scroll()
+            cnf.reload_menu()
+            cnf.reload_strbar()

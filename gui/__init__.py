@@ -1,5 +1,5 @@
-from .application import Application
+from .application import app
 
 __all__ = (
-    "Application",
+    "app",
     )

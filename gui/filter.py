@@ -5,7 +5,6 @@ from datetime import datetime
 
 from cfg import cnf
 
-from .globals import Globals
 from .utils import *
 from .widgets import *
 
@@ -91,7 +90,7 @@ class CCalendarEntry(CWindow):
             self.change_title()
             self.set_my_date()
             self.fill_days()
-            Globals.set_calendar_title()
+            cnf.set_calendar_title()
         except tkinter.TclError:
             print("enter custom date widgets calendar error title change")
 
@@ -231,7 +230,7 @@ class CCalendar(CFrame, CCalendarEntry):
             self.dd = int(e.widget.cget("text"))
             self.set_my_date()
             self.change_title()
-            Globals.set_calendar_title()
+            cnf.set_calendar_title()
 
     def switch_month(self, e=None):
         if e.widget.cget("text") != "<":
@@ -249,7 +248,7 @@ class CCalendar(CFrame, CCalendarEntry):
         self.set_my_date()
         self.change_title()
         self.fill_days()
-        Globals.set_calendar_title()
+        cnf.set_calendar_title()
 
     def reset_cal(self):
         self.dd = self.today.day
@@ -279,7 +278,7 @@ class Filter(CWindow):
         left_title = CLabel(left_frame, text=cnf.lng.start, font=f)
         left_title.pack()
 
-        self.l_calendar = CCalendar(left_frame, Globals.start)
+        self.l_calendar = CCalendar(left_frame, cnf.start)
         self.l_calendar.pack()
 
         right_frame = CFrame(calendar_frames)
@@ -288,11 +287,11 @@ class Filter(CWindow):
         right_title = CLabel(right_frame, text=cnf.lng.end, font=f)
         right_title.pack()
 
-        self.r_calendar = CCalendar(right_frame, Globals.end)
+        self.r_calendar = CCalendar(right_frame, cnf.end)
         self.r_calendar.pack()
 
-        if any((Globals.start, Globals.end)):
-            cals_t = f"{Globals.named_start} - {Globals.named_end}"
+        if any((cnf.start, cnf.end)):
+            cals_t = f"{cnf.named_start} - {cnf.named_end}"
         else:
             cals_t = cnf.lng.dates_not_sel
         self.cals_titles = CLabel(self, text=cals_t, font=f)
@@ -359,7 +358,7 @@ class Filter(CWindow):
         self.deiconify()
         self.wait_visibility()
         self.grab_set_global()
-        Globals.set_calendar_title = self.set_calendar_title
+        cnf.set_calendar_title = self.set_calendar_title
 
     def named_date(self, date: datetime):
         day = f"{date.day} "
@@ -407,14 +406,14 @@ class Filter(CWindow):
 
     def ok_cmd(self, e=None):
         if self.date_changed:
-            Globals.start = self.l_calendar.my_date
-            Globals.end = self.r_calendar.my_date
-            Globals.named_start = self.named_date(Globals.start)
-            Globals.named_end = self.named_date(Globals.end)
+            cnf.start = self.l_calendar.my_date
+            cnf.end = self.r_calendar.my_date
+            cnf.named_start = self.named_date(cnf.start)
+            cnf.named_end = self.named_date(cnf.end)
 
         if self.reseted:
-            Globals.start = None
-            Globals.end = None
+            cnf.start = None
+            cnf.end = None
 
         if self.product.cget("bg") == cnf.lgray_color:
             cnf.product = True
@@ -443,8 +442,8 @@ class Filter(CWindow):
 
         self.destroy()
         cnf.root.focus_force()
-        Globals.search_var.set("")
-        Globals.reload_scroll()
+        cnf.search_var.set("")
+        cnf.reload_scroll()
 
     def cancel(self):
         self.destroy()

@@ -41,17 +41,20 @@ class Application:
                 "tk::mac::ReopenApplication", cnf.root.deiconify
                 )
 
-        menu = Menu(cnf.root)
-        r_frame = CFrame(cnf.root)
-        thumbnails = Thumbnails(r_frame)
-        sep = CSep(r_frame)
-        stbar = StBar(r_frame)
+        self.menu = Menu(cnf.root)
+        self.menu.pack(side="left", fill="y", pady=10)
 
-        menu.pack(side="left", fill="y", pady=10)
+        r_frame = CFrame(cnf.root)
         r_frame.pack(fill="both", expand=1, padx=15)
-        thumbnails.pack(fill="both", expand=1)
+
+        self.thumbnails = Thumbnails(r_frame)
+        self.thumbnails.pack(fill="both", expand=1)
+
+        sep = CSep(r_frame)
         sep.pack(fill="x", pady=10)
-        stbar.pack(pady=(0, 10))
+
+        self.stbar = StBar(r_frame)
+        self.stbar.pack(pady=(0, 10))
 
         MacMenu()
 
@@ -93,3 +96,6 @@ class Application:
 
         run_applescript(applescript)
         cnf.root.focus_force()
+
+
+app = Application()

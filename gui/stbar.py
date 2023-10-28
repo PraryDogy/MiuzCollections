@@ -4,7 +4,6 @@ from cfg import cnf
 from .scaner import scaner
 from .utils import *
 
-from .globals import Globals
 from .settings import Settings
 from .widgets import *
 
@@ -66,9 +65,6 @@ class StBar(CFrame):
         self.stbar = self.load_stbar()
         self.stbar.pack(fill="x")
 
-        Globals.stbar_btn = self.upd_btn
-        Globals.reload_stbar = self.reload_stbar
-
     def load_stbar(self):
         frame = CFrame(self)
 
@@ -78,9 +74,10 @@ class StBar(CFrame):
 
         CSep(frame).pack(fill="y", side="left", padx=10)
 
-        self.upd_btn = CButton(frame, text=cnf.lng.update)
-        self.upd_btn.cmd(lambda e: self.update_cmd(btn))
-        self.upd_btn.pack(side="left")
+        upd_btn = CButton(frame, text=cnf.lng.update)
+        upd_btn.cmd(lambda e: self.update_cmd())
+        upd_btn.pack(side="left")
+        cnf.stbar_btn = upd_btn
 
         return frame
 

@@ -1,10 +1,12 @@
 import json
 import os
 import shutil
+import subprocess
 import threading
 import tkinter
-from lang import Rus, Eng
-import subprocess
+from datetime import datetime
+
+from lang import Eng, Rus
 
 __all__ = (
     "cnf",
@@ -38,7 +40,18 @@ class Config:
         self.limit = 150
         self.all_colls = "all"
 
-        # dynamic variables for gui
+        # root
+        self.root = tkinter.Tk()
+        self.root.withdraw()
+
+        # global variables
+        self.stbar_btn: tkinter.Label = None
+        self.search_var = tkinter.StringVar(value="") # thumbnails > ThumbsSearch()
+        self.start: datetime = None
+        self.end: datetime = None
+        self.named_start: str = None # datetime as readable text
+        self.named_end: str = None # datetime as readable text
+        self.set_calendar_title = None # filter > Filter().set_calendar_title()
         self.lng = Rus()
         self.first_load = True
         self.scan_flag = False
@@ -49,10 +62,6 @@ class Config:
         self.product_name = "IMG"
         self.catalog_name = "Обтравка"
         self.models_name = "Model IMG"
-
-        # root
-        self.root = tkinter.Tk()
-        self.root.withdraw()
 
         # user settings for json
         self.coll_folder = "/Volumes/Shares/Marketing/Photo/_Collections"
@@ -110,6 +119,34 @@ class Config:
 
         if not os.path.exists(self.db_dir):
             shutil.copyfile(self.db_name, self.db_dir)
+
+    def reload_thumbs(self):
+        from gui.application import app
+        app.thumbnails.reload_thumbs()
+
+    def reload_scroll(self):
+        from gui.application import app
+        app.thumbnails.reload_scroll()
+
+    def reload_strbar(self):
+        from gui.application import app
+        app.stbar.reload_stbar()
+
+    def reload_menu(self):
+        from gui.application import app
+        app.menu.reload_menu()
+
+    def show_coll(self, e: tkinter.Event, collname):
+        from gui.application import app
+        app.menu.show_coll(e, collname)
+
+    def topbar_text(self, text):
+        from gui.application import app
+        app.thumbnails.topbar_text(text)
+
+    def topbar_default(self):
+        from gui.application import app
+        app.thumbnails.topbar_default()
 
 
 cnf = Config()

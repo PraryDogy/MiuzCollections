@@ -3,9 +3,8 @@ try:
     import traceback
 
     from cfg import cnf
-    from gui import Application
+    from gui import app
 
-    Application()
     cnf.root.mainloop()
 
 except Exception as e:

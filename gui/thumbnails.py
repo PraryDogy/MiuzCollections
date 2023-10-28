@@ -12,7 +12,6 @@ from cfg import cnf
 from database import Dbase, Thumbs
 
 from .filter import Filter
-from .globals import Globals
 from .img_viewer import ImgViewer
 from .utils import *
 from .widgets import *
@@ -101,7 +100,7 @@ class ThumbsSearch(CFrame):
 
         self.search_wid = tkinter.Entry(
             self,
-            textvariable=Globals.search_var,
+            textvariable=cnf.search_var,
             bg=cnf.dgray_color,
             insertbackground="white",
             fg=cnf.fg_color,
@@ -121,7 +120,7 @@ class ThumbsSearch(CFrame):
 
         CSep(btns_frame).pack(fill="y", side="left", padx=10)
 
-        if Globals.search_var.get():
+        if cnf.search_var.get():
             self.btn_search.configure(bg=cnf.blue_color)
 
         self.btn_clear = CButton(btns_frame, text=cnf.lng.clear)
@@ -134,13 +133,13 @@ class ThumbsSearch(CFrame):
         self.search_wid.bind("<ButtonRelease-2>", ContextSearch)
 
     def search_go(self, e=None):
-        Globals.search_var.set(self.search_wid.get())
-        Globals.start, Globals.end = None, None
-        Globals.reload_scroll()
+        cnf.search_var.set(self.search_wid.get())
+        cnf.start, cnf.end = None, None
+        cnf.reload_scroll()
 
     def search_clear(self, e=None):
-        Globals.search_var.set("")
-        Globals.reload_scroll()
+        cnf.search_var.set("")
+        cnf.reload_scroll()
 
 
 class ThumbsPrepare:
@@ -164,10 +163,10 @@ class ThumbsPrepare:
         for img, src, modified in thumbs_raw:
             date_key = datetime.fromtimestamp(modified).date()
 
-            if not any((Globals.start, Globals.end)):
+            if not any((cnf.start, cnf.end)):
                 date_key = f"{cnf.lng.months[date_key.month]} {date_key.year}"
             else:
-                date_key = f"{Globals.named_start} - {Globals.named_end}"
+                date_key = f"{cnf.named_start} - {cnf.named_end}"
 
             thumbs_dict.setdefault(date_key, [])
             thumbs_dict[date_key].append((img, src))
@@ -175,15 +174,15 @@ class ThumbsPrepare:
         return thumbs_dict
 
     def stamp_dates(self):
-        start = datetime.combine(Globals.start, datetime.min.time())
+        start = datetime.combine(cnf.start, datetime.min.time())
         end = datetime.combine(
-            Globals.end, datetime.max.time().replace(microsecond=0)
+            cnf.end, datetime.max.time().replace(microsecond=0)
             )
         return (datetime.timestamp(start), datetime.timestamp(end))
 
     def get_query(self):
         q = sqlalchemy.select(Thumbs.img150, Thumbs.src, Thumbs.modified)
-        search = Globals.search_var.get()
+        search = cnf.search_var.get()
 
         if search:
             search.replace("\n", "").strip()
@@ -214,7 +213,7 @@ class ThumbsPrepare:
 
         q = q.filter(sqlalchemy.or_(*filters))
 
-        if not any((Globals.start, Globals.end)):
+        if not any((cnf.start, cnf.end)):
             q = q.limit(cnf.limit)
 
         else:
@@ -251,11 +250,6 @@ class Thumbnails(CFrame, ThumbsPrepare):
         cnf.root.bind("<Configure>", self.decect_resize)
         self.resize_task = None
         self.search_task = None
-
-        Globals.reload_scroll = self.reload_scroll
-        Globals.reload_thumbs = self.reload_thumbs
-        Globals.topbar_text = self.topbar_text
-        Globals.topbar_default = self.topbar_default
 
     def load_scroll(self):
         self.scroll_frame = CFrame(self)
@@ -332,7 +326,7 @@ class Thumbnails(CFrame, ThumbsPrepare):
 
         btn_filter = CButton(self.thumbs_frame, text=cnf.lng.filters)
         btn_filter.pack(pady=(10, 0))
-        if any((Globals.start, Globals.end)):
+        if any((cnf.start, cnf.end)):
             btn_filter.configure(bg=cnf.blue_color)
         btn_filter.cmd(lambda e: Filter())
 
@@ -408,7 +402,7 @@ class Thumbnails(CFrame, ThumbsPrepare):
                     ))
 
         if not thumbs_dict:
-            str_var = Globals.search_var.get()
+            str_var = cnf.search_var.get()
 
             noimg_t = cnf.lng.no_photo
 
@@ -418,10 +412,10 @@ class Thumbnails(CFrame, ThumbsPrepare):
                     f"\n\"{str_var}\""
                     )
 
-            elif any((Globals.start, Globals.end)):
+            elif any((cnf.start, cnf.end)):
                 noimg_t=(
                     f"{cnf.lng.no_photo}"
-                    f"\n{Globals.named_start} - {Globals.named_end}"
+                    f"\n{cnf.named_start} - {cnf.named_end}"
                     )
 
             no_images = CLabel(
@@ -436,7 +430,7 @@ class Thumbnails(CFrame, ThumbsPrepare):
 
     def show_more_cmd(self):
         cnf.limit += 150
-        Globals.reload_thumbs()
+        cnf.reload_thumbs()
 
     def decect_resize(self, e):
         if self.resize_task:
@@ -454,7 +448,7 @@ class Thumbnails(CFrame, ThumbsPrepare):
                 w, h = cnf.root.winfo_width(), cnf.root.winfo_height()
                 cnf.root_g["w"], cnf.root_g["h"] = w, h
                 cnf.root.update_idletasks()
-                Globals.reload_thumbs()
+                cnf.reload_thumbs()
 
     def reload_scroll(self):
         self.scroll_frame.destroy()

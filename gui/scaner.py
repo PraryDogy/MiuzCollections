@@ -5,7 +5,6 @@ import sqlalchemy
 from cfg import cnf
 from database import Dbase, Thumbs
 
-from .globals import Globals
 from .utils import *
 import threading
 
@@ -26,8 +25,9 @@ class Scaner:
         self.scaner_task = cnf.root.after(ms, self.scaner_start)
 
     def scaner_start(self):
+
         cnf.scan_flag = True
-        Globals.stbar_btn.configure(text=cnf.lng.updating,bg=cnf.blue_color)
+        cnf.stbar_btn.configure(text=cnf.lng.updating, bg=cnf.blue_color)
 
         cnf.scaner_task = threading.Thread(target=self.task, daemon=True)
         cnf.scaner_task.start()
@@ -38,12 +38,12 @@ class Scaner:
         self.__change_live_text("")
 
         if self.need_update:
-            Globals.reload_thumbs()
-            Globals.reload_menu()
+            cnf.reload_thumbs()
+            cnf.reload_menu()
             self.need_update = False
 
         cnf.scan_flag = False
-        Globals.stbar_btn.configure(text=cnf.lng.update, bg=cnf.btn_color)
+        cnf.stbar_btn.configure(text=cnf.lng.update, bg=cnf.btn_color)
 
         self.scaner_sheldue()
 

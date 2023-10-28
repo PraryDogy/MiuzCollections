@@ -4,7 +4,6 @@ import tkinter
 
 from cfg import cnf
 
-from .globals import Globals
 from .utils import *
 
 __all__ = (
@@ -175,7 +174,7 @@ class Context(tkinter.Menu):
     def clear(self):
         self.add_command(
             label=cnf.lng.clear,
-            command=lambda: Globals.search_var.set("")
+            command=lambda: cnf.search_var.set("")
             )
 
     def download_onefile(self, img_src):
@@ -203,7 +202,7 @@ class Context(tkinter.Menu):
     def show_coll(self, e: tkinter.Event, collname):
         self.add_command(
             label=cnf.lng.view,
-            command=lambda: Globals.show_coll(e, collname)
+            command=lambda: cnf.show_coll(e, collname)
             )
         
     def copy_tiffs_paths(self, img_src):

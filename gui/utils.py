@@ -17,7 +17,6 @@ from PIL import Image, ImageChops
 from cfg import cnf
 from database import *
 
-from .globals import Globals
 
 __all__ = (
     "apply_filter",
@@ -67,7 +66,7 @@ def wait_utils_task():
 def cancel_utils_task():
     cnf.topbar_flag = False
     wait_utils_task()
-    Globals.topbar_default()
+    cnf.topbar_default()
 
 
 def delay():
@@ -79,7 +78,7 @@ def dec_utils_task(task):
         wait_utils_task()
         run_utils_task(task, args, kwargs)
         wait_utils_task()
-        Globals.topbar_default()
+        cnf.topbar_default()
         wait_utils_task()
         cnf.topbar_flag = True
     return wrapper
@@ -179,7 +178,7 @@ def reveal_coll(coll_name):
 def paste_search():
     try:
         pasted = cnf.root.clipboard_get().strip()
-        Globals.search_var.set(pasted)
+        cnf.search_var.set(pasted)
     except tkinter.TclError:
         print("no clipboard")
 
@@ -315,7 +314,7 @@ def find_tiffs(src: str):
 
 
 def reveal_files(list_paths: list):
-    Globals.topbar_text(cnf.lng.please_wait)
+    cnf.topbar_text(cnf.lng.please_wait)
 
     paths = (
         f"\"{i}\" as POSIX file"
@@ -340,7 +339,7 @@ def db_remove_img(src):
             Thumbs.src==src
             ))
     Dbase.conn.execute(q)
-    Globals.reload_thumbs()
+    cnf.reload_thumbs()
 
 
 def copy_text(text):
@@ -362,9 +361,9 @@ def apply_filter(e: tkinter.Event, label, collname=None):
         cnf.product = cnf.models = cnf.catalog = True
 
     if collname:
-        Globals.show_coll(e, collname)
+        cnf.show_coll(e, collname)
     else:
-        Globals.reload_scroll()
+        cnf.reload_scroll()
 
 
 @dec_utils_task
@@ -377,13 +376,13 @@ def finder_actions(
         src = [src]
 
     if not [i for i in src if os.path.exists(i)]:
-        Globals.topbar_text(cnf.lng.no_jpg)
+        cnf.topbar_text(cnf.lng.no_jpg)
         delay()
         return
 
     if tiff:
         tiffs = []
-        Globals.topbar_text(cnf.lng.please_wait)
+        cnf.topbar_text(cnf.lng.please_wait)
 
         for i in src:
     
@@ -397,18 +396,18 @@ def finder_actions(
     
         src = tiffs.copy()
         if not tiffs:
-            Globals.topbar_text(cnf.lng.no_tiff)
+            cnf.topbar_text(cnf.lng.no_tiff)
             delay()
             return
 
     if reveal:
-        Globals.topbar_text(cnf.lng.please_wait)
+        cnf.topbar_text(cnf.lng.please_wait)
         reveal_files(src)
         delay()
         return
     
     if copy_path:
-        Globals.topbar_text(cnf.lng.please_wait)
+        cnf.topbar_text(cnf.lng.please_wait)
         cnf.root.clipboard_clear()
         cnf.root.clipboard_append("\n".join(src))
         delay()
@@ -423,7 +422,7 @@ def finder_actions(
             if not cnf.topbar_flag:
                 return
 
-            Globals.topbar_text(
+            cnf.topbar_text(
                 f"{cnf.lng.copying} {num} {cnf.lng.from_pretext} {ln_src}"
                 )
 

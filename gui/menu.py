@@ -7,7 +7,6 @@ import tkmacosx
 from cfg import cnf
 from database import Dbase, Thumbs
 
-from .globals import Globals
 from .widgets import *
 
 __all__ = (
@@ -33,7 +32,6 @@ class ContextMenu(Context):
 class Menu(tkmacosx.SFrame):
     def __init__(self, master: tkinter):
         self.sel_btn: tkinter.Label = None
-        Globals.reload_menu = self.reload_menu
 
         super().__init__(
             master,
@@ -45,7 +43,6 @@ class Menu(tkmacosx.SFrame):
         self.menu_frame = self.load_menu_buttons()
         self.menu_frame.pack()
         self.bind("<Enter>", lambda e: self.focus_force)
-        Globals.show_coll = self.show_coll
 
     def fake_name(self, coll: str):
         try:
@@ -95,7 +92,7 @@ class Menu(tkmacosx.SFrame):
             btn = CButton(
                 frame, text=fakename, width=13, pady=5, anchor="w", padx=10
                 )
-            btn.cmd(lambda e: self.show_coll(e, collname))
+            btn.cmd(lambda e, collname=collname: self.show_coll(e, collname))
             btn.pack()
             btn.bind("<Button-2>", (
                 lambda e, collname=collname: ContextMenu(e, collname)
@@ -128,6 +125,6 @@ class Menu(tkmacosx.SFrame):
         self.sel_btn = e.widget
         cnf.curr_coll = collname
 
-        Globals.start, Globals.end = None, None
-        Globals.search_var.set("")
-        Globals.reload_scroll()
+        cnf.start, cnf.end = None, None
+        cnf.search_var.set("")
+        cnf.reload_scroll()
