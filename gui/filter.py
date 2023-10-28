@@ -141,8 +141,14 @@ class CCalendar(CFrame, CCalendarEntry):
         self.change_title()
         self.title.pack(side="left")
         self.title.bind("<ButtonRelease-1>", self.cust_date_win)
-        self.title.bind("<Enter>", lambda e: self.title.configure(bg=cnf.blue_color))
-        self.title.bind("<Leave>", lambda e: self.title.configure(bg=cnf.bg_color))
+        self.title.bind(
+            "<Enter>",
+            lambda e: self.title.configure(bg=cnf.blue_color)
+            )
+        self.title.bind(
+            "<Leave>",
+            lambda e: self.title.configure(bg=cnf.bg_color)
+            )
         self.all_btns.append(self.title)
 
         next_m = CButton(titles, text=">", width=6, font=f, bg=cnf.bg_color)
