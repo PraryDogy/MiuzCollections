@@ -136,32 +136,31 @@ class Context(tkinter.Menu):
                     e.widget.configure(bg=cnf.btn_color)
             self.grab_release()
 
-    def imgview(self, e: tkinter.Event):
+    def imgview(self, img_src, all_src):
         from .img_viewer import ImgViewer
         self.add_command(
             label=cnf.lng.view,
-            command=lambda: ImgViewer(e.widget.src, e.widget.all_src)
+            command=lambda: ImgViewer(img_src, all_src)
             )
 
-    def imginfo(self, e: tkinter.Event):
+    def imginfo(self, img_src):
         from .img_info import ImageInfo
         self.add_command(
             label=cnf.lng.info,
-            command=lambda: ImageInfo(e.widget.src)
+            command=lambda: ImageInfo(img_src)
             )
 
-    def reveal_jpg(self, e: tkinter.Event):
+    def reveal_jpg(self, img_src):
         self.add_command(
             label=cnf.lng.find_jpg,
-            command=lambda: finder_actions(e.widget.src, reveal=True),
+            command=lambda: finder_actions(img_src, reveal=True),
             
             )
 
-    def reveal_tiffs(self, e: tkinter.Event):
+    def reveal_tiffs(self, img_src):
         self.add_command(
             label=cnf.lng.find_tiff,
-            command=lambda: finder_actions(e.widget.src, tiff=True, reveal=True),
-            
+            command=lambda: finder_actions(img_src, tiff=True, reveal=True)
             )
 
     def pastesearch(self):
@@ -176,23 +175,22 @@ class Context(tkinter.Menu):
             command=lambda: Globals.search_var.set("")
             )
 
-    def download_onefile(self, e: tkinter.Event):
+    def download_onefile(self, img_src):
         self.add_command(
             label=(
                 f"{cnf.lng.copy} jpg {cnf.lng.to_downloads}"
                 ),
-            command=lambda: finder_actions(e.widget.src, download=True),
+            command=lambda: finder_actions(img_src, download=True),
             
         )
 
-    def download_tiffs(self, e: tkinter.Event):
+    def download_tiffs(self, img_src):
         self.add_command(
             label=(
                 f"{cnf.lng.copy} tiff {cnf.lng.to_downloads}"
                 ),
-            command=lambda: finder_actions(e.widget.src, tiff=True, download=True),
-            
-        )
+            command=lambda: finder_actions(img_src, tiff=True, download=True)
+            )
 
     def reveal_coll(self, e: tkinter.Event):
         self.add_command(
@@ -206,24 +204,23 @@ class Context(tkinter.Menu):
             command=lambda: Globals.show_coll(e)
             )
         
-    def copy_tiffs_paths(self, e: tkinter.Event):
+    def copy_tiffs_paths(self, img_src):
         self.add_command(
             label=cnf.lng.copy_path_tiff,
-            command=lambda: finder_actions(e.widget.src, tiff=True, copy_path=True),
-            
+            command=lambda: finder_actions(img_src, tiff=True, copy_path=True)
             )
         
-    def copy_jpg_path(self, e: tkinter.Event):
+    def copy_jpg_path(self, img_src):
         self.add_command(
             label=cnf.lng.copy_path_jpg,
-            command=lambda: finder_actions(e.widget.src, copy_path=True),
+            command=lambda: finder_actions(img_src, copy_path=True),
             
             )
 
-    def db_remove_img(self, e: tkinter.Event):
+    def db_remove_img(self, img_src):
         self.add_command(
             label=cnf.lng.remove_fromapp,
-            command=lambda: db_remove_img(e.widget.src)
+            command=lambda: db_remove_img(img_src)
             )
 
     def download_group(self, e: tkinter.Event):
@@ -260,11 +257,10 @@ class Context(tkinter.Menu):
             command=lambda: copy_text(e.widget.get("1.0",tkinter.END))
             )
 
-    def download_fullsize(self, e:tkinter.Event):
+    def download_fullsize(self, img_src):
         self.add_command(
             label=cnf.lng.fullsize,
-            command=lambda: finder_actions(e.widget.src, tiff=True, fullsize=True),
-            
+            command=lambda: finder_actions(img_src, tiff=True, fullsize=True)
             )
 
     def download_group_fullsize(self, e:tkinter.Event):

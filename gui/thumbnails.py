@@ -2,6 +2,7 @@ import math
 import tkinter
 import traceback
 from datetime import datetime
+from functools import partial
 
 import sqlalchemy
 import tkmacosx
@@ -53,35 +54,35 @@ class ContextTitles(Context):
 
 
 class ContextAdvanced(Context):
-    def __init__(self, e: tkinter.Event):
+    def __init__(self, e: tkinter.Event, img_src):
         super().__init__()
-        self.db_remove_img(e)
+        self.db_remove_img(img_src)
         self.do_popup(e)
 
 
 class ContextThumbs(Context):
-    def __init__(self, e: tkinter.Event):
+    def __init__(self, e: tkinter.Event, img_src, all_src):
         super().__init__()
 
         if cnf.first_load:
             self.please_wait()
 
         else:
-            self.imgview(e)
-            self.imginfo(e)
+            self.imgview(img_src, all_src)
+            self.imginfo(img_src)
 
             self.sep()
-            self.copy_jpg_path(e)
-            self.reveal_jpg(e)
-            self.download_onefile(e)
+            self.copy_jpg_path(img_src)
+            self.reveal_jpg(img_src)
+            self.download_onefile(img_src)
 
             self.sep()
-            self.copy_tiffs_paths(e)
-            self.reveal_tiffs(e)
-            self.download_tiffs(e)
+            self.copy_tiffs_paths(img_src)
+            self.reveal_tiffs(img_src)
+            self.download_tiffs(img_src)
 
             self.sep()
-            self.download_fullsize(e)
+            self.download_fullsize(img_src)
 
         self.do_popup(e)
 
@@ -236,7 +237,7 @@ class Thumbnails(CFrame, ThumbsPrepare):
             bg=cnf.bg_color, pady=1,
             )
         self.topbar.pack(pady=(5, 0), side="left", fill="x", expand=1)
-        self.topbar.cmd(self.scroll_up)
+        self.topbar.cmd(lambda e: self.sframe["canvas"].yview_moveto("0.0"))
 
         CSep(self).pack(fill="x", pady=5)
 
@@ -266,7 +267,6 @@ class Thumbnails(CFrame, ThumbsPrepare):
 
     def load_thumbs(self):
         self.clmns_count = self.get_clmns_count()
-        self.thumb_size = cnf.thumb_size + cnf.thumb_pad
 
         thumbs_dict = Dbase.conn.execute(self.get_query()).fetchall()
         thumbs_dict = self.decode_thumbs(thumbs_dict)
@@ -364,8 +364,8 @@ class Thumbnails(CFrame, ThumbsPrepare):
                 chunk_ln = len(chunk)
                 rows = math.ceil(chunk_ln/self.clmns_count)
 
-                w = self.thumb_size * self.clmns_count
-                h = self.thumb_size * rows
+                w = cnf.thumb_size * self.clmns_count
+                h = cnf.thumb_size * rows
 
                 empty = Image.new("RGBA", (w, h), color=cnf.bg_color)
                 row, clmn = 0, 0
@@ -375,14 +375,14 @@ class Thumbnails(CFrame, ThumbsPrepare):
 
                     all_src.append(src)
 
-                    coord = (clmn//self.thumb_size, row//self.thumb_size)
+                    coord = (clmn//cnf.thumb_size, row//cnf.thumb_size)
                     coords[coord] = src
 
                     empty.paste(img, (clmn, row))
 
-                    clmn += self.thumb_size
+                    clmn += cnf.thumb_size
                     if x % self.clmns_count == 0:
-                        row += self.thumb_size
+                        row += cnf.thumb_size
                         clmn = 0
 
                 img = ImageTk.PhotoImage(empty)
@@ -390,12 +390,19 @@ class Thumbnails(CFrame, ThumbsPrepare):
                 img_lbl.pack(anchor="w")
                 img_lbl.image_names = img
 
-                img_lbl.coords = coords
-                img_lbl.all_src = all_src
+                img_lbl.bind("<ButtonRelease-1>", (
+                    lambda e, all_src=all_src, coords=coords:
+                    self.click(e, all_src, coords)
+                    ))
 
-                img_lbl.bind("<ButtonRelease-1>", self.click)
-                img_lbl.bind("<ButtonRelease-2>", self.r_click)
-                img_lbl.bind("<Command-ButtonRelease-2>", self.r_cmd_click)
+                img_lbl.bind("<ButtonRelease-2>", (
+                    lambda e, all_src=all_src, coords=coords:
+                    self.r_click(e, all_src, coords)
+                    ))
+
+                img_lbl.bind("<Command-ButtonRelease-2>", (
+                    lambda e, coords=coords: self.r_cmd_click(e, coords)
+                    ))
 
         if not thumbs_dict:
             str_var = Globals.search_var.get()
@@ -423,8 +430,6 @@ class Thumbnails(CFrame, ThumbsPrepare):
         more_btn = CButton(self.thumbs_frame, text=cnf.lng.show_more)
         more_btn.cmd(lambda e: self.show_more_cmd())
         more_btn.pack(pady=(15, 0))
-
-
 
     def show_more_cmd(self):
         cnf.limit += 150
@@ -462,32 +467,29 @@ class Thumbnails(CFrame, ThumbsPrepare):
         clmns = (cnf.root_g["w"] - cnf.menu_w) // cnf.thumb_size
         return 1 if clmns == 0 else clmns
 
-    def get_coords(self, e: tkinter.Event):
+    def get_coords(self, e: tkinter.Event, coords: dict):
         try:
-            clmn, row = e.x//self.thumb_size, e.y//self.thumb_size
-            e.widget.src = e.widget.coords[(clmn, row)]
-            return True
-
+            clmn, row = e.x//cnf.thumb_size, e.y//cnf.thumb_size
+            return coords[(clmn, row)]
         except KeyError:
             return False
 
-    def click(self, e: tkinter.Event):
-        if self.get_coords(e):
-            ImgViewer(e.widget.src, e.widget.all_src)
+    def click(self, e: tkinter.Event, all_src: list, coords: dict):
+        img_src = self.get_coords(e, coords)
+        if img_src:
+            ImgViewer(img_src, all_src)
 
-    def r_cmd_click(self, e: tkinter.Event):
-        if self.get_coords(e):
-            # print(e.widget.src)
-            ContextAdvanced(e)
+    def r_cmd_click(self, e: tkinter.Event, coords):
+        img_src = self.get_coords(e, coords)
+        if img_src:
+            ContextAdvanced(e, img_src)
 
-    def r_click(self, e: tkinter.Event):
-        if self.get_coords(e):
-            ContextThumbs(e)
+    def r_click(self, e: tkinter.Event, all_src: list, coords: dict):
+        img_src = self.get_coords(e, coords)
+        if img_src:
+            ContextThumbs(e, img_src, all_src)
         else:
             ContextFilter(e)
-
-    def scroll_up(self, e=None):
-        self.sframe["canvas"].yview_moveto("0.0")
 
     def topbar_text(self, text):
         try:

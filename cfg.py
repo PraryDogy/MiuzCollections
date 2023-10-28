@@ -33,10 +33,9 @@ class Config:
         self.lgray_color = "#4B4B4B"
         self.dgray_color = "#141416"
 
-        self.thumb_size = 150
+        self.thumb_size = 150 + 3
         self.menu_w = 180
         self.limit = 150
-        self.thumb_pad = 3
         self.all_colls = "all"
 
         # dynamic variables for gui
