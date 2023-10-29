@@ -22,9 +22,24 @@ class Application:
 
         cnf.root.title(cnf.app_name)
         cnf.root.configure(bg=cnf.bg_color)
+        cnf.root.createcommand("tk::mac::Quit", on_exit)
+
+        if cnf.root_g["w"] < 50 or cnf.root_g["h"] < 50:
+            cnf.root_g["w"], cnf.root_g["h"] = 700, 500
+
+        cnf.root.geometry(
+            (f"{cnf.root_g['w']}x{cnf.root_g['h']}"
+            f"+{cnf.root_g['x']}+{cnf.root_g['y']}")
+            )
+
+        cnf.root.minsize(610, 300)
         cnf.root.deiconify()
 
-        cnf.root.createcommand("tk::mac::Quit", on_exit)
+        temp = CLabel(
+            cnf.root, text=cnf.lng.please_wait,
+            font=("San Francisco Pro", 22, "bold")
+            )
+        temp.pack(expand=1, fill="both")
 
         mac_ver, _, _ = platform.mac_ver()
         mac_ver = float(".".join(mac_ver.split(".")[:2]))
@@ -42,38 +57,25 @@ class Application:
                 )
 
         self.menu = Menu(cnf.root)
-        self.menu.pack(side="left", fill="y", pady=10)
-
         r_frame = CFrame(cnf.root)
-        r_frame.pack(fill="both", expand=1, padx=15)
-
         self.thumbnails = Thumbnails(r_frame)
-        self.thumbnails.pack(fill="both", expand=1)
-
         sep = CSep(r_frame)
-        sep.pack(fill="x", pady=10)
-
         self.stbar = StBar(r_frame)
-        self.stbar.pack(pady=(0, 10))
-
         MacMenu()
 
-        if cnf.root_g["w"] < 50 or cnf.root_g["h"] < 50:
-            cnf.root_g["w"], cnf.root_g["h"] = 700, 500
+        temp.destroy()
+        self.menu.pack(side="left", fill="y", pady=10)
+        r_frame.pack(fill="both", expand=1, padx=15)
+        self.thumbnails.pack(fill="both", expand=1)
+        sep.pack(fill="x", pady=10)
+        self.stbar.pack(pady=(0, 10))
 
-        cnf.root.geometry(
-            (f"{cnf.root_g['w']}x{cnf.root_g['h']}"
-            f"+{cnf.root_g['x']}+{cnf.root_g['y']}")
-            )
-
-        cnf.root.minsize(610, 300)
 
         if smb_check():
             scaner.scaner_start()
         else:
             scaner.scaner_sheldue()
             SmbAlert()
-
 
         cnf.first_load = False
 
