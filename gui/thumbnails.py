@@ -68,7 +68,7 @@ class ContextThumbs(Context):
 
         else:
             self.imgview(img_src, all_src)
-            self.imginfo(img_src)
+            self.imginfo(e.widget.winfo_toplevel(), img_src)
 
             self.sep()
             self.copy_jpg_path(img_src)

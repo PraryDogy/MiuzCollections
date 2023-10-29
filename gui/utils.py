@@ -151,15 +151,10 @@ def get_coll_name(src: str):
         return cnf.coll_folder.strip(os.sep).split(os.sep)[-1]
 
 
-def place_center():
-    win: tkinter.Toplevel = [
-        i for i in cnf.root.winfo_children()
-        if isinstance(i, tkinter.Toplevel)][-1]
-
-    x, y = cnf.root.winfo_x(), cnf.root.winfo_y()
-    xx = x + cnf.root.winfo_width()//2 - win.winfo_width()//2
-    yy = y + cnf.root.winfo_height()//2 - win.winfo_height()//2
-
+def place_center(parrent: tkinter.Toplevel, win: tkinter.Toplevel, w, h):
+    x, y = parrent.winfo_x(), parrent.winfo_y()
+    xx = x + parrent.winfo_width()//2 - w//2
+    yy = y + parrent.winfo_height()//2 - h//2
     win.geometry(f"+{xx}+{yy}")
 
 

@@ -21,19 +21,13 @@ class ContextInfo(Context):
 
 
 class ImageInfo(CWindow):
-    def __init__(self, src: str):
-        under_win = None
-
-        for k, v in cnf.root.children.items():
-            if isinstance(v, CWindow):
-                under_win = v
-
-        if not under_win:
-            under_win = cnf.root
-
+    def __init__(self, parrent: tkinter.Toplevel, src: str):
         super().__init__()
-
         self.title(cnf.lng.info)
+        self.minsize(416, 155)
+        place_center(parrent, self, 416, 155)
+        self.protocol("WM_DELETE_WINDOW", lambda: self.close_info(parrent))
+        self.bind("<Escape>", lambda e: self.close_info(parrent))
 
         name = src.split(os.sep)[-1]
         try:
@@ -110,24 +104,8 @@ class ImageInfo(CWindow):
         right_lbl.configure(state=tkinter.DISABLED)
         right_lbl.pack(anchor="n", side="left")
 
-        self.protocol("WM_DELETE_WINDOW", self.close_win)
-        self.bind("<Escape>", self.close_win)
-
         cnf.root.update_idletasks()
-
-        x, y = under_win.winfo_x(), under_win.winfo_y()
-        xx = x + under_win.winfo_width()//2 - self.winfo_width()//2
-        yy = y + under_win.winfo_height()//2 - self.winfo_height()//2
-
-        self.geometry(f"+{xx}+{yy}")
-
-        self.deiconify()
-        self.wait_visibility()
         self.grab_set_global()
-
-    def close_win(self, e=None):
-        self.destroy()
-        focus_last_win()
 
     def r_click(self, e: tkinter.Event):
         try:
@@ -137,3 +115,9 @@ class ImageInfo(CWindow):
             print("img_info > ImageInfo > r_click > text not selected")
 
         ContextInfo(e)
+
+    def close_info(self, parrent: tkinter.Toplevel):
+        self.grab_release()
+        self.destroy()
+        if isinstance(parrent, tkinter.Toplevel):
+            parrent.grab_set_global()

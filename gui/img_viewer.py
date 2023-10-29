@@ -25,7 +25,7 @@ class ContextViewer(Context):
             self.please_wait()
 
         else:
-            self.imginfo(img_src)
+            self.imginfo(e.widget.winfo_toplevel(), img_src)
             self.sep()
 
             self.sep()
@@ -52,9 +52,12 @@ class ImgViewer(CWindow):
         self.all_src = all_src
 
         self.set_title()
-        self.geometry(f"{cnf.imgview_g['w']}x{cnf.imgview_g['h']}")
         self.minsize(500, 300)
         self.resizable(1, 1)
+        self.geometry(f"{cnf.imgview_g['w']}x{cnf.imgview_g['h']}")
+        place_center(cnf.root, self, cnf.imgview_g["w"], cnf.imgview_g["h"])
+        self.protocol("WM_DELETE_WINDOW", self.close_view)
+        self.bind("<Escape>", self.close_view)
 
         self.img = CLabel(
             self, bg="black", width=cnf.imgview_g["w"],
@@ -69,12 +72,14 @@ class ImgViewer(CWindow):
 
         cnf.root.update_idletasks()
 
-        self.load_thumb()
-        self.img_task = cnf.root.after(300, self.load_img)
         self.resize_task = None
 
-        place_center()
-        self.deiconify()
+        self.load_thumb()
+        self.img_task = cnf.root.after(300, self.load_img)
+        cnf.root.after(
+            400, lambda: self.bind("<Configure>", self.decect_resize)
+            )
+
         self.wait_visibility()
         self.grab_set_global()
 
@@ -86,7 +91,6 @@ class ImgViewer(CWindow):
             "<Right>",
             lambda e: self.switch_img(self.all_src.index(self.img_src)+1)
             )
-        self.bind("<Configure>", self.decect_resize)
 
     def decect_resize(self, e: tkinter.Event):
         if self.resize_task:
@@ -169,3 +173,6 @@ class ImgViewer(CWindow):
         collection_name = get_coll_name(self.img_src)
         self.title(f"{collection_name} - {name}")
 
+    def close_view(self, e=None):
+        self.grab_release()
+        self.destroy()

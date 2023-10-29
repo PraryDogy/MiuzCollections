@@ -54,19 +54,8 @@ class CLabel(tkinter.Label):
 class CWindow(tkinter.Toplevel):
     def __init__(self, bg=cnf.bg_color, padx=15, pady=15, **kwargs):
         super().__init__(bg=bg, padx=padx, pady=pady, **kwargs)
-        cnf.root.eval(f"tk::PlaceWindow {self} center")
-        self.withdraw()
-
-        self.protocol("WM_DELETE_WINDOW", self.close_win)
-        self.bind("<Escape>", self.close_win)
-        self.bind("<Command-w>", self.close_win)
         self.bind("<Command-q>", on_exit)
-
         self.resizable(0,0)
-
-    def close_win(self, e=None):
-        self.destroy()
-        focus_last_win()
 
 
 class SmbAlert(CWindow):
@@ -146,11 +135,11 @@ class Context(tkinter.Menu):
             command=lambda: ImgViewer(img_src, all_src)
             )
 
-    def imginfo(self, img_src):
+    def imginfo(self, parrent: tkinter.Toplevel, img_src):
         from .img_info import ImageInfo
         self.add_command(
             label=cnf.lng.info,
-            command=lambda: ImageInfo(img_src)
+            command=lambda: ImageInfo(parrent, img_src)
             )
 
     def reveal_jpg(self, img_src):

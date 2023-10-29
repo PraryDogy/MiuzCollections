@@ -17,6 +17,9 @@ class ScanerGui(CWindow):
         super().__init__()
         self.title(cnf.lng.updating)
         self.geometry("300x90")
+        place_center(cnf.root, self, 300, 90)
+        self.protocol("WM_DELETE_WINDOW", self.close_gui)
+        self.bind("<Escape>", self.close_gui)
 
         self.live_lbl = CLabel(
             self, text=cnf.scan_win_txt, anchor="w", justify="left",
@@ -27,15 +30,11 @@ class ScanerGui(CWindow):
         self.can_btn.pack(pady=(10, 0))
         self.can_btn.cmd(self.cancel)
 
-        cnf.root.update_idletasks()
-
-        place_center()
-        self.deiconify()
-        self.wait_visibility()
-        self.grab_set_global()
-
         self.live_task = False
         self.update_livelbl()
+
+        cnf.root.update_idletasks()
+        self.grab_set_global()
 
     def cancel(self, e=None):
         cnf.scan_flag = False
@@ -43,19 +42,21 @@ class ScanerGui(CWindow):
         self.live_lbl.configure(text=cnf.lng.please_wait)
         while cnf.scaner_task.is_alive():
             cnf.root.update()
-        self.destroy()
-        focus_last_win()
+        self.close_gui()
 
     def update_livelbl(self):
-
         if self.winfo_exists():
             self.live_lbl.configure(text=cnf.scan_win_txt)
             self.live_task = cnf.root.after(100, self.update_livelbl)
 
         if not cnf.scan_win_txt:
             cnf.root.after_cancel(self.live_task)
-            self.destroy()
-            focus_last_win()
+            self.close_gui()
+
+    def close_gui(self, e=None):
+        self.grab_release()
+        self.destroy()
+        cnf.root.focus_force()
 
 
 class StBar(CFrame):
@@ -75,7 +76,7 @@ class StBar(CFrame):
         CSep(frame).pack(fill="y", side="left", padx=10)
 
         upd_btn = CButton(frame, text=cnf.lng.update)
-        upd_btn.cmd(lambda e: self.update_cmd())
+        upd_btn.cmd(self.update_cmd)
         upd_btn.pack(side="left")
         cnf.stbar_btn = upd_btn
 

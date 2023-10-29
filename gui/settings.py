@@ -15,11 +15,12 @@ __all__ = (
 class Settings(CWindow):
     def __init__(self):
         super().__init__()
-        self.protocol("WM_DELETE_WINDOW", self.cancel_cmd)
-        self.bind("<Escape>", self.cancel_cmd)
-        self.bind("<Return>", self.save_cmd)
+        self.protocol("WM_DELETE_WINDOW", self.close_sett)
+        self.bind("<Escape>", self.close_sett)
+        self.bind("<Return>", self.save_sett)
         self.title(cnf.lng.settings)
-        self.minsize(450, 450)
+        self.minsize(450, 500)
+        place_center(cnf.root, self, 450, 500)
 
         self.scan_again = False
         self.old_time = cnf.scan_time
@@ -105,20 +106,15 @@ class Settings(CWindow):
         CSep(cancel_frame).pack(pady=15, fill="x")
 
         save_btn = CButton(cancel_frame, text=cnf.lng.ok)
-        save_btn.cmd(self.save_cmd)
+        save_btn.cmd(self.save_sett)
         save_btn.pack(padx=(0, 15), side="left")
 
         cancel_btn = CButton(cancel_frame, text=cnf.lng.cancel)
-        cancel_btn.cmd(self.cancel_cmd)
+        cancel_btn.cmd(self.close_sett)
         cancel_btn.pack(side="left")
 
-        cnf.root.update_idletasks()
-
-        place_center()
-        self.deiconify()
-        self.wait_visibility()
+        self.update_idletasks()
         self.grab_set_global()
-
 
     def scan_time_cmd(self, e=None):
         times = [5, 10, 30, 60]
@@ -167,18 +163,19 @@ class Settings(CWindow):
         if self.down_widget.cget("text") != path:
             self.down_widget.configure(text=path)
 
-    def cancel_cmd(self, e=None):
+    def close_sett(self, e=None):
         cnf.scan_time = self.old_time
         cnf.lng = self.old_lng
-
+        self.grab_release()
         self.destroy()
         cnf.root.focus_force()
 
-    def save_cmd(self, e=None):
+    def save_sett(self, e=None):
         cnf.coll_folder = self.path_widget.cget("text")
         cnf.down_folder = self.down_widget.cget("text")
 
         cnf.write_cfg()
+        self.grab_release()
         self.destroy()
         cnf.root.focus_force()
 
