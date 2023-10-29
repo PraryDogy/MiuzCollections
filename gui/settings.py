@@ -145,7 +145,8 @@ class Settings(CWindow):
 
 
     def select_path_cmd(self, e=None):
-        path = filedialog.askdirectory(initialdir=cnf.coll_folder)
+        path = filedialog.askdirectory(initialdir=cnf.coll_folder, parent=self)
+        self.focus_force()
 
         if len(path) == 0:
             return
@@ -155,7 +156,8 @@ class Settings(CWindow):
             self.scan_again = True
 
     def select_down_cmd(self, e=None):
-        path = filedialog.askdirectory(initialdir=cnf.down_folder)
+        path = filedialog.askdirectory(initialdir=cnf.down_folder, parent=self)
+        self.focus_force()
 
         if len(path) == 0:
             return
@@ -174,10 +176,10 @@ class Settings(CWindow):
         cnf.coll_folder = self.path_widget.cget("text")
         cnf.down_folder = self.down_widget.cget("text")
 
-        cnf.write_cfg()
         self.grab_release()
         self.destroy()
         cnf.root.focus_force()
+        cnf.write_cfg()
 
         if self.scan_again:
             if smb_check():
