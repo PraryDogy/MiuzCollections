@@ -29,7 +29,7 @@ class Config:
         self.db_dir = os.path.join(self.cfg_dir, self.db_name)
 
         self.fg_color = "#E2E2E2"
-        self.bg_color = "#19191B"
+        self.bg_color = "#1e1e1e"
         self.btn_color = "#2A2A2D"
         self.blue_color = "#0056D9"
         self.lgray_color = "#4B4B4B"
@@ -37,9 +37,11 @@ class Config:
 
         self.menugray = "#383838"
         self.selectgray = "#525252"
-        self.grayfont = "#7b7b7b"
+        self.fontgray = "#7b7b7b"
+        self.fontwhite = "#e9e9e9"
+        self.btngray  = "#2b2b2b"
 
-        self.thumb_size = 150 + 3
+        self.thumb_size = 150
         self.menu_w = 180
         self.limit = 150
         self.all_colls = "all"

@@ -256,8 +256,8 @@ class Thumbnails(CFrame, ThumbsPrepare):
         self.scroll_frame.pack(expand=1, fill=tkinter.BOTH)
 
         self.sframe = tkmacosx.SFrame(
-            self.scroll_frame, bg=cnf.bg_color, scrollbarwidth=7)
-        self.sframe.pack(expand=1, fill=tkinter.BOTH)
+            self.scroll_frame, bg=cnf.bg_color, scrollbarwidth=1)
+        self.sframe.pack(expand=1, fill=tkinter.BOTH, padx=(15, 0))
 
     def load_thumbs(self):
         self.clmns_count = self.get_clmns_count()
@@ -361,8 +361,8 @@ class Thumbnails(CFrame, ThumbsPrepare):
                 chunk_ln = len(chunk)
                 rows = math.ceil(chunk_ln/self.clmns_count)
 
-                w = cnf.thumb_size * self.clmns_count
-                h = cnf.thumb_size * rows
+                w = (cnf.thumb_size+3) * self.clmns_count
+                h = (cnf.thumb_size+3) * rows
 
                 empty = Image.new("RGBA", (w, h), color=cnf.bg_color)
                 row, clmn = 0, 0
@@ -372,14 +372,14 @@ class Thumbnails(CFrame, ThumbsPrepare):
 
                     all_src.append(src)
 
-                    coord = (clmn//cnf.thumb_size, row//cnf.thumb_size)
+                    coord = (clmn//(cnf.thumb_size+3), row//(cnf.thumb_size+3))
                     coords[coord] = src
 
                     empty.paste(img, (clmn, row))
 
-                    clmn += cnf.thumb_size
+                    clmn += (cnf.thumb_size+3)
                     if x % self.clmns_count == 0:
-                        row += cnf.thumb_size
+                        row += (cnf.thumb_size+3)
                         clmn = 0
 
                 img = ImageTk.PhotoImage(empty)
@@ -461,12 +461,12 @@ class Thumbnails(CFrame, ThumbsPrepare):
         self.load_thumbs()
 
     def get_clmns_count(self):
-        clmns = (cnf.root_g["w"] - cnf.menu_w) // cnf.thumb_size
+        clmns = (cnf.root_g["w"] - cnf.menu_w) // (cnf.thumb_size-3)
         return 1 if clmns == 0 else clmns
 
     def get_coords(self, e: tkinter.Event, coords: dict):
         try:
-            clmn, row = e.x//cnf.thumb_size, e.y//cnf.thumb_size
+            clmn, row = e.x//(cnf.thumb_size+3), e.y//(cnf.thumb_size+3)
             return coords[(clmn, row)]
         except KeyError:
             return False
@@ -495,7 +495,7 @@ class Thumbnails(CFrame, ThumbsPrepare):
             if len(self.topbar_frame.children) < 2:
 
                 self.topbar_can = CButton(
-                    self.topbar_frame, text="Cancel", bg=cnf.blue_color,
+                    self.topbar_frame, text=cnf.lng.cancel, bg=cnf.blue_color,
                     pady=1
                     )
                 self.topbar_can.configure()

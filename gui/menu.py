@@ -36,7 +36,7 @@ class Menu(tkmacosx.SFrame):
         super().__init__(
             master,
             bg=cnf.menugray,
-            scrollbarwidth = 7,
+            scrollbarwidth = 1,
             width = cnf.menu_w
             )
 
@@ -52,17 +52,12 @@ class Menu(tkmacosx.SFrame):
             return coll[:13]
 
     def load_menu_buttons(self):
-        bl_frame = CFrame(self, bg="black")
-
-        bd_frame = CFrame(bl_frame, bg=cnf.grayfont)
-        bd_frame.pack(fill="both", expand=1, padx=1, pady=1)
-
-        frame = CFrame(bd_frame, bg=cnf.menugray)
-        frame.pack(fill="both", expand=1, padx=1, pady=1)
+        frame = CFrame(self, bg=cnf.menugray)
+        frame.pack(fill="both", expand=1)
 
         title = CLabel(
             frame, text=cnf.lng.menu, font=("San Francisco Pro", 14, "bold"),
-            bg=cnf.menugray, fg=cnf.grayfont, anchor="w", padx=5
+            bg=cnf.menugray, fg=cnf.fontgray, anchor="w", padx=5
             )
         title.pack(pady=(15,15), padx=10, fill="x")
 
@@ -86,7 +81,7 @@ class Menu(tkmacosx.SFrame):
 
         last = CButton(
             frame, text=cnf.lng.all_colls, pady=5,
-            anchor="w", padx=5, bg=cnf.menugray
+            anchor="w", padx=5, bg=cnf.menugray, fg=cnf.fontwhite
             )
         last.cmd(lambda e: self.show_coll(e, cnf.all_colls))
         last.bind("<Button-2>", lambda e: ContextMenu(e, cnf.all_colls))
@@ -95,7 +90,7 @@ class Menu(tkmacosx.SFrame):
         for fakename, collname in menus.items():
             btn = CButton(
                 frame, text=fakename, pady=5, anchor="w", padx=5,
-                bg=cnf.menugray
+                bg=cnf.menugray, fg=cnf.fontwhite
                 )
             btn.cmd(lambda e, collname=collname: self.show_coll(e, collname))
             btn.pack(fill="x", padx=10)
@@ -111,7 +106,7 @@ class Menu(tkmacosx.SFrame):
             last.configure(bg=cnf.selectgray)
             self.sel_btn = last
 
-        return bl_frame
+        return frame
 
     def reload_menu(self):
         self.menu_frame.destroy()

@@ -65,9 +65,9 @@ class Application:
 
         temp.destroy()
         self.menu.pack(side="left", fill="y")
-        r_frame.pack(fill="both", expand=1, padx=15)
+        r_frame.pack(fill="both", expand=1)
         self.thumbnails.pack(fill="both", expand=1)
-        sep.pack(fill="x", pady=10)
+        sep.pack(fill="x", padx=1, pady=(10, 10))
         self.stbar.pack(pady=(0, 10))
 
 
@@ -78,7 +78,6 @@ class Application:
             SmbAlert()
 
         cnf.first_load = False
-        print("loaded")
 
     def minim(self, e=None):
         applescript = f"""
