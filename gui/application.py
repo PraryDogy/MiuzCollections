@@ -70,7 +70,6 @@ class Application:
         sep.pack(fill="x", padx=1, pady=(10, 10))
         self.stbar.pack(pady=(0, 10))
 
-
         if smb_check():
             cnf.root.after(1000, scaner.scaner_start)
         else:
