@@ -241,6 +241,7 @@ class Thumbnails(CFrame, ThumbsPrepare):
         CSep(self).pack(fill="x", pady=5)
 
         self.clmns_count = 1
+        self.thumbsize = cnf.thumb_size + 3
 
         cnf.root.update_idletasks()
 
@@ -361,8 +362,8 @@ class Thumbnails(CFrame, ThumbsPrepare):
                 chunk_ln = len(chunk)
                 rows = math.ceil(chunk_ln/self.clmns_count)
 
-                w = (cnf.thumb_size+3) * self.clmns_count
-                h = (cnf.thumb_size+3) * rows
+                w = (self.thumbsize) * self.clmns_count
+                h = (self.thumbsize) * rows
 
                 empty = Image.new("RGBA", (w, h), color=cnf.bg_color)
                 row, clmn = 0, 0
@@ -372,14 +373,19 @@ class Thumbnails(CFrame, ThumbsPrepare):
 
                     all_src.append(src)
 
-                    coord = (clmn//(cnf.thumb_size+3), row//(cnf.thumb_size+3))
+                    coord = (clmn//(self.thumbsize), row//(self.thumbsize))
                     coords[coord] = src
+
+                    # img = img.resize((146, 146))
+                    # framed = Image.new("RGBA", (150, 150), color='#ffffff')
+                    # framed.paste(img, (2, 2))
+                    # img = framed
 
                     empty.paste(img, (clmn, row))
 
-                    clmn += (cnf.thumb_size+3)
+                    clmn += (self.thumbsize)
                     if x % self.clmns_count == 0:
-                        row += (cnf.thumb_size+3)
+                        row += (self.thumbsize)
                         clmn = 0
 
                 img = ImageTk.PhotoImage(empty)
@@ -466,7 +472,7 @@ class Thumbnails(CFrame, ThumbsPrepare):
 
     def get_coords(self, e: tkinter.Event, coords: dict):
         try:
-            clmn, row = e.x//(cnf.thumb_size+3), e.y//(cnf.thumb_size+3)
+            clmn, row = e.x//(self.thumbsize), e.y//(self.thumbsize)
             return coords[(clmn, row)]
         except KeyError:
             return False
