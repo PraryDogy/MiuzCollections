@@ -64,7 +64,7 @@ class Application:
         MacMenu()
 
         temp.destroy()
-        self.menu.pack(side="left", fill="y", pady=10)
+        self.menu.pack(side="left", fill="y")
         r_frame.pack(fill="both", expand=1, padx=15)
         self.thumbnails.pack(fill="both", expand=1)
         sep.pack(fill="x", pady=10)
@@ -72,12 +72,13 @@ class Application:
 
 
         if smb_check():
-            scaner.scaner_start()
+            cnf.root.after(1000, scaner.scaner_start)
         else:
             scaner.scaner_sheldue()
             SmbAlert()
 
         cnf.first_load = False
+        print("loaded")
 
     def minim(self, e=None):
         applescript = f"""

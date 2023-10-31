@@ -35,6 +35,10 @@ class Config:
         self.lgray_color = "#4B4B4B"
         self.dgray_color = "#141416"
 
+        self.menugray = "#383838"
+        self.selectgray = "#525252"
+        self.grayfont = "#7b7b7b"
+
         self.thumb_size = 150 + 3
         self.menu_w = 180
         self.limit = 150
@@ -125,8 +129,12 @@ class Config:
         app.thumbnails.reload_thumbs()
 
     def reload_scroll(self):
-        from gui.application import app
-        app.thumbnails.reload_scroll()
+        try:
+            from gui.application import app
+            app.thumbnails.reload_scroll()
+        except Exception as e:
+            print("cfg > reload scroll import err")
+            print(e)
 
     def reload_strbar(self):
         from gui.application import app

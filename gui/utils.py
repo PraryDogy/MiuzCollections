@@ -228,7 +228,7 @@ def encode_image(src):
     if src.endswith((".png", ".PNG")):
         image = replace_bg(image, cnf.bg_color)
 
-    resized = resize_image(image, cnf.thumb_size, cnf.thumb_size, True)
+    resized = resize_image(image, cnf.thumb_size-3, cnf.thumb_size-3, True)
 
     try:
         return cv2.imencode(".jpg", resized)[1].tobytes()
@@ -260,7 +260,7 @@ def crop_image(img):
     else:
         delta = (width-height)//2
         cropped = img[0:height, delta:width-delta]
-    return cropped[0:cnf.thumb_size, 0:cnf.thumb_size]
+    return cropped[0:cnf.thumb_size-3, 0:cnf.thumb_size-3]
 
 
 def black_borders(img: Image):
