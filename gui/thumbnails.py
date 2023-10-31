@@ -281,7 +281,7 @@ class Thumbnails(CFrame, ThumbsPrepare):
 
         title = CLabel(
             self.thumbs_frame, text=coll_title, width=30,
-            font=("San Francisco Pro", 30, "bold")
+            font=("San Francisco Pro", 24, "bold")
             )
         title.pack(anchor="center")
 
@@ -346,7 +346,7 @@ class Thumbnails(CFrame, ThumbsPrepare):
             chunk_title = CLabel(
                 self.thumbs_frame,
                 text=f"{date_key}, {cnf.lng.total}: {len(img_list)}",
-                font=("San Francisco Pro", 18, "bold")
+                font=("San Francisco Pro", 18, "bold"),
                 )
             chunk_title.pack(anchor="w", pady=(30, 0), padx=2)
 
