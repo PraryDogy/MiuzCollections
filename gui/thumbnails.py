@@ -186,21 +186,21 @@ class ThumbsSearch(CFrame):
             justify="left",
             border=0,
             highlightthickness=0,
-            width=15
+            width=15,
             )
-        self.search_wid.pack(ipady=5, side="left", anchor="e")
+        self.search_wid.pack(ipady=6, side="left", anchor="e")
 
         self.btns_fr = CFrame(self, bg=cnf.dgray_color)
         self.btns_fr.pack(side="right")
 
         self.btn_clear = CButton(
-            self.btns_fr, text="⌫", width=3, bg=cnf.dgray_color)
+            self.btns_fr, text="⌫", width=3, bg=cnf.dgray_color, pady=5)
         self.btn_clear.pack(side="right")
         self.btn_clear.cmd(self.search_clear)
 
         self.btn_search = CButton(
-            self.btns_fr, text="✓", width=3, bg=cnf.dgray_color)
-        self.btn_search.pack(side="right", pady=3)
+            self.btns_fr, text="✓", width=3, bg=cnf.dgray_color, pady=5)
+        self.btn_search.pack(side="right")
         self.btn_search.cmd(self.search_go)
 
         self.search_wid.bind("<Escape>", lambda e: cnf.root.focus_force())
@@ -245,7 +245,7 @@ class FilterRow(CFrame):
         CSep(self).pack(side="left", fill="y", padx=5)
 
         filter = CButton(
-            self, text=cnf.lng.dates, bg=cnf.bg_color, pady=5, width=7)
+            self, text=cnf.lng.dates, bg=cnf.bg_color, width=7)
         filter.cmd(lambda e: Filter())
         filter.pack(side="left", fill="x")
 
@@ -255,7 +255,7 @@ class FilterRow(CFrame):
         btns = {"prod": prod, "mod": mod, "cat": cat}
 
         for k, v in btns.items():
-            v.configure(width=7, pady=5, bg=cnf.bg_color)
+            v.configure(width=7, bg=cnf.bg_color)
             v.configure(bg=cnf.btn_color) if cnf.filter[k] else None
             v.cmd(lambda e, k=k: self.filtr_cmd(k))
 
@@ -348,12 +348,15 @@ class Thumbnails(CFrame, ThumbsPrepare):
                 for i in range(0, len(img_list), limit)
                 ]
 
+            chunk_t = f"{date_key}, {cnf.lng.total}: {len(img_list)}"
+            if cnf.search_var.get():
+                chunk_t = f"\"{cnf.search_var.get()}\": {chunk_t}"
+
             chunk_title = CLabel(
-                self.thumbs_frame,
-                text=f"{date_key}, {cnf.lng.total}: {len(img_list)}",
-                font=("San Francisco Pro", 18, "bold"),
+                self.thumbs_frame, text=chunk_t,
+                font=("San Francisco Pro", 18, "bold")
                 )
-            chunk_title.pack(anchor="w", pady=(30, 0), padx=2)
+            chunk_title.pack(anchor="w", pady=(30, 0))
 
             chunk_title.bind(
                 "<ButtonRelease-2>", (

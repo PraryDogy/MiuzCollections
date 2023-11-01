@@ -80,8 +80,8 @@ class Menu(tkmacosx.SFrame):
             }
 
         last = CButton(
-            frame, text=cnf.lng.all_colls, pady=5,
-            anchor="w", padx=5, bg=cnf.menugray, fg=cnf.fontwhite
+            frame, text=cnf.lng.all_colls,
+            anchor="w", padx=5, pady=5, bg=cnf.menugray, fg=cnf.fontwhite
             )
         last.cmd(lambda e: self.show_coll(e, cnf.all_colls))
         last.bind("<Button-2>", lambda e: ContextMenu(e, cnf.all_colls))
@@ -89,7 +89,7 @@ class Menu(tkmacosx.SFrame):
 
         for fakename, collname in menus.items():
             btn = CButton(
-                frame, text=fakename, pady=5, anchor="w", padx=5,
+                frame, text=fakename, anchor="w", padx=5, pady=5,
                 bg=cnf.menugray, fg=cnf.fontwhite
                 )
             btn.cmd(lambda e, collname=collname: self.show_coll(e, collname))

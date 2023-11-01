@@ -25,12 +25,12 @@ class CSep(tkinter.Frame):
 
 class CButton(tkinter.Label):
     def __init__(
-            self, master: tkinter, bg=cnf.btn_color, fg=cnf.fg_color,
+            self, master: tkinter, bg=cnf.btn_color, fg=cnf.fg_color, pady=3,
             width=11, height=1, font=("San Francisco Pro", 13, "normal"),
             **kwargs
             ):
         super().__init__(
-            master, bg=bg, fg=fg, width=width, height=height,
+            master, bg=bg, fg=fg, width=width, height=height, pady=pady,
             font=font, **kwargs
             )
 

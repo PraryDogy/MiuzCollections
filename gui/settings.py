@@ -37,7 +37,7 @@ class Settings(CWindow):
             )
         self.path_widget.pack(anchor="w")
 
-        select_path = CButton(self, text=cnf.lng.browse, pady=5)
+        select_path = CButton(self, text=cnf.lng.browse)
         select_path.cmd(self.select_path_cmd)
         select_path.pack(pady=(10, 0))
 
@@ -61,7 +61,7 @@ class Settings(CWindow):
             )
         self.down_widget.pack(anchor="w")
 
-        select_down = CButton(self, text=cnf.lng.browse, pady=5)
+        select_down = CButton(self, text=cnf.lng.browse)
         select_down.cmd(self.select_down_cmd)
         select_down.pack(pady=(10, 0))
 
@@ -70,7 +70,7 @@ class Settings(CWindow):
         CSep(self).pack(pady=15, padx=50, fill="x")
 
         self.scan_btn = CButton(
-            self, width=28, pady=5,
+            self, width=28,
             text=f"{cnf.lng.update_every} {cnf.scan_time} {cnf.lng.mins}",
             )
         self.scan_btn.cmd(self.scan_time_cmd)
@@ -88,7 +88,7 @@ class Settings(CWindow):
             )
         lang_lbl.pack(anchor="w")
 
-        self.lang_btn = CButton(self, text=cnf.lng.language, pady=5)
+        self.lang_btn = CButton(self, text=cnf.lng.language)
         self.lang_btn.pack(pady=(10, 0))
         self.lang_btn.cmd(self.lang_cmd)
 
@@ -105,11 +105,11 @@ class Settings(CWindow):
 
         CSep(cancel_frame).pack(pady=15, fill="x")
 
-        save_btn = CButton(cancel_frame, text=cnf.lng.ok, pady=5)
+        save_btn = CButton(cancel_frame, text=cnf.lng.ok)
         save_btn.cmd(self.save_sett)
         save_btn.pack(padx=(0, 15), side="left")
 
-        cancel_btn = CButton(cancel_frame, text=cnf.lng.cancel, pady=5)
+        cancel_btn = CButton(cancel_frame, text=cnf.lng.cancel)
         cancel_btn.cmd(self.close_sett)
         cancel_btn.pack(side="left")
 

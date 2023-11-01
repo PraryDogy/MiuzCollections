@@ -44,7 +44,7 @@ class CCalendarEntry(CWindow):
         btns = CFrame(self.win_entry)
         btns.pack(pady=(15, 0))
 
-        ok = CButton(btns, text=cnf.lng.ok, pady=5)
+        ok = CButton(btns, text=cnf.lng.ok)
         ok.pack(side="left", padx=(0, 15))
         ok.configure(fg=cnf.fg_color)
         ok.bind(
@@ -58,7 +58,7 @@ class CCalendarEntry(CWindow):
         t = var.get()
         self.cust_date = datetime.strptime(t, "%d.%m.%Y")
 
-        cancel = CButton(btns, text=cnf.lng.cancel, pady=5)
+        cancel = CButton(btns, text=cnf.lng.cancel)
         cancel.pack(side="left")
         cancel.bind(
             "<ButtonRelease-1>",
@@ -322,7 +322,7 @@ class Filter(CWindow):
         self.cals_titles = CLabel(self, text=cals_t, font=f)
         self.cals_titles.pack()
 
-        cals_reset = CButton(self, text=cnf.lng.reset, pady=5)
+        cals_reset = CButton(self, text=cnf.lng.reset)
         cals_reset.pack(pady=(15, 0))
         cals_reset.cmd(self.cals_titles_reset)
 
@@ -331,11 +331,11 @@ class Filter(CWindow):
         btns_frame = CFrame(self)
         btns_frame.pack(pady=(15, 0))
 
-        ok_btn = CButton(btns_frame, text=cnf.lng.ok, pady=5)
+        ok_btn = CButton(btns_frame, text=cnf.lng.ok)
         ok_btn.pack(side="left", padx=15)
         ok_btn.cmd(self.ok_filter)
 
-        cancel_btn = CButton(btns_frame, text=cnf.lng.cancel, pady=5)
+        cancel_btn = CButton(btns_frame, text=cnf.lng.cancel)
         cancel_btn.pack(side="left")
         cancel_btn.cmd(self.close_filter)
 
