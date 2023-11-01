@@ -223,7 +223,7 @@ class ThumbsSearch(CFrame):
 
 class FilterRow(CFrame):
     def __init__(self, master: tkinter):
-        super().__init__(master, bg="red")
+        super().__init__(master)
 
         if not any(i for i in cnf.filter.values()):
             for i in cnf.filter.keys():
@@ -281,10 +281,10 @@ class TitleRow(CFrame):
         title = CButton(
             self, text=coll_title, bg=cnf.bg_color, anchor="w",
             font=("San Francisco Pro", 22, "bold"))
-        title.pack(side="left")
+        title.pack(side="left", fill="x", expand=1)
 
-        FilterRow(self).pack(side="left", fill="x")
-        ThumbsSearch(self).pack(side="left", padx=10)
+        FilterRow(self).pack(side="left", fill="x", expand=1)
+        ThumbsSearch(self).pack(side="left", fill="x", expand=1, padx=10)
 
 
 class Thumbnails(CFrame, ThumbsPrepare):
@@ -305,7 +305,8 @@ class Thumbnails(CFrame, ThumbsPrepare):
         CSep(self).pack(fill="x", pady=5)
 
         self.clmns_count = 1
-        self.thumbsize = cnf.thumb_size + 3
+        self.thumbs_pad = 3
+        self.thumbsize = cnf.thumb_size + self.thumbs_pad
 
         cnf.root.update_idletasks()
 
@@ -335,17 +336,15 @@ class Thumbnails(CFrame, ThumbsPrepare):
         thumbs_dict = self.decode_thumbs(thumbs_dict)
         thumbs_dict = self.create_thumbs_dict(thumbs_dict)
 
+        scrl_w = self.sframe.cget("scrollbarwidth")
         self.thumbs_frame = CFrame(
             self.sframe, width=(self.thumbsize) * self.clmns_count)
-        self.thumbs_frame.pack(
-            expand=1,
-            anchor="w",
-            padx=(self.sframe.cget("scrollbarwidth"), 0),
-            )
+        self.thumbs_frame.pack(expand=1, anchor="w", padx=(scrl_w, 10-scrl_w))
         self.thumbs_frame.bind("<ButtonRelease-2>", ContextFilter)
 
         all_src = []
         limit = 500
+        w = self.thumbsize*self.clmns_count
 
         for date_key, img_list in thumbs_dict.items():
             chunks = [
@@ -371,8 +370,7 @@ class Thumbnails(CFrame, ThumbsPrepare):
 
                 chunk_ln = len(chunk)
                 rows = math.ceil(chunk_ln/self.clmns_count)
-
-                w = (self.thumbsize) * self.clmns_count
+                
                 h = (self.thumbsize) * rows
 
                 empty = Image.new("RGBA", (w, h), color=cnf.bg_color)
@@ -473,7 +471,7 @@ class Thumbnails(CFrame, ThumbsPrepare):
         self.load_thumbs()
 
     def get_clmns_count(self):
-        clmns = (cnf.root_g["w"] - cnf.menu_w) // (cnf.thumb_size-3)
+        clmns = (cnf.root_g["w"] - cnf.menu_w) // (cnf.thumb_size)
         return 1 if clmns == 0 else clmns
 
     def get_coords(self, e: tkinter.Event, coords: dict):
