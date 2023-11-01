@@ -183,33 +183,33 @@ class ThumbsSearch(CFrame):
             bg=cnf.dgray_color,
             insertbackground="white",
             fg=cnf.fg_color,
-            justify="center",
-            selectbackground=cnf.btn_color,
-            border=1,
+            justify="left",
+            border=0,
             highlightthickness=0,
+            width=15
             )
-        self.search_wid.pack(fill="x", ipady=2, ipadx=2)
+        self.search_wid.pack(ipady=5, side="left", anchor="e")
 
-        # btns_frame = CFrame(self)
-        # btns_frame.pack(pady=(10, 0))
+        self.btns_fr = CFrame(self, bg=cnf.dgray_color)
+        self.btns_fr.pack(side="right")
 
-        # self.btn_search = CButton(btns_frame, text=cnf.lng.search)
-        # self.btn_search.pack(side="left")
-        # self.btn_search.cmd(self.search_go)
+        self.btn_clear = CButton(
+            self.btns_fr, text="⌫", width=3, bg=cnf.dgray_color)
+        self.btn_clear.pack(side="right")
+        self.btn_clear.cmd(self.search_clear)
 
-        # CSep(btns_frame).pack(fill="y", side="left", padx=10)
-
-        # if cnf.search_var.get():
-        #     self.btn_search.configure(bg=cnf.blue_color)
-
-        # self.btn_clear = CButton(btns_frame, text=cnf.lng.clear)
-        # self.btn_clear.pack(side="left")
-        # self.btn_clear.cmd(self.search_clear)
+        self.btn_search = CButton(
+            self.btns_fr, text="✓", width=3, bg=cnf.dgray_color)
+        self.btn_search.pack(side="right", pady=3)
+        self.btn_search.cmd(self.search_go)
 
         self.search_wid.bind("<Escape>", lambda e: cnf.root.focus_force())
         cnf.root.bind("<Command-f>", lambda e: self.search_wid.focus_force())
         self.search_wid.bind("<Return>", self.search_go)
         self.search_wid.bind("<ButtonRelease-2>", ContextSearch)
+    
+    def btns_destr(self, e=None):
+        self.btns_fr.destroy()
 
     def search_go(self, e=None):
         cnf.search_var.set(self.search_wid.get())
@@ -230,24 +230,24 @@ class FilterRow(CFrame):
                 cnf.filter[i] = True
 
         prod = CButton(self, text=cnf.lng.product)
-        prod.pack(side="left")
+        prod.pack(side="left", fill="x")
 
-        CSep(self).pack(side="left", fill="y", padx=10)
+        CSep(self).pack(side="left", fill="y", padx=5)
 
         mod = CButton(self, text=cnf.lng.models)
-        mod.pack(side="left")
+        mod.pack(side="left", fill="x")
 
-        CSep(self).pack(side="left", fill="y", padx=10)
+        CSep(self).pack(side="left", fill="y", padx=5)
 
         cat = CButton(self, text=cnf.lng.catalog)
-        cat.pack(side="left")
+        cat.pack(side="left", fill="x")
 
-        CSep(self).pack(side="left", fill="y", padx=10)
+        CSep(self).pack(side="left", fill="y", padx=5)
 
         filter = CButton(
             self, text=cnf.lng.dates, bg=cnf.bg_color, pady=5, width=7)
         filter.cmd(lambda e: Filter())
-        filter.pack(side="left")
+        filter.pack(side="left", fill="x")
 
         if any((cnf.start, cnf.end)):
             filter.configure(bg=cnf.btn_color)
@@ -283,8 +283,7 @@ class TitleRow(CFrame):
             font=("San Francisco Pro", 22, "bold"))
         title.pack(side="left", fill="x", expand=1)
 
-        FilterRow(self).pack(side="left", fill="x", expand=1)
-        ThumbsSearch(self).pack(side="left", fill="x", expand=1, padx=10)
+        ThumbsSearch(self).pack(side="left")
 
 
 class Thumbnails(CFrame, ThumbsPrepare):
@@ -320,7 +319,7 @@ class Thumbnails(CFrame, ThumbsPrepare):
     def load_scroll(self):
         self.titles = TitleRow(self)
         self.titles.bind("<ButtonRelease-2>", ContextFilter)
-        self.titles.pack(pady=(0, 5), padx=(15, 0), fill="x")
+        self.titles.pack(pady=(0, 5), padx=(15, 15), fill="x")
 
         self.scroll_frame = CFrame(self)
         self.scroll_frame.pack(expand=1, fill=tkinter.BOTH)
@@ -341,6 +340,8 @@ class Thumbnails(CFrame, ThumbsPrepare):
             self.sframe, width=(self.thumbsize) * self.clmns_count)
         self.thumbs_frame.pack(expand=1, anchor="w", padx=(scrl_w, 10-scrl_w))
         self.thumbs_frame.bind("<ButtonRelease-2>", ContextFilter)
+
+        FilterRow(self.thumbs_frame).pack(pady=(5, 0))
 
         all_src = []
         limit = 500
