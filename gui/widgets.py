@@ -61,6 +61,10 @@ class CWindow(tkinter.Toplevel):
 class SmbAlert(CWindow):
     def __init__(self):
         super().__init__()
+        self.minsize(420, 85)
+        self.protocol("WM_DELETE_WINDOW", self.close_smb)
+        self.bind("<Escape>", self.close_smb)
+        place_center(cnf.root, self, 420, 85)
 
         txt = cnf.lng.no_connection
         title_lbl = CLabel(
@@ -72,19 +76,12 @@ class SmbAlert(CWindow):
         descr_lbl = CLabel(self, text=txt2, justify="left")
         descr_lbl.pack(padx=15, pady=(0, 5))
 
-        btn = CButton(self, text=cnf.lng.close)
-        btn.cmd(self.btn_cmd)
-        btn.pack()
-
         cnf.root.update_idletasks()
-        place_center()
-        self.deiconify()
-        self.wait_visibility()
         self.grab_set_global()
 
-    def btn_cmd(self, e=None):
+    def close_smb(self, e=None):
         self.destroy()
-        focus_last_win()
+        cnf.root.focus_force()
 
 
 class MacMenu(tkinter.Menu):

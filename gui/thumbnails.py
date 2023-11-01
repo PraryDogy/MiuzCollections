@@ -259,11 +259,6 @@ class FilterRow(CFrame):
             v.configure(bg=cnf.btn_color) if cnf.filter[k] else None
             v.cmd(lambda e, k=k: self.filtr_cmd(k))
 
-        for i in (prod, mod, cat, filter):
-            old = i.cget("bg")
-            i.bind("<Enter>", lambda e: e.widget.configure(bg=cnf.selectgray))
-            i.bind("<Leave>", lambda e, old=old: e.widget.configure(bg=old))
-
     def filtr_cmd(self, key):
         cnf.filter[key] = False if cnf.filter[key] else True
         cnf.reload_scroll()

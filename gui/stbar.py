@@ -26,7 +26,7 @@ class ScanerGui(CWindow):
             )
         self.live_lbl.pack(expand=1, fill="both")
 
-        self.can_btn = CButton(self, text=cnf.lng.cancel)
+        self.can_btn = CButton(self, text=cnf.lng.cancel, pady=5)
         self.can_btn.pack(pady=(10, 0))
         self.can_btn.cmd(self.cancel)
 
@@ -69,13 +69,13 @@ class StBar(CFrame):
     def load_stbar(self):
         frame = CFrame(self)
 
-        btn = CButton(frame, text=cnf.lng.settings)
+        btn = CButton(frame, text=cnf.lng.settings, pady=5, width=9)
         btn.cmd(lambda e: self.settings_cmd(btn))
         btn.pack(side="left")
 
         CSep(frame).pack(fill="y", side="left", padx=10)
 
-        upd_btn = CButton(frame, text=cnf.lng.update)
+        upd_btn = CButton(frame, text=cnf.lng.update, pady=5, width=9)
         upd_btn.cmd(self.update_cmd)
         upd_btn.pack(side="left")
         cnf.stbar_btn = upd_btn
