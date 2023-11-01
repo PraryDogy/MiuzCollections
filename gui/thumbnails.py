@@ -177,12 +177,15 @@ class ThumbsSearch(CFrame):
     def __init__(self, master: tkinter):
         super().__init__(master)
 
+        CLabel(
+            self, width=1, bg=cnf.dgray_color).pack(side="left", fill="y")
+
         self.search_wid = tkinter.Entry(
             self,
             textvariable=cnf.search_var,
             bg=cnf.dgray_color,
             insertbackground="white",
-            fg=cnf.fg_color,
+            fg=cnf.blue_color,
             justify="left",
             border=0,
             highlightthickness=0,
@@ -350,10 +353,13 @@ class Thumbnails(CFrame, ThumbsPrepare):
 
             chunk_t = f"{date_key}, {cnf.lng.total}: {len(img_list)}"
             if cnf.search_var.get():
-                chunk_t = f"\"{cnf.search_var.get()}\": {chunk_t}"
+                chunk_t = (
+                    f"{cnf.lng.photo} {cnf.lng.with_name} "
+                    f"\"{cnf.search_var.get()}\"\n{chunk_t}"
+                    )
 
             chunk_title = CLabel(
-                self.thumbs_frame, text=chunk_t,
+                self.thumbs_frame, text=chunk_t, anchor="w", justify="left",
                 font=("San Francisco Pro", 18, "bold")
                 )
             chunk_title.pack(anchor="w", pady=(30, 0))
