@@ -223,7 +223,7 @@ class ThumbsSearch(CFrame):
 
 class FilterRow(CFrame):
     def __init__(self, master: tkinter):
-        super().__init__(master)
+        super().__init__(master, bg="red")
 
         if not any(i for i in cnf.filter.values()):
             for i in cnf.filter.keys():
@@ -264,10 +264,10 @@ class FilterRow(CFrame):
             i.bind("<Enter>", lambda e: e.widget.configure(bg=cnf.selectgray))
             i.bind("<Leave>", lambda e, old=old: e.widget.configure(bg=old))
 
-
     def filtr_cmd(self, key):
         cnf.filter[key] = False if cnf.filter[key] else True
         cnf.reload_scroll()
+
 
 class TitleRow(CFrame):
     def __init__(self, master: tkinter, **kw):
@@ -279,12 +279,12 @@ class TitleRow(CFrame):
             coll_title = cnf.curr_coll
 
         title = CButton(
-            self, text=coll_title, bg=cnf.bg_color, anchor="w", justify="left",
-            padx=0, font=("San Francisco Pro", 22, "bold"))
-        title.pack(side="left", anchor="w", padx=(0, 70))
+            self, text=coll_title, bg=cnf.bg_color, anchor="w",
+            font=("San Francisco Pro", 22, "bold"))
+        title.pack(side="left")
 
-        FilterRow(self).pack(side="left")
-        ThumbsSearch(self).pack(side="left", padx=(70, 0))
+        FilterRow(self).pack(side="left", fill="x")
+        ThumbsSearch(self).pack(side="left", padx=10)
 
 
 class Thumbnails(CFrame, ThumbsPrepare):
@@ -318,8 +318,8 @@ class Thumbnails(CFrame, ThumbsPrepare):
 
     def load_scroll(self):
         self.titles = TitleRow(self)
-        self.titles.pack(pady=(0, 5))
         self.titles.bind("<ButtonRelease-2>", ContextFilter)
+        self.titles.pack(pady=(0, 5), padx=(15, 0), fill="x")
 
         self.scroll_frame = CFrame(self)
         self.scroll_frame.pack(expand=1, fill=tkinter.BOTH)
@@ -334,7 +334,6 @@ class Thumbnails(CFrame, ThumbsPrepare):
         thumbs_dict = Dbase.conn.execute(self.get_query()).fetchall()
         thumbs_dict = self.decode_thumbs(thumbs_dict)
         thumbs_dict = self.create_thumbs_dict(thumbs_dict)
-
 
         self.thumbs_frame = CFrame(
             self.sframe, width=(self.thumbsize) * self.clmns_count)
@@ -414,8 +413,9 @@ class Thumbnails(CFrame, ThumbsPrepare):
                     ))
 
         if not thumbs_dict:
+            self.thumbs_frame.pack(anchor="center")
+        
             str_var = cnf.search_var.get()
-
             noimg_t = cnf.lng.no_photo
 
             if str_var:
