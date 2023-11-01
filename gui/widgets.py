@@ -266,10 +266,10 @@ class Context(tkinter.Menu):
                 )
                 )
         
-    def apply_filter(self, e: tkinter.Event, label, collname=None):
+    def apply_filter(self, e: tkinter.Event, label, filter, collname=None):
         self.add_command(
             label=label,
-            command=lambda: apply_filter(e, label, collname)
+            command=lambda: apply_filter(e, filter, collname)
             )
         
     def please_wait(self):

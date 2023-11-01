@@ -30,7 +30,7 @@ class Config:
 
         self.fg_color = "#E2E2E2"
         self.bg_color = "#1e1e1e"
-        self.btn_color = "#2A2A2D"
+        self.btn_color = "#303030"
         self.blue_color = "#0056D9"
         self.lgray_color = "#4B4B4B"
         self.dgray_color = "#141416"
@@ -80,10 +80,7 @@ class Config:
 
         self.scan_time = 10
 
-        self.sort_modified = True
-        self.catalog = False
-        self.product = True
-        self.models = True
+        self.filter = {"prod": True, "mod": True, "cat": False}
         self.lang = self.lng.name
 
     def load_cfg(self):

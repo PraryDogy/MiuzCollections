@@ -21,14 +21,93 @@ __all__ = (
     )
 
 
+class ThumbsPrepare:
+    def decode_thumbs(self, thumbs_raw):
+        result = []
+        for blob, src, modified in thumbs_raw:
+            try:
+                decoded = decode_image(blob)
+                cropped = crop_image(decoded)
+                img = convert_to_rgb(cropped)
+                result.append((img, src, modified))
+
+            except Exception:
+                print(traceback.format_exc())
+
+        return result
+
+    def create_thumbs_dict(self, thumbs_raw):
+        thumbs_dict = {}
+
+        for img, src, modified in thumbs_raw:
+            date_key = datetime.fromtimestamp(modified).date()
+
+            if not any((cnf.start, cnf.end)):
+                date_key = f"{cnf.lng.months[date_key.month]} {date_key.year}"
+            else:
+                date_key = f"{cnf.named_start} - {cnf.named_end}"
+
+            thumbs_dict.setdefault(date_key, [])
+            thumbs_dict[date_key].append((img, src))
+
+        return thumbs_dict
+
+    def stamp_dates(self):
+        start = datetime.combine(cnf.start, datetime.min.time())
+        end = datetime.combine(
+            cnf.end, datetime.max.time().replace(microsecond=0)
+            )
+        return (datetime.timestamp(start), datetime.timestamp(end))
+
+    def get_query(self):
+        q = sqlalchemy.select(Thumbs.img150, Thumbs.src, Thumbs.modified)
+        search = cnf.search_var.get()
+
+        if search:
+            search.replace("\n", "").strip()
+            q = q.filter(Thumbs.src.like("%" + search + "%"))
+
+        q = q.order_by(-Thumbs.modified)
+
+        if cnf.curr_coll != cnf.all_colls:
+            q = q.filter(Thumbs.collection == cnf.curr_coll)
+
+        filters = []
+
+        if cnf.filter["mod"]:
+            filters.append(Thumbs.src.like("%" + cnf.models_name + "%"))
+
+        if cnf.filter["cat"]:
+            filters.append(Thumbs.src.like("%" + cnf.catalog_name + "%"))
+
+        if cnf.filter["prod"]:
+            tmp = sqlalchemy.and_(
+                Thumbs.src.not_like("%" + cnf.catalog_name + "%"),
+                Thumbs.src.not_like("%" + cnf.models_name + "%")
+                )
+            filters.append(tmp)
+
+        q = q.filter(sqlalchemy.or_(*filters))
+
+        if not any((cnf.start, cnf.end)):
+            q = q.limit(cnf.limit)
+
+        else:
+            t = self.stamp_dates()
+            q = q.filter(Thumbs.modified > t[0])
+            q = q.filter(Thumbs.modified < t[1])
+
+        return q
+    
+
 class ContextFilter(Context):
     def __init__(self, e: tkinter.Event):
         super().__init__()
 
-        self.apply_filter(e, cnf.lng.product)
-        self.apply_filter(e, cnf.lng.models)
-        self.apply_filter(e, cnf.lng.catalog)
-        self.apply_filter(e, cnf.lng.show_all)
+        self.apply_filter(e, label=cnf.lng.product, filter="prod")
+        self.apply_filter(e, label=cnf.lng.models, filter="mod")
+        self.apply_filter(e, label=cnf.lng.catalog, filter="cat")
+        self.apply_filter(e, label=cnf.lng.show_all, filter="all")
 
         self.do_popup(e)
 
@@ -111,21 +190,21 @@ class ThumbsSearch(CFrame):
             )
         self.search_wid.pack(fill="x", ipady=2, ipadx=2)
 
-        btns_frame = CFrame(self)
-        btns_frame.pack(pady=(10, 0))
+        # btns_frame = CFrame(self)
+        # btns_frame.pack(pady=(10, 0))
 
-        self.btn_search = CButton(btns_frame, text=cnf.lng.search)
-        self.btn_search.pack(side="left")
-        self.btn_search.cmd(self.search_go)
+        # self.btn_search = CButton(btns_frame, text=cnf.lng.search)
+        # self.btn_search.pack(side="left")
+        # self.btn_search.cmd(self.search_go)
 
-        CSep(btns_frame).pack(fill="y", side="left", padx=10)
+        # CSep(btns_frame).pack(fill="y", side="left", padx=10)
 
-        if cnf.search_var.get():
-            self.btn_search.configure(bg=cnf.blue_color)
+        # if cnf.search_var.get():
+        #     self.btn_search.configure(bg=cnf.blue_color)
 
-        self.btn_clear = CButton(btns_frame, text=cnf.lng.clear)
-        self.btn_clear.pack(side="left")
-        self.btn_clear.cmd(self.search_clear)
+        # self.btn_clear = CButton(btns_frame, text=cnf.lng.clear)
+        # self.btn_clear.pack(side="left")
+        # self.btn_clear.cmd(self.search_clear)
 
         self.search_wid.bind("<Escape>", lambda e: cnf.root.focus_force())
         cnf.root.bind("<Command-f>", lambda e: self.search_wid.focus_force())
@@ -142,86 +221,70 @@ class ThumbsSearch(CFrame):
         cnf.reload_scroll()
 
 
-class ThumbsPrepare:
-    def decode_thumbs(self, thumbs_raw):
-        result = []
-        for blob, src, modified in thumbs_raw:
-            try:
-                decoded = decode_image(blob)
-                cropped = crop_image(decoded)
-                img = convert_to_rgb(cropped)
-                result.append((img, src, modified))
+class FilterRow(CFrame):
+    def __init__(self, master: tkinter):
+        super().__init__(master)
 
-            except Exception:
-                print(traceback.format_exc())
+        if not any(i for i in cnf.filter.values()):
+            for i in cnf.filter.keys():
+                cnf.filter[i] = True
 
-        return result
+        prod = CButton(self, text=cnf.lng.product)
+        prod.pack(side="left")
 
-    def create_thumbs_dict(self, thumbs_raw):
-        thumbs_dict = {}
+        CSep(self).pack(side="left", fill="y", padx=10)
 
-        for img, src, modified in thumbs_raw:
-            date_key = datetime.fromtimestamp(modified).date()
+        mod = CButton(self, text=cnf.lng.models)
+        mod.pack(side="left")
 
-            if not any((cnf.start, cnf.end)):
-                date_key = f"{cnf.lng.months[date_key.month]} {date_key.year}"
-            else:
-                date_key = f"{cnf.named_start} - {cnf.named_end}"
+        CSep(self).pack(side="left", fill="y", padx=10)
 
-            thumbs_dict.setdefault(date_key, [])
-            thumbs_dict[date_key].append((img, src))
+        cat = CButton(self, text=cnf.lng.catalog)
+        cat.pack(side="left")
 
-        return thumbs_dict
+        CSep(self).pack(side="left", fill="y", padx=10)
 
-    def stamp_dates(self):
-        start = datetime.combine(cnf.start, datetime.min.time())
-        end = datetime.combine(
-            cnf.end, datetime.max.time().replace(microsecond=0)
-            )
-        return (datetime.timestamp(start), datetime.timestamp(end))
+        filter = CButton(
+            self, text=cnf.lng.dates, bg=cnf.bg_color, pady=5, width=7)
+        filter.cmd(lambda e: Filter())
+        filter.pack(side="left")
 
-    def get_query(self):
-        q = sqlalchemy.select(Thumbs.img150, Thumbs.src, Thumbs.modified)
-        search = cnf.search_var.get()
+        if any((cnf.start, cnf.end)):
+            filter.configure(bg=cnf.btn_color)
 
-        if search:
-            search.replace("\n", "").strip()
-            q = q.filter(Thumbs.src.like("%" + search + "%"))
+        btns = {"prod": prod, "mod": mod, "cat": cat}
 
-        if cnf.sort_modified:
-            q = q.order_by(-Thumbs.modified)
+        for k, v in btns.items():
+            v.configure(width=7, pady=5, bg=cnf.bg_color)
+            v.configure(bg=cnf.btn_color) if cnf.filter[k] else None
+            v.cmd(lambda e, k=k: self.filtr_cmd(k))
+
+        for i in (prod, mod, cat, filter):
+            old = i.cget("bg")
+            i.bind("<Enter>", lambda e: e.widget.configure(bg=cnf.selectgray))
+            i.bind("<Leave>", lambda e, old=old: e.widget.configure(bg=old))
+
+
+    def filtr_cmd(self, key):
+        cnf.filter[key] = False if cnf.filter[key] else True
+        cnf.reload_scroll()
+
+class TitleRow(CFrame):
+    def __init__(self, master: tkinter, **kw):
+        super().__init__(master, **kw)
+
+        if cnf.curr_coll == cnf.all_colls:
+            coll_title = cnf.lng.all_colls
         else:
-            q = q.order_by(-Thumbs.created)
+            coll_title = cnf.curr_coll
 
-        if cnf.curr_coll != cnf.all_colls:
-            q = q.filter(Thumbs.collection == cnf.curr_coll)
+        title = CButton(
+            self, text=coll_title, bg=cnf.bg_color, anchor="w", justify="left",
+            padx=0, font=("San Francisco Pro", 22, "bold"))
+        title.pack(side="left", anchor="w", padx=(0, 70))
 
-        filters = []
-
-        if cnf.models:
-            filters.append(Thumbs.src.like("%" + cnf.models_name + "%"))
-
-        if cnf.catalog:
-            filters.append(Thumbs.src.like("%" + cnf.catalog_name + "%"))
-
-        if cnf.product:
-            tmp = sqlalchemy.and_(
-                Thumbs.src.not_like("%" + cnf.catalog_name + "%"),
-                Thumbs.src.not_like("%" + cnf.models_name + "%")
-                )
-            filters.append(tmp)
-
-        q = q.filter(sqlalchemy.or_(*filters))
-
-        if not any((cnf.start, cnf.end)):
-            q = q.limit(cnf.limit)
-
-        else:
-            t = self.stamp_dates()
-            q = q.filter(Thumbs.modified > t[0])
-            q = q.filter(Thumbs.modified < t[1])
-
-        return q
+        FilterRow(self).pack(side="left")
+        ThumbsSearch(self).pack(side="left", padx=(70, 0))
 
 
 class Thumbnails(CFrame, ThumbsPrepare):
@@ -235,7 +298,8 @@ class Thumbnails(CFrame, ThumbsPrepare):
             font=("San Francisco Pro", 13, "normal"),
             bg=cnf.bg_color, pady=1,
             )
-        self.topbar.pack(pady=(5, 0), side="left", fill="x", expand=1)
+        self.topbar.pack(
+            pady=(5, 0), side="left", fill="x", expand=1, padx=(5, 0))
         self.topbar.cmd(lambda e: self.sframe["canvas"].yview_moveto("0.0"))
 
         CSep(self).pack(fill="x", pady=5)
@@ -253,6 +317,10 @@ class Thumbnails(CFrame, ThumbsPrepare):
         self.search_task = None
 
     def load_scroll(self):
+        self.titles = TitleRow(self)
+        self.titles.pack(pady=(0, 5))
+        self.titles.bind("<ButtonRelease-2>", ContextFilter)
+
         self.scroll_frame = CFrame(self)
         self.scroll_frame.pack(expand=1, fill=tkinter.BOTH)
 
@@ -267,72 +335,15 @@ class Thumbnails(CFrame, ThumbsPrepare):
         thumbs_dict = self.decode_thumbs(thumbs_dict)
         thumbs_dict = self.create_thumbs_dict(thumbs_dict)
 
-        self.thumbs_frame = CFrame(self.sframe)
+
+        self.thumbs_frame = CFrame(
+            self.sframe, width=(self.thumbsize) * self.clmns_count)
         self.thumbs_frame.pack(
             expand=1,
-            fill=tkinter.BOTH,
-            padx=(self.sframe.cget("scrollbarwidth"), 0)
+            anchor="w",
+            padx=(self.sframe.cget("scrollbarwidth"), 0),
             )
-
-        if cnf.curr_coll == cnf.all_colls:
-            coll_title = cnf.lng.all_colls
-        else:
-            coll_title = cnf.curr_coll
-
-        title = CLabel(
-            self.thumbs_frame, text=coll_title, width=30,
-            font=("San Francisco Pro", 24, "bold")
-            )
-        title.pack(anchor="center")
-
-        filtr_fr = CFrame(self.thumbs_frame)
-        filtr_fr.pack()
-
-        filtr_l = CLabel(
-            filtr_fr, font=("San Francisco Pro", 13, "normal"),
-            justify="right", anchor="e", width=20,
-            text=(
-                f"{cnf.lng.filter}"
-                f"\n{cnf.lng.sort}"
-                ),
-                )
-        filtr_l.pack(side="left")
-
-        filter_row = []
-        if cnf.product:
-            filter_row.append(cnf.lng.product)
-        if cnf.models:
-            filter_row.append(cnf.lng.models)
-        if cnf.catalog:
-            filter_row.append(cnf.lng.catalog)
-        filter_row = ", ".join(filter_row)
-
-        if cnf.sort_modified:
-            sort_text = cnf.lng.date_changed_by
-        else:
-            sort_text = cnf.lng.date_created_by
-
-        filtr_r = CLabel(
-            filtr_fr, font=("San Francisco Pro", 13, "normal"),
-            justify="left", anchor="w", width=20,
-            text=(
-                f"{filter_row}"
-                f"\n{sort_text}"
-                ),
-                )
-        filtr_r.pack(side="right")
-
-        for i in (self.thumbs_frame, title, filtr_l, filtr_r):
-            i.bind("<ButtonRelease-2>", ContextFilter)
-
-        btn_filter = CButton(self.thumbs_frame, text=cnf.lng.filters)
-        btn_filter.pack(pady=(10, 0))
-        if any((cnf.start, cnf.end)):
-            btn_filter.configure(bg=cnf.blue_color)
-        btn_filter.cmd(lambda e: Filter())
-
-        search = ThumbsSearch(self.thumbs_frame)
-        search.pack(pady=(10, 0))
+        self.thumbs_frame.bind("<ButtonRelease-2>", ContextFilter)
 
         all_src = []
         limit = 500
@@ -375,11 +386,6 @@ class Thumbnails(CFrame, ThumbsPrepare):
 
                     coord = (clmn//(self.thumbsize), row//(self.thumbsize))
                     coords[coord] = src
-
-                    # img = img.resize((146, 146))
-                    # framed = Image.new("RGBA", (150, 150), color='#ffffff')
-                    # framed.paste(img, (2, 2))
-                    # img = framed
 
                     empty.paste(img, (clmn, row))
 
@@ -457,8 +463,8 @@ class Thumbnails(CFrame, ThumbsPrepare):
                 cnf.reload_thumbs()
 
     def reload_scroll(self):
-        self.scroll_frame.destroy()
-        self.thumbs_frame.destroy()
+        for i in (self.titles, self.scroll_frame, self.thumbs_frame):
+            i.destroy()
         self.load_scroll()
         self.load_thumbs()
 
@@ -508,7 +514,7 @@ class Thumbnails(CFrame, ThumbsPrepare):
                 self.topbar_can.cmd(lambda e: cancel_utils_task())
                 self.topbar_can.pack(
                     side="left",
-                    pady=(5, 0), padx=(1, 0)
+                    pady=(5, 0), padx=(1, 5)
                     )
 
         except RuntimeError as e:

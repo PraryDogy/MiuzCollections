@@ -273,8 +273,8 @@ class Filter(CWindow):
     def __init__(self):
         super().__init__()
         self.title(cnf.lng.filter)
-        self.minsize(633, 666)
-        place_center(cnf.root, self, 633, 666)
+        self.minsize(633, 490)
+        place_center(cnf.root, self, 633, 490)
         self.protocol("WM_DELETE_WINDOW", self.close_filter)
         self.bind("<Escape>", self.close_filter)
         self.bind("<Return>", self.ok_filter)
@@ -315,44 +315,6 @@ class Filter(CWindow):
         cals_reset.pack(pady=(15, 0))
         cals_reset.cmd(self.cals_titles_reset)
 
-        CSep(self).pack(fill="x", padx=15, pady=15)
-
-        grop_frame = CFrame(self)
-        grop_frame.pack()
-
-        self.product = CButton(grop_frame, text=cnf.lng.product)
-        if cnf.product:
-            self.product.configure(bg=cnf.lgray_color)
-        self.product.pack(side="left")
-        self.product.cmd(self.product_cmd)
-
-        self.models = CButton(grop_frame, text=cnf.lng.models)
-        if cnf.models:
-            self.models.configure(bg=cnf.lgray_color)
-        self.models.pack(side="left", padx=15)
-        self.models.cmd(self.models_cmd)
-
-        self.catalog = CButton(grop_frame, text=cnf.lng.catalog)
-        if cnf.catalog:
-            self.catalog.configure(bg=cnf.lgray_color)
-        self.catalog.pack(side="left")
-        self.catalog.cmd(self.catalog_cmd)
-
-        if cnf.sort_modified:
-            sort_btn_t = cnf.lng.date_changed
-        else:
-            sort_btn_t = cnf.lng.date_created
-
-        self.btn_sort = CButton(self, text=sort_btn_t, width=13)
-        self.btn_sort.pack(pady=(15, 0))
-        self.btn_sort.cmd(self.sort_btn_cmd)
-
-        marketing_lbl = CLabel(
-            self, text="\n".join(cnf.lng.filter_descr),
-            anchor="w", justify="left"
-            )
-        marketing_lbl.pack(anchor="w", pady=(15, 0))
-
         CSep(self).pack(fill="x", padx=150, pady=15)
 
         btns_frame = CFrame(self)
@@ -390,29 +352,6 @@ class Filter(CWindow):
         self.date_changed = False
         self.cals_titles.configure(text=cnf.lng.dates_not_sel)
 
-    def sort_btn_cmd(self, e):
-        if self.btn_sort.cget("text") == cnf.lng.date_changed:
-            self.btn_sort.configure(text=cnf.lng.date_created)
-        else:
-            self.btn_sort.configure(text=cnf.lng.date_changed)
-
-    def product_cmd(self, e=None):
-        if self.product.cget("bg") == cnf.lgray_color:
-            self.product.configure(bg=cnf.btn_color)
-        else:
-            self.product.configure(bg=cnf.lgray_color)
-
-    def catalog_cmd(self, e=None):
-        if self.catalog.cget("bg") == cnf.lgray_color:
-            self.catalog.configure(bg=cnf.btn_color)
-        else:
-            self.catalog.configure(bg=cnf.lgray_color)
-
-    def models_cmd(self, e=None):
-        if self.models.cget("bg") == cnf.lgray_color:
-            self.models.configure(bg=cnf.btn_color)
-        else:
-            self.models.configure(bg=cnf.lgray_color)
 
     def ok_filter(self, e=None):
         if self.date_changed:
@@ -424,31 +363,6 @@ class Filter(CWindow):
         if self.reseted:
             cnf.start = None
             cnf.end = None
-
-        if self.product.cget("bg") == cnf.lgray_color:
-            cnf.product = True
-        else:
-            cnf.product = False
-
-        if self.models.cget("bg") == cnf.lgray_color:
-            cnf.models = True
-        else:
-            cnf.models = False
-
-        if self.catalog.cget("bg") == cnf.lgray_color:
-            cnf.catalog = True
-        else:
-            cnf.catalog = False
-
-        if not any((cnf.product, cnf.models, cnf.catalog)):
-            cnf.product = True
-            cnf.models = True
-            cnf.catalog = True
-
-        if self.btn_sort.cget("text") == cnf.lng.date_created:
-            cnf.sort_modified = False
-        else:
-            cnf.sort_modified = True
 
         self.grab_release()
         self.destroy()

@@ -342,18 +342,14 @@ def copy_text(text):
     cnf.root.clipboard_append(text)
 
 
-def apply_filter(e: tkinter.Event, label, collname=None):
-    if label == cnf.lng.product:
-        cnf.product = True
-        cnf.models = cnf.catalog = False
-    elif label == cnf.lng.models:
-        cnf.models = True
-        cnf.product = cnf.catalog = False
-    elif label == cnf.lng.catalog:
-        cnf.catalog = True
-        cnf.product = cnf.models = False
+def apply_filter(e: tkinter.Event, filter, collname=None):
+    if filter == "all":
+        for k in ("prod", "mod", "cat"):
+            cnf.filter[k] = True
     else:
-        cnf.product = cnf.models = cnf.catalog = True
+        for k in ("prod", "mod", "cat"):
+            cnf.filter[k] = False
+        cnf.filter[filter] = True
 
     if collname:
         cnf.show_coll(e, collname)

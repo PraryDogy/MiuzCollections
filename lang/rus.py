@@ -44,6 +44,7 @@ class Rus:
         self.file_size = "Размер"
         self.file_path = "Расположение"
         self.collection = "Коллеция"
+        self.dates = "Даты"
 
 
         self.sett_descr = (
