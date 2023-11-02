@@ -177,11 +177,14 @@ class ThumbsSearch(CFrame):
     def __init__(self, master: tkinter):
         super().__init__(master)
 
+        fr = CFrame(self)
+        fr.pack(anchor="e")
+
         CLabel(
-            self, width=1, bg=cnf.dgray_color).pack(side="left", fill="y")
+            fr, width=1, bg=cnf.dgray_color).pack(side="left", fill="y")
 
         self.search_wid = tkinter.Entry(
-            self,
+            fr,
             textvariable=cnf.search_var,
             bg=cnf.dgray_color,
             insertbackground="white",
@@ -191,19 +194,19 @@ class ThumbsSearch(CFrame):
             highlightthickness=0,
             width=15,
             )
-        self.search_wid.pack(ipady=6, side="left", anchor="e")
+        self.search_wid.pack(ipady=6, side="left")
 
-        self.btns_fr = CFrame(self, bg=cnf.dgray_color)
-        self.btns_fr.pack(side="right")
+        # self.btns_fr = CFrame(self, bg=cnf.dgray_color)
+        # self.btns_fr.pack(side="left")
 
         self.btn_clear = CButton(
-            self.btns_fr, text="⌫", width=3, bg=cnf.dgray_color, pady=5)
-        self.btn_clear.pack(side="right")
+            fr, text="⌫", width=3, bg=cnf.dgray_color, pady=5)
+        self.btn_clear.pack(side="left")
         self.btn_clear.cmd(self.search_clear)
 
         self.btn_search = CButton(
-            self.btns_fr, text="✓", width=3, bg=cnf.dgray_color, pady=5)
-        self.btn_search.pack(side="right")
+            fr, text="✓", width=3, bg=cnf.dgray_color, pady=5)
+        self.btn_search.pack(side="left")
         self.btn_search.cmd(self.search_go)
 
         self.search_wid.bind("<Escape>", lambda e: cnf.root.focus_force())
@@ -262,10 +265,27 @@ class FilterRow(CFrame):
             v.configure(bg=cnf.btn_color) if cnf.filter[k] else None
             v.cmd(lambda e, k=k: self.filtr_cmd(k))
 
+        self.bind(
+            "<Configure>",
+            lambda e: self.small_names((prod, mod, cat, filter))
+            )
+
     def filtr_cmd(self, key):
         cnf.filter[key] = False if cnf.filter[key] else True
         cnf.reload_scroll()
 
+    def small_names(self, btns: tuple):
+        names = ("💍", "👤", "🌐", "📅")
+        bigs = (
+            cnf.lng.product, cnf.lng.models, cnf.lng.catalog, cnf.lng.dates
+            )
+
+        if cnf.root.winfo_width() < 890:
+            for btn, name in zip(btns, names):
+                btn.configure(text=name, width=2)
+        else:
+            for btn, name in zip(btns, bigs):
+                btn.configure(text=name, width=7)
 
 class TitleRow(CFrame):
     def __init__(self, master: tkinter, **kw):
@@ -276,16 +296,13 @@ class TitleRow(CFrame):
         else:
             coll_title = cnf.curr_coll
 
-        func_fr = CFrame(self)
-        func_fr.pack()
-
         title = CButton(
-            func_fr, text=coll_title, bg=cnf.bg_color, anchor="w",
+            self, text=coll_title, bg=cnf.bg_color, anchor="w", justify="left",
             font=("San Francisco Pro", 22, "bold"))
-        title.pack(side="left", fill="x", expand=1)
+        title.pack(side="left", fill="x", expand=1, anchor="w")
 
-        FilterRow(func_fr).pack(side="left", fill="x", expand=1)
-        ThumbsSearch(func_fr).pack(side="left")
+        FilterRow(self).pack(side="left", fill="x", expand=1)
+        ThumbsSearch(self).pack(side="right", fill="x", expand=1, anchor="e")
 
 
 class Thumbnails(CFrame, ThumbsPrepare):
@@ -302,8 +319,6 @@ class Thumbnails(CFrame, ThumbsPrepare):
         self.topbar.pack(
             pady=(5, 0), side="left", fill="x", expand=1, padx=(5, 0))
         self.topbar.cmd(lambda e: self.sframe["canvas"].yview_moveto("0.0"))
-
-        # CSep(self).pack(fill="x", pady=5)
 
         self.clmns_count = 1
         self.thumbs_pad = 3
@@ -323,8 +338,8 @@ class Thumbnails(CFrame, ThumbsPrepare):
         self.titles.bind("<ButtonRelease-2>", ContextFilter)
         self.titles.pack(padx=(15, 15), fill="x")
 
-        CSep(self, bg="black").pack(fill="x", pady=(5, 0))
-        CSep(self, bg="#161616").pack(fill="x")
+        self.title_sep = CSep(self)
+        self.title_sep.pack(fill="x", pady=(5, 0), padx=1)
 
         self.scroll_frame = CFrame(self)
         self.scroll_frame.pack(expand=1, fill=tkinter.BOTH)
@@ -471,7 +486,8 @@ class Thumbnails(CFrame, ThumbsPrepare):
                 cnf.reload_thumbs()
 
     def reload_scroll(self):
-        for i in (self.titles, self.scroll_frame, self.thumbs_frame):
+        for i in (
+            self.titles, self.scroll_frame, self.thumbs_frame, self.title_sep):
             i.destroy()
         self.load_scroll()
         self.load_thumbs()
