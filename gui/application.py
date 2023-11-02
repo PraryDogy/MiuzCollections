@@ -32,7 +32,7 @@ class Application:
             f"+{cnf.root_g['x']}+{cnf.root_g['y']}")
             )
 
-        cnf.root.minsize(610, 300)
+        cnf.root.minsize(700, 300)
         cnf.root.deiconify()
 
         temp = CLabel(

@@ -192,6 +192,7 @@ class ThumbsSearch(CFrame):
             justify="left",
             border=0,
             highlightthickness=0,
+            width=12
             )
         self.search_wid.pack(ipady=6, side="left")
 
@@ -209,7 +210,16 @@ class ThumbsSearch(CFrame):
         cnf.root.bind("<Command-f>", lambda e: self.search_wid.focus_force())
         self.search_wid.bind("<Return>", self.search_go)
         self.search_wid.bind("<ButtonRelease-2>", ContextSearch)
-    
+
+        self.search_wid.bind("<Configure>", self.small_search)
+
+    def small_search(self, e):
+        if cnf.root.winfo_width() < 870:
+            self.search_wid.configure(width=10)
+        else:
+            self.search_wid.configure(width=12)
+
+
     def btns_destr(self, e=None):
         self.btns_fr.destroy()
 
@@ -276,7 +286,7 @@ class FilterRow(CFrame):
             cnf.lng.product, cnf.lng.models, cnf.lng.catalog, cnf.lng.dates
             )
 
-        if cnf.root.winfo_width() < 890:
+        if cnf.root.winfo_width() <870:
             for btn, name in zip(btns, names):
                 btn.configure(width=2, text=name)
         else:
