@@ -192,12 +192,8 @@ class ThumbsSearch(CFrame):
             justify="left",
             border=0,
             highlightthickness=0,
-            width=15,
             )
         self.search_wid.pack(ipady=6, side="left")
-
-        # self.btns_fr = CFrame(self, bg=cnf.dgray_color)
-        # self.btns_fr.pack(side="left")
 
         self.btn_clear = CButton(
             fr, text="⌫", width=3, bg=cnf.dgray_color, pady=5)
@@ -282,10 +278,10 @@ class FilterRow(CFrame):
 
         if cnf.root.winfo_width() < 890:
             for btn, name in zip(btns, names):
-                btn.configure(text=name, width=2)
+                btn.configure(width=2, text=name)
         else:
             for btn, name in zip(btns, bigs):
-                btn.configure(text=name, width=7)
+                btn.configure(width=7, text=name)
 
 class TitleRow(CFrame):
     def __init__(self, master: tkinter, **kw):
@@ -301,8 +297,8 @@ class TitleRow(CFrame):
             font=("San Francisco Pro", 22, "bold"))
         title.pack(side="left", fill="x", expand=1, anchor="w")
 
-        FilterRow(self).pack(side="left", fill="x", expand=1)
-        ThumbsSearch(self).pack(side="right", fill="x", expand=1, anchor="e")
+        FilterRow(self).pack(side="left", fill="x", expand=1, anchor="center")
+        ThumbsSearch(self).pack(side="right", fill="x", expand=1)
 
 
 class Thumbnails(CFrame, ThumbsPrepare):
