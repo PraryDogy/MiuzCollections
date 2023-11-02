@@ -32,7 +32,7 @@ class Application:
             f"+{cnf.root_g['x']}+{cnf.root_g['y']}")
             )
 
-        cnf.root.minsize(610, 300)
+        cnf.root.minsize(890, 300)
         cnf.root.deiconify()
 
         temp = CLabel(
@@ -59,7 +59,6 @@ class Application:
         self.menu = Menu(cnf.root)
         r_frame = CFrame(cnf.root)
         self.thumbnails = Thumbnails(r_frame)
-        sep = CSep(r_frame)
         self.stbar = StBar(r_frame)
         MacMenu()
 
@@ -67,7 +66,8 @@ class Application:
         self.menu.pack(side="left", fill="y")
         r_frame.pack(fill="both", expand=1)
         self.thumbnails.pack(fill="both", expand=1)
-        sep.pack(fill="x", padx=1, pady=(10, 10))
+        CSep(r_frame, bg="#161616").pack(fill="x", pady=(10, 0))
+        CSep(r_frame, bg="black").pack(fill="x", pady=(0, 10))
         self.stbar.pack(pady=(0, 10))
 
         if smb_check():

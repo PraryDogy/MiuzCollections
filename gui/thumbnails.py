@@ -276,12 +276,16 @@ class TitleRow(CFrame):
         else:
             coll_title = cnf.curr_coll
 
+        func_fr = CFrame(self)
+        func_fr.pack()
+
         title = CButton(
-            self, text=coll_title, bg=cnf.bg_color, anchor="w",
+            func_fr, text=coll_title, bg=cnf.bg_color, anchor="w",
             font=("San Francisco Pro", 22, "bold"))
         title.pack(side="left", fill="x", expand=1)
 
-        ThumbsSearch(self).pack(side="left")
+        FilterRow(func_fr).pack(side="left", fill="x", expand=1)
+        ThumbsSearch(func_fr).pack(side="left")
 
 
 class Thumbnails(CFrame, ThumbsPrepare):
@@ -299,7 +303,7 @@ class Thumbnails(CFrame, ThumbsPrepare):
             pady=(5, 0), side="left", fill="x", expand=1, padx=(5, 0))
         self.topbar.cmd(lambda e: self.sframe["canvas"].yview_moveto("0.0"))
 
-        CSep(self).pack(fill="x", pady=5)
+        # CSep(self).pack(fill="x", pady=5)
 
         self.clmns_count = 1
         self.thumbs_pad = 3
@@ -317,7 +321,10 @@ class Thumbnails(CFrame, ThumbsPrepare):
     def load_scroll(self):
         self.titles = TitleRow(self)
         self.titles.bind("<ButtonRelease-2>", ContextFilter)
-        self.titles.pack(pady=(0, 5), padx=(15, 15), fill="x")
+        self.titles.pack(padx=(15, 15), fill="x")
+
+        CSep(self, bg="black").pack(fill="x", pady=(5, 0))
+        CSep(self, bg="#161616").pack(fill="x")
 
         self.scroll_frame = CFrame(self)
         self.scroll_frame.pack(expand=1, fill=tkinter.BOTH)
@@ -338,8 +345,6 @@ class Thumbnails(CFrame, ThumbsPrepare):
             self.sframe, width=(self.thumbsize) * self.clmns_count)
         self.thumbs_frame.pack(expand=1, anchor="w", padx=(scrl_w, 10-scrl_w))
         self.thumbs_frame.bind("<ButtonRelease-2>", ContextFilter)
-
-        FilterRow(self.thumbs_frame).pack(pady=(5, 0))
 
         all_src = []
         limit = 500
