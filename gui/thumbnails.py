@@ -279,7 +279,7 @@ class TitleRow(CFrame):
         title.grid(column=0, row=0, sticky="w")
 
         self.filters = FilterRow(self)
-        self.filters.grid(column=1, row=0)
+        self.filters.grid(column=1, row=0, sticky="nesw")
 
         search = ThumbsSearch(self)
         search.rowconfigure(0, weight=1)
@@ -295,15 +295,14 @@ class TitleRow(CFrame):
     def min(self, e: tkinter.Event):
         if not self.small:
             if e.width < 670:
-                print("small")
                 self.small = True
                 self.filters.grid(row=1, column=0, sticky="nesw")
                 self.rowconfigure(1, weight=1)
 
-        elif self.small and e.width > 670:
-            print("big")
-            self.small = False
-            self.filters.grid(row=0, column=1, sticky="nesw")
+        elif self.small:
+            if e.width > 670:
+                self.small = False
+                self.filters.grid(column=1, row=0, sticky="nesw")
 
 
 class Thumbnails(CFrame, ThumbsPrepare):
