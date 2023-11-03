@@ -175,7 +175,7 @@ class ContextSearch(Context):
 
 class ThumbsSearch(CFrame):
     def __init__(self, master: tkinter):
-        super().__init__(master)
+        super().__init__(master, bg="red")
 
         fr = CFrame(self)
         fr.pack(anchor="e")
@@ -210,18 +210,6 @@ class ThumbsSearch(CFrame):
         cnf.root.bind("<Command-f>", lambda e: self.search_wid.focus_force())
         self.search_wid.bind("<Return>", self.search_go)
         self.search_wid.bind("<ButtonRelease-2>", ContextSearch)
-
-        self.search_wid.bind("<Configure>", self.small_search)
-
-    def small_search(self, e):
-        if cnf.root.winfo_width() < 870:
-            self.search_wid.configure(width=10)
-        else:
-            self.search_wid.configure(width=12)
-
-
-    def btns_destr(self, e=None):
-        self.btns_fr.destroy()
 
     def search_go(self, e=None):
         cnf.search_var.set(self.search_wid.get())
@@ -271,27 +259,10 @@ class FilterRow(CFrame):
             v.configure(bg=cnf.btn_color) if cnf.filter[k] else None
             v.cmd(lambda e, k=k: self.filtr_cmd(k))
 
-        self.bind(
-            "<Configure>",
-            lambda e: self.small_names((prod, mod, cat, filter))
-            )
-
     def filtr_cmd(self, key):
         cnf.filter[key] = False if cnf.filter[key] else True
         cnf.reload_scroll()
 
-    def small_names(self, btns: tuple):
-        names = ("💍", "👤", "🌐", "📅")
-        bigs = (
-            cnf.lng.product, cnf.lng.models, cnf.lng.catalog, cnf.lng.dates
-            )
-
-        if cnf.root.winfo_width() <870:
-            for btn, name in zip(btns, names):
-                btn.configure(width=2, text=name)
-        else:
-            for btn, name in zip(btns, bigs):
-                btn.configure(width=7, text=name)
 
 class TitleRow(CFrame):
     def __init__(self, master: tkinter, **kw):
@@ -305,10 +276,34 @@ class TitleRow(CFrame):
         title = CButton(
             self, text=coll_title, bg=cnf.bg_color, anchor="w", justify="left",
             font=("San Francisco Pro", 22, "bold"))
-        title.pack(side="left", fill="x", expand=1, anchor="w")
+        title.grid(column=0, row=0, sticky="w")
 
-        FilterRow(self).pack(side="left", fill="x", expand=1, anchor="center")
-        ThumbsSearch(self).pack(side="right", fill="x", expand=1)
+        self.filters = FilterRow(self)
+        self.filters.grid(column=1, row=0)
+
+        search = ThumbsSearch(self)
+        search.rowconfigure(0, weight=1)
+        search.columnconfigure(2, weight=1)
+        search.grid(column=2, row=0, sticky="e")
+
+        self.columnconfigure(tuple(range(2)), weight=1)
+        self.rowconfigure(tuple(range(1)), weight=1)
+
+        self.bind("<Configure>", self.min)
+        self.small = False
+
+    def min(self, e: tkinter.Event):
+        if not self.small:
+            if e.width < 670:
+                print("small")
+                self.small = True
+                self.filters.grid(row=1, column=0, sticky="nesw")
+                self.rowconfigure(1, weight=1)
+
+        elif self.small and e.width > 670:
+            print("big")
+            self.small = False
+            self.filters.grid(row=0, column=1, sticky="nesw")
 
 
 class Thumbnails(CFrame, ThumbsPrepare):
