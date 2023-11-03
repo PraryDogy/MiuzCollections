@@ -229,34 +229,31 @@ class FilterRow(CFrame):
             for i in cnf.filter.keys():
                 cnf.filter[i] = True
 
-        prod = CButton(self, text=cnf.lng.product)
-        prod.pack(side="left", fill="x")
+        prod = CButton(self, text=cnf.lng.product, width=0)
+        prod.pack(side="left", fill="x", padx=(0, 10))
 
-        CSep(self).pack(side="left", fill="y", padx=5)
+        mod = CButton(self, text=cnf.lng.models, width=0)
+        mod.pack(side="left", fill="x", padx=(0, 10))
 
-        mod = CButton(self, text=cnf.lng.models)
-        mod.pack(side="left", fill="x")
-
-        CSep(self).pack(side="left", fill="y", padx=5)
-
-        cat = CButton(self, text=cnf.lng.catalog)
-        cat.pack(side="left", fill="x")
-
-        CSep(self).pack(side="left", fill="y", padx=5)
+        cat = CButton(self, text=cnf.lng.catalog, width=0)
+        cat.pack(side="left", fill="x", padx=(0, 10))
 
         filter = CButton(
-            self, text=cnf.lng.dates, bg=cnf.bg_color, width=7)
+            self, text=cnf.lng.dates + " ⨁", bg=cnf.bg_color, width=0)
         filter.cmd(lambda e: Filter())
         filter.pack(side="left", fill="x")
 
         if any((cnf.start, cnf.end)):
-            filter.configure(bg=cnf.btn_color)
+            filter.configure(fg=cnf.blue_color, text=cnf.lng.dates + " ⨂")
 
         btns = {"prod": prod, "mod": mod, "cat": cat}
 
         for k, v in btns.items():
-            v.configure(width=7, bg=cnf.bg_color)
-            v.configure(bg=cnf.btn_color) if cnf.filter[k] else None
+            v.configure(bg=cnf.bg_color)
+            if cnf.filter[k]:
+                v.configure(fg=cnf.blue_color, text=v.cget("text") + " ⨂")
+            else:
+                v.configure(text=v.cget("text") + " ⨁")
             v.cmd(lambda e, k=k: self.filtr_cmd(k))
 
     def filtr_cmd(self, key):
