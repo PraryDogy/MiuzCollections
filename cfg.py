@@ -35,11 +35,10 @@ class Config:
         self.lgray_color = "#4B4B4B"
         self.dgray_color = "#141416"
 
-        self.menugray = "#383838"
-        self.selectgray = "#525252"
-        self.fontgray = "#7b7b7b"
-        self.fontwhite = "#e9e9e9"
-        self.btngray  = "#2b2b2b"
+        self.fg_color_menu_bg = "#383838"
+        self.fg_color_menu_sel = "#525252"
+        self.fg_color_meny_title = "#7b7b7b"
+        self.fg_color_menu = "#e9e9e9"
 
         self.thumb_size = 150
         self.menu_w = 180
@@ -59,7 +58,6 @@ class Config:
         self.named_end: str = None # datetime as readable text
         self.set_calendar_title = None # filter > Filter().set_calendar_title()
         self.lng = Rus()
-        self.first_load = True
         self.scan_flag = False
         self.topbar_flag = True
         self.scan_win_txt = ""

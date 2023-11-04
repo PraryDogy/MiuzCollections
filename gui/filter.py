@@ -9,118 +9,7 @@ from .utils import *
 from .widgets import *
 
 
-class CCalendarEntry(CWindow):
-    def entry_win(self, parrent: tkinter.Toplevel, e=None):
-        self.win_entry = CWindow()
-        self.win_entry.title(cnf.lng.enter_date)
-        self.win_entry.minsize(255, 118)
-        place_center(parrent, self.win_entry, 255, 118)
-        self.win_entry.protocol(
-            "WM_DELETE_WINDOW", lambda: self.close_entry(parrent)
-            )
-        self.win_entry.bind("<Escape>", lambda e: self.close_entry(parrent))
-
-        cust_l = CLabel(self.win_entry, text=cnf.lng.d_m_y)
-        cust_l.pack(pady=(0, 5))
-
-        var = tkinter.StringVar(value=f"{self.dd}.{self.mm}.{self.yy}")
-        entry = tkinter.Entry(
-            self.win_entry,
-            width=15,
-            textvariable=var,
-            bg=cnf.dgray_color,
-            insertbackground="white",
-            fg=cnf.fg_color,
-            highlightthickness=0,
-            justify="center",
-            selectbackground=cnf.btn_color,
-            border=1
-            )
-        entry.focus_force()
-        entry.icursor(10)
-        entry.selection_range(0, "end")
-        entry.pack(ipady=2)
-
-        btns = CFrame(self.win_entry)
-        btns.pack(pady=(15, 0))
-
-        ok = CButton(btns, text=cnf.lng.ok)
-        ok.pack(side="left", padx=(0, 15))
-        ok.configure(fg=cnf.fg_color)
-        ok.bind(
-            "<ButtonRelease-1>",
-            lambda e: self.ok_entry(parrent)
-            )
-        self.win_entry.bind(
-            "<Return>",
-            lambda e: self.ok_entry(parrent)
-            )
-        t = var.get()
-        self.cust_date = datetime.strptime(t, "%d.%m.%Y")
-
-        cancel = CButton(btns, text=cnf.lng.cancel)
-        cancel.pack(side="left")
-        cancel.bind(
-            "<ButtonRelease-1>",
-            lambda e: self.close_entry(parrent))
-
-        var.trace("w", lambda *args: self.character_limit(parrent, var, ok))
-        cnf.root.update_idletasks()
-        self.win_entry.grab_set_global()
-
-    def character_limit(
-            self, parrent: tkinter.Toplevel, var:tkinter.StringVar,
-            ok: tkinter.Label
-            ):
-
-        t = var.get()
-        t_reg = re.match(r"\d{,2}\W\d{,2}\W\d{4}", t)
-
-        if t_reg:
-            t = re.sub("\W", ".", t_reg.group(0))
-            var.set(t)
-
-        try:
-            self.cust_date = datetime.strptime(t, "%d.%m.%Y")
-            ok.configure(fg=cnf.fg_color)
-            ok.bind(
-                "<ButtonRelease-1>",
-                lambda e: self.ok_entry(parrent)
-                )
-            self.win_entry.bind(
-                "<Return>",
-                lambda e: self.ok_entry(parrent)
-                )
-
-        except ValueError:
-            ok.configure(fg=cnf.dgray_color)
-            ok.unbind("<ButtonRelease-1>")
-            self.win_entry.unbind("<Return>")
-
-            if len(t) > 10:
-                var.set(t[:10])
-
-    def ok_entry(self, parrent: tkinter.Toplevel):
-        self.yy, self.mm, self.dd = tuple(self.cust_date.timetuple())[:3]
-
-        try:
-            self.change_title()
-            self.set_my_date()
-            self.fill_days()
-            cnf.set_calendar_title()
-        except tkinter.TclError:
-            print("enter custom date widgets calendar error title change")
-
-        self.close_entry(parrent)
-
-    def close_entry(self, parrent: tkinter.Toplevel):
-        self.win_entry.grab_release()
-        self.win_entry.destroy()
-        parrent.focus_force()
-        parrent.grab_set_global()
-
-
-class CCalendar(CFrame, CCalendarEntry):
+class CalendarBase(CFrame):
     def __init__(self, master: tkinter.Frame, my_date: datetime):
         super().__init__(master)
 
@@ -156,17 +45,14 @@ class CCalendar(CFrame, CCalendarEntry):
             )
         self.change_title()
         self.title.pack(side="left")
-        self.title.bind(
-            "<ButtonRelease-1>",
-            lambda e: self.entry_win(master.winfo_toplevel())
-            )
+
         self.title.bind(
             "<Enter>",
-            lambda e: self.title.configure(bg=cnf.blue_color)
+            lambda e: self.title.configure(fg=cnf.blue_color)
             )
         self.title.bind(
             "<Leave>",
-            lambda e: self.title.configure(bg=cnf.bg_color)
+            lambda e: self.title.configure(fg=cnf.fg_color)
             )
         self.all_btns.append(self.title)
 
@@ -278,6 +164,125 @@ class CCalendar(CFrame, CCalendarEntry):
         self.set_my_date()
         self.change_title()
         self.fill_days()
+
+
+class CCalendar(CalendarBase):
+    def __init__(self, master: tkinter, my_date: datetime):
+        super().__init__(master, my_date)
+        self.title.bind(
+            "<ButtonRelease-1>",
+            lambda e: self.entry_win(master.winfo_toplevel())
+            )
+
+    def entry_win(self, master: tkinter.Toplevel, e=None):
+        self.win_entry = CWindow()
+
+        self.win_entry.title(cnf.lng.enter_date)
+        self.win_entry.minsize(255, 118)
+        place_center(master, self.win_entry, 255, 118)
+        self.win_entry.protocol(
+            "WM_DELETE_WINDOW", lambda: self.close_entry(master)
+            )
+        self.win_entry.bind("<Escape>", lambda e: self.close_entry(master))
+
+        cust_l = CLabel(self.win_entry, text=cnf.lng.d_m_y)
+        cust_l.pack(pady=(0, 5))
+
+        var = tkinter.StringVar(value=f"{self.dd}.{self.mm}.{self.yy}")
+        entry = tkinter.Entry(
+            self.win_entry,
+            width=15,
+            textvariable=var,
+            bg=cnf.dgray_color,
+            insertbackground="white",
+            fg=cnf.fg_color,
+            highlightthickness=0,
+            justify="center",
+            selectbackground=cnf.btn_color,
+            border=1
+            )
+        entry.focus_force()
+        entry.icursor(10)
+        entry.selection_range(0, "end")
+        entry.pack(ipady=2)
+
+        btns = CFrame(self.win_entry)
+        btns.pack(pady=(15, 0))
+
+        ok = CButton(btns, text=cnf.lng.ok)
+        ok.pack(side="left", padx=(0, 15))
+        ok.configure(fg=cnf.fg_color)
+        ok.bind(
+            "<ButtonRelease-1>",
+            lambda e: self.ok_entry(master)
+            )
+        self.win_entry.bind(
+            "<Return>",
+            lambda e: self.ok_entry(master)
+            )
+        t = var.get()
+        self.cust_date = datetime.strptime(t, "%d.%m.%Y")
+
+        cancel = CButton(btns, text=cnf.lng.cancel)
+        cancel.pack(side="left")
+        cancel.bind(
+            "<ButtonRelease-1>",
+            lambda e: self.close_entry(master))
+
+        var.trace("w", lambda *args: self.character_limit(master, var, ok))
+        cnf.root.update_idletasks()
+        self.win_entry.grab_set_global()
+
+    def character_limit(
+            self, parrent: tkinter.Toplevel, var:tkinter.StringVar,
+            ok: tkinter.Label
+            ):
+
+        t = var.get()
+        t_reg = re.match(r"\d{,2}\W\d{,2}\W\d{4}", t)
+
+        if t_reg:
+            t = re.sub("\W", ".", t_reg.group(0))
+            var.set(t)
+
+        try:
+            self.cust_date = datetime.strptime(t, "%d.%m.%Y")
+            ok.configure(fg=cnf.fg_color)
+            ok.bind(
+                "<ButtonRelease-1>",
+                lambda e: self.ok_entry(parrent)
+                )
+            self.win_entry.bind(
+                "<Return>",
+                lambda e: self.ok_entry(parrent)
+                )
+
+        except ValueError:
+            ok.configure(fg=cnf.dgray_color)
+            ok.unbind("<ButtonRelease-1>")
+            self.win_entry.unbind("<Return>")
+
+            if len(t) > 10:
+                var.set(t[:10])
+
+    def ok_entry(self, parrent: tkinter.Toplevel):
+        self.yy, self.mm, self.dd = tuple(self.cust_date.timetuple())[:3]
+
+        try:
+            self.change_title()
+            self.set_my_date()
+            self.fill_days()
+            cnf.set_calendar_title()
+        except tkinter.TclError:
+            print("enter custom date widgets calendar error title change")
+
+        self.close_entry(parrent)
+
+    def close_entry(self, parrent: tkinter.Toplevel):
+        self.win_entry.grab_release()
+        self.win_entry.destroy()
+        parrent.focus_force()
+        parrent.grab_set_global()
 
 
 class Filter(CWindow):

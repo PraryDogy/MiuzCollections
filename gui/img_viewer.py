@@ -21,25 +21,21 @@ class ContextViewer(Context):
     def __init__(self, e: tkinter.Event, img_src):
         super().__init__()
 
-        if cnf.first_load:
-            self.please_wait()
+        self.imginfo(e.widget.winfo_toplevel(), img_src)
+        self.sep()
 
-        else:
-            self.imginfo(e.widget.winfo_toplevel(), img_src)
-            self.sep()
+        self.sep()
+        self.copy_jpg_path(img_src)
+        self.reveal_jpg(img_src)
+        self.download_onefile(img_src)
 
-            self.sep()
-            self.copy_jpg_path(img_src)
-            self.reveal_jpg(img_src)
-            self.download_onefile(img_src)
+        self.sep()
+        self.copy_tiffs_paths(img_src)
+        self.reveal_tiffs(img_src)
+        self.download_tiffs(img_src)
 
-            self.sep()
-            self.copy_tiffs_paths(img_src)
-            self.reveal_tiffs(img_src)
-            self.download_tiffs(img_src)
-
-            self.sep()
-            self.download_fullsize(img_src)
+        self.sep()
+        self.download_fullsize(img_src)
 
         self.do_popup(e)
 

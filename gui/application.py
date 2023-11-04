@@ -76,8 +76,6 @@ class Application:
             scaner.scaner_sheldue()
             SmbAlert()
 
-        cnf.first_load = False
-
     def minim(self, e=None):
         applescript = f"""
             set appName to "{cnf.app_name}"
