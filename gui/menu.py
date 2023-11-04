@@ -39,7 +39,7 @@ class Menu(tkmacosx.SFrame):
 
         super().__init__(
             master,
-            bg=cnf.fg_color_menu_bg,
+            bg=cnf.bg_color_menu,
             scrollbarwidth = 1,
             width = cnf.menu_w
             )
@@ -56,12 +56,12 @@ class Menu(tkmacosx.SFrame):
             return coll[:13]
 
     def load_menu_buttons(self):
-        frame = CFrame(self, bg=cnf.fg_color_menu_bg)
+        frame = CFrame(self, bg=cnf.bg_color_menu)
         frame.pack(fill="both", expand=1)
 
         title = CLabel(
             frame, text=cnf.lng.menu, font=("San Francisco Pro", 14, "bold"),
-            bg=cnf.fg_color_menu_bg, fg=cnf.fg_color_meny_title, anchor="w", padx=5
+            bg=cnf.bg_color_menu, fg=cnf.tit_color_menu, anchor="w", padx=5
             )
         title.pack(pady=(15,15), padx=10, fill="x")
 
@@ -85,7 +85,7 @@ class Menu(tkmacosx.SFrame):
 
         last = CButton(
             frame, text=cnf.lng.all_colls,
-            anchor="w", padx=5, pady=5, bg=cnf.fg_color_menu_bg, fg=cnf.fg_color_menu
+            anchor="w", padx=5, pady=5, bg=cnf.bg_color_menu, fg=cnf.fg_color_menu
             )
         last.cmd(lambda e: self.show_coll(e, cnf.all_colls))
         last.bind("<Button-2>", lambda e: ContextMenu(e, cnf.all_colls))
@@ -94,7 +94,7 @@ class Menu(tkmacosx.SFrame):
         for fakename, collname in menus.items():
             btn = CButton(
                 frame, text=fakename, anchor="w", padx=5, pady=5,
-                bg=cnf.fg_color_menu_bg, fg=cnf.fg_color_menu
+                bg=cnf.bg_color_menu, fg=cnf.fg_color_menu
                 )
             btn.cmd(lambda e, collname=collname: self.show_coll(e, collname))
             btn.pack(fill="x", padx=10)
@@ -103,11 +103,11 @@ class Menu(tkmacosx.SFrame):
                 ))
 
             if collname == cnf.curr_coll:
-                btn.configure(bg=cnf.fg_color_menu_sel)
+                btn.configure(bg=cnf.sel_color_menu)
                 self.sel_btn = btn
     
         if cnf.curr_coll == cnf.all_colls:
-            last.configure(bg=cnf.fg_color_menu_sel)
+            last.configure(bg=cnf.sel_color_menu)
             self.sel_btn = last
 
         return frame
@@ -121,8 +121,8 @@ class Menu(tkmacosx.SFrame):
     def show_coll(self, e: tkinter.Event, collname):
         cnf.limit = 150
 
-        self.sel_btn.configure(bg=cnf.fg_color_menu_bg)
-        e.widget.configure(bg=cnf.fg_color_menu_sel)
+        self.sel_btn.configure(bg=cnf.bg_color_menu)
+        e.widget.configure(bg=cnf.sel_color_menu)
         self.sel_btn = e.widget
         cnf.curr_coll = collname
 

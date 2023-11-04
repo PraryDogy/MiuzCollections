@@ -122,7 +122,7 @@ class Context(tkinter.Menu):
             if collname == cnf.curr_coll:
                 e.widget.configure(bg=cnf.lgray_color)
             else:
-                e.widget.configure(bg=cnf.btn_color)
+                e.widget.configure(bg=cnf.bg_color_menu)
             self.grab_release()
 
     def imgview(self, img_src, all_src):
@@ -268,11 +268,3 @@ class Context(tkinter.Menu):
             label=label,
             command=lambda: apply_filter(e, filter, collname)
             )
-        
-    def please_wait(self):
-        self.add_command(
-            label=(
-                f"{cnf.lng.please_wait}"
-                f"\n{cnf.lng.updating} {cnf.lng.all_colls.lower()}"
-                )
-                )

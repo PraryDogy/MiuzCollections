@@ -67,8 +67,8 @@ class Application:
         self.menu.pack(side="left", fill="y")
         r_frame.pack(fill="both", expand=1)
         self.thumbs.pack(fill="both", expand=1)
-        sep.pack(fill="x", padx=1, pady=(10, 10))
-        self.stbar.pack(pady=(0, 10))
+        sep.pack(fill="x", padx=1)
+        self.stbar.pack(pady=10)
 
         if smb_check():
             cnf.root.after(1000, scaner.scaner_start)

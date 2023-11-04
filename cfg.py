@@ -35,9 +35,9 @@ class Config:
         self.lgray_color = "#4B4B4B"
         self.dgray_color = "#141416"
 
-        self.fg_color_menu_bg = "#383838"
-        self.fg_color_menu_sel = "#525252"
-        self.fg_color_meny_title = "#7b7b7b"
+        self.bg_color_menu = "#383838"
+        self.sel_color_menu = "#525252"
+        self.tit_color_menu = "#7b7b7b"
         self.fg_color_menu = "#e9e9e9"
 
         self.thumb_size = 150
