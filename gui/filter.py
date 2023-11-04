@@ -368,7 +368,6 @@ class Filter(CWindow):
         self.date_changed = False
         self.cals_titles.configure(text=cnf.lng.dates_not_sel)
 
-
     def ok_filter(self, e=None):
         if self.date_changed:
             cnf.start = self.l_calendar.my_date
