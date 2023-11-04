@@ -6,7 +6,7 @@ import sqlalchemy
 from PIL import ImageTk
 
 from cfg import cnf
-from database import Dbase, Thumbs
+from database import Dbase, ThumbsMd
 from .utils import *
 from .utils import place_center
 
@@ -114,8 +114,8 @@ class ImgViewer(CWindow):
             print(ex)
 
     def load_thumb(self):
-        img = Dbase.conn.execute(sqlalchemy.select(Thumbs.img150).where(
-            Thumbs.src==self.img_src)).first()[0]
+        img = Dbase.conn.execute(sqlalchemy.select(ThumbsMd.img150).where(
+            ThumbsMd.src==self.img_src)).first()[0]
         img = decode_image(img)
         img = resize_image(
             img, cnf.imgview_g["w"], cnf.imgview_g["h"], thumbnail=False

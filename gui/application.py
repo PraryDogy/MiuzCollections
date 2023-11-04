@@ -6,7 +6,7 @@ from cfg import cnf
 from .menu import Menu
 from .scaner import scaner
 from .stbar import StBar
-from .thumbnails import Thumbnails
+from .thumbnails import Thumbs
 from .utils import on_exit, run_applescript, smb_check
 from .widgets import *
 
@@ -58,7 +58,7 @@ class Application:
 
         self.menu = Menu(cnf.root)
         r_frame = CFrame(cnf.root)
-        self.thumbnails = Thumbnails(r_frame)
+        self.thumbs = Thumbs(r_frame)
         sep = CSep(r_frame)
         self.stbar = StBar(r_frame)
         MacMenu()
@@ -66,7 +66,7 @@ class Application:
         temp.destroy()
         self.menu.pack(side="left", fill="y")
         r_frame.pack(fill="both", expand=1)
-        self.thumbnails.pack(fill="both", expand=1)
+        self.thumbs.pack(fill="both", expand=1)
         sep.pack(fill="x", padx=1, pady=(10, 10))
         self.stbar.pack(pady=(0, 10))
 

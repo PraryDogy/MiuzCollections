@@ -9,7 +9,7 @@ import tkmacosx
 from PIL import Image, ImageTk
 
 from cfg import cnf
-from database import Dbase, Thumbs
+from database import Dbase, ThumbsMd
 
 from .filter import Filter
 from .img_viewer import ImgViewer
@@ -17,88 +17,9 @@ from .utils import *
 from .widgets import *
 
 __all__ = (
-    "Thumbnails",
+    "Thumbs",
     )
 
-
-class ThumbsPrepare:
-    def decode_thumbs(self, thumbs_raw):
-        result = []
-        for blob, src, modified in thumbs_raw:
-            try:
-                decoded = decode_image(blob)
-                cropped = crop_image(decoded)
-                img = convert_to_rgb(cropped)
-                result.append((img, src, modified))
-
-            except Exception:
-                print(traceback.format_exc())
-
-        return result
-
-    def create_thumbs_dict(self, thumbs_raw):
-        thumbs_dict = {}
-
-        for img, src, modified in thumbs_raw:
-            date_key = datetime.fromtimestamp(modified).date()
-
-            if not any((cnf.start, cnf.end)):
-                date_key = f"{cnf.lng.months[date_key.month]} {date_key.year}"
-            else:
-                date_key = f"{cnf.named_start} - {cnf.named_end}"
-
-            thumbs_dict.setdefault(date_key, [])
-            thumbs_dict[date_key].append((img, src))
-
-        return thumbs_dict
-
-    def stamp_dates(self):
-        start = datetime.combine(cnf.start, datetime.min.time())
-        end = datetime.combine(
-            cnf.end, datetime.max.time().replace(microsecond=0)
-            )
-        return (datetime.timestamp(start), datetime.timestamp(end))
-
-    def get_query(self):
-        q = sqlalchemy.select(Thumbs.img150, Thumbs.src, Thumbs.modified)
-        search = cnf.search_var.get()
-
-        if search:
-            search.replace("\n", "").strip()
-            q = q.filter(Thumbs.src.like("%" + search + "%"))
-
-        q = q.order_by(-Thumbs.modified)
-
-        if cnf.curr_coll != cnf.all_colls:
-            q = q.filter(Thumbs.collection == cnf.curr_coll)
-
-        filters = []
-
-        if cnf.filter["mod"]:
-            filters.append(Thumbs.src.like("%" + cnf.models_name + "%"))
-
-        if cnf.filter["cat"]:
-            filters.append(Thumbs.src.like("%" + cnf.catalog_name + "%"))
-
-        if cnf.filter["prod"]:
-            tmp = sqlalchemy.and_(
-                Thumbs.src.not_like("%" + cnf.catalog_name + "%"),
-                Thumbs.src.not_like("%" + cnf.models_name + "%")
-                )
-            filters.append(tmp)
-
-        q = q.filter(sqlalchemy.or_(*filters))
-
-        if not any((cnf.start, cnf.end)):
-            q = q.limit(cnf.limit)
-
-        else:
-            t = self.stamp_dates()
-            q = q.filter(Thumbs.modified > t[0])
-            q = q.filter(Thumbs.modified < t[1])
-
-        return q
-    
 
 class ContextFilter(Context):
     def __init__(self, e: tkinter.Event):
@@ -173,15 +94,93 @@ class ContextSearch(Context):
         self.do_popup(e)
 
 
-class ThumbsSearch(CFrame):
+class ThumbsPrepare:
+    def decode_thumbs(self, thumbs_raw):
+        result = []
+        for blob, src, modified in thumbs_raw:
+            try:
+                decoded = decode_image(blob)
+                cropped = crop_image(decoded)
+                img = convert_to_rgb(cropped)
+                result.append((img, src, modified))
+
+            except Exception:
+                print(traceback.format_exc())
+
+        return result
+
+    def create_thumbs_dict(self, thumbs_raw):
+        thumbs_dict = {}
+
+        for img, src, modified in thumbs_raw:
+            date_key = datetime.fromtimestamp(modified).date()
+
+            if not any((cnf.start, cnf.end)):
+                date_key = f"{cnf.lng.months[date_key.month]} {date_key.year}"
+            else:
+                date_key = f"{cnf.named_start} - {cnf.named_end}"
+
+            thumbs_dict.setdefault(date_key, [])
+            thumbs_dict[date_key].append((img, src))
+
+        return thumbs_dict
+
+    def stamp_dates(self):
+        start = datetime.combine(cnf.start, datetime.min.time())
+        end = datetime.combine(
+            cnf.end, datetime.max.time().replace(microsecond=0)
+            )
+        return (datetime.timestamp(start), datetime.timestamp(end))
+
+    def get_query(self):
+        q = sqlalchemy.select(ThumbsMd.img150, ThumbsMd.src, ThumbsMd.modified)
+        search = cnf.search_var.get()
+
+        if search:
+            search.replace("\n", "").strip()
+            q = q.filter(ThumbsMd.src.like("%" + search + "%"))
+
+        q = q.order_by(-ThumbsMd.modified)
+
+        if cnf.curr_coll != cnf.all_colls:
+            q = q.filter(ThumbsMd.collection == cnf.curr_coll)
+
+        filters = []
+
+        if cnf.filter["mod"]:
+            filters.append(ThumbsMd.src.like("%" + cnf.models_name + "%"))
+
+        if cnf.filter["cat"]:
+            filters.append(ThumbsMd.src.like("%" + cnf.catalog_name + "%"))
+
+        if cnf.filter["prod"]:
+            tmp = sqlalchemy.and_(
+                ThumbsMd.src.not_like("%" + cnf.catalog_name + "%"),
+                ThumbsMd.src.not_like("%" + cnf.models_name + "%")
+                )
+            filters.append(tmp)
+
+        q = q.filter(sqlalchemy.or_(*filters))
+
+        if not any((cnf.start, cnf.end)):
+            q = q.limit(cnf.limit)
+
+        else:
+            t = self.stamp_dates()
+            q = q.filter(ThumbsMd.modified > t[0])
+            q = q.filter(ThumbsMd.modified < t[1])
+
+        return q
+    
+
+class SearchWid(CFrame):
     def __init__(self, master: tkinter):
-        super().__init__(master, bg="red")
+        super().__init__(master)
 
         fr = CFrame(self)
         fr.pack(anchor="e")
 
-        CLabel(
-            fr, width=1, bg=cnf.dgray_color).pack(side="left", fill="y")
+        CLabel(fr, width=1, bg=cnf.dgray_color).pack(side="left", fill="y")
 
         self.search_wid = tkinter.Entry(
             fr,
@@ -197,7 +196,7 @@ class ThumbsSearch(CFrame):
         self.search_wid.pack(ipady=6, side="left")
 
         self.btn_clear = CButton(
-            fr, text="⌫", width=3, bg=cnf.dgray_color, pady=5)
+            fr, text="⨂", width=3, bg=cnf.dgray_color, pady=5)
         self.btn_clear.pack(side="left")
         self.btn_clear.cmd(self.search_clear)
 
@@ -221,7 +220,7 @@ class ThumbsSearch(CFrame):
         cnf.reload_scroll()
 
 
-class FilterRow(CFrame):
+class FiltersWid(CFrame):
     def __init__(self, master: tkinter):
         super().__init__(master)
 
@@ -244,14 +243,16 @@ class FilterRow(CFrame):
         filter.pack(side="left", fill="x")
 
         if any((cnf.start, cnf.end)):
-            filter.configure(fg=cnf.blue_color, text=cnf.lng.dates + " ⨂")
+            filter.configure(
+                fg=cnf.blue_color, text=cnf.lng.dates + " ⨂")
 
         btns = {"prod": prod, "mod": mod, "cat": cat}
 
         for k, v in btns.items():
             v.configure(bg=cnf.bg_color)
             if cnf.filter[k]:
-                v.configure(fg=cnf.blue_color, text=v.cget("text") + " ⨂")
+                v.configure(
+                    fg=cnf.blue_color, text=v.cget("text") + " ⨂")
             else:
                 v.configure(text=v.cget("text") + " ⨁")
             v.cmd(lambda e, k=k: self.filtr_cmd(k))
@@ -261,7 +262,7 @@ class FilterRow(CFrame):
         cnf.reload_scroll()
 
 
-class TitleRow(CFrame):
+class TitlesWid(CFrame):
     def __init__(self, master: tkinter, **kw):
         super().__init__(master, **kw)
 
@@ -275,10 +276,10 @@ class TitleRow(CFrame):
             font=("San Francisco Pro", 22, "bold"))
         title.grid(column=0, row=0, sticky="w")
 
-        self.filters = FilterRow(self)
-        self.filters.grid(column=1, row=0, sticky="nesw")
+        filters = FiltersWid(self)
+        filters.grid(column=1, row=0, sticky="nesw", pady=(6, 0))
 
-        search = ThumbsSearch(self)
+        search = SearchWid(self)
         search.rowconfigure(0, weight=1)
         search.columnconfigure(2, weight=1)
         search.grid(column=2, row=0, sticky="e")
@@ -286,36 +287,69 @@ class TitleRow(CFrame):
         self.columnconfigure(tuple(range(2)), weight=1)
         self.rowconfigure(tuple(range(1)), weight=1)
 
-        self.bind("<Configure>", self.min)
         self.small = False
+        self.bind("<Configure>", lambda e: self.min(e, filters))
+        
 
-    def min(self, e: tkinter.Event):
+    def min(self, e: tkinter.Event, widget: tkinter.Frame):
         if not self.small:
             if e.width < 670:
                 self.small = True
-                self.filters.grid(row=1, column=0, sticky="nesw")
+                widget.grid(row=1, column=0, sticky="nesw")
                 self.rowconfigure(1, weight=1)
 
         elif self.small:
             if e.width > 670:
                 self.small = False
-                self.filters.grid(column=1, row=0, sticky="nesw")
+                widget.grid(column=1, row=0, sticky="nesw")
 
 
-class Thumbnails(CFrame, ThumbsPrepare):
+class TopBar(CFrame):
+    def __init__(self, master: tkinter):
+        super().__init__(master)
+
+        self.btn_up = CButton(self, text=f"▲", bg=cnf.bg_color)
+        self.btn_up.pack(side="left", fill="x", expand=1)
+
+    def topbar_text(self, text):
+        try:
+            self.btn_up.configure(text=text, bg=cnf.blue_color)
+
+            if len(self.children) < 2:
+
+                self.topbar_can = CButton(
+                    self, text=cnf.lng.cancel, bg=cnf.blue_color,
+                    )
+                self.topbar_can.configure()
+                self.topbar_can.cmd(lambda e: cancel_utils_task())
+                self.topbar_can.pack(side="left", padx=(1, 0))
+
+        except RuntimeError as e:
+            print("thumbnails > topbar text error")
+            print(e)
+
+    def topbar_default(self):
+        try:
+            self.topbar_can.destroy()
+        except AttributeError as e:
+            print("thumbnails > no topbar cancel button")
+            print(e)
+
+        try:
+            self.btn_up.configure(text=f"▲", bg=cnf.bg_color)
+        except RuntimeError as e:
+            print("thumbnails > can't configure topbar to default")
+            print(e)
+
+
+class Thumbs(CFrame, ThumbsPrepare):
     def __init__(self, master):
         super().__init__(master)
-        self.topbar_frame = CFrame(self)
-        self.topbar_frame.pack(fill="x")
 
-        self.topbar = CButton(
-            self.topbar_frame, text=f"▲",
-            font=("San Francisco Pro", 13, "normal"),
-            bg=cnf.bg_color, pady=1,
-            )
-        self.topbar.pack(
-            pady=(5, 0), side="left", fill="x", expand=1, padx=(5, 0))
-        self.topbar.cmd(lambda e: self.sframe["canvas"].yview_moveto("0.0"))
+        self.topbar = TopBar(self)
+        self.topbar.pack(fill="x", padx=15, pady=(5, 0))
+        self.topbar.btn_up.cmd(
+            lambda e: self.sframe["canvas"].yview_moveto("0.0"))
 
         self.clmns_count = 1
         self.thumbs_pad = 3
@@ -328,10 +362,9 @@ class Thumbnails(CFrame, ThumbsPrepare):
 
         cnf.root.bind("<Configure>", self.decect_resize)
         self.resize_task = None
-        self.search_task = None
 
     def load_scroll(self):
-        self.titles = TitleRow(self)
+        self.titles = TitlesWid(self)
         self.titles.bind("<ButtonRelease-2>", ContextFilter)
         self.titles.pack(padx=(15, 15), fill="x")
 
@@ -494,7 +527,7 @@ class Thumbnails(CFrame, ThumbsPrepare):
         self.load_thumbs()
 
     def get_clmns_count(self):
-        clmns = (cnf.root_g["w"] - cnf.menu_w) // (cnf.thumb_size)
+        clmns = (cnf.root_g["w"] - cnf.menu_w) // (self.thumbsize)
         return 1 if clmns == 0 else clmns
 
     def get_coords(self, e: tkinter.Event, coords: dict):
@@ -520,38 +553,3 @@ class Thumbnails(CFrame, ThumbsPrepare):
             ContextThumbs(e, img_src, all_src)
         else:
             ContextFilter(e)
-
-    def topbar_text(self, text):
-        try:
-            self.topbar.configure(text=text, bg=cnf.blue_color)
-
-            if len(self.topbar_frame.children) < 2:
-
-                self.topbar_can = CButton(
-                    self.topbar_frame, text=cnf.lng.cancel, bg=cnf.blue_color,
-                    pady=1
-                    )
-                self.topbar_can.configure()
-                self.topbar_can.cmd(lambda e: cancel_utils_task())
-                self.topbar_can.pack(
-                    side="left",
-                    pady=(5, 0), padx=(1, 5)
-                    )
-
-        except RuntimeError as e:
-            print("thumbnails > topbar text error")
-            print(e)
-
-
-    def topbar_default(self):
-        try:
-            self.topbar_can.destroy()
-        except AttributeError as e:
-            print("thumbnails > no topbar cancel button")
-            print(e)
-
-        try:
-            self.topbar.configure(text=f"▲", bg=cnf.bg_color)
-        except RuntimeError as e:
-            print("thumbnails > can't configure topbar to default")
-            print(e)

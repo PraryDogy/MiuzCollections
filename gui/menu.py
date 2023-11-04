@@ -5,7 +5,7 @@ import sqlalchemy
 import tkmacosx
 
 from cfg import cnf
-from database import Dbase, Thumbs
+from database import Dbase, ThumbsMd
 
 from .widgets import *
 
@@ -62,7 +62,7 @@ class Menu(tkmacosx.SFrame):
         title.pack(pady=(15,15), padx=10, fill="x")
 
         colls_list = Dbase.conn.execute(
-            sqlalchemy.select(Thumbs.collection)
+            sqlalchemy.select(ThumbsMd.collection)
             .distinct()
             ).fetchall()
         colls_list = (i[0] for i in colls_list)

@@ -7,7 +7,7 @@ from cfg import cnf
 
 __all__ = (
     "Dbase",
-    "Thumbs"
+    "ThumbsMd"
     )
 
 
@@ -21,7 +21,7 @@ class Dbase():
     base = sqlalchemy.ext.declarative.declarative_base()
 
 
-class Thumbs(Dbase.base):
+class ThumbsMd(Dbase.base):
     __tablename__ = "thumbs"
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
     img150 = sqlalchemy.Column(sqlalchemy.LargeBinary)

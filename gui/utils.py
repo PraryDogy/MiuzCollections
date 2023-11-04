@@ -330,8 +330,8 @@ def reveal_files(list_paths: list):
 
 def db_remove_img(src):
     q = (
-        sqlalchemy.delete(Thumbs).filter(
-            Thumbs.src==src
+        sqlalchemy.delete(ThumbsMd).filter(
+            ThumbsMd.src==src
             ))
     Dbase.conn.execute(q)
     cnf.reload_thumbs()

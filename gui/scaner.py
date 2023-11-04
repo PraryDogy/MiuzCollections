@@ -3,7 +3,7 @@ import os
 import sqlalchemy
 
 from cfg import cnf
-from database import Dbase, Thumbs
+from database import Dbase, ThumbsMd
 
 from .utils import *
 import threading
@@ -52,7 +52,7 @@ class Scaner:
 
         db_images = Dbase.conn.execute(
             sqlalchemy.select(
-            Thumbs.src, Thumbs.size, Thumbs.created, Thumbs.modified
+            ThumbsMd.src, ThumbsMd.size, ThumbsMd.created, ThumbsMd.modified
             )
             ).fetchall()
 
@@ -149,7 +149,7 @@ class Scaner:
                 if not cnf.scan_flag:
                     return
 
-                q = sqlalchemy.insert(Thumbs).values(
+                q = sqlalchemy.insert(ThumbsMd).values(
                     {
                         "img150": sqlalchemy.bindparam("b_img150"),
                         "src": sqlalchemy.bindparam("b_src"),
@@ -196,11 +196,11 @@ class Scaner:
                 if not cnf.scan_flag:
                     return
 
-                q = sqlalchemy.delete(Thumbs).filter(
-                    Thumbs.src == sqlalchemy.bindparam("b_src"),
-                    Thumbs.size == sqlalchemy.bindparam("b_size"),
-                    Thumbs.created == sqlalchemy.bindparam("b_created"),
-                    Thumbs.modified == sqlalchemy.bindparam("b_modified")
+                q = sqlalchemy.delete(ThumbsMd).filter(
+                    ThumbsMd.src == sqlalchemy.bindparam("b_src"),
+                    ThumbsMd.size == sqlalchemy.bindparam("b_size"),
+                    ThumbsMd.created == sqlalchemy.bindparam("b_created"),
+                    ThumbsMd.modified == sqlalchemy.bindparam("b_modified")
                     )
                 Dbase.conn.execute(q, vals)
 

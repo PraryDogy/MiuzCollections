@@ -125,12 +125,12 @@ class Config:
 
     def reload_thumbs(self):
         from gui.application import app
-        app.thumbnails.reload_thumbs()
+        app.thumbs.reload_thumbs()
 
     def reload_scroll(self):
         try:
             from gui.application import app
-            app.thumbnails.reload_scroll()
+            app.thumbs.reload_scroll()
         except Exception as e:
             print("cfg > reload scroll import err")
             print(e)
@@ -149,11 +149,11 @@ class Config:
 
     def topbar_text(self, text):
         from gui.application import app
-        app.thumbnails.topbar_text(text)
+        app.thumbs.topbar.topbar_text(text)
 
     def topbar_default(self):
         from gui.application import app
-        app.thumbnails.topbar_default()
+        app.thumbs.topbar.topbar_default()
 
 
 cnf = Config()
