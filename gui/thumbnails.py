@@ -187,7 +187,7 @@ class SearchWid(CFrame):
             textvariable=cnf.search_var,
             bg=cnf.dgray_color,
             insertbackground="white",
-            fg=cnf.blue_color,
+            fg=cnf.fg_color,
             justify="left",
             border=0,
             highlightthickness=0,
@@ -347,7 +347,7 @@ class Thumbs(CFrame, ThumbsPrepare):
         super().__init__(master)
 
         self.topbar = TopBar(self)
-        self.topbar.pack(fill="x", padx=15, pady=(5, 0))
+        self.topbar.pack(fill="x", padx=15, pady=(5, 5))
         self.topbar.btn_up.cmd(
             lambda e: self.sframe["canvas"].yview_moveto("0.0"))
 

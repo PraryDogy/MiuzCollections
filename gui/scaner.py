@@ -27,7 +27,7 @@ class Scaner:
     def scaner_start(self):
 
         cnf.scan_flag = True
-        cnf.stbar_btn.configure(text=cnf.lng.updating, bg=cnf.blue_color)
+        cnf.stbar_btn.configure(text=cnf.lng.updating, fg=cnf.blue_color)
 
         cnf.scaner_task = threading.Thread(target=self.task, daemon=True)
         cnf.scaner_task.start()
@@ -43,7 +43,7 @@ class Scaner:
             self.need_update = False
 
         cnf.scan_flag = False
-        cnf.stbar_btn.configure(text=cnf.lng.update, bg=cnf.btn_color)
+        cnf.stbar_btn.configure(text=cnf.lng.update, fg=cnf.fg_color)
 
         self.scaner_sheldue()
 
