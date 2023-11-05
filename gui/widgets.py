@@ -24,17 +24,10 @@ class CScroll(customtkinter.CTkScrollableFrame):
     def __init__(self, master: tkinter, fg_color=cnf.bg_color, **kw):
         super().__init__(
             master, fg_color=fg_color, 
-            scrollbar_button_color=cnf.bg_color,
             **kw)
-
-        # self.bind("<Enter>", self.show_scroll)
 
     def moveup(self, e=None):
         self._parent_canvas.yview_moveto("0.0")
-
-    def show_scroll(self, e: tkinter.Event):
-        print(e.x)
-
 
 class CSep(tkinter.Frame):
     def __init__(self, master: tkinter, bg=cnf.btn_color, height=1, **kw):
