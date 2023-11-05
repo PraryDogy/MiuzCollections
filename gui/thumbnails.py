@@ -279,7 +279,7 @@ class TopBar(CFrame):
         search = SearchWid(self)
         search.rowconfigure(0, weight=1)
         search.columnconfigure(2, weight=1)
-        search.grid(column=2, row=0, sticky="e", pady=(0, 4))
+        search.grid(column=2, row=0, sticky="e")
 
         self.columnconfigure(tuple(range(2)), weight=1)
         self.rowconfigure(tuple(range(1)), weight=1)

@@ -21,10 +21,15 @@ __all__ = (
 
 
 class CScroll(customtkinter.CTkScrollableFrame):
-    def __init__(self, master: tkinter, fg_color=cnf.bg_color, **kw):
+    def __init__(
+            self, master: tkinter, fg_color=cnf.bg_color, **kw
+            ):
         super().__init__(
-            master, fg_color=fg_color, 
-            **kw)
+            master, fg_color=fg_color,
+            **kw
+            )
+
+        self._scrollbar.configure(width=15)
 
     def moveup(self, e=None):
         self._parent_canvas.yview_moveto("0.0")
