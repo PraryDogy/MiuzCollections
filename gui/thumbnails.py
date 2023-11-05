@@ -86,7 +86,13 @@ class ContextSearch(Context):
         self.do_popup(e)
 
 
-class ThumbsPrepare:
+class ThumbsDict(dict):
+    def __init__(self):
+        super().__init__()
+        data = Dbase.conn.execute(self.get_query()).fetchall()
+        decoded = self.decode_thumbs(data)
+        self.update(self.create_thumbs_dict(decoded))
+
     def decode_thumbs(self, thumbs_raw):
         result = []
         for blob, src, modified in thumbs_raw:
@@ -185,15 +191,15 @@ class SearchWid(CFrame):
             highlightthickness=0,
             width=12
             )
-        self.search_wid.pack(ipady=6, side="left")
+        self.search_wid.pack(ipady=4, side="left")
 
         self.btn_clear = CButton(
-            fr, text="⨂", width=3, bg=cnf.dgray_color, pady=5)
+            fr, text="⨂", width=3, bg=cnf.dgray_color, pady=3)
         self.btn_clear.pack(side="left")
         self.btn_clear.cmd(self.search_clear)
 
         self.btn_search = CButton(
-            fr, text="✓", width=3, bg=cnf.dgray_color, pady=5)
+            fr, text="✓", width=3, bg=cnf.dgray_color, pady=3)
         self.btn_search.pack(side="left")
         self.btn_search.cmd(self.search_go)
 
@@ -254,7 +260,7 @@ class FiltersWid(CFrame):
         cnf.reload_scroll()
 
 
-class TitlesWid(CFrame):
+class TopBar(CFrame):
     def __init__(self, master: tkinter, **kw):
         super().__init__(master, **kw)
 
@@ -274,7 +280,7 @@ class TitlesWid(CFrame):
         search = SearchWid(self)
         search.rowconfigure(0, weight=1)
         search.columnconfigure(2, weight=1)
-        search.grid(column=2, row=0, sticky="e")
+        search.grid(column=2, row=0, sticky="e", pady=(0, 4))
 
         self.columnconfigure(tuple(range(2)), weight=1)
         self.rowconfigure(tuple(range(1)), weight=1)
@@ -296,7 +302,7 @@ class TitlesWid(CFrame):
                 widget.grid(column=1, row=0, sticky="nesw")
 
 
-class TopBar(CFrame):
+class NotifyBar(CFrame):
     def __init__(self, master: tkinter):
         super().__init__(master)
 
@@ -334,11 +340,11 @@ class TopBar(CFrame):
             print(e)
 
 
-class Thumbs(CFrame, ThumbsPrepare):
+class Thumbs(CFrame):
     def __init__(self, master):
         super().__init__(master)
 
-        self.topbar = TopBar(self)
+        self.topbar = NotifyBar(self)
         self.topbar.pack(fill="x", padx=15, pady=(5, 5))
         self.topbar.btn_up.cmd(
             lambda e: self.sframe["canvas"].yview_moveto("0.0"))
@@ -356,7 +362,7 @@ class Thumbs(CFrame, ThumbsPrepare):
         self.resize_task = None
 
     def load_scroll(self):
-        self.titles = TitlesWid(self)
+        self.titles = TopBar(self)
         self.titles.bind("<ButtonRelease-2>", ContextFilter)
         self.titles.pack(padx=(15, 15), fill="x")
 
@@ -373,9 +379,7 @@ class Thumbs(CFrame, ThumbsPrepare):
     def load_thumbs(self):
         self.clmns_count = self.get_clmns_count()
 
-        thumbs_dict = Dbase.conn.execute(self.get_query()).fetchall()
-        thumbs_dict = self.decode_thumbs(thumbs_dict)
-        thumbs_dict = self.create_thumbs_dict(thumbs_dict)
+        thumbs_dict = ThumbsDict()
 
         scrl_w = self.sframe.cget("scrollbarwidth")
         self.thumbs_frame = CFrame(
