@@ -493,8 +493,6 @@ class Thumbs(CFrame):
             more_btn.cmd(lambda e: self.show_more_cmd())
             more_btn.pack(pady=(15, 0))
 
-        cnf.root.bind("<ButtonRelease-1>", lambda e: print(e.widget))
-
     def show_more_cmd(self):
         cnf.limit += 150
         cnf.reload_thumbs()
