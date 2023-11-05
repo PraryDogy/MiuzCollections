@@ -71,7 +71,7 @@ class StBar(CFrame):
 
         btn = CButton(frame, text=cnf.lng.settings, width=9)
         btn.cmd(lambda e: self.settings_cmd(btn))
-        btn.pack(side="left", padx=(0, 15))
+        btn.pack(side="left", padx=(0, 20))
 
         cnf.stbar_btn = CButton(frame, text=cnf.lng.update, width=9)
         cnf.stbar_btn.cmd(self.update_cmd)
