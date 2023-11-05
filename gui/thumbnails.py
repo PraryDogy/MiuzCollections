@@ -2,10 +2,8 @@ import math
 import tkinter
 import traceback
 from datetime import datetime
-from functools import partial
 
 import sqlalchemy
-import tkmacosx
 from PIL import Image, ImageTk
 
 from cfg import cnf
@@ -15,6 +13,7 @@ from .filter import Filter
 from .img_viewer import ImgViewer
 from .utils import *
 from .widgets import *
+
 
 __all__ = (
     "Thumbs",
@@ -346,8 +345,6 @@ class Thumbs(CFrame):
 
         self.topbar = NotifyBar(self)
         self.topbar.pack(fill="x", padx=15, pady=(5, 5))
-        self.topbar.btn_up.cmd(
-            lambda e: self.sframe["canvas"].yview_moveto("0.0"))
 
         self.clmns_count = 1
         self.thumbs_pad = 3
@@ -370,18 +367,19 @@ class Thumbs(CFrame):
         self.title_sep.pack(fill="x", pady=(5, 0), padx=1)
 
         self.scroll_frame = CFrame(self)
-        self.scroll_frame.pack(expand=1, fill=tkinter.BOTH)
+        self.scroll_frame.pack(expand=1, fill="both")
 
-        self.sframe = tkmacosx.SFrame(
-            self.scroll_frame, bg=cnf.bg_color, scrollbarwidth=1)
-        self.sframe.pack(expand=1, fill=tkinter.BOTH, padx=(15, 0))
+        self.sframe = CScroll(self.scroll_frame)
+        self.sframe.pack(expand=1, fill="both", padx=(15, 0))
+        self.topbar.btn_up.cmd(self.sframe.moveup)
 
     def load_thumbs(self):
         self.clmns_count = self.get_clmns_count()
 
         thumbs_dict = ThumbsDict()
 
-        scrl_w = self.sframe.cget("scrollbarwidth")
+        # scrl_w = self.sframe.cget("scrollbarwidth")
+        scrl_w = 1
         self.thumbs_frame = CFrame(
             self.sframe, width=(self.thumbsize) * self.clmns_count)
         self.thumbs_frame.pack(expand=1, anchor="w", padx=(scrl_w, 10-scrl_w))

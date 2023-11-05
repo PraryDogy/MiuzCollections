@@ -24,7 +24,7 @@ packages = [
         "Pillow",
         "pycparser",
         "SQLAlchemy",
-        "tkmacosx",
+        "customtkinter",
         "typing-extensions",
         "zipp",
         ]

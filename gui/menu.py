@@ -2,7 +2,6 @@ import re
 import tkinter
 
 import sqlalchemy
-import tkmacosx
 
 from cfg import cnf
 from database import Dbase, ThumbsMd
@@ -33,16 +32,11 @@ class ContextMenu(Context):
         self.do_popup_menu(e, collname)
 
 
-class Menu(tkmacosx.SFrame):
+class Menu(CScroll):
     def __init__(self, master: tkinter):
         self.sel_btn: tkinter.Label = None
 
-        super().__init__(
-            master,
-            bg=cnf.bg_color_menu,
-            scrollbarwidth = 1,
-            width = cnf.menu_w
-            )
+        super().__init__(master, fg_color=cnf.bg_color_menu, width=cnf.menu_w)
 
         self.menu_frame = self.load_menu_buttons()
         self.menu_frame.pack(fill="x")
