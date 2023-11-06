@@ -108,6 +108,7 @@ class CalendarBase(CFrame):
             btn: CButton
             if day:
                 btn.configure(text=day, fg_color=cnf.btn_color)
+                btn.uncmd()
                 btn.cmd(lambda e, btn=btn: self.switch_day(btn))
             else:
                 btn.configure(text="", fg_color=cnf.bg_color)
@@ -133,7 +134,6 @@ class CalendarBase(CFrame):
         self.yy, self.mm, self.dd = tuple(self.my_date.timetuple())[:3]
 
     def switch_day(self, lbl: tkinter.Label):
-        print(lbl.cget("text"))
         if lbl.cget("text"):
             self.curr_btn.configure(fg_color=cnf.btn_color)
             self.curr_btn = lbl
