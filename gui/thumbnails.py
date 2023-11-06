@@ -170,14 +170,14 @@ class ThumbsDict(dict):
         return q
     
 
-class SearchWid(CFrame):
+class SearchWid(RFrame):
     def __init__(self, master: tkinter):
         super().__init__(master)
 
         fr = CFrame(self)
-        fr.pack(anchor="e")
+        fr.pack(anchor="e", padx=1, pady=1)
 
-        CLabel(fr, width=1, bg=cnf.dgray_color).pack(side="left", fill="y")
+        CLabel(fr, width=0, bg=cnf.dgray_color).pack(side="left", fill="y")
 
         self.search_wid = tkinter.Entry(
             fr,
@@ -188,17 +188,21 @@ class SearchWid(CFrame):
             justify="left",
             border=0,
             highlightthickness=0,
-            width=12
+            width=12,
             )
-        self.search_wid.pack(ipady=5, side="left", fill="y")
+        self.search_wid.pack(side="left", fill="y")
 
         self.btn_clear = CButton(
-            fr, text="⨂", width=3, fg_color=cnf.dgray_color, corner_radius=0, border_spacing=4)
+            fr, text="⨂", width=3, fg_color=cnf.dgray_color, corner_radius=0,
+            border_spacing=2
+            )
         self.btn_clear.pack(side="left")
         self.btn_clear.cmd(self.search_clear)
 
         self.btn_search = CButton(
-            fr, text="✓", width=3, fg_color=cnf.dgray_color, corner_radius=0, border_spacing=4)
+            fr, text="✓", width=3, fg_color=cnf.dgray_color, corner_radius=0,
+            border_spacing=2
+            )
         self.btn_search.pack(side="left")
         self.btn_search.cmd(self.search_go)
 
@@ -226,18 +230,18 @@ class FiltersWid(CFrame):
                 cnf.filter[i] = True
 
         prod = CButton(self, text=cnf.lng.product)
-        prod.pack(side="left", fill="x", padx=(0, 10))
+        prod.pack(side="left", fill="x", padx=(0, 5))
 
         mod = CButton(self, text=cnf.lng.models)
-        mod.pack(side="left", fill="x", padx=(0, 10))
+        mod.pack(side="left", fill="x", padx=(0, 5))
 
         cat = CButton(self, text=cnf.lng.catalog)
-        cat.pack(side="left", fill="x", padx=(0, 10))
+        cat.pack(side="left", fill="x", padx=(0, 5))
 
         filter = CButton(
             self, text=cnf.lng.dates + " ⨁", fg_color=cnf.bg_color)
         filter.cmd(lambda e: Filter())
-        filter.pack(side="left", fill="x")
+        filter.pack(side="left", fill="x", padx=(0, 5))
 
         if any((cnf.start, cnf.end)):
             filter.configure(
@@ -282,14 +286,13 @@ class TopBar(CFrame):
         search = SearchWid(self)
         search.rowconfigure(0, weight=1)
         search.columnconfigure(2, weight=1)
-        search.grid(column=2, row=0, sticky="e")
+        search.grid(column=2, row=0, sticky="e", pady=(6, 0))
 
         self.columnconfigure(tuple(range(2)), weight=1)
         self.rowconfigure(tuple(range(1)), weight=1)
 
         self.small = False
         self.bind("<Configure>", lambda e: self.min(e, filters))
-        
 
     def min(self, e: tkinter.Event, widget: tkinter.Frame):
         if not self.small:

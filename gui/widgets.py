@@ -12,12 +12,18 @@ __all__ = (
     "CSep",
     "CButton",
     "CFrame",
+    "RFrame",
     "CLabel",
     "CWindow",
     "SmbAlert",
     "MacMenu",
     "Context",
     )
+
+
+class RFrame(customtkinter.CTkFrame):
+    def __init__(self, master):
+        super().__init__(master, corner_radius=3, fg_color=cnf.dgray_color)
 
 
 class CScroll(customtkinter.CTkScrollableFrame):
