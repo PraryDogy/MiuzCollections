@@ -37,7 +37,7 @@ class Menu(CScroll):
         self.sel_btn: tkinter.Label = None
 
         super().__init__(
-            master, fg_color=cnf.bg_color_menu, corner_radius=3,
+            master, fg_color=cnf.bg_color_menu, corner_radius=0,
             width=cnf.menu_w
             )
 

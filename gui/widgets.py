@@ -57,7 +57,7 @@ class CButton(customtkinter.CTkButton):
     def __init__(
             self, master: tkinter,
             text_color=cnf.fg_color, fg_color=cnf.btn_color,
-            corner_radius=3, width=75,
+            corner_radius=8, width=75,
             hover=0, border_spacing=2,
             font=("San Francisco Pro", 13, "normal"),
             **kw,
