@@ -282,16 +282,24 @@ class TopBar(CFrame):
         second_row = CFrame(self)
         second_row.pack(fill="x")
 
-        title = CLabel(
+        self.topbar_title = CLabel(
             first_row, text=coll_title, anchor="w",
             font=("San Francisco Pro", 22, "bold"))
-        title.pack(anchor="w", side="left")
+        self.topbar_title.pack(anchor="w", side="left")
 
         search = SearchWid(first_row)
         search.pack(anchor="e", side="right")
 
         self.filters = FiltersWid(second_row)
         self.filters.pack(anchor="w")
+
+    def set_title(self):
+        if cnf.curr_coll == cnf.all_colls:
+            coll_title = cnf.lng.all_colls
+        else:
+            coll_title = cnf.curr_coll
+
+        self.topbar_title.configure(text=coll_title)
 
 
 class NotifyBar(CFrame):
@@ -463,7 +471,7 @@ class Thumbs(CFrame):
                 font=("San Francisco Pro", 18, "bold")
                 )
             pad = 30 if x != 0 else 15
-            chunk_title.pack(anchor="w", pady=(pad, 0))
+            chunk_title.pack(anchor="w", pady=(pad, 0), padx=self.thumbs_pad)
 
             chunk_title.bind(
                 "<ButtonRelease-2>", (
@@ -516,10 +524,13 @@ class Thumbs(CFrame):
                     lambda e, coords=coords: self.r_cmd_click(e, coords)
                     ))
 
+
+        ln_thumbs = sum(len(i) for i in list(thumbs_dict.values()))
+
         if not thumbs_dict:
             NoImages(self.scroll).pack()
 
-        else:
+        elif thumbs_dict and ln_thumbs == cnf.limit:
             more_btn = CButton(self.thumbs_frame, text=cnf.lng.show_more)
             more_btn.cmd(lambda e: self.show_more_cmd())
             more_btn.pack(pady=(15, 0))
@@ -550,6 +561,7 @@ class Thumbs(CFrame):
         for i in (self.scroll_parrent, self.scroll):
             i.destroy()
         self.topbar.filters.filters_configure()
+        self.topbar.set_title()
         self.load_scroll()
         self.load_thumbs()
 
