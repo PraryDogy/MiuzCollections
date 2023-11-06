@@ -27,14 +27,8 @@ class RFrame(customtkinter.CTkFrame):
 
 
 class CScroll(customtkinter.CTkScrollableFrame):
-    def __init__(
-            self, master: tkinter, fg_color=cnf.bg_color, **kw
-            ):
-        super().__init__(
-            master, fg_color=fg_color,
-            **kw
-            )
-
+    def __init__(self, master: tkinter, fg_color=cnf.bg_color, **kw):
+        super().__init__(master, fg_color=fg_color, **kw)
         self._scrollbar.configure(width=15)
 
     def moveup(self, e=None):
@@ -67,9 +61,11 @@ class CButton(customtkinter.CTkButton):
             ):
 
         super().__init__(
-            master, fg_color=fg_color, text_color=text_color,
-            width=width, font=font, corner_radius=corner_radius,
+            master,
+            text_color=text_color, fg_color=fg_color,
+            corner_radius=corner_radius, width=width,
             hover=hover, border_spacing=border_spacing,
+            font=font, 
             **kw
             )
 
@@ -78,9 +74,6 @@ class CButton(customtkinter.CTkButton):
 
     def uncmd(self):
         self.unbind("<ButtonRelease-1>")
-
-    def get_text(self):
-        a = self["text"]
 
 
 class CFrame(tkinter.Frame):
