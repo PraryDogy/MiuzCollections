@@ -304,8 +304,16 @@ class Context(tkinter.Menu):
                 )
                 )
         
-    def apply_filter(self, e: tkinter.Event, label, filter, collname=None):
+    def apply_filter_menu(
+            self, label, filter, collname, btn):
         self.add_command(
             label=label,
-            command=lambda: apply_filter(e, filter, collname)
+            command=lambda: apply_filter(
+                filter=filter, collname=collname, btn=btn)
+            )
+
+    def apply_filter_thumbs(self, label, filter):
+        self.add_command(
+            label=label,
+            command=lambda: apply_filter(filter=filter)
             )

@@ -24,10 +24,10 @@ class ContextFilter(Context):
     def __init__(self, e: tkinter.Event):
         super().__init__()
 
-        self.apply_filter(e, label=cnf.lng.product, filter="prod")
-        self.apply_filter(e, label=cnf.lng.models, filter="mod")
-        self.apply_filter(e, label=cnf.lng.catalog, filter="cat")
-        self.apply_filter(e, label=cnf.lng.show_all, filter="all")
+        self.apply_filter_thumbs(label=cnf.lng.product, filter="prod")
+        self.apply_filter_thumbs(label=cnf.lng.models, filter="mod")
+        self.apply_filter_thumbs(label=cnf.lng.catalog, filter="cat")
+        self.apply_filter_thumbs(label=cnf.lng.show_all, filter="all")
 
         self.do_popup(e)
 
@@ -388,7 +388,7 @@ class NoImages(CFrame):
             reset.cmd(self.reset_filters)
             reset.pack(pady=(15, 0))
 
-        for i in (master.get_parrent(),  no_images):
+        for i in (master, master.get_parrent(),  no_images):
             i.bind("<ButtonRelease-2>", ContextFilter)
 
     def reset_filters(self, e):

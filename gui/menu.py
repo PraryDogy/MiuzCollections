@@ -20,14 +20,14 @@ class ContextMenu(Context):
         self.reveal_coll(collname)
         self.sep()
 
-        self.apply_filter(
-            e, label=cnf.lng.product, filter="prod", collname=collname)
-        self.apply_filter(
-            e, label=cnf.lng.models, filter="mod", collname=collname)
-        self.apply_filter(
-            e, label=cnf.lng.catalog, filter="cat", collname=collname)
-        self.apply_filter(
-            e, label=cnf.lng.show_all, filter="all", collname=collname)
+        self.apply_filter_menu(
+            label=cnf.lng.product, filter="prod", collname=collname, btn=btn)
+        self.apply_filter_menu(
+            label=cnf.lng.models, filter="mod", collname=collname, btn=btn)
+        self.apply_filter_menu(
+            label=cnf.lng.catalog, filter="cat", collname=collname, btn=btn)
+        self.apply_filter_menu(
+            label=cnf.lng.show_all, filter="all", collname=collname, btn=btn)
 
         self.do_popup_menu(e, btn, collname)
 
@@ -85,7 +85,7 @@ class Menu(CScroll):
             fg_color=cnf.bg_color_menu, text_color=cnf.fg_color_menu
             )
         last.cmd(
-            lambda e: self.show_coll(e, last, cnf.all_colls)
+            lambda e: cnf.show_coll(last, cnf.all_colls)
             )
         last.bind("<Button-2>", lambda e: ContextMenu(e, last, cnf.all_colls))
         last.pack(pady=(0, 15), fill="x", padx=10)
@@ -97,12 +97,12 @@ class Menu(CScroll):
                 )
             btn.cmd(
                 lambda e,
-                btn=btn, collname=collname: self.show_coll(e, btn, collname)
+                btn=btn, collname=collname: cnf.show_coll(btn, collname)
                 )
             btn.pack(fill="x", padx=10)
             btn.bind("<Button-2>", (
                 lambda e,
-                btn=btn, collname=collname: ContextMenu(e,btn, collname)
+                btn=btn, collname=collname: ContextMenu(e, btn, collname)
                 ))
 
             if collname == cnf.curr_coll:
@@ -121,7 +121,7 @@ class Menu(CScroll):
         self.menu_frame.pack()
         return
     
-    def show_coll(self, e: tkinter.Event, btn: tkinter.Label, collname):
+    def show_coll(self, btn: CButton, collname):
         cnf.limit = 150
 
         self.sel_btn.configure(fg_color=cnf.bg_color_menu)

@@ -342,7 +342,7 @@ def copy_text(text):
     cnf.root.clipboard_append(text)
 
 
-def apply_filter(e: tkinter.Event, filter, collname=None):
+def apply_filter(filter, btn=None, collname=None):
     if filter == "all":
         for k in ("prod", "mod", "cat"):
             cnf.filter[k] = True
@@ -351,8 +351,8 @@ def apply_filter(e: tkinter.Event, filter, collname=None):
             cnf.filter[k] = False
         cnf.filter[filter] = True
 
-    if collname:
-        cnf.show_coll(e, collname)
+    if collname and btn:
+        cnf.show_coll(btn, collname)
     else:
         cnf.reload_scroll()
 
