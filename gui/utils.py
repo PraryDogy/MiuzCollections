@@ -66,7 +66,7 @@ def wait_utils_task():
 def cancel_utils_task():
     cnf.topbar_flag = False
     wait_utils_task()
-    cnf.topbar_default()
+    cnf.notibar_default()
 
 
 def delay():
@@ -78,7 +78,7 @@ def dec_utils_task(task):
         wait_utils_task()
         run_utils_task(task, args, kwargs)
         wait_utils_task()
-        cnf.topbar_default()
+        cnf.notibar_default()
         wait_utils_task()
         cnf.topbar_flag = True
     return wrapper
@@ -309,7 +309,7 @@ def find_tiffs(src: str):
 
 
 def reveal_files(list_paths: list):
-    cnf.topbar_text(cnf.lng.please_wait)
+    cnf.notibar_text(cnf.lng.please_wait)
 
     paths = (
         f"\"{i}\" as POSIX file"
@@ -367,13 +367,13 @@ def finder_actions(
         src = [src]
 
     if not [i for i in src if os.path.exists(i)]:
-        cnf.topbar_text(cnf.lng.no_jpg)
+        cnf.notibar_text(cnf.lng.no_jpg)
         delay()
         return
 
     if tiff:
         tiffs = []
-        cnf.topbar_text(cnf.lng.please_wait)
+        cnf.notibar_text(cnf.lng.please_wait)
 
         for i in src:
     
@@ -387,18 +387,18 @@ def finder_actions(
     
         src = tiffs.copy()
         if not tiffs:
-            cnf.topbar_text(cnf.lng.no_tiff)
+            cnf.notibar_text(cnf.lng.no_tiff)
             delay()
             return
 
     if reveal:
-        cnf.topbar_text(cnf.lng.please_wait)
+        cnf.notibar_text(cnf.lng.please_wait)
         reveal_files(src)
         delay()
         return
     
     if copy_path:
-        cnf.topbar_text(cnf.lng.please_wait)
+        cnf.notibar_text(cnf.lng.please_wait)
         cnf.root.clipboard_clear()
         cnf.root.clipboard_append("\n".join(src))
         delay()
@@ -413,7 +413,7 @@ def finder_actions(
             if not cnf.topbar_flag:
                 return
 
-            cnf.topbar_text(
+            cnf.notibar_text(
                 f"{cnf.lng.copying} {num} {cnf.lng.from_pretext} {ln_src}"
                 )
 

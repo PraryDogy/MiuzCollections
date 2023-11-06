@@ -171,8 +171,8 @@ class ThumbsDict(dict):
     
 
 class SearchWid(RFrame):
-    def __init__(self, master: tkinter):
-        super().__init__(master)
+    def __init__(self, master: tkinter, **kw):
+        super().__init__(master, **kw)
 
         fr = CFrame(self, bg=cnf.dgray_color)
         fr.pack(anchor="e", padx=1, pady=1)
@@ -188,7 +188,7 @@ class SearchWid(RFrame):
             justify="left",
             border=0,
             highlightthickness=0,
-            width=15,
+            width=20,
             )
         self.search_wid.pack(side="left", fill="y")
 
@@ -213,6 +213,7 @@ class SearchWid(RFrame):
         cnf.search_var.set(self.search_wid.get())
         cnf.start, cnf.end = None, None
         cnf.reload_scroll()
+        cnf.root.focus_force()
 
     def search_clear(self, e=None):
         cnf.search_var.set("")
@@ -220,8 +221,8 @@ class SearchWid(RFrame):
 
 
 class FiltersWid(CFrame):
-    def __init__(self, master: tkinter):
-        super().__init__(master)
+    def __init__(self, master: tkinter, **kw):
+        super().__init__(master, **kw)
 
         if not any(i for i in cnf.filter.values()):
             for i in cnf.filter.keys():
@@ -236,32 +237,35 @@ class FiltersWid(CFrame):
         cat = CButton(self, text=cnf.lng.catalog)
         cat.pack(side="left", fill="x", padx=(0, 5))
 
-        filter = CButton(
-            self, text=cnf.lng.dates + " ⨁", fg_color=cnf.bg_color)
-        filter.cmd(lambda e: Filter())
-        filter.pack(side="left", fill="x", padx=(0, 5))
+        self.filter_btns = {cat: "cat", mod: "mod", prod: "prod"}
 
-        if any((cnf.start, cnf.end)):
-            filter.configure(
-                fg_color=cnf.btn_color, text=cnf.lng.dates + " ⨂")
+        for k, v in self.filter_btns.items():
+            k.cmd(lambda e, v=v: self.filters_cmd(v))
 
-        btns = {"prod": prod, "mod": mod, "cat": cat}
+        self.dates_btn = CButton(self, text=cnf.lng.dates)
+        self.dates_btn.pack(side="left", fill="x", padx=(0, 5))
+        self.dates_btn.cmd(lambda e: Filter())
 
-        for k, v in btns.items():
+        self.filters_configure()
 
-            v.configure(fg_color=cnf.bg_color)
-
-            if cnf.filter[k]:
-                v.configure(
-                    fg_color=cnf.btn_color, text=v.cget("text") + " ⨂")
-            else:
-                v.configure(text=v.cget("text") + " ⨁")
-
-            v.cmd(lambda e, k=k: self.filtr_cmd(k))
-
-    def filtr_cmd(self, key):
-        cnf.filter[key] = False if cnf.filter[key] else True
+    def filters_cmd(self, v):
+        cnf.filter[v] = False if cnf.filter[v] else True
         cnf.reload_scroll()
+
+    def filters_configure(self):
+        for k, v in self.filter_btns.items():
+            k: CButton
+            t = k.cget("text").split()[0]
+            if cnf.filter[v]:
+                k.configure(fg_color=cnf.btn_color, text=t + " ⨂")
+            else:
+                k.configure(fg_color=cnf.bg_color, text=t + " ⨁")
+
+        t = self.dates_btn.cget("text").split()[0]
+        if any((cnf.start, cnf.end)):
+            self.dates_btn.configure(fg_color=cnf.btn_color, text=t + " ⨂")
+        else:
+            self.dates_btn.configure(fg_color=cnf.bg_color, text=t + " ⨁")
 
 
 class TopBar(CFrame):
@@ -273,36 +277,21 @@ class TopBar(CFrame):
         else:
             coll_title = cnf.curr_coll
 
-        title = CButton(
-            self, text=coll_title, fg_color=cnf.bg_color, anchor="w",
+        first_row = CFrame(self)
+        first_row.pack(fill="x")
+        second_row = CFrame(self)
+        second_row.pack(fill="x")
+
+        title = CLabel(
+            first_row, text=coll_title, anchor="w",
             font=("San Francisco Pro", 22, "bold"))
-        title.grid(column=0, row=0, sticky="w")
+        title.pack(anchor="w", side="left")
 
-        filters = FiltersWid(self)
-        filters.grid(column=1, row=0, sticky="nesw", pady=(6, 0))
+        search = SearchWid(first_row)
+        search.pack(anchor="e", side="right")
 
-        search = SearchWid(self)
-        search.rowconfigure(0, weight=1)
-        search.columnconfigure(2, weight=1)
-        search.grid(column=2, row=0, sticky="e", pady=(6, 0))
-
-        self.columnconfigure(tuple(range(2)), weight=1)
-        self.rowconfigure(tuple(range(1)), weight=1)
-
-        self.small = False
-        self.bind("<Configure>", lambda e: self.min(e, filters))
-
-    def min(self, e: tkinter.Event, widget: tkinter.Frame):
-        if not self.small:
-            if e.width < 670:
-                self.small = True
-                widget.grid(row=1, column=0, sticky="nesw")
-                self.rowconfigure(1, weight=1)
-
-        elif self.small:
-            if e.width > 670:
-                self.small = False
-                widget.grid(column=1, row=0, sticky="nesw")
+        self.filters = FiltersWid(second_row)
+        self.filters.pack(anchor="w")
 
 
 class NotifyBar(CFrame):
@@ -312,7 +301,7 @@ class NotifyBar(CFrame):
         self.btn_up = CButton(self, text=f"▲", fg_color=cnf.bg_color)
         self.btn_up.pack(side="left", fill="x", expand=1)
 
-    def topbar_text(self, text):
+    def notibar_text(self, text):
         try:
             self.btn_up.configure(text=text, fg_color=cnf.blue_color)
 
@@ -329,7 +318,7 @@ class NotifyBar(CFrame):
             print("thumbnails > topbar text error")
             print(e)
 
-    def topbar_default(self):
+    def notibar_default(self):
         try:
             self.topbar_can.destroy()
         except AttributeError as e:
@@ -343,6 +332,61 @@ class NotifyBar(CFrame):
             print(e)
 
 
+class NoImages(CFrame):
+    def __init__(self, master: CScroll, *kw):
+        super().__init__(master)
+
+        str_var = cnf.search_var.get()
+        noimg_t = cnf.lng.no_photo
+
+        no_images = CLabel(
+            master, text=noimg_t,
+            font=("San Francisco Pro", 18, "bold")
+            )
+        no_images.pack(pady=(15, 0))
+
+        reset = CButton(master)
+        reset.pack(pady=(15, 0))
+
+        if str_var:
+            noimg_t = (
+                f"{cnf.lng.no_photo} {cnf.lng.with_name}"
+                f"\n\"{str_var}\""
+                )
+            no_images.configure(text=noimg_t)
+            reset.configure(text=cnf.lng.reset)
+            reset.cmd(self.reset_search)
+
+        elif any((cnf.start, cnf.end)):
+            noimg_t = (
+                f"{cnf.lng.no_photo}"
+                f"\n{cnf.named_start} - {cnf.named_end}"
+                )
+            no_images.configure(text=noimg_t)
+            reset.configure(text=cnf.lng.reset_dates)
+            reset.cmd(self.reset_dates)
+
+        else:
+            reset.configure(text=cnf.lng.show_all)
+            reset.cmd(self.reset_filters)
+
+        for i in (master.get_parrent(),  no_images):
+            i.bind("<ButtonRelease-2>", ContextFilter)
+
+    def reset_filters(self, e):
+        for k, v in cnf.filter.items():
+            cnf.filter[k] = True
+        cnf.reload_scroll()
+
+    def reset_search(self, e):
+        cnf.search_var.set("")
+        cnf.reload_scroll()
+
+    def reset_dates(self, e):
+        cnf.start, cnf.end = None, None
+        cnf.reload_scroll()
+
+
 class Thumbs(CFrame):
     def __init__(self, master):
         super().__init__(master)
@@ -350,48 +394,45 @@ class Thumbs(CFrame):
         self.notibar = NotifyBar(self)
         self.notibar.pack(fill="x", padx=15, pady=(5, 5))
 
+        self.topbar = TopBar(self)
+        self.topbar.bind("<ButtonRelease-2>", ContextFilter)
+        self.topbar.pack(padx=(15, 15), fill="x")
+
+        sep = CSep(self)
+        sep.pack(fill="x", pady=(5, 0), padx=1)
+
         self.clmns_count = 1
         self.thumbs_pad = 3
         self.thumbsize = cnf.thumb_size + self.thumbs_pad
 
         cnf.root.update_idletasks()
 
+        self.resize_task = None
+        cnf.root.bind("<Configure>", self.decect_resize)
+
         self.load_scroll()
         self.load_thumbs()
 
-        cnf.root.bind("<Configure>", self.decect_resize)
-        self.resize_task = None
-
     def load_scroll(self):
-        self.topbar = TopBar(self)
-        self.topbar.bind("<ButtonRelease-2>", ContextFilter)
-        self.topbar.pack(padx=(15, 15), fill="x")
+        self.scroll_parrent = CFrame(self)
+        self.scroll_parrent.pack(expand=1, fill="both")
 
-        self.topbar_sep = CSep(self)
-        self.topbar_sep.pack(fill="x", pady=(5, 0), padx=1)
-
-        self.scroll_frame = CFrame(self)
-        self.scroll_frame.pack(expand=1, fill="both")
-
-        self.sframe = CScroll(self.scroll_frame)
-        self.sframe.pack(expand=1, fill="both", padx=(15, 0))
+        self.scroll = CScroll(self.scroll_parrent)
+        self.scroll.pack(expand=1, fill="both")
 
         self.notibar.btn_up.uncmd()
-        self.notibar.btn_up.cmd(self.sframe.moveup)
+        self.notibar.btn_up.cmd(self.scroll.moveup)
 
     def load_thumbs(self):
-        self.clmns_count = self.get_clmns_count()
-
-        thumbs_dict = ThumbsDict()
-
-        self.thumbs_frame = CFrame(
-            self.sframe, width=(self.thumbsize) * self.clmns_count)
-        self.thumbs_frame.pack(fill="both", expand=1, anchor="w", padx=(0, 15))
+        self.thumbs_frame = CFrame(self.scroll)
+        self.thumbs_frame.pack(fill="both", expand=1, anchor="w", padx=15)
         self.thumbs_frame.bind("<ButtonRelease-2>", ContextFilter)
 
         all_src = []
         limit = 500
+        self.clmns_count = self.get_clmns_count()
         w = self.thumbsize*self.clmns_count
+        thumbs_dict = ThumbsDict()
 
         for date_key, img_list in thumbs_dict.items():
             chunks = [
@@ -464,31 +505,7 @@ class Thumbs(CFrame):
                     ))
 
         if not thumbs_dict:
-            self.thumbs_frame.pack(anchor="center")
-        
-            str_var = cnf.search_var.get()
-            noimg_t = cnf.lng.no_photo
-
-            if str_var:
-                noimg_t = (
-                    f"{cnf.lng.no_photo} {cnf.lng.with_name}"
-                    f"\n\"{str_var}\""
-                    )
-
-            elif any((cnf.start, cnf.end)):
-                noimg_t=(
-                    f"{cnf.lng.no_photo}"
-                    f"\n{cnf.named_start} - {cnf.named_end}"
-                    )
-
-            no_images = CLabel(
-                self.thumbs_frame, text=noimg_t,
-                font=("San Francisco Pro", 18, "bold")
-                )
-            no_images.pack(pady=(15, 0))
-
-            for i in (self.sframe.get_parrent(),  no_images):
-                i.bind("<ButtonRelease-2>", ContextFilter)
+            NoImages(self.scroll).pack()
 
         else:
             more_btn = CButton(self.thumbs_frame, text=cnf.lng.show_more)
@@ -502,9 +519,9 @@ class Thumbs(CFrame):
     def decect_resize(self, e):
         if self.resize_task:
             cnf.root.after_cancel(self.resize_task)
-        self.resize_task = cnf.root.after(500, self.frame_resize)
+        self.resize_task = cnf.root.after(500, self.thumbs_resize)
 
-    def frame_resize(self):
+    def thumbs_resize(self):
         old_w = cnf.root_g["w"]
         new_w = cnf.root.winfo_width()
 
@@ -518,9 +535,9 @@ class Thumbs(CFrame):
                 cnf.reload_thumbs()
 
     def reload_scroll(self):
-        for i in (
-            self.topbar, self.scroll_frame, self.thumbs_frame, self.topbar_sep):
+        for i in (self.scroll_parrent, self.scroll):
             i.destroy()
+        self.topbar.filters.filters_configure()
         self.load_scroll()
         self.load_thumbs()
 
@@ -529,7 +546,7 @@ class Thumbs(CFrame):
         self.load_thumbs()
 
     def get_clmns_count(self):
-        clmns = (cnf.root_g["w"] - cnf.menu_w) // (self.thumbsize)
+        clmns = (cnf.root.winfo_width()-cnf.menu_w)//(self.thumbsize)
         return 1 if clmns == 0 else clmns
 
     def get_coords(self, e: tkinter.Event, coords: dict):

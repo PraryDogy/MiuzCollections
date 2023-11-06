@@ -22,8 +22,10 @@ __all__ = (
 
 
 class RFrame(customtkinter.CTkFrame):
-    def __init__(self, master):
-        super().__init__(master, corner_radius=3, fg_color=cnf.dgray_color)
+    def __init__(
+            self, master, corner_radius=3, fg_color=cnf.dgray_color, **kw):
+        super().__init__(
+            master, corner_radius=corner_radius, fg_color=fg_color, **kw)
 
 
 class CScroll(customtkinter.CTkScrollableFrame):

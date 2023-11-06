@@ -40,8 +40,8 @@ class Config:
         self.tit_color_menu = "#7b7b7b"
         self.fg_color_menu = "#e9e9e9"
 
+        self.menu_w = 200
         self.thumb_size = 150
-        self.menu_w = 180
         self.limit = 150
         self.all_colls = "all"
 
@@ -145,13 +145,13 @@ class Config:
         from gui.application import app
         app.menu.show_coll(e, btn, collname)
 
-    def topbar_text(self, text):
+    def notibar_text(self, text):
         from gui.application import app
-        app.thumbs.notibar.topbar_text(text)
+        app.thumbs.notibar.notibar_text(text)
 
-    def topbar_default(self):
+    def notibar_default(self):
         from gui.application import app
-        app.thumbs.notibar.topbar_default()
+        app.thumbs.notibar.notibar_default()
 
 
 cnf = Config()

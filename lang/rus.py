@@ -94,7 +94,7 @@ class Rus:
         self.date_created_by = "По дате создания"
         self.date_changed = "Дата изменения"
         self.date_created = "Дата создания"
-        self.reset_dates = "Сброс дат"
+        self.reset_dates = "Сбросить даты"
         self.dates_not_sel = "Даты не выбраны"
         self.enter_date = "Введите дату"
         self.d_m_y = "день.месяц.год"

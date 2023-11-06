@@ -35,12 +35,6 @@ class Application:
         cnf.root.minsize(700, 300)
         cnf.root.deiconify()
 
-        temp = CLabel(
-            cnf.root, text=cnf.lng.please_wait,
-            font=("San Francisco Pro", 22, "bold")
-            )
-        temp.pack(expand=1, fill="both")
-
         mac_ver, _, _ = platform.mac_ver()
         mac_ver = float(".".join(mac_ver.split(".")[:2]))
 
@@ -57,18 +51,21 @@ class Application:
                 )
 
         self.menu = Menu(cnf.root)
-        r_frame = CFrame(cnf.root)
-        self.thumbs = Thumbs(r_frame)
-        sep = CSep(r_frame)
-        self.stbar = StBar(r_frame)
-        MacMenu()
-
-        temp.destroy()
         self.menu.pack(side="left", fill="y")
+
+        r_frame = CFrame(cnf.root)
         r_frame.pack(fill="both", expand=1)
+
+        self.thumbs = Thumbs(r_frame)
         self.thumbs.pack(fill="both", expand=1)
+
+        sep = CSep(r_frame)
         sep.pack(fill="x", padx=1)
+
+        self.stbar = StBar(r_frame)
         self.stbar.pack(pady=10)
+
+        MacMenu()
 
         if smb_check():
             cnf.root.after(1000, scaner.scaner_start)

@@ -331,7 +331,7 @@ class Filter(CWindow):
         self.cals_titles = CLabel(self, text=cals_t, font=f)
         self.cals_titles.pack()
 
-        cals_reset = CButton(self, text=cnf.lng.reset)
+        cals_reset = CButton(self, text=cnf.lng.reset_dates)
         cals_reset.pack(pady=(15, 0))
         cals_reset.cmd(self.cals_titles_reset)
 
