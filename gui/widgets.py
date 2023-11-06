@@ -23,14 +23,17 @@ __all__ = (
 
 class RFrame(customtkinter.CTkFrame):
     def __init__(
-            self, master, corner_radius=3, fg_color=cnf.dgray_color, **kw):
+            self, master, corner_radius=cnf.corner, fg_color=cnf.dgray_color,
+            **kw
+            ):
         super().__init__(
             master, corner_radius=corner_radius, fg_color=fg_color, **kw)
 
 
 class CScroll(customtkinter.CTkScrollableFrame):
     def __init__(self, master: tkinter, fg_color=cnf.bg_color, 
-                 **kw):
+                 **kw
+                 ):
         super().__init__(master, fg_color=fg_color, **kw)
         self._scrollbar.configure(width=15)
 
@@ -57,7 +60,7 @@ class CButton(customtkinter.CTkButton):
     def __init__(
             self, master: tkinter,
             text_color=cnf.fg_color, fg_color=cnf.btn_color,
-            corner_radius=8, width=75,
+            corner_radius=cnf.corner, width=75,
             hover=0, border_spacing=2,
             font=("San Francisco Pro", 13, "normal"),
             **kw,

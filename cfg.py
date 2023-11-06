@@ -40,6 +40,7 @@ class Config:
         self.tit_color_menu = "#7b7b7b"
         self.fg_color_menu = "#e9e9e9"
 
+        self.corner = 8
         self.menu_w = 200
         self.thumb_size = 150
         self.limit = 150

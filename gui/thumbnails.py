@@ -171,18 +171,19 @@ class ThumbsDict(dict):
     
 
 class SearchWid(RFrame):
-    def __init__(self, master: tkinter, **kw):
-        super().__init__(master, fg_color=cnf.btn_color, corner_radius=8, **kw)
+    def __init__(self, master: tkinter, color=cnf.btn_color, **kw):
+        super().__init__(
+            master, fg_color=color, corner_radius=cnf.corner, **kw)
 
-        fr = CFrame(self, bg=cnf.btn_color)
+        fr = CFrame(self, bg=color)
         fr.pack(anchor="e", padx=2, pady=2)
 
-        CLabel(fr, width=0, bg=cnf.btn_color).pack(side="left", fill="y")
+        CLabel(fr, width=0, bg=color).pack(side="left", fill="y")
 
         self.search_wid = tkinter.Entry(
             fr,
             textvariable=cnf.search_var,
-            bg=cnf.btn_color,
+            bg=color,
             insertbackground="white",
             fg=cnf.fg_color,
             justify="left",
@@ -193,13 +194,13 @@ class SearchWid(RFrame):
         self.search_wid.pack(side="left", fill="y")
 
         self.btn_clear = CButton(
-            fr, text="⨂", width=3, fg_color=cnf.btn_color, corner_radius=0,
+            fr, text="⨂", width=3, fg_color=color, corner_radius=0,
             )
         self.btn_clear.pack(side="left", padx=(0, 5))
         self.btn_clear.cmd(self.search_clear)
 
         self.btn_search = CButton(
-            fr, text="✓", width=3, fg_color=cnf.btn_color, corner_radius=0,
+            fr, text="✓", width=3, fg_color=color, corner_radius=0,
             )
         self.btn_search.pack(side="left", padx=(0, 5))
         self.btn_search.cmd(self.search_go)
