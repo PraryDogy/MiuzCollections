@@ -229,7 +229,7 @@ class Context(tkinter.Menu):
     def show_coll(self, e: tkinter.Event, btn, collname):
         self.add_command(
             label=cnf.lng.view,
-            command=lambda: cnf.show_coll(e, btn, collname)
+            command=lambda: cnf.show_coll(btn=btn, collname=collname)
             )
         
     def copy_tiffs_paths(self, img_src):
