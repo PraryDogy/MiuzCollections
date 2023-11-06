@@ -278,7 +278,7 @@ class TopBar(CFrame):
             coll_title = cnf.curr_coll
 
         first_row = CFrame(self)
-        first_row.pack(fill="x")
+        first_row.pack(fill="x", pady=(0, 5))
         second_row = CFrame(self)
         second_row.pack(fill="x")
 
@@ -396,7 +396,7 @@ class Thumbs(CFrame):
 
         self.topbar = TopBar(self)
         self.topbar.bind("<ButtonRelease-2>", ContextFilter)
-        self.topbar.pack(padx=(15, 15), fill="x")
+        self.topbar.pack(padx=15, fill="x")
 
         sep = CSep(self)
         sep.pack(fill="x", pady=(5, 0), padx=1)
@@ -419,13 +419,14 @@ class Thumbs(CFrame):
 
         self.scroll = CScroll(self.scroll_parrent)
         self.scroll.pack(expand=1, fill="both")
+        self.scroll.bind("<Enter>", lambda e: self.scroll.focus_force())
 
         self.notibar.btn_up.uncmd()
         self.notibar.btn_up.cmd(self.scroll.moveup)
 
     def load_thumbs(self):
         self.thumbs_frame = CFrame(self.scroll)
-        self.thumbs_frame.pack(fill="both", expand=1, anchor="w", padx=15)
+        self.thumbs_frame.pack(anchor="w", padx=(0, 15))
         self.thumbs_frame.bind("<ButtonRelease-2>", ContextFilter)
 
         all_src = []
@@ -486,7 +487,7 @@ class Thumbs(CFrame):
                         clmn = 0
 
                 img = ImageTk.PhotoImage(empty)
-                img_lbl = CLabel(self.thumbs_frame, image=img)
+                img_lbl = CLabel(self.thumbs_frame, image=img, anchor="w")
                 img_lbl.pack(anchor="w")
                 img_lbl.image_names = img
 
@@ -546,7 +547,8 @@ class Thumbs(CFrame):
         self.load_thumbs()
 
     def get_clmns_count(self):
-        clmns = (cnf.root.winfo_width()-cnf.menu_w)//(self.thumbsize)
+        padx = self.thumbs_frame.pack_info()["padx"][1]*2
+        clmns = (cnf.root.winfo_width()-cnf.menu_w-padx)//(self.thumbsize)
         return 1 if clmns == 0 else clmns
 
     def get_coords(self, e: tkinter.Event, coords: dict):

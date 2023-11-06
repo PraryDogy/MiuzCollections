@@ -68,7 +68,7 @@ class Application:
         MacMenu()
 
         if smb_check():
-            cnf.root.after(1000, scaner.scaner_start)
+            cnf.root.after(100, scaner.scaner_start)
         else:
             scaner.scaner_sheldue()
             SmbAlert()
