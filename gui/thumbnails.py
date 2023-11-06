@@ -332,6 +332,16 @@ class NotifyBar(CFrame):
             print(e)
 
 
+class ResetDatesBtn(CButton):
+    def __init__(self, master: tkinter, text=cnf.lng.reset_dates, **kw):
+        super().__init__(master, text=text, **kw)
+        self.cmd(self.reset_dates_cmd)
+
+    def reset_dates_cmd(self, e):
+        cnf.start, cnf.end = None, None
+        cnf.reload_scroll()
+
+
 class NoImages(CFrame):
     def __init__(self, master: CScroll, *kw):
         super().__init__(master)
@@ -346,7 +356,6 @@ class NoImages(CFrame):
         no_images.pack(pady=(15, 0))
 
         reset = CButton(master)
-        reset.pack(pady=(15, 0))
 
         if str_var:
             noimg_t = (
@@ -356,6 +365,7 @@ class NoImages(CFrame):
             no_images.configure(text=noimg_t)
             reset.configure(text=cnf.lng.reset)
             reset.cmd(self.reset_search)
+            reset.pack(pady=(15, 0))
 
         elif any((cnf.start, cnf.end)):
             noimg_t = (
@@ -363,12 +373,12 @@ class NoImages(CFrame):
                 f"\n{cnf.named_start} - {cnf.named_end}"
                 )
             no_images.configure(text=noimg_t)
-            reset.configure(text=cnf.lng.reset_dates)
-            reset.cmd(self.reset_dates)
+            ResetDatesBtn(master).pack(pady=(15, 0))
 
         else:
             reset.configure(text=cnf.lng.show_all)
             reset.cmd(self.reset_filters)
+            reset.pack(pady=(15, 0))
 
         for i in (master.get_parrent(),  no_images):
             i.bind("<ButtonRelease-2>", ContextFilter)
@@ -380,10 +390,6 @@ class NoImages(CFrame):
 
     def reset_search(self, e):
         cnf.search_var.set("")
-        cnf.reload_scroll()
-
-    def reset_dates(self, e):
-        cnf.start, cnf.end = None, None
         cnf.reload_scroll()
 
 
@@ -425,17 +431,21 @@ class Thumbs(CFrame):
         self.notibar.btn_up.cmd(self.scroll.moveup)
 
     def load_thumbs(self):
+        thumbs_dict = ThumbsDict()
+
         self.thumbs_frame = CFrame(self.scroll)
         self.thumbs_frame.pack(anchor="w", padx=(0, 15))
         self.thumbs_frame.bind("<ButtonRelease-2>", ContextFilter)
+
+        if any((cnf.start, cnf.end)) and thumbs_dict:
+            ResetDatesBtn(self.thumbs_frame).pack(pady=(15, 0))
 
         all_src = []
         limit = 500
         self.clmns_count = self.get_clmns_count()
         w = self.thumbsize*self.clmns_count
-        thumbs_dict = ThumbsDict()
 
-        for date_key, img_list in thumbs_dict.items():
+        for x, (date_key, img_list) in enumerate(thumbs_dict.items()):
             chunks = [
                 img_list[i:i+limit]
                 for i in range(0, len(img_list), limit)
@@ -452,7 +462,8 @@ class Thumbs(CFrame):
                 self.thumbs_frame, text=chunk_t, anchor="w", justify="left",
                 font=("San Francisco Pro", 18, "bold")
                 )
-            chunk_title.pack(anchor="w", pady=(30, 0))
+            pad = 30 if x != 0 else 15
+            chunk_title.pack(anchor="w", pady=(pad, 0))
 
             chunk_title.bind(
                 "<ButtonRelease-2>", (
