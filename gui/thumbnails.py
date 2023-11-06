@@ -467,7 +467,7 @@ class Thumbs(CFrame):
                     )
 
             chunk_title = CLabel(
-                self.thumbs_frame, text=chunk_t, anchor="w", justify="left",
+                self.thumbs_frame, text=chunk_t, anchor="w",
                 font=("San Francisco Pro", 18, "bold")
                 )
             pad = 30 if x != 0 else 15
