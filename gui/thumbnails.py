@@ -190,15 +190,15 @@ class SearchWid(CFrame):
             highlightthickness=0,
             width=12
             )
-        self.search_wid.pack(ipady=4, side="left")
+        self.search_wid.pack(ipady=5, side="left", fill="y")
 
         self.btn_clear = CButton(
-            fr, text="⨂", width=3, bg=cnf.dgray_color, pady=3)
+            fr, text="⨂", width=3, fg_color=cnf.dgray_color, corner_radius=0, border_spacing=4)
         self.btn_clear.pack(side="left")
         self.btn_clear.cmd(self.search_clear)
 
         self.btn_search = CButton(
-            fr, text="✓", width=3, bg=cnf.dgray_color, pady=3)
+            fr, text="✓", width=3, fg_color=cnf.dgray_color, corner_radius=0, border_spacing=4)
         self.btn_search.pack(side="left")
         self.btn_search.cmd(self.search_go)
 
@@ -225,33 +225,36 @@ class FiltersWid(CFrame):
             for i in cnf.filter.keys():
                 cnf.filter[i] = True
 
-        prod = CButton(self, text=cnf.lng.product, width=0)
+        prod = CButton(self, text=cnf.lng.product)
         prod.pack(side="left", fill="x", padx=(0, 10))
 
-        mod = CButton(self, text=cnf.lng.models, width=0)
+        mod = CButton(self, text=cnf.lng.models)
         mod.pack(side="left", fill="x", padx=(0, 10))
 
-        cat = CButton(self, text=cnf.lng.catalog, width=0)
+        cat = CButton(self, text=cnf.lng.catalog)
         cat.pack(side="left", fill="x", padx=(0, 10))
 
         filter = CButton(
-            self, text=cnf.lng.dates + " ⨁", bg=cnf.bg_color, width=0)
+            self, text=cnf.lng.dates + " ⨁", fg_color=cnf.bg_color)
         filter.cmd(lambda e: Filter())
         filter.pack(side="left", fill="x")
 
         if any((cnf.start, cnf.end)):
             filter.configure(
-                fg=cnf.blue_color, text=cnf.lng.dates + " ⨂")
+                fg_color=cnf.btn_color, text=cnf.lng.dates + " ⨂")
 
         btns = {"prod": prod, "mod": mod, "cat": cat}
 
         for k, v in btns.items():
-            v.configure(bg=cnf.bg_color)
+
+            v.configure(fg_color=cnf.bg_color)
+
             if cnf.filter[k]:
                 v.configure(
-                    fg=cnf.blue_color, text=v.cget("text") + " ⨂")
+                    fg_color=cnf.btn_color, text=v.cget("text") + " ⨂")
             else:
                 v.configure(text=v.cget("text") + " ⨁")
+
             v.cmd(lambda e, k=k: self.filtr_cmd(k))
 
     def filtr_cmd(self, key):
@@ -269,7 +272,7 @@ class TopBar(CFrame):
             coll_title = cnf.curr_coll
 
         title = CButton(
-            self, text=coll_title, bg=cnf.bg_color, anchor="w", justify="left",
+            self, text=coll_title, fg_color=cnf.bg_color, anchor="w",
             font=("San Francisco Pro", 22, "bold"))
         title.grid(column=0, row=0, sticky="w")
 
@@ -305,17 +308,17 @@ class NotifyBar(CFrame):
     def __init__(self, master: tkinter):
         super().__init__(master)
 
-        self.btn_up = CButton(self, text=f"▲", bg=cnf.bg_color)
+        self.btn_up = CButton(self, text=f"▲", fg_color=cnf.bg_color)
         self.btn_up.pack(side="left", fill="x", expand=1)
 
     def topbar_text(self, text):
         try:
-            self.btn_up.configure(text=text, bg=cnf.blue_color)
+            self.btn_up.configure(text=text, fg_color=cnf.blue_color)
 
             if len(self.children) < 2:
 
                 self.topbar_can = CButton(
-                    self, text=cnf.lng.cancel, bg=cnf.blue_color,
+                    self, text=cnf.lng.cancel, fg_color=cnf.blue_color,
                     )
                 self.topbar_can.configure()
                 self.topbar_can.cmd(lambda e: cancel_utils_task())
@@ -333,7 +336,7 @@ class NotifyBar(CFrame):
             print(e)
 
         try:
-            self.btn_up.configure(text=f"▲", bg=cnf.bg_color)
+            self.btn_up.configure(text=f"▲", fg_color=cnf.bg_color)
         except RuntimeError as e:
             print("thumbnails > can't configure topbar to default")
             print(e)
@@ -371,6 +374,7 @@ class Thumbs(CFrame):
 
         self.sframe = CScroll(self.scroll_frame)
         self.sframe.pack(expand=1, fill="both", padx=(15, 0))
+        self.topbar.btn_up.uncmd()
         self.topbar.btn_up.cmd(self.sframe.moveup)
 
     def load_thumbs(self):
@@ -378,11 +382,9 @@ class Thumbs(CFrame):
 
         thumbs_dict = ThumbsDict()
 
-        # scrl_w = self.sframe.cget("scrollbarwidth")
-        scrl_w = 1
         self.thumbs_frame = CFrame(
             self.sframe, width=(self.thumbsize) * self.clmns_count)
-        self.thumbs_frame.pack(expand=1, anchor="w", padx=(scrl_w, 10-scrl_w))
+        self.thumbs_frame.pack(fill="both", expand=1, anchor="w", padx=(0, 15))
         self.thumbs_frame.bind("<ButtonRelease-2>", ContextFilter)
 
         all_src = []
@@ -483,7 +485,7 @@ class Thumbs(CFrame):
                 )
             no_images.pack(pady=(15, 0))
 
-            for i in (self.sframe["canvas"],  no_images):
+            for i in (self.sframe.get_parrent(),  no_images):
                 i.bind("<ButtonRelease-2>", ContextFilter)
 
         else:

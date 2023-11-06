@@ -141,9 +141,9 @@ class Config:
         from gui.application import app
         app.menu.reload_menu()
 
-    def show_coll(self, e: tkinter.Event, collname):
+    def show_coll(self, e: tkinter.Event, btn, collname):
         from gui.application import app
-        app.menu.show_coll(e, collname)
+        app.menu.show_coll(e, btn, collname)
 
     def topbar_text(self, text):
         from gui.application import app

@@ -35,9 +35,11 @@ class CalendarBase(CFrame):
         titles = CFrame(parrent)
         titles.pack(pady=5)
 
-        prev_m = CButton(titles, text="<", width=6, font=f, bg=cnf.bg_color)
+        prev_m = CButton(
+            titles, text="<", width=0, font=f, fg_color=cnf.bg_color
+            )
         prev_m.pack(side="left")
-        prev_m.cmd(self.switch_month)
+        prev_m.cmd(lambda e: self.switch_month(prev_m))
         self.all_btns.append(prev_m)
 
         self.title = CLabel(
@@ -56,16 +58,18 @@ class CalendarBase(CFrame):
             )
         self.all_btns.append(self.title)
 
-        next_m = CButton(titles, text=">", width=6, font=f, bg=cnf.bg_color)
+        next_m = CButton(
+            titles, text=">", width=0, font=f, fg_color=cnf.bg_color
+            )
         next_m.pack(side="left")
-        next_m.cmd(self.switch_month)
+        next_m.cmd(lambda e: self.switch_month(next_m))
         self.all_btns.append(next_m)
 
         row = CFrame(parrent)
         row.pack()
 
         for i in cnf.lng.calendar_days:
-            lbl = CButton(row, text=i, width=4, height=2)
+            lbl = CButton(row, text=i, width=40, height=40, corner_radius=0)
             lbl.pack(side="left")
             self.all_btns.append(lbl)
 
@@ -76,9 +80,8 @@ class CalendarBase(CFrame):
         row.pack()
 
         for i in range(1, 43):
-            lbl = CButton(row, width=4, height=2)
+            lbl = CButton(row, width=40, height=40, corner_radius=0)
             lbl.pack(side="left")
-            lbl.cmd(self.switch_day)
 
             if i % 7 == 0:
                 row = CFrame(parrent)
@@ -98,17 +101,18 @@ class CalendarBase(CFrame):
         days = [None for i in range(first_weekday)]
         days.extend([i for i in range(1, month_len)])
         days.extend([None for i in range(42 - len(days))])
-
         return days
 
     def fill_days(self):
         for day, btn in zip(self.create_days(), self.btns):
+            btn: CButton
             if day:
-                btn.configure(text=day, bg=cnf.btn_color)
+                btn.configure(text=day, fg_color=cnf.btn_color)
+                btn.cmd(lambda e, btn=btn: self.switch_day(btn))
             else:
-                btn.configure(text="", bg=cnf.bg_color)
+                btn.configure(text="", fg_color=cnf.bg_color)
             if btn.cget("text") == self.dd:
-                btn.configure(bg=cnf.lgray_color)
+                btn.configure(fg_color=cnf.lgray_color)
                 self.curr_btn = btn
 
     def change_title(self):
@@ -128,18 +132,19 @@ class CalendarBase(CFrame):
 
         self.yy, self.mm, self.dd = tuple(self.my_date.timetuple())[:3]
 
-    def switch_day(self, e=None):
-        if e.widget.cget("text"):
-            self.curr_btn.configure(bg=cnf.btn_color)
-            self.curr_btn = e.widget
-            self.curr_btn.configure(bg=cnf.lgray_color)
-            self.dd = int(e.widget.cget("text"))
+    def switch_day(self, lbl: tkinter.Label):
+        print(lbl.cget("text"))
+        if lbl.cget("text"):
+            self.curr_btn.configure(fg_color=cnf.btn_color)
+            self.curr_btn = lbl
+            self.curr_btn.configure(fg_color=cnf.lgray_color)
+            self.dd = int(lbl.cget("text"))
             self.set_my_date()
             self.change_title()
             cnf.set_calendar_title()
 
-    def switch_month(self, e=None):
-        if e.widget.cget("text") != "<":
+    def switch_month(self, lbl: tkinter.Label):
+        if lbl.cget("text") != "<":
             self.mm += 1
         else:
             self.mm -= 1
@@ -211,7 +216,6 @@ class CCalendar(CalendarBase):
 
         ok = CButton(btns, text=cnf.lng.ok)
         ok.pack(side="left", padx=(0, 15))
-        ok.configure(fg=cnf.fg_color)
         ok.bind(
             "<ButtonRelease-1>",
             lambda e: self.ok_entry(master)
@@ -247,7 +251,7 @@ class CCalendar(CalendarBase):
 
         try:
             self.cust_date = datetime.strptime(t, "%d.%m.%Y")
-            ok.configure(fg=cnf.fg_color)
+            ok.configure(text_color=cnf.fg_color)
             ok.bind(
                 "<ButtonRelease-1>",
                 lambda e: self.ok_entry(parrent)
@@ -258,7 +262,7 @@ class CCalendar(CalendarBase):
                 )
 
         except ValueError:
-            ok.configure(fg=cnf.dgray_color)
+            ok.configure(text_color=cnf.dgray_color)
             ok.unbind("<ButtonRelease-1>")
             self.win_entry.unbind("<Return>")
 

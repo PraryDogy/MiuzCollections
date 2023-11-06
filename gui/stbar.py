@@ -69,13 +69,13 @@ class StBar(CFrame):
     def load_stbar(self):
         frame = CFrame(self)
 
-        btn = CButton(frame, text=cnf.lng.settings, width=9)
+        btn = CButton(frame, text=cnf.lng.settings, width=90)
         btn.cmd(lambda e: self.settings_cmd(btn))
         btn.pack(side="left", padx=(0, 20))
 
-        cnf.stbar_btn = CButton(frame, text=cnf.lng.update, width=9)
+        cnf.stbar_btn = CButton(frame, text=cnf.lng.update, width=90)
         cnf.stbar_btn.cmd(self.update_cmd)
-        cnf.stbar_btn.pack(side="left")
+        cnf.stbar_btn.pack(side="right")
 
         return frame
 

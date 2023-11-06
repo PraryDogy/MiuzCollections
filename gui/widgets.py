@@ -32,26 +32,49 @@ class CScroll(customtkinter.CTkScrollableFrame):
         self._scrollbar.configure(width=15)
 
     def moveup(self, e=None):
-        self._parent_canvas.yview_moveto("0.0")
+        try:
+            self._parent_canvas.yview_moveto("0.0")
+        except Exception as e:
+            print("widgets > CScroll > cant move up")
+            print(e)
+
+    def scroll_width(self):
+        return self._scrollbar.winfo_reqwidth()
+    
+    def get_parrent(self):
+        return self._parent_canvas
+
 
 class CSep(tkinter.Frame):
     def __init__(self, master: tkinter, bg=cnf.btn_color, height=1, **kw):
         super().__init__(master, bg=bg, height=height, **kw)
 
 
-class CButton(tkinter.Label):
+class CButton(customtkinter.CTkButton):
     def __init__(
-            self, master: tkinter, bg=cnf.btn_color, fg=cnf.fg_color, pady=3,
-            width=11, height=1, font=("San Francisco Pro", 13, "normal"),
-            **kwargs
+            self, master: tkinter,
+            text_color=cnf.fg_color, fg_color=cnf.btn_color,
+            corner_radius=3, width=75,
+            hover=0, border_spacing=2,
+            font=("San Francisco Pro", 13, "normal"),
+            **kw,
             ):
+
         super().__init__(
-            master, bg=bg, fg=fg, width=width, height=height, pady=pady,
-            font=font, **kwargs
+            master, fg_color=fg_color, text_color=text_color,
+            width=width, font=font, corner_radius=corner_radius,
+            hover=hover, border_spacing=border_spacing,
+            **kw
             )
 
     def cmd(self, cmd):
         self.bind("<ButtonRelease-1>", cmd)
+
+    def uncmd(self):
+        self.unbind("<ButtonRelease-1>")
+
+    def get_text(self):
+        a = self["text"]
 
 
 class CFrame(tkinter.Frame):
@@ -130,15 +153,15 @@ class Context(tkinter.Menu):
         finally:
             self.grab_release()
         
-    def do_popup_menu(self, e: tkinter.Event, collname):
+    def do_popup_menu(self, e: tkinter.Event, btn, collname):
         try:
-            e.widget.configure(bg=cnf.blue_color)
+            btn.configure(fg_color=cnf.blue_color)
             self.tk_popup(e.x_root, e.y_root)
         finally:
             if collname == cnf.curr_coll:
-                e.widget.configure(bg=cnf.lgray_color)
+                btn.configure(fg_color=cnf.lgray_color)
             else:
-                e.widget.configure(bg=cnf.bg_color_menu)
+                btn.configure(fg_color=cnf.bg_color_menu)
             self.grab_release()
 
     def imgview(self, img_src, all_src):
@@ -201,10 +224,10 @@ class Context(tkinter.Menu):
             command=lambda: reveal_coll(collname)
             )
 
-    def show_coll(self, e: tkinter.Event, collname):
+    def show_coll(self, e: tkinter.Event, btn, collname):
         self.add_command(
             label=cnf.lng.view,
-            command=lambda: cnf.show_coll(e, collname)
+            command=lambda: cnf.show_coll(e, btn, collname)
             )
         
     def copy_tiffs_paths(self, img_src):
