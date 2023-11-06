@@ -174,7 +174,7 @@ class SearchWid(RFrame):
     def __init__(self, master: tkinter):
         super().__init__(master)
 
-        fr = CFrame(self)
+        fr = CFrame(self, bg=cnf.dgray_color)
         fr.pack(anchor="e", padx=1, pady=1)
 
         CLabel(fr, width=0, bg=cnf.dgray_color).pack(side="left", fill="y")
@@ -188,22 +188,20 @@ class SearchWid(RFrame):
             justify="left",
             border=0,
             highlightthickness=0,
-            width=12,
+            width=15,
             )
         self.search_wid.pack(side="left", fill="y")
 
         self.btn_clear = CButton(
             fr, text="⨂", width=3, fg_color=cnf.dgray_color, corner_radius=0,
-            border_spacing=2
             )
-        self.btn_clear.pack(side="left")
+        self.btn_clear.pack(side="left", padx=(0, 5))
         self.btn_clear.cmd(self.search_clear)
 
         self.btn_search = CButton(
             fr, text="✓", width=3, fg_color=cnf.dgray_color, corner_radius=0,
-            border_spacing=2
             )
-        self.btn_search.pack(side="left")
+        self.btn_search.pack(side="left", padx=(0, 5))
         self.btn_search.cmd(self.search_go)
 
         self.search_wid.bind("<Escape>", lambda e: cnf.root.focus_force())
@@ -349,8 +347,8 @@ class Thumbs(CFrame):
     def __init__(self, master):
         super().__init__(master)
 
-        self.topbar = NotifyBar(self)
-        self.topbar.pack(fill="x", padx=15, pady=(5, 5))
+        self.notibar = NotifyBar(self)
+        self.notibar.pack(fill="x", padx=15, pady=(5, 5))
 
         self.clmns_count = 1
         self.thumbs_pad = 3
@@ -365,20 +363,21 @@ class Thumbs(CFrame):
         self.resize_task = None
 
     def load_scroll(self):
-        self.titles = TopBar(self)
-        self.titles.bind("<ButtonRelease-2>", ContextFilter)
-        self.titles.pack(padx=(15, 15), fill="x")
+        self.topbar = TopBar(self)
+        self.topbar.bind("<ButtonRelease-2>", ContextFilter)
+        self.topbar.pack(padx=(15, 15), fill="x")
 
-        self.title_sep = CSep(self)
-        self.title_sep.pack(fill="x", pady=(5, 0), padx=1)
+        self.topbar_sep = CSep(self)
+        self.topbar_sep.pack(fill="x", pady=(5, 0), padx=1)
 
         self.scroll_frame = CFrame(self)
         self.scroll_frame.pack(expand=1, fill="both")
 
         self.sframe = CScroll(self.scroll_frame)
         self.sframe.pack(expand=1, fill="both", padx=(15, 0))
-        self.topbar.btn_up.uncmd()
-        self.topbar.btn_up.cmd(self.sframe.moveup)
+
+        self.notibar.btn_up.uncmd()
+        self.notibar.btn_up.cmd(self.sframe.moveup)
 
     def load_thumbs(self):
         self.clmns_count = self.get_clmns_count()
@@ -520,7 +519,7 @@ class Thumbs(CFrame):
 
     def reload_scroll(self):
         for i in (
-            self.titles, self.scroll_frame, self.thumbs_frame, self.title_sep):
+            self.topbar, self.scroll_frame, self.thumbs_frame, self.topbar_sep):
             i.destroy()
         self.load_scroll()
         self.load_thumbs()

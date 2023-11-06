@@ -147,11 +147,11 @@ class Config:
 
     def topbar_text(self, text):
         from gui.application import app
-        app.thumbs.topbar.topbar_text(text)
+        app.thumbs.notibar.topbar_text(text)
 
     def topbar_default(self):
         from gui.application import app
-        app.thumbs.topbar.topbar_default()
+        app.thumbs.notibar.topbar_default()
 
 
 cnf = Config()
