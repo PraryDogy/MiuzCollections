@@ -565,11 +565,13 @@ class Thumbs(CFrame):
         self.topbar.set_title()
         self.load_scroll()
         self.load_thumbs()
+        cnf.root.focus_force()
 
     def reload_thumbs(self):
         for i in (self.above_thumbsframe, self.thumbs_frame):
             i.destroy()
         self.load_thumbs()
+        cnf.root.focus_force()
 
     def get_clmns_count(self):
         padx = self.thumbs_frame.pack_info()["padx"][1]*2
