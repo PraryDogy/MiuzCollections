@@ -31,9 +31,7 @@ class RFrame(customtkinter.CTkFrame):
 
 
 class CScroll(customtkinter.CTkScrollableFrame):
-    def __init__(self, master: tkinter, fg_color=cnf.bg_color, 
-                 **kw
-                 ):
+    def __init__(self, master: tkinter, fg_color=cnf.bg_color, **kw):
         super().__init__(master, fg_color=fg_color, **kw)
         self._scrollbar.configure(width=15)
 
@@ -43,9 +41,6 @@ class CScroll(customtkinter.CTkScrollableFrame):
         except Exception as e:
             print("widgets > CScroll > cant move up")
             print(e)
-
-    def scroll_width(self):
-        return self._scrollbar.winfo_reqwidth()
     
     def get_parrent(self):
         return self._parent_canvas

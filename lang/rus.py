@@ -104,6 +104,7 @@ class Rus:
         self.fullsize = "Скачать полноразмерный jpg"
         self.group_fullsize = "Скачать полноразмерные jpg"
         self.show_all = "Показать все"
+        self.reset_search = "Очистить поиск"
 
 
         self.colls_case = "коллекций"

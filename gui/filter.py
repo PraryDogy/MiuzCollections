@@ -194,22 +194,25 @@ class CCalendar(CalendarBase):
         cust_l.pack(pady=(0, 5))
 
         var = tkinter.StringVar(value=f"{self.dd}.{self.mm}.{self.yy}")
+
+        fr = RFrame(self.win_entry, fg_color=cnf.btn_color)
+        fr.pack()
+
         entry = tkinter.Entry(
-            self.win_entry,
-            width=15,
+            fr,
+            width=17,
             textvariable=var,
-            bg=cnf.dgray_color,
+            bg=cnf.btn_color,
             insertbackground="white",
             fg=cnf.fg_color,
-            highlightthickness=0,
             justify="center",
-            selectbackground=cnf.btn_color,
-            border=1
+            border=0,
+            highlightthickness=0,
             )
         entry.focus_force()
         entry.icursor(10)
         entry.selection_range(0, "end")
-        entry.pack(ipady=2)
+        entry.pack(padx=5, pady=5)
 
         btns = CFrame(self.win_entry)
         btns.pack(pady=(15, 0))

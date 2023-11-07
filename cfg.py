@@ -5,7 +5,7 @@ import subprocess
 import threading
 import tkinter
 from datetime import datetime
-
+import traceback
 from lang import Eng, Rus
 
 __all__ = (
@@ -130,9 +130,9 @@ class Config:
         try:
             from gui.application import app
             app.thumbs.reload_scroll()
-        except Exception as e:
+        except Exception as ex:
             print("cfg > reload scroll import err")
-            print(e)
+            traceback.print_exception(type(ex), ex, ex.__traceback__)
 
     def reload_strbar(self):
         from gui.application import app

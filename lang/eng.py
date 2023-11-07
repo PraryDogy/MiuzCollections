@@ -103,7 +103,7 @@ class Eng:
         self.fullsize = "Download fullsize jpg"
         self.group_fullsize = "Download fullsize jpg"
         self.show_all = "Show all"
-
+        self.reset_search = "Reset search"
 
         self.colls_case = "collections"
         self.new_photo_case = "new_photos"
