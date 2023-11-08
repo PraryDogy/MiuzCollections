@@ -202,7 +202,7 @@ class ResetFiltersBtn(CButton):
 
 
 class SearchWid(CEntry):
-    def __init__(self, master: tkinter, color=cnf.btn_color, **kw):
+    def __init__(self, master: tkinter, **kw):
         super().__init__(
             master,
             textvariable=cnf.search_var,
