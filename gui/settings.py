@@ -12,6 +12,45 @@ __all__ = (
     )
 
 
+class BrowsePathFrame(CFrame):
+    def __init__(self, master, path_label, path, descr, **kw):
+        super().__init__(master, **kw)
+
+        path_title = CLabel(
+            self, text=path_label, anchor="w", justify="left"
+            )
+        path_title.pack(anchor="w")
+
+        self.path_widget = CLabel(
+            self, text=f"{path}", anchor="w", justify="left",
+            wraplength = 400,
+            )
+        self.path_widget.pack(anchor="w")
+
+        select_path = CButton(self, text=cnf.lng.browse)
+        select_path.cmd(lambda e: self.select_path_cmd(path))
+        select_path.pack(pady=(10, 0))
+
+        sett_desc = CLabel(
+            self, text=descr, anchor="w", justify="left"
+            )
+        if descr:
+            sett_desc.pack(anchor="w", pady=(15, 0))
+
+    def select_path_cmd(self, path, e=None):
+        dialog = filedialog.askdirectory(initialdir=path, parent=self)
+        self.focus_force()
+
+        if len(path) == 0:
+            return
+
+        if self.path_widget.cget("text") != dialog:
+            self.path_widget.configure(text=dialog)
+
+    def get_path(self):
+        return self.path_widget.cget("text")
+
+
 class Settings(CWindow):
     def __init__(self):
         super().__init__()
@@ -22,50 +61,22 @@ class Settings(CWindow):
         self.minsize(450, 500)
         place_center(cnf.root, self, 450, 500)
 
-        self.scan_again = False
         self.old_time = cnf.scan_time
         self.old_lng = cnf.lng
 
-        path_name = CLabel(
-            self, text=cnf.lng.colls_path, anchor="w", justify="left"
+        self.browse_colls = BrowsePathFrame(
+            self, path_label=cnf.lng.colls_path, path=cnf.coll_folder, 
+            descr=cnf.lng.sett_descr
             )
-        path_name.pack(anchor="w")
-
-        self.path_widget = CLabel(
-            self, text=f"{cnf.coll_folder}", anchor="w", justify="left",
-            wraplength = 400,
-            )
-        self.path_widget.pack(anchor="w")
-
-        select_path = CButton(self, text=cnf.lng.browse)
-        select_path.cmd(self.select_path_cmd)
-        select_path.pack(pady=(10, 0))
-
-        sett_desc = CLabel(
-            self, text=cnf.lng.sett_descr, anchor="w", justify="left"
-            )
-        sett_desc.pack(anchor="w", pady=(15, 0))
-
-
+        self.browse_colls.pack(fill="both", expand=1)
 
         CSep(self).pack(pady=15, padx=50, fill="x")
 
-        down_title = CLabel(
-            self, text=cnf.lng.down_path, anchor="w", justify="left"
+        self.browse_down = BrowsePathFrame(
+            self, path_label=cnf.lng.down_path, path=cnf.down_folder, 
+            descr=None
             )
-        down_title.pack(anchor="w")
-
-        self.down_widget = CLabel(
-            self, text=f"{cnf.down_folder}", anchor="w", justify="left",
-            wraplength = 400,
-            )
-        self.down_widget.pack(anchor="w")
-
-        select_down = CButton(self, text=cnf.lng.browse)
-        select_down.cmd(self.select_down_cmd)
-        select_down.pack(pady=(10, 0))
-
-
+        self.browse_down.pack(fill="both", expand=1)
 
         CSep(self).pack(pady=15, padx=50, fill="x")
 
@@ -75,8 +86,6 @@ class Settings(CWindow):
             )
         self.scan_btn.cmd(self.scan_time_cmd)
         self.scan_btn.pack()
-
-
 
         CSep(self).pack(pady=15, padx=50, fill="x")
 
@@ -96,9 +105,6 @@ class Settings(CWindow):
             self, text=cnf.lng.lang_descr, anchor="w", justify="left"
             )
         self.lang_descr.pack(anchor="w", pady=(15, 0))
-
-
-
 
         cancel_frame = CFrame(self)
         cancel_frame.pack(expand=1)
@@ -143,28 +149,6 @@ class Settings(CWindow):
         self.lang_btn.configure(text=cnf.lng.language)
         self.lang_descr.configure(text=cnf.lng.lang_descr)
 
-
-    def select_path_cmd(self, e=None):
-        path = filedialog.askdirectory(initialdir=cnf.coll_folder, parent=self)
-        self.focus_force()
-
-        if len(path) == 0:
-            return
-
-        if self.path_widget.cget("text") != path:
-            self.path_widget.configure(text=path)
-            self.scan_again = True
-
-    def select_down_cmd(self, e=None):
-        path = filedialog.askdirectory(initialdir=cnf.down_folder, parent=self)
-        self.focus_force()
-
-        if len(path) == 0:
-            return
-
-        if self.down_widget.cget("text") != path:
-            self.down_widget.configure(text=path)
-
     def close_sett(self, e=None):
         cnf.scan_time = self.old_time
         cnf.lng = self.old_lng
@@ -173,15 +157,21 @@ class Settings(CWindow):
         cnf.root.focus_force()
 
     def save_sett(self, e=None):
-        cnf.coll_folder = self.path_widget.cget("text")
-        cnf.down_folder = self.down_widget.cget("text")
+        new_down_path = self.browse_down.get_path()
+        new_colls_path = self.browse_colls.get_path()
 
         self.grab_release()
         self.destroy()
         cnf.root.focus_force()
-        cnf.write_cfg()
 
-        if self.scan_again:
+        if new_down_path:
+            cnf.down_folder = new_down_path
+            cnf.write_cfg()
+
+        if cnf.coll_folder != new_colls_path:
+            cnf.coll_folder = new_colls_path
+            cnf.write_cfg()
+
             if smb_check():
                 scaner.scaner_start()
             else:
@@ -192,3 +182,4 @@ class Settings(CWindow):
             cnf.reload_scroll()
             cnf.reload_menu()
             cnf.reload_strbar()
+

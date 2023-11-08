@@ -230,10 +230,6 @@ class FiltersWid(CFrame):
     def __init__(self, master: tkinter, **kw):
         super().__init__(master, **kw)
 
-        if not any(i for i in cnf.filter.values()):
-            for i in cnf.filter.keys():
-                cnf.filter[i] = True
-
         prod = CButton(self, text=cnf.lng.product)
         prod.pack(side="left", fill="x", padx=(0, 5))
 
