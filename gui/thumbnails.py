@@ -211,6 +211,7 @@ class SearchWid(CEntry):
 
         self.bind("<Escape>", lambda e: cnf.root.focus_force())
         cnf.root.bind("<Command-f>", lambda e: self.focus_force())
+
         self.bind("<Return>", self.search_go)
         self.bind("<ButtonRelease-2>", ContextSearch)
 
