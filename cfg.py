@@ -80,6 +80,8 @@ class Config:
         self.scan_time = 10
 
         self.filter = {"prod": True, "mod": True, "cat": False}
+        self.filter_names = {
+            "prod": "1 IMG", "mod": "2 Model IMG", "cat": "Обтравка"}
         self.lang = self.lng.name
 
     def load_cfg(self):

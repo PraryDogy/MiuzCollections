@@ -131,42 +131,30 @@ class ThumbsDict(dict):
 
     def get_query(self):
         q = sqlalchemy.select(ThumbsMd.img150, ThumbsMd.src, ThumbsMd.modified)
-        search = cnf.search_var.get()
 
+        search = cnf.search_var.get()
         if search:
             search.replace("\n", "").strip()
             q = q.filter(ThumbsMd.src.like("%" + search + "%"))
-
-        q = q.order_by(-ThumbsMd.modified)
 
         if cnf.curr_coll != cnf.all_colls:
             q = q.filter(ThumbsMd.collection == cnf.curr_coll)
 
         filters = []
-
-        if cnf.filter["mod"]:
-            filters.append(ThumbsMd.src.like("%" + cnf.models_name + "%"))
-
-        if cnf.filter["cat"]:
-            filters.append(ThumbsMd.src.like("%" + cnf.catalog_name + "%"))
-
-        if cnf.filter["prod"]:
-            tmp = sqlalchemy.and_(
-                ThumbsMd.src.not_like("%" + cnf.catalog_name + "%"),
-                ThumbsMd.src.not_like("%" + cnf.models_name + "%")
-                )
-            filters.append(tmp)
-
+        for k, v in cnf.filter_names.items():
+            if cnf.filter[k]:
+                filters.append(
+                    ThumbsMd.src.like("%" + f"/{cnf.filter_names[k]}/" + "%"))
         q = q.filter(sqlalchemy.or_(*filters))
 
         if not any((cnf.start, cnf.end)):
             q = q.limit(cnf.limit)
-
         else:
             t = self.stamp_dates()
             q = q.filter(ThumbsMd.modified > t[0])
             q = q.filter(ThumbsMd.modified < t[1])
 
+        q = q.order_by(-ThumbsMd.modified)
         return q
 
 
