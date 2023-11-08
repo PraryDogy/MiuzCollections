@@ -201,44 +201,40 @@ class ResetFiltersBtn(CButton):
         cnf.reload_scroll()
 
 
-class SearchWid(RFrame):
+class SearchWid(CEntry):
     def __init__(self, master: tkinter, color=cnf.btn_color, **kw):
         super().__init__(
-            master, fg_color=color, corner_radius=cnf.corner, **kw)
-
-        self.search_wid = tkinter.Entry(
-            self,
+            master,
             textvariable=cnf.search_var,
-            bg=color,
-            insertbackground="white",
-            fg=cnf.fg_color,
-            justify="left",
-            border=0,
-            highlightthickness=0,
-            width=20,
-            )
-        self.search_wid.pack(side="left", fill="y", padx=(5, 0))
+            width=200,
+            **kw)
 
-        self.btn_search = CButton(
-            self, text="✓", width=3, fg_color=color, corner_radius=0,
-            )
-        self.btn_search.pack(side="left", padx=(0, 5))
-        self.btn_search.cmd(self.search_go)
+        self.bind("<Escape>", lambda e: cnf.root.focus_force())
+        cnf.root.bind("<Command-f>", lambda e: self.focus_force())
+        self.bind("<Return>", self.search_go)
+        self.bind("<ButtonRelease-2>", ContextSearch)
 
-        self.search_wid.bind("<Escape>", lambda e: cnf.root.focus_force())
-        cnf.root.bind("<Command-f>", lambda e: self.search_wid.focus_force())
-        self.search_wid.bind("<Return>", self.search_go)
-        self.search_wid.bind("<ButtonRelease-2>", ContextSearch)
+        cnf.search_var.trace("w", lambda *args: self.create_search_task(args))
+        self.search_task = None
+        self.old_search_var = None
+
+    def cancel_search_task(self):
+        if self.search_task:
+            cnf.root.after_cancel(self.search_task)
+
+    def create_search_task(self, *args):
+        search_var = cnf.search_var.get()
+        if search_var:
+            if search_var != self.old_search_var:
+                self.cancel_search_task()
+                self.search_task = cnf.root.after(1000, self.search_go)
 
     def search_go(self, e=None):
-        cnf.search_var.set(self.search_wid.get())
+        self.old_search_var = cnf.search_var.get()
+        cnf.search_var.set(self.get())
         cnf.start, cnf.end = None, None
         cnf.reload_scroll()
         cnf.root.focus_force()
-
-    def search_clear(self, e=None):
-        cnf.search_var.set("")
-        cnf.reload_scroll()
 
 
 class FiltersWid(CFrame):

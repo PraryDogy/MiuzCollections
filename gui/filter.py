@@ -195,24 +195,12 @@ class CCalendar(CalendarBase):
 
         var = tkinter.StringVar(value=f"{self.dd}.{self.mm}.{self.yy}")
 
-        fr = RFrame(self.win_entry, fg_color=cnf.btn_color)
-        fr.pack()
-
-        entry = tkinter.Entry(
-            fr,
-            width=17,
-            textvariable=var,
-            bg=cnf.btn_color,
-            insertbackground="white",
-            fg=cnf.fg_color,
-            justify="center",
-            border=0,
-            highlightthickness=0,
-            )
+        entry = CEntry(
+            self.win_entry, textvariable=var, width=150, justify="center")
+        entry.pack()
         entry.focus_force()
         entry.icursor(10)
-        entry.selection_range(0, "end")
-        entry.pack(padx=5, pady=5)
+        entry.select_adjust(10)
 
         btns = CFrame(self.win_entry)
         btns.pack(pady=(15, 0))

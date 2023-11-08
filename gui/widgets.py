@@ -8,6 +8,7 @@ from .utils import *
 import customtkinter
 
 __all__ = (
+    "CEntry",
     "CScroll",
     "CSep",
     "CButton",
@@ -19,6 +20,20 @@ __all__ = (
     "MacMenu",
     "Context",
     )
+
+
+class CEntry(customtkinter.CTkEntry):
+    def __init__(
+            self, master, fg_color=cnf.btn_color, border_width=0, 
+            corner_radius=cnf.corner, textvariable=None, width=200,
+            justify="left",
+            **kw):
+
+        super().__init__(
+            master, fg_color=fg_color, border_width=border_width,
+            corner_radius=corner_radius, textvariable=textvariable,
+            width=width, justify=justify,
+            **kw)
 
 
 class RFrame(customtkinter.CTkFrame):
