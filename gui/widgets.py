@@ -13,7 +13,6 @@ __all__ = (
     "CSep",
     "CButton",
     "CFrame",
-    "RFrame",
     "CLabel",
     "CWindow",
     "SmbAlert",
@@ -34,16 +33,6 @@ class CEntry(customtkinter.CTkEntry):
             corner_radius=corner_radius, textvariable=textvariable,
             width=width, justify=justify,
             **kw)
-
-
-class RFrame(customtkinter.CTkFrame):
-    def __init__(
-            self, master, corner_radius=cnf.corner, fg_color=cnf.dgray_color,
-            **kw
-            ):
-        super().__init__(
-            master, corner_radius=corner_radius, fg_color=fg_color, **kw)
-
 
 class CScroll(customtkinter.CTkScrollableFrame):
     def __init__(self, master: tkinter, fg_color=cnf.bg_color, **kw):
