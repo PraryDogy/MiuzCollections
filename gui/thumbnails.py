@@ -24,9 +24,9 @@ class ContextFilter(Context):
     def __init__(self, e: tkinter.Event):
         super().__init__()
 
-        self.apply_filter_thumbs(label=cnf.lng.product, filter="prod")
-        self.apply_filter_thumbs(label=cnf.lng.models, filter="mod")
-        self.apply_filter_thumbs(label=cnf.lng.catalog, filter="cat")
+        for k, v in cnf.lng.filter_names.items():
+            self.apply_filter_thumbs(label=v, filter=k)
+
         self.apply_filter_thumbs(label=cnf.lng.show_all, filter="all")
 
         self.do_popup(e)
@@ -141,10 +141,14 @@ class ThumbsDict(dict):
             q = q.filter(ThumbsMd.collection == cnf.curr_coll)
 
         filters = []
-        for k, v in cnf.filter_names.items():
-            if cnf.filter[k]:
-                filters.append(
-                    ThumbsMd.src.like("%" + f"/{cnf.filter_names[k]}/" + "%"))
+        for k, v in cnf.filter_true_name.items():
+            if cnf.filter_value[k]:
+                if cnf.filter_true_name[k]:
+                    filters.append(
+                        ThumbsMd.src.like(
+                            "%" + f"/{cnf.filter_true_name[k]}/" + "%"
+                            )
+                            )
         q = q.filter(sqlalchemy.or_(*filters))
 
         if not any((cnf.start, cnf.end)):
@@ -184,8 +188,8 @@ class ResetFiltersBtn(CButton):
         self.cmd(self.reset_filters_cmd)
 
     def reset_filters_cmd(self, e):
-        for k, v in cnf.filter.items():
-            cnf.filter[k] = True
+        for k, v in cnf.filter_value.items():
+            cnf.filter_value[k] = True
         cnf.reload_scroll()
 
 
@@ -230,13 +234,13 @@ class FiltersWid(CFrame):
     def __init__(self, master: tkinter, **kw):
         super().__init__(master, **kw)
 
-        prod = CButton(self, text=cnf.lng.product)
+        prod = CButton(self, text=cnf.lng.filter_names["prod"])
         prod.pack(side="left", fill="x", padx=(0, 5))
 
-        mod = CButton(self, text=cnf.lng.models)
+        mod = CButton(self, text=cnf.lng.filter_names["mod"])
         mod.pack(side="left", fill="x", padx=(0, 5))
 
-        cat = CButton(self, text=cnf.lng.catalog)
+        cat = CButton(self, text=cnf.lng.filter_names["cat"])
         cat.pack(side="left", fill="x", padx=(0, 5))
 
         self.filter_btns = {cat: "cat", mod: "mod", prod: "prod"}
@@ -251,23 +255,33 @@ class FiltersWid(CFrame):
         self.filters_configure()
 
     def filters_cmd(self, v):
-        cnf.filter[v] = False if cnf.filter[v] else True
+        cnf.filter_value[v] = False if cnf.filter_value[v] else True
         cnf.reload_scroll()
 
     def filters_configure(self):
         for k, v in self.filter_btns.items():
             k: CButton
-            t = k.cget("text").split()[0]
-            if cnf.filter[v]:
-                k.configure(fg_color=cnf.btn_color, text=t + " ⨂")
+            if cnf.filter_value[v]:
+                k.configure(
+                    fg_color=cnf.btn_color,
+                    text=cnf.lng.filter_names[v] + " ⨂"
+                    )
             else:
-                k.configure(fg_color=cnf.bg_color, text=t + " ⨁")
+                k.configure(
+                    fg_color=cnf.bg_color,
+                    text=cnf.lng.filter_names[v] + " ⨁"
+                    )
 
-        t = self.dates_btn.cget("text").split()[0]
         if any((cnf.start, cnf.end)):
-            self.dates_btn.configure(fg_color=cnf.btn_color, text=t + " ⨂")
+            self.dates_btn.configure(
+                fg_color=cnf.btn_color,
+                text=cnf.lng.dates + " ⨂"
+                )
         else:
-            self.dates_btn.configure(fg_color=cnf.bg_color, text=t + " ⨁")
+            self.dates_btn.configure(
+                fg_color=cnf.bg_color,
+                text=cnf.lng.dates + " ⨁"
+                )
 
 
 class TopBar(CFrame):

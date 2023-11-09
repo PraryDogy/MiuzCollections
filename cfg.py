@@ -20,6 +20,7 @@ class Config:
         self.db_name = "db.db"
         self.cfg_name = "cfg.json"
         self.thumb_err = "thumb.jpg"
+        self.lng = None
 
         self.cfg_dir = os.path.join(
             os.path.expanduser("~"),
@@ -58,7 +59,6 @@ class Config:
         self.named_start: str = None # datetime as readable text
         self.named_end: str = None # datetime as readable text
         self.set_calendar_title = None # filter > Filter().set_calendar_title()
-        self.lng = Rus()
         self.scan_flag = False
         self.topbar_flag = True
         self.scan_win_txt = ""
@@ -79,21 +79,28 @@ class Config:
 
         self.scan_time = 10
 
-        self.filter = {"prod": True, "mod": True, "cat": False}
-        self.filter_names = {
+        self.filter_value = {"prod": True, "mod": True, "cat": False}
+
+        self.filter_true_name = {
             "prod": "1 IMG", "mod": "2 Model IMG", "cat": "Обтравка"}
-        self.lang = self.lng.name
+
+        self.lang = None
+
+    def set_lng(self):
+        from lang import Rus, Eng
+        for i in (Rus(), Eng()):
+            if i.name == self.lang:
+                self.lng = i
 
     def load_cfg(self):
         with open(file=self.json_dir, encoding="utf8", mode="r") as file:
-            data = json.loads(file.read())
+            data: dict = json.loads(file.read())
 
-        for key in data:
-            if key in self.__dict__:
-                setattr(self, key, data[key])
+        for k, v in data.items():
+            if k in self.__dict__:
+                setattr(self, k, v)
 
     def write_cfg(self):
-        self.lang = self.lng.name
         slice_keys = list(self.__dict__)
         start = slice_keys.index("coll_folder")
         slice_keys = slice_keys[start:]
@@ -108,7 +115,6 @@ class Config:
             os.mkdir(self.cfg_dir)
 
         if not os.path.exists(self.json_dir):
-
             cmd = "return user locale of (get system info)"
             l = subprocess.check_output(["osascript", "-e", cmd], text=True)
             l = l.split("\n")[0]
@@ -160,4 +166,5 @@ class Config:
 cnf = Config()
 cnf.check_dir()
 cnf.load_cfg()
+cnf.set_lng()
 cnf.write_cfg()

@@ -2,6 +2,8 @@ class Rus:
     def __init__(self):
         self.name = "ru"
 
+        self.filter_names = {"prod": "Имиджи", "mod": "Модели", "cat": "Каталог"}
+
         self.language = "Русский"
         self.lang_label = "Язык/Language"
         self.up = "Наверх"
@@ -20,9 +22,6 @@ class Rus:
         self.exit = "Выход"
         self.reset = "Сброс"
         self.mins = "мин."
-        self.product = "Имиджи"
-        self.models = "Модели"
-        self.catalog = "Каталог"
         self.updating = "Обновляю"
         self.update = "Обновить"
         self.filter = "Фильтр"
@@ -49,14 +48,7 @@ class Rus:
 
         self.sett_descr = (
             "Если имя коллекции начинается с _ или ."
-            "\nпрограмма проигнорирует ее."
-            )
-
-        self.filter_descr = (
-            "Имиджи - показывать предметные фото.",
-            "Модели - показывать модельные фото.",
-            "Каталог - показывать каталожные фото.",
-            "Сортировка - по дате изменения или по дате создания.",
+            " программа проигнорирует ее."
             )
 
         self.smb_descr = (

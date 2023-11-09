@@ -19,9 +19,9 @@ class Scaner:
         self.need_update = False
         self.scaner_task = None
 
-    def scaner_sheldue(self):
+    def scaner_sheldue(self, default_time=cnf.scan_time*60000):
         cnf.root.after_cancel(self.task)
-        ms = cnf.scan_time*60000
+        ms = default_time
         self.scaner_task = cnf.root.after(ms, self.scaner_start)
 
     def scaner_start(self):

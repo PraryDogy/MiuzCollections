@@ -16,6 +16,9 @@ class BrowsePathFrame(CFrame):
     def __init__(self, master, path_label, path, descr, **kw):
         super().__init__(master, **kw)
 
+        if descr:
+            path_label = path_label + "\n" + descr
+
         path_title = CLabel(
             self, text=path_label, anchor="w", justify="left"
             )
@@ -31,17 +34,11 @@ class BrowsePathFrame(CFrame):
         select_path.cmd(lambda e: self.select_path_cmd(path))
         select_path.pack(pady=(10, 0))
 
-        sett_desc = CLabel(
-            self, text=descr, anchor="w", justify="left"
-            )
-        if descr:
-            sett_desc.pack(anchor="w", pady=(15, 0))
-
     def select_path_cmd(self, path, e=None):
         dialog = filedialog.askdirectory(initialdir=path, parent=self)
         self.focus_force()
 
-        if len(path) == 0:
+        if len(dialog) == 0:
             return
 
         if self.path_widget.cget("text") != dialog:
@@ -51,6 +48,37 @@ class BrowsePathFrame(CFrame):
         return self.path_widget.cget("text")
 
 
+class FiltersWid(CFrame):
+    def __init__(self, master, **kw):
+        super().__init__(master)
+        self.bind("<ButtonRelease-1>", lambda e: self.focus_force())
+
+        title = CLabel(self, text=cnf.lng.filters)
+        title.pack(anchor="w")
+
+        for k, v in cnf.filter_true_name.items():
+            row = CFrame(self)
+            row.pack(pady=(10, 0), anchor="w")
+
+            lbl = CLabel(
+                row, text=cnf.lng.filter_names[k], width=7,
+                anchor="w", justify="left"
+                )
+            lbl.pack(side="left", padx=(0, 10))
+
+            ent = CEntry(row, textvariable=tkinter.StringVar(self, v))
+            ent.pack(side="left")
+            setattr(__class__, k, ent)
+
+        self.get_entries_values()
+
+    def get_entries_values(self):
+        return {
+            k: getattr(__class__, k).get()
+            for k, v in cnf.filter_true_name.items()
+            }
+
+
 class Settings(CWindow):
     def __init__(self):
         super().__init__()
@@ -58,17 +86,20 @@ class Settings(CWindow):
         self.bind("<Escape>", self.close_sett)
         self.bind("<Return>", self.save_sett)
         self.title(cnf.lng.settings)
-        self.minsize(450, 500)
-        place_center(cnf.root, self, 450, 500)
-
-        self.old_time = cnf.scan_time
-        self.old_lng = cnf.lng
+        w, h = 500, 610
+        self.minsize(w, h)
+        place_center(cnf.root, self, w, h)
 
         self.browse_colls = BrowsePathFrame(
             self, path_label=cnf.lng.colls_path, path=cnf.coll_folder, 
             descr=cnf.lng.sett_descr
             )
         self.browse_colls.pack(fill="both", expand=1)
+
+        CSep(self).pack(pady=15, padx=50, fill="x")
+
+        self.filters = FiltersWid(self)
+        self.filters.pack(fill="both", expand=1)
 
         CSep(self).pack(pady=15, padx=50, fill="x")
 
@@ -91,7 +122,7 @@ class Settings(CWindow):
 
         lang_lbl = CLabel(
             self,
-            text=cnf.lng.lang_label,
+            text=cnf.lng.lang_label + "\n" + cnf.lng.lang_descr,
             anchor="w",
             justify="left",
             )
@@ -101,15 +132,10 @@ class Settings(CWindow):
         self.lang_btn.pack(pady=(10, 0))
         self.lang_btn.cmd(self.lang_cmd)
 
-        self.lang_descr = CLabel(
-            self, text=cnf.lng.lang_descr, anchor="w", justify="left"
-            )
-        self.lang_descr.pack(anchor="w", pady=(15, 0))
+        CSep(self).pack(fill="x", pady=15)
 
         cancel_frame = CFrame(self)
-        cancel_frame.pack(expand=1)
-
-        CSep(cancel_frame).pack(pady=15, fill="x")
+        cancel_frame.pack()
 
         save_btn = CButton(cancel_frame, text=cnf.lng.ok)
         save_btn.cmd(self.save_sett)
@@ -124,62 +150,68 @@ class Settings(CWindow):
 
     def scan_time_cmd(self, e=None):
         times = [5, 10, 30, 60]
-        try:
-            ind = times.index(cnf.scan_time)
-        except ValueError:
-            ind = -1
+        new_scan_time = "new_scan_time"
+
+        if hasattr(__class__, new_scan_time):
+            ind = times.index(getattr(__class__, new_scan_time))
+        else:
+            try:
+                ind = times.index(cnf.scan_time)
+            except ValueError:
+                ind = -1
 
         try:
-            cnf.scan_time = times[ind+1]
+            setattr(__class__, new_scan_time, times[ind+1])
         except IndexError:
-            cnf.scan_time = times[0]
+            setattr(__class__, new_scan_time, times[0])
 
+        t = getattr(__class__, new_scan_time)
         self.scan_btn.configure(
-            text=f"{cnf.lng.update_every} {cnf.scan_time} {cnf.lng.mins}"
+            text=f"{cnf.lng.update_every} {t} {cnf.lng.mins}"
             )
 
     def lang_cmd(self, e=None):
         from lang import Eng, Rus
 
-        if isinstance(cnf.lng, Rus):
-            cnf.lng = Eng()
-        else:
-            cnf.lng = Rus()
-
-        self.lang_btn.configure(text=cnf.lng.language)
-        self.lang_descr.configure(text=cnf.lng.lang_descr)
+        for i in (Rus(), Eng()):
+            if cnf.lang != i.name:
+                setattr(__class__, "new_lang", i.name)
+                self.lang_btn.configure(text=i.language)
+                return
 
     def close_sett(self, e=None):
-        cnf.scan_time = self.old_time
-        cnf.lng = self.old_lng
         self.grab_release()
         self.destroy()
         cnf.root.focus_force()
 
     def save_sett(self, e=None):
-        new_down_path = self.browse_down.get_path()
-        new_colls_path = self.browse_colls.get_path()
+        if hasattr(__class__, "new_scan_time"):
+            cnf.scan_time = getattr(__class__, "new_scan_time")
+
+        if hasattr(__class__, "new_lang"):
+            cnf.lang = getattr(__class__, "new_lang")
+            cnf.set_lng()
+
+        cnf.down_folder = self.browse_down.get_path()
+
+        if cnf.coll_folder != self.browse_colls.get_path():
+            cnf.coll_folder = self.browse_colls.get_path()
+            if smb_check():
+                scaner.scaner_sheldue(1000)
+            else:
+                scaner.scaner_sheldue()
+                SmbAlert()
+
+        entries = self.filters.get_entries_values()
+        for k, v in entries.items():
+            cnf.filter_true_name[k] = v
+
+        cnf.write_cfg()
 
         self.grab_release()
         self.destroy()
         cnf.root.focus_force()
 
-        if new_down_path:
-            cnf.down_folder = new_down_path
-            cnf.write_cfg()
-
-        if cnf.coll_folder != new_colls_path:
-            cnf.coll_folder = new_colls_path
-            cnf.write_cfg()
-
-            if smb_check():
-                scaner.scaner_start()
-            else:
-                scaner.scaner_sheldue()
-                SmbAlert()
-
-        if self.old_lng != cnf.lng:
-            cnf.reload_scroll()
-            cnf.reload_menu()
-            cnf.reload_strbar()
-
+        cnf.reload_scroll()
+        cnf.reload_menu()
+        cnf.reload_strbar()

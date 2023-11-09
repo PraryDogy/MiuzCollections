@@ -2,6 +2,8 @@ class Eng:
     def __init__(self):
         self.name = "en"
 
+        self.filter_names = {"prod": "Product", "mod": "Models", "cat": "Catalog"}
+
         self.language = "English"
         self.lang_label = "Language/Язык"
         self.up = "Up"
@@ -20,9 +22,6 @@ class Eng:
         self.exit = "Exit"
         self.reset = "Reset"
         self.mins = "mins."
-        self.product = "Product"
-        self.models = "Models"
-        self.catalog = "Catalog"
         self.updating = "Updating"
         self.update = "Update"
         self.filter = "Filter"
@@ -48,14 +47,7 @@ class Eng:
 
         self.sett_descr = (
             "If the collection name starts with _ or ."
-            "\nMiuzCollections app will ignore it."
-            )
-
-        self.filter_descr = (
-            "Product - show procuct photos created by marketing department.",
-            "Models - show model photos created by marketing department.",
-            "Catalog - show photos for website.",
-            "Sort - by date mofidied or date created.",
+            " MiuzCollections app will ignore it."
             )
 
         self.smb_descr = (
@@ -69,7 +61,6 @@ class Eng:
             )
 
         self.lang_descr = "Press ok to change language"
-
 
         self.please_wait = "Please, wait"
         self.no_tiff = "Can't find tiff"

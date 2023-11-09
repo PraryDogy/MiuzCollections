@@ -20,12 +20,10 @@ class ContextMenu(Context):
         self.reveal_coll(collname)
         self.sep()
 
-        self.apply_filter_menu(
-            label=cnf.lng.product, filter="prod", collname=collname, btn=btn)
-        self.apply_filter_menu(
-            label=cnf.lng.models, filter="mod", collname=collname, btn=btn)
-        self.apply_filter_menu(
-            label=cnf.lng.catalog, filter="cat", collname=collname, btn=btn)
+        for k, v in cnf.lng.filter_names.items():
+            self.apply_filter_menu(
+                label=v, filter=k, collname=collname, btn=btn)
+
         self.apply_filter_menu(
             label=cnf.lng.show_all, filter="all", collname=collname, btn=btn)
 
