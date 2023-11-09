@@ -82,7 +82,7 @@ class Config:
         self.filter_value = {"prod": True, "mod": True, "cat": False}
 
         self.filter_true_name = {
-            "prod": "1 IMG", "mod": "2 Model IMG", "cat": "Обтравка"}
+            "prod": "1 IMG", "mod": "2 Model IMG", "cat": "5 Обтравка"}
 
         self.lang = None
 
