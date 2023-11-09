@@ -43,9 +43,6 @@ class Menu(CScroll):
         self.menu_frame.pack(fill="x")
         self.bind("<Enter>", lambda e: self.focus_force)
 
-    def fake_name(self, coll: str):
-        return coll.lstrip('0123456789').strip()
-
     def load_menu_buttons(self):
         frame = CFrame(self, bg=cnf.bg_color_menu)
         frame.pack(fill="both", expand=1)
@@ -63,7 +60,7 @@ class Menu(CScroll):
         colls_list = (i[0] for i in colls_list)
 
         menus = {
-            self.fake_name(coll): coll
+            coll.lstrip('0123456789').strip(): coll
             for coll in colls_list
             }
 
