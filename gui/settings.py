@@ -132,7 +132,7 @@ class Settings(CWindow):
         self.lang_btn.pack(pady=(10, 0))
         self.lang_btn.cmd(self.lang_cmd)
 
-        CSep(self).pack(fill="x", pady=15)
+        CSep(self).pack(fill="x", pady=15, padx=50)
 
         cancel_frame = CFrame(self)
         cancel_frame.pack()
@@ -194,17 +194,17 @@ class Settings(CWindow):
 
         cnf.down_folder = self.browse_down.get_path()
 
-        if cnf.coll_folder != self.browse_colls.get_path():
-            cnf.coll_folder = self.browse_colls.get_path()
-            if smb_check():
-                scaner.scaner_sheldue(1000)
-            else:
-                scaner.scaner_sheldue()
-                SmbAlert()
-
         entries = self.filters.get_entries_values()
         for k, v in entries.items():
             cnf.filter_true_name[k] = v
+
+        if cnf.coll_folder != self.browse_colls.get_path():
+            cnf.coll_folder = self.browse_colls.get_path()
+            if smb_check():
+                scaner.scaner_sheldue(3000)
+            else:
+                scaner.scaner_sheldue()
+                SmbAlert()
 
         cnf.write_cfg()
 
