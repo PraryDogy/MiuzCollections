@@ -13,6 +13,8 @@ from .filter import Filter
 from .img_viewer import ImgViewer
 from .utils import *
 from .widgets import *
+from typing import Union, Tuple
+
 
 
 __all__ = (
@@ -395,6 +397,32 @@ class AboveThumbs(CFrame):
             ResetSearchBtn(self).pack(pady=(15, 0))
 
 
+class ImgGridTitle(CLabel):
+    def __init__(
+            self,
+            master: tkinter,
+            date_key: str,
+            img_list: Tuple[Tuple[str, str]]
+            ):
+        text = f"{date_key}, {cnf.lng.total}: {len(img_list)}"
+        if cnf.search_var.get():
+            text = (
+                f"{cnf.lng.photo} {cnf.lng.with_name} "
+                f"\"{cnf.search_var.get()}\"\n{text}"
+                )
+
+        super().__init__(
+            master, text=text, anchor="w", justify="left",
+            font=("San Francisco Pro", 18, "bold")
+            )
+
+        self.bind(
+            "<ButtonRelease-2>", (
+                lambda e, title=date_key,
+                paths_list=[i[1] for i in img_list]: 
+                ContextTitles(e, title, paths_list)
+                ))
+
 
 class Thumbs(CFrame):
     def __init__(self, master):
@@ -459,26 +487,9 @@ class Thumbs(CFrame):
                 for i in range(0, len(img_list), limit)
                 ]
 
-            chunk_t = f"{date_key}, {cnf.lng.total}: {len(img_list)}"
-            if cnf.search_var.get():
-                chunk_t = (
-                    f"{cnf.lng.photo} {cnf.lng.with_name} "
-                    f"\"{cnf.search_var.get()}\"\n{chunk_t}"
-                    )
-
-            chunk_title = CLabel(
-                self.thumbs_frame, text=chunk_t, anchor="w", justify="left",
-                font=("San Francisco Pro", 18, "bold")
-                )
+            title = ImgGridTitle(self.thumbs_frame, date_key, img_list)
             pad = 30 if x != 0 else 15
-            chunk_title.pack(anchor="w", pady=(pad, 0), padx=self.thumbs_pad)
-
-            chunk_title.bind(
-                "<ButtonRelease-2>", (
-                    lambda e, title=date_key,
-                    paths_list=[i[1] for i in img_list]: 
-                    ContextTitles(e, title, paths_list)
-                    ))
+            title.pack(anchor="w", pady=(pad, 0), padx=self.thumbs_pad)
 
             for chunk in chunks:
 

@@ -1,14 +1,9 @@
-class Test:
-    def __init__(self):
-        None
+from typing import Union, Tuple, List
 
-    def tes(self):
-        if hasattr(self, "hui"):
-            print(self.hui)
+
+def test(ar: Tuple[Tuple[str, int]] = "transparent"):
+    print(ar)
 
 
 
-t = Test()
-t.hui = 9000
-
-t.tes()
+test(1)
