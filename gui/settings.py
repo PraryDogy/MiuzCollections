@@ -13,39 +13,36 @@ __all__ = (
 
 
 class BrowsePathFrame(CFrame):
-    def __init__(self, master, path_label, path, descr, **kw):
+    def __init__(self, master, title, path, **kw):
         super().__init__(master, **kw)
 
-        if descr:
-            path_label = path_label + "\n" + descr
-
-        path_title = CLabel(
-            self, text=path_label, anchor="w", justify="left"
+        title_lbl = CLabel(
+            self, text=title, anchor="w", justify="left"
             )
-        path_title.pack(anchor="w")
+        title_lbl.pack(anchor="w")
 
-        self.path_widget = CLabel(
+        self.path_lbl = CLabel(
             self, text=f"{path}", anchor="w", justify="left",
             wraplength = 400,
             )
-        self.path_widget.pack(anchor="w")
+        self.path_lbl.pack(anchor="w")
 
-        select_path = CButton(self, text=cnf.lng.browse)
-        select_path.cmd(lambda e: self.select_path_cmd(path))
-        select_path.pack(pady=(10, 0))
+        path_selector = CButton(self, text=cnf.lng.browse)
+        path_selector.cmd(lambda e: self.selector_cmd(path))
+        path_selector.pack(pady=(10, 0))
 
-    def select_path_cmd(self, path, e=None):
+    def get_path(self):
+        return self.path_lbl.cget("text")
+
+    def selector_cmd(self, path, e=None):
         dialog = filedialog.askdirectory(initialdir=path, parent=self)
         self.focus_force()
 
         if len(dialog) == 0:
             return
 
-        if self.path_widget.cget("text") != dialog:
-            self.path_widget.configure(text=dialog)
-
-    def get_path(self):
-        return self.path_widget.cget("text")
+        if self.get_path() != dialog:
+            self.path_lbl.configure(text=dialog)
 
 
 class FiltersWid(CFrame):
@@ -55,6 +52,8 @@ class FiltersWid(CFrame):
 
         title = CLabel(self, text=cnf.lng.filters)
         title.pack(anchor="w")
+
+        self.entries = {}
 
         for k, v in cnf.filter_true_name.items():
             row = CFrame(self)
@@ -68,14 +67,12 @@ class FiltersWid(CFrame):
 
             ent = CEntry(row, textvariable=tkinter.StringVar(self, v))
             ent.pack(side="left")
-            setattr(__class__, k, ent)
-
-        self.get_entries_values()
+            self.entries[k] = ent
 
     def get_entries_values(self):
         return {
-            k: getattr(__class__, k).get()
-            for k, v in cnf.filter_true_name.items()
+            k: v.get()
+            for k, v in self.entries.items()
             }
 
 
@@ -91,23 +88,21 @@ class Settings(CWindow):
         place_center(cnf.root, self, w, h)
 
         self.browse_colls = BrowsePathFrame(
-            self, path_label=cnf.lng.colls_path, path=cnf.coll_folder, 
-            descr=cnf.lng.sett_descr
+            self, title=cnf.lng.colls_path, path=cnf.coll_folder
             )
         self.browse_colls.pack(fill="both", expand=1)
 
         CSep(self).pack(pady=15, padx=50, fill="x")
 
-        self.filters = FiltersWid(self)
-        self.filters.pack(fill="both", expand=1)
+        self.browse_down = BrowsePathFrame(
+            self, title=cnf.lng.down_path, path=cnf.down_folder
+            )
+        self.browse_down.pack(fill="both", expand=1)
 
         CSep(self).pack(pady=15, padx=50, fill="x")
 
-        self.browse_down = BrowsePathFrame(
-            self, path_label=cnf.lng.down_path, path=cnf.down_folder, 
-            descr=None
-            )
-        self.browse_down.pack(fill="both", expand=1)
+        self.filters = FiltersWid(self)
+        self.filters.pack(fill="both", expand=1)
 
         CSep(self).pack(pady=15, padx=50, fill="x")
 
@@ -150,24 +145,22 @@ class Settings(CWindow):
 
     def scan_time_cmd(self, e=None):
         times = [5, 10, 30, 60]
-        new_scan_time = "new_scan_time"
 
-        if hasattr(__class__, new_scan_time):
-            ind = times.index(getattr(__class__, new_scan_time))
+        if hasattr(self, "new_scan_time"):
+            ind = times.index(self.new_scan_time)
         else:
             try:
                 ind = times.index(cnf.scan_time)
             except ValueError:
-                ind = -1
+                ind = 0
 
         try:
-            setattr(__class__, new_scan_time, times[ind+1])
+            self.new_scan_time = times[ind+1]
         except IndexError:
-            setattr(__class__, new_scan_time, times[0])
+            self.new_scan_time = times[0]
 
-        t = getattr(__class__, new_scan_time)
         self.scan_btn.configure(
-            text=f"{cnf.lng.update_every} {t} {cnf.lng.mins}"
+            text=f"{cnf.lng.update_every} {self.new_scan_time} {cnf.lng.mins}"
             )
 
     def lang_cmd(self, e=None):
@@ -175,7 +168,7 @@ class Settings(CWindow):
 
         for i in (Rus(), Eng()):
             if cnf.lang != i.name:
-                setattr(__class__, "new_lang", i.name)
+                self.new_lang = i.name
                 self.lang_btn.configure(text=i.language)
                 return
 
@@ -185,11 +178,11 @@ class Settings(CWindow):
         cnf.root.focus_force()
 
     def save_sett(self, e=None):
-        if hasattr(__class__, "new_scan_time"):
-            cnf.scan_time = getattr(__class__, "new_scan_time")
+        if hasattr(self, "new_scan_time"):
+            cnf.scan_time = self.new_scan_time
 
-        if hasattr(__class__, "new_lang"):
-            cnf.lang = getattr(__class__, "new_lang")
+        if hasattr(self, "new_lang"):
+            cnf.lang = self.new_lang
             cnf.set_lng()
 
         cnf.down_folder = self.browse_down.get_path()

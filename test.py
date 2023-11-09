@@ -1,19 +1,14 @@
-import tkinter
+class Test:
+    def __init__(self):
+        None
 
-root = tkinter.Tk()
-
-class Btn(tkinter.Label):
-    def __init__(self, master, bg="blue", **kwargs) -> None:
-        super().__init__(master, kwargs, bg=bg)
+    def tes(self):
+        if hasattr(self, "hui"):
+            print(self.hui)
 
 
-bt = Btn(
-    root,
-    # bg="red",
-    text="hello",
-    width=10,
-    height=10
-    )
-bt.pack()
 
-root.mainloop()
+t = Test()
+t.hui = 9000
+
+t.tes()
