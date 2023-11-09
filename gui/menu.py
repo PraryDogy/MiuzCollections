@@ -44,11 +44,7 @@ class Menu(CScroll):
         self.bind("<Enter>", lambda e: self.focus_force)
 
     def fake_name(self, coll: str):
-        try:
-            coll = re.search("[A-Za-zА-Яа-я]+.{0,11}", coll).group(0)[:13]
-            return coll
-        except AttributeError:
-            return coll[:13]
+        return coll.lstrip('0123456789').strip()
 
     def load_menu_buttons(self):
         frame = CFrame(self, bg=cnf.bg_color_menu)

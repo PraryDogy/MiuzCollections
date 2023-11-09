@@ -171,7 +171,6 @@ class Scaner:
 
         if remove_images:
 
-            self.__change_live_text(cnf.lng.finishing)
             self.need_update = True
 
             values = [
@@ -191,7 +190,12 @@ class Scaner:
                 for i in range(0, len(values), limit)
                 ]
 
-            for vals in values:
+            ln_vals = len(values)
+            for x, vals in enumerate(values, 1):
+                self.__change_live_text(
+                    f"{cnf.lng.finishing} {x} {cnf.lng.from_pretext} {ln_vals}"
+                    )
+
 
                 if not cnf.scan_flag:
                     return

@@ -191,7 +191,7 @@ class ResetFiltersBtn(CButton):
 
     def reset_filters_cmd(self, e):
         for k, v in cnf.filter_value.items():
-            cnf.filter_value[k] = True
+            cnf.filter_value[k] = False
         cnf.reload_scroll()
 
 
