@@ -55,7 +55,7 @@ class FiltersWid(CFrame):
 
         self.entries = {}
 
-        for k, v in cnf.filter_true_name.items():
+        for k, v in cnf.filter_true_names.items():
             row = CFrame(self)
             row.pack(pady=(10, 0), anchor="w")
 
@@ -189,7 +189,7 @@ class Settings(CWindow):
 
         entries = self.filters.get_entries_values()
         for k, v in entries.items():
-            cnf.filter_true_name[k] = v
+            cnf.filter_true_names[k] = v
 
         if cnf.coll_folder != self.browse_colls.get_path():
             cnf.coll_folder = self.browse_colls.get_path()

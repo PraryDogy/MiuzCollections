@@ -80,9 +80,9 @@ class Config:
 
         self.scan_time = 10
 
-        self.filter_value = {"prod": True, "mod": True, "cat": False}
+        self.filter_values = {"prod": True, "mod": True, "cat": False}
 
-        self.filter_true_name = {
+        self.filter_true_names = {
             "prod": "1 IMG", "mod": "2 Model IMG", "cat": "5 Обтравка"}
 
         self.lang = None

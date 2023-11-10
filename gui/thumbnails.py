@@ -143,12 +143,12 @@ class ThumbsDict(dict):
             q = q.filter(ThumbsMd.collection == cnf.curr_coll)
 
         filters = []
-        for k, v in cnf.filter_true_name.items():
-            if cnf.filter_value[k]:
-                if cnf.filter_true_name[k]:
+        for k, v in cnf.filter_true_names.items():
+            if cnf.filter_values[k]:
+                if cnf.filter_true_names[k]:
                     filters.append(
                         ThumbsMd.src.like(
-                            "%" + f"/{cnf.filter_true_name[k]}/" + "%"
+                            "%" + f"/{cnf.filter_true_names[k]}/" + "%"
                             )
                             )
         q = q.filter(sqlalchemy.or_(*filters))
@@ -190,8 +190,8 @@ class ResetFiltersBtn(CButton):
         self.cmd(self.reset_filters_cmd)
 
     def reset_filters_cmd(self, e):
-        for k, v in cnf.filter_value.items():
-            cnf.filter_value[k] = False
+        for k, v in cnf.filter_values.items():
+            cnf.filter_values[k] = False
         cnf.reload_scroll()
 
 
@@ -236,16 +236,12 @@ class FiltersWid(CFrame):
     def __init__(self, master: tkinter, **kw):
         super().__init__(master, **kw)
 
-        prod = CButton(self, text=cnf.lng.filter_names["prod"])
-        prod.pack(side="left", fill="x", padx=(0, 5))
+        self.filter_btns = {}
 
-        mod = CButton(self, text=cnf.lng.filter_names["mod"])
-        mod.pack(side="left", fill="x", padx=(0, 5))
-
-        cat = CButton(self, text=cnf.lng.filter_names["cat"])
-        cat.pack(side="left", fill="x", padx=(0, 5))
-
-        self.filter_btns = {cat: "cat", mod: "mod", prod: "prod"}
+        for k, v in cnf.lng.filter_names.items():
+            btn = CButton(self, text=cnf.lng.filter_names[k])
+            btn.pack(side="left", fill="x", padx=(0, 5))
+            self.filter_btns[btn] = k
 
         for k, v in self.filter_btns.items():
             k.cmd(lambda e, v=v: self.filters_cmd(v))
@@ -257,13 +253,13 @@ class FiltersWid(CFrame):
         self.filters_configure()
 
     def filters_cmd(self, v):
-        cnf.filter_value[v] = False if cnf.filter_value[v] else True
+        cnf.filter_values[v] = False if cnf.filter_values[v] else True
         cnf.reload_scroll()
 
     def filters_configure(self):
         for k, v in self.filter_btns.items():
             k: CButton
-            if cnf.filter_value[v]:
+            if cnf.filter_values[v]:
                 k.configure(
                     fg_color=cnf.btn_color,
                     text=cnf.lng.filter_names[v] + " ⨂"
@@ -470,8 +466,8 @@ class Thumbs(CFrame):
         else:
             self.above_thumbsframe = NoImages(self.scroll)
             self.above_thumbsframe.pack()
-            for i in (self.scroll.get_parrent(), self.above_thumbsframe):
-                i.bind("<ButtonRelease-2>", ContextFilter)
+            for i in (self.scroll, self.above_thumbsframe):
+                i.get_parrent().bind("<ButtonRelease-2>", ContextFilter)
 
         self.thumbs_frame = CFrame(self.scroll)
         self.thumbs_frame.pack(anchor="w", padx=(0, 15))

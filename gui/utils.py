@@ -344,12 +344,12 @@ def copy_text(text):
 
 def apply_filter(filter, btn=None, collname=None):
     if filter == "all":
-        for k in ("prod", "mod", "cat"):
-            cnf.filter_value[k] = True
+        for k, v in cnf.filter_values.items():
+            cnf.filter_values[k] = False
     else:
-        for k in ("prod", "mod", "cat"):
-            cnf.filter_value[k] = False
-        cnf.filter_value[filter] = True
+        for k, v in cnf.filter_values.items():
+            cnf.filter_values[k] = False
+        cnf.filter_values[filter] = True
 
     if collname and btn:
         cnf.show_coll(btn, collname)

@@ -6,6 +6,8 @@ from cfg import cnf
 
 from .utils import *
 import customtkinter
+import abc
+
 
 __all__ = (
     "CEntry",
@@ -21,7 +23,13 @@ __all__ = (
     )
 
 
-class CEntry(customtkinter.CTkEntry):
+class BaseCWid(abc.ABC):
+    @abc.abstractmethod
+    def get_parrent(self):
+        pass
+
+
+class CEntry(customtkinter.CTkEntry, BaseCWid):
     def __init__(
             self, master, fg_color=cnf.btn_color, border_width=0, 
             corner_radius=cnf.corner, textvariable=None, width=200,
@@ -33,8 +41,12 @@ class CEntry(customtkinter.CTkEntry):
             corner_radius=corner_radius, textvariable=textvariable,
             width=width, justify=justify,
             **kw)
+        
+    def get_parrent(self):
+        return self._canvas
 
-class CScroll(customtkinter.CTkScrollableFrame):
+
+class CScroll(customtkinter.CTkScrollableFrame, BaseCWid):
     def __init__(self, master: tkinter, fg_color=cnf.bg_color, **kw):
         super().__init__(master, fg_color=fg_color, **kw)
 
@@ -77,12 +89,14 @@ class CScroll(customtkinter.CTkScrollableFrame):
                 cnf.autohide_scroll, self.hide_scroll)
 
 
-class CSep(tkinter.Frame):
+class CSep(tkinter.Frame, BaseCWid):
     def __init__(self, master: tkinter, bg=cnf.btn_color, height=1, **kw):
         super().__init__(master, bg=bg, height=height, **kw)
 
+    def get_parrent(self):
+        return self
 
-class CButton(customtkinter.CTkButton):
+class CButton(customtkinter.CTkButton, BaseCWid):
     def __init__(
             self, master: tkinter,
             text_color=cnf.fg_color, fg_color=cnf.btn_color,
@@ -111,7 +125,7 @@ class CButton(customtkinter.CTkButton):
         self.unbind("<ButtonRelease-1>")
 
 
-class CFrame(tkinter.Frame):
+class CFrame(tkinter.Frame, BaseCWid):
     def __init__(self, master: tkinter, bg=cnf.bg_color, **kwargs):
         super().__init__(master, bg=bg, **kwargs)
 
@@ -119,7 +133,7 @@ class CFrame(tkinter.Frame):
         return self
 
 
-class CLabel(tkinter.Label):
+class CLabel(tkinter.Label, BaseCWid):
     def __init__(
             self, master, bg=cnf.bg_color, fg=cnf.fg_color,
             font=("San Francisco Pro", 13, "normal"), **kwargs
@@ -130,11 +144,14 @@ class CLabel(tkinter.Label):
         return self
 
 
-class CWindow(tkinter.Toplevel):
+class CWindow(tkinter.Toplevel, BaseCWid):
     def __init__(self, bg=cnf.bg_color, padx=15, pady=15, **kwargs):
         super().__init__(bg=bg, padx=padx, pady=pady, **kwargs)
         self.bind("<Command-q>", on_exit)
         self.resizable(0,0)
+
+    def get_parrent(self):
+        return self
 
 
 class SmbAlert(CWindow):
