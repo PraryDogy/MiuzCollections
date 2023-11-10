@@ -165,8 +165,8 @@ class ThumbsDict(dict):
 
 
 class ResetDatesBtn(CButton):
-    def __init__(self, master: tkinter, text=cnf.lng.reset_dates, **kw):
-        super().__init__(master, text=text, **kw)
+    def __init__(self, master: tkinter, **kw):
+        super().__init__(master, text=cnf.lng.reset_dates, **kw)
         self.cmd(self.reset_dates_cmd)
 
     def reset_dates_cmd(self, e):
@@ -175,8 +175,8 @@ class ResetDatesBtn(CButton):
 
 
 class ResetSearchBtn(CButton):
-    def __init__(self, master: tkinter, text=cnf.lng.reset_search, **kw):
-        super().__init__(master, text=text, **kw)
+    def __init__(self, master: tkinter, **kw):
+        super().__init__(master, text=cnf.lng.reset_search, **kw)
         self.cmd(self.reset_search_cmd)
 
     def reset_search_cmd(self, e):
@@ -185,8 +185,8 @@ class ResetSearchBtn(CButton):
 
 
 class ResetFiltersBtn(CButton):
-    def __init__(self, master: tkinter, text=cnf.lng.show_all, **kw):
-        super().__init__(master, text=text, **kw)
+    def __init__(self, master: tkinter, **kw):
+        super().__init__(master, text=cnf.lng.show_all, **kw)
         self.cmd(self.reset_filters_cmd)
 
     def reset_filters_cmd(self, e):

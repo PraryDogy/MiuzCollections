@@ -45,11 +45,12 @@ class Menu(CScroll):
     def load_menu_buttons(self):
         frame = CFrame(self, bg=cnf.bg_color_menu)
 
-        title = CLabel(
+        title = CButton(
             frame, text=cnf.lng.menu, font=("San Francisco Pro", 14, "bold"),
-            bg=cnf.bg_color_menu, fg=cnf.tit_color_menu, anchor="w", padx=5
+            fg_color=cnf.bg_color_menu, text_color=cnf.tit_color_menu,
+            anchor="w",
             )
-        title.pack(pady=(15,15))
+        title.pack(pady=(15,15), padx=10, anchor="w", fill="x")
 
         colls_list = Dbase.conn.execute(
             sqlalchemy.select(ThumbsMd.collection)
@@ -77,14 +78,14 @@ class Menu(CScroll):
             lambda e: cnf.show_coll(last, cnf.all_colls)
             )
         last.bind("<Button-2>", lambda e: ContextMenu(e, last, cnf.all_colls))
-        last.pack(pady=(0, 15), fill="x", padx=10)
+        last.pack(pady=(0, 15), fill="x", padx=10, anchor="w")
 
         for fakename, collname in menus.items():
             btn = CButton(
-                frame, text=fakename, anchor="w", fg_color=cnf.bg_color_menu, 
-                text_color=cnf.fg_color_menu
+                frame, text=fakename[:23], fg_color=cnf.bg_color_menu, 
+                text_color=cnf.fg_color_menu, anchor="w",
                 )
-            btn.pack(fill="x", padx=10)
+            btn.pack(fill="x", padx=10, anchor="w")
 
             btn.cmd(
                 lambda e,

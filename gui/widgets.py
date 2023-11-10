@@ -89,7 +89,10 @@ class CScroll(customtkinter.CTkScrollableFrame, BaseCWid):
 
     def hide_scroll(self, e=None):
         if self.scrolltask:
-            self.get_scrollbar().configure(button_color=self.fg_color)
+            try:
+                self.get_scrollbar().configure(button_color=self.fg_color)
+            except tkinter.TclError:
+                print("widgets > scroll > hide scroll > no scroll")
             self.scrolltask = None
 
     def show_scroll(self, e=None):
@@ -100,6 +103,7 @@ class CScroll(customtkinter.CTkScrollableFrame, BaseCWid):
             self.get_scrollbar().configure(button_color=self.old_scroll_bg)
             self.scrolltask = cnf.root.after(
                 cnf.autohide_scroll, self.hide_scroll)
+
 
 
 class CSep(tkinter.Frame, BaseCWid):
