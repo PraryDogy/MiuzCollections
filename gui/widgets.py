@@ -37,7 +37,13 @@ class CEntry(customtkinter.CTkEntry):
 class CScroll(customtkinter.CTkScrollableFrame):
     def __init__(self, master: tkinter, fg_color=cnf.bg_color, **kw):
         super().__init__(master, fg_color=fg_color, **kw)
-        self._scrollbar.configure(width=15)
+
+        self.fg_color = fg_color
+        self.old_scroll_bg = self.get_scrollbar().__dict__["_button_color"]
+
+        self.get_scrollbar().configure(width=15, button_color=fg_color)
+        cnf.root.bind("<MouseWheel>", self.show_scroll)
+        self.scrolltask = None
 
     def moveup(self, e=None):
         try:
@@ -48,6 +54,19 @@ class CScroll(customtkinter.CTkScrollableFrame):
     
     def get_parrent(self):
         return self._parent_canvas
+    
+    def get_scrollbar(self):
+        return self._scrollbar
+    
+    def hide_scroll(self):
+        if self.scrolltask:
+            self.get_scrollbar().configure(button_color=self.fg_color)
+            self.scrolltask = None
+
+    def show_scroll(self, e):
+        if not self.scrolltask:
+            self.get_scrollbar().configure(button_color=self.old_scroll_bg)
+            self.scrolltask = cnf.root.after(2000, self.hide_scroll)
 
 
 class CSep(tkinter.Frame):
