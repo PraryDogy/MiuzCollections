@@ -86,13 +86,7 @@ class Config:
         self.filter_true_names = {
             "prod": "1 IMG", "mod": "2 Model IMG", "cat": "5 Обтравка"}
 
-        self.lang = None
-
-    def set_lng(self):
-        from lang import Rus, Eng
-        for i in (Rus(), Eng()):
-            if i.name == self.lang:
-                self.lng = i
+        self.user_lang = None
 
     def load_cfg(self):
         with open(file=self.json_dir, encoding="utf8", mode="r") as file:
@@ -112,21 +106,31 @@ class Config:
         with open(file=self.json_dir, encoding="utf8", mode="w") as file:
             json.dump(data, file, indent=4, ensure_ascii=False)
 
+    def set_lng(self):
+        from lang import Rus, Eng
+        for i in (Rus(), Eng()):
+            if i.name == self.user_lang:
+                self.lng = i
+        if not self.lng:
+            self.set_system_lng()
+
+    def set_system_lng(self):
+        cmd = "return user locale of (get system info)"
+        l = subprocess.check_output(["osascript", "-e", cmd], text=True)
+        l = l.split("\n")[0]
+        if "ru_RU" == l:
+            self.lng = Rus()
+            self.user_lang = self.lng.name
+        else:
+            self.lng = Eng()
+            self.user_lang = self.lng.name
+
     def check_dir(self):
         if not os.path.exists(self.cfg_dir):
             os.mkdir(self.cfg_dir)
 
         if not os.path.exists(self.json_dir):
-            cmd = "return user locale of (get system info)"
-            l = subprocess.check_output(["osascript", "-e", cmd], text=True)
-            l = l.split("\n")[0]
-            if "ru_RU" == l:
-                self.lng = Rus()
-                self.lang = self.lng.name
-            else:
-                self.lng = Eng()
-                self.lang = self.lng.name
-
+            self.set_system_lng()
             self.write_cfg()
 
         if not os.path.exists(self.db_dir):

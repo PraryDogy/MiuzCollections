@@ -129,7 +129,7 @@ class LangWid(CFrame):
         from lang import Eng, Rus
 
         for i in (Rus(), Eng()):
-            if cnf.lang != i.name:
+            if cnf.user_lang != i.name:
                 self.new_lang = i.name
                 btn.configure(text=i.language)
                 return
@@ -197,7 +197,7 @@ class Settings(CWindow):
             cnf.scan_time = self.scaner_wid.new_scan_time
 
         if hasattr(self.lang_wid, "new_lang"):
-            cnf.lang = self.lang_wid.new_lang
+            cnf.user_lang = self.lang_wid.new_lang
             cnf.set_lng()
 
         cnf.down_folder = self.browse_down.get_path()
