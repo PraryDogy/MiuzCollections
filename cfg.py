@@ -111,6 +111,8 @@ class Config:
         for i in (Rus(), Eng()):
             if i.name == self.user_lang:
                 self.lng = i
+                break
+
         if not self.lng:
             self.set_system_lng()
 
