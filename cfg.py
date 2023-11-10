@@ -42,6 +42,7 @@ class Config:
         self.fg_color_menu = "#e9e9e9"
 
         self.corner = 8
+        self.scroll_width = 17
         self.menu_w = 200
         self.thumb_size = 150
         self.limit = 150

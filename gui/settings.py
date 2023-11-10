@@ -17,12 +17,12 @@ class BrowsePathFrame(CFrame):
         super().__init__(master, **kw)
 
         title_lbl = CLabel(
-            self, text=title, anchor="w", justify="left"
+            self, text=title, anchor="w", justify="left", 
             )
-        title_lbl.pack(anchor="w")
+        title_lbl.pack(anchor="w", pady=(0, 5))
 
         first_row = CFrame(self)
-        first_row.pack(anchor="w", pady=(10, 0))
+        first_row.pack(anchor="w")
 
         path_selector = CButton(first_row, text=cnf.lng.browse)
         path_selector.cmd(lambda e: self.selector_cmd(path))

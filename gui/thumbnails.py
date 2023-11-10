@@ -590,7 +590,8 @@ class Thumbs(CFrame):
 
     def get_clmns_count(self):
         padx = self.thumbs_frame.pack_info()["padx"]*2
-        clmns = (cnf.root.winfo_width()-cnf.menu_w-padx)//(self.thumbsize)
+        w = cnf.root.winfo_width() - cnf.menu_w - cnf.scroll_width - padx
+        clmns = w // (self.thumbsize)
         return 1 if clmns == 0 else clmns
 
     def get_coords(self, e: tkinter.Event, coords: dict):

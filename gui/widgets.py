@@ -49,6 +49,7 @@ class CEntry(customtkinter.CTkEntry, BaseCWid):
 class CScroll(customtkinter.CTkScrollableFrame, BaseCWid):
     def __init__(
             self, master: tkinter, fg_color=cnf.bg_color, corner_radius=0,
+            scroll_width=cnf.scroll_width,
             **kw
             ):
         super().__init__(
@@ -56,10 +57,17 @@ class CScroll(customtkinter.CTkScrollableFrame, BaseCWid):
 
         self.fg_color = fg_color
         self.old_scroll_bg = self.get_scrollbar().__dict__["_button_color"]
-        self.get_scrollbar().configure(width=15, button_color=fg_color)
+        self.get_scrollbar().configure(
+            width=scroll_width, button_color=fg_color
+            )
 
         self.scrolltask = None
-    
+        self.get_scrollbar().bind("<Enter>", self.hovered)
+        self.get_scrollbar().unbind("<Leave>")
+
+    def hovered(self, e=None):
+        self.show_scroll()
+
     def get_parrent(self):
         return self._parent_canvas
     
@@ -79,13 +87,14 @@ class CScroll(customtkinter.CTkScrollableFrame, BaseCWid):
             print("widgets > CScroll > cant move up")
             print(e)
 
-    def hide_scroll(self):
+    def hide_scroll(self, e=None):
         if self.scrolltask:
             self.get_scrollbar().configure(button_color=self.fg_color)
             self.scrolltask = None
 
-    def show_scroll(self, e):
-        self._mouse_wheel_all(e)
+    def show_scroll(self, e=None):
+        if e:
+            self._mouse_wheel_all(e)
 
         if not self.scrolltask:
             self.get_scrollbar().configure(button_color=self.old_scroll_bg)
