@@ -33,19 +33,18 @@ class ContextMenu(Context):
 class Menu(CScroll):
     def __init__(self, master: tkinter):
         self.sel_btn: tkinter.Label = None
-
         super().__init__(
             master, fg_color=cnf.bg_color_menu, corner_radius=0,
             width=cnf.menu_w
             )
 
         self.menu_frame = self.load_menu_buttons()
-        self.menu_frame.pack(fill="x")
+        self.menu_frame.pack()
         self.bind("<Enter>", lambda e: self.focus_force)
+        self.bind_scroll_menu()
 
     def load_menu_buttons(self):
         frame = CFrame(self, bg=cnf.bg_color_menu)
-        frame.pack(fill="both", expand=1)
 
         title = CLabel(
             frame, text=cnf.lng.menu, font=("San Francisco Pro", 14, "bold"),
@@ -83,14 +82,15 @@ class Menu(CScroll):
 
         for fakename, collname in menus.items():
             btn = CButton(
-                frame, text=fakename, anchor="w",
-                fg_color=cnf.bg_color_menu, text_color=cnf.fg_color_menu
+                frame, text=fakename, anchor="w", fg_color=cnf.bg_color_menu, 
+                text_color=cnf.fg_color_menu,
                 )
+            btn.pack(fill="x", padx=10)
+
             btn.cmd(
                 lambda e,
                 btn=btn, collname=collname: cnf.show_coll(btn, collname)
                 )
-            btn.pack(fill="x", padx=10)
             btn.bind("<Button-2>", (
                 lambda e,
                 btn=btn, collname=collname: ContextMenu(e, btn, collname)
@@ -106,11 +106,17 @@ class Menu(CScroll):
 
         return frame
 
+    def bind_scroll_menu(self):
+        for i in (self, self.menu_frame, *self.menu_frame.winfo_children()):
+            self.set_tag("scroll_menu", i.get_parrent())
+        self.bind_autohide_scroll("scroll_menu")
+
     def reload_menu(self):
         self.menu_frame.destroy()
         self.menu_frame = self.load_menu_buttons()
         self.menu_frame.pack()
-        return
+        self.bind("<Enter>", lambda e: self.focus_force)
+        self.bind_scroll_menu()
     
     def show_coll(self, btn: CButton, collname):
         cnf.limit = 150

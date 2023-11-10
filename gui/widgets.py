@@ -40,10 +40,21 @@ class CScroll(customtkinter.CTkScrollableFrame):
 
         self.fg_color = fg_color
         self.old_scroll_bg = self.get_scrollbar().__dict__["_button_color"]
-
         self.get_scrollbar().configure(width=15, button_color=fg_color)
-        cnf.root.bind("<MouseWheel>", self.show_scroll)
+
         self.scrolltask = None
+    
+    def get_parrent(self):
+        return self._parent_canvas
+    
+    def get_scrollbar(self):
+        return self._scrollbar
+
+    def set_tag(self, tag, widget: tkinter.Label):
+        widget.bindtags((tag,) + widget.bindtags())
+
+    def bind_autohide_scroll(self, tag):
+        self.bind_class(tag, "<MouseWheel>", self.show_scroll)
 
     def moveup(self, e=None):
         try:
@@ -51,22 +62,19 @@ class CScroll(customtkinter.CTkScrollableFrame):
         except Exception as e:
             print("widgets > CScroll > cant move up")
             print(e)
-    
-    def get_parrent(self):
-        return self._parent_canvas
-    
-    def get_scrollbar(self):
-        return self._scrollbar
-    
+
     def hide_scroll(self):
         if self.scrolltask:
             self.get_scrollbar().configure(button_color=self.fg_color)
             self.scrolltask = None
 
     def show_scroll(self, e):
+        self._mouse_wheel_all(e)
+
         if not self.scrolltask:
             self.get_scrollbar().configure(button_color=self.old_scroll_bg)
-            self.scrolltask = cnf.root.after(2000, self.hide_scroll)
+            self.scrolltask = cnf.root.after(
+                cnf.autohide_scroll, self.hide_scroll)
 
 
 class CSep(tkinter.Frame):
@@ -93,6 +101,9 @@ class CButton(customtkinter.CTkButton):
             **kw
             )
 
+    def get_parrent(self):
+        return self._canvas
+
     def cmd(self, cmd):
         self.bind("<ButtonRelease-1>", cmd)
 
@@ -104,6 +115,9 @@ class CFrame(tkinter.Frame):
     def __init__(self, master: tkinter, bg=cnf.bg_color, **kwargs):
         super().__init__(master, bg=bg, **kwargs)
 
+    def get_parrent(self):
+        return self
+
 
 class CLabel(tkinter.Label):
     def __init__(
@@ -111,6 +125,9 @@ class CLabel(tkinter.Label):
             font=("San Francisco Pro", 13, "normal"), **kwargs
             ):
         super().__init__(master, bg=bg, fg=fg, font=font, **kwargs)
+
+    def get_parrent(self):
+        return self
 
 
 class CWindow(tkinter.Toplevel):

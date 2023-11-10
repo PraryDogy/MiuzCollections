@@ -45,6 +45,7 @@ class Config:
         self.menu_w = 200
         self.thumb_size = 150
         self.limit = 150
+        self.autohide_scroll = 2000
         self.all_colls = "all"
 
         # root

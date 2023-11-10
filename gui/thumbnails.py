@@ -449,6 +449,7 @@ class Thumbs(CFrame):
 
         self.load_scroll()
         self.load_thumbs()
+        self.bind_scroll_thumbs()
 
     def load_scroll(self):
         self.scroll_parrent = CFrame(self)
@@ -542,6 +543,15 @@ class Thumbs(CFrame):
             more_btn.cmd(lambda e: self.show_more_cmd())
             more_btn.pack(pady=(15, 0))
 
+    def bind_scroll_thumbs(self):
+        for i in (
+            self.scroll_parrent, self.scroll, self.thumbs_frame,
+            *self.thumbs_frame.winfo_children()
+            ):
+            self.scroll.set_tag("thumbs_scroll", i.get_parrent())
+        self.scroll.bind_autohide_scroll("thumbs_scroll")
+
+
     def show_more_cmd(self):
         cnf.limit += 150
         cnf.reload_thumbs()
@@ -571,6 +581,7 @@ class Thumbs(CFrame):
         self.topbar.set_title()
         self.load_scroll()
         self.load_thumbs()
+        self.bind_scroll_thumbs()
         cnf.root.focus_force()
 
     def reload_thumbs(self):
