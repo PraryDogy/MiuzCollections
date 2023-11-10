@@ -82,7 +82,7 @@ shutil.rmtree("build")
 shutil.rmtree(".eggs")
 shutil.rmtree("dist")
 
-zip_cmd = f"cd ~/Desktop && zip -r -X {cnf.app_name}.zip {cnf.app_name}.app"
-subprocess.call(zip_cmd, shell=True)
+# zip_cmd = f"cd ~/Desktop && zip -r -X {cnf.app_name}.zip {cnf.app_name}.app"
+# subprocess.call(zip_cmd, shell=True)
 
 subprocess.Popen(["open", "-R", dest])
