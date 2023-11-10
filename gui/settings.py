@@ -21,15 +21,18 @@ class BrowsePathFrame(CFrame):
             )
         title_lbl.pack(anchor="w")
 
-        self.path_lbl = CLabel(
-            self, text=f"{path}", anchor="w", justify="left",
-            wraplength = 400,
-            )
-        self.path_lbl.pack(anchor="w")
+        first_row = CFrame(self)
+        first_row.pack(anchor="w", pady=(10, 0))
 
-        path_selector = CButton(self, text=cnf.lng.browse)
+        path_selector = CButton(first_row, text=cnf.lng.browse)
         path_selector.cmd(lambda e: self.selector_cmd(path))
-        path_selector.pack(pady=(10, 0))
+        path_selector.pack(anchor="w", side="left")
+
+        self.path_lbl = CLabel(
+            first_row, text=f"{path}", anchor="w", justify="left",
+            wraplength = 300,
+            )
+        self.path_lbl.pack(anchor="w", side="left", padx=10)
 
     def get_path(self):
         return self.path_lbl.cget("text")
@@ -43,6 +46,40 @@ class BrowsePathFrame(CFrame):
 
         if self.get_path() != dialog:
             self.path_lbl.configure(text=dialog)
+
+
+class ScanerWid(CFrame):
+    def __init__(self, master, **kw):
+        super().__init__(master, **kw)
+
+        scan_btn = CButton(
+            self,  text=f"{cnf.scan_time} {cnf.lng.mins}", width=75,
+            )
+        scan_btn.cmd(lambda e: self.scan_time_cmd(scan_btn, e))
+        scan_btn.pack(side="left")
+
+        scan_title = CLabel(self, text=cnf.lng.update_every)
+        scan_title.pack(side="left", padx=10)
+
+    def scan_time_cmd(self, btn: CButton, e=None):
+        times = [5, 10, 30, 60]
+
+        if hasattr(self, "new_scan_time"):
+            ind = times.index(self.new_scan_time)
+        else:
+            try:
+                ind = times.index(cnf.scan_time)
+            except ValueError:
+                ind = 0
+
+        try:
+            self.new_scan_time = times[ind+1]
+        except IndexError:
+            self.new_scan_time = times[0]
+
+        btn.configure(
+            text=f"{self.new_scan_time} {cnf.lng.mins}"
+            )
 
 
 class FiltersWid(CFrame):
@@ -60,10 +97,10 @@ class FiltersWid(CFrame):
             row.pack(pady=(10, 0), anchor="w")
 
             lbl = CLabel(
-                row, text=cnf.lng.filter_names[k], width=7,
+                row, text=cnf.lng.filter_names[k], width=9,
                 anchor="w", justify="left"
                 )
-            lbl.pack(side="left", padx=(0, 10))
+            lbl.pack(side="left")
 
             ent = CEntry(row, textvariable=tkinter.StringVar(self, v))
             ent.pack(side="left")
@@ -76,6 +113,28 @@ class FiltersWid(CFrame):
             }
 
 
+class LangWid(CFrame):
+    def __init__(self, master, **kw):
+        super().__init__(master, **kw)
+
+        lang_btn = CButton(self, text=cnf.lng.language)
+        lang_btn.pack(side="left")
+        lang_btn.cmd(lambda e: self.lang_cmd(lang_btn, e))
+
+        title = CLabel(
+            self, text=cnf.lng.lang_label, anchor="w", justify="left")
+        title.pack(side="left", padx=10)
+
+    def lang_cmd(self, btn: CButton, e=None):
+        from lang import Eng, Rus
+
+        for i in (Rus(), Eng()):
+            if cnf.lang != i.name:
+                self.new_lang = i.name
+                btn.configure(text=i.language)
+                return
+
+
 class Settings(CWindow):
     def __init__(self):
         super().__init__()
@@ -83,51 +142,36 @@ class Settings(CWindow):
         self.bind("<Escape>", self.close_sett)
         self.bind("<Return>", self.save_sett)
         self.title(cnf.lng.settings)
-        w, h = 500, 610
+        w, h = 440, 490
         self.minsize(w, h)
         place_center(cnf.root, self, w, h)
+
+        pader = 15
 
         self.browse_colls = BrowsePathFrame(
             self, title=cnf.lng.colls_path, path=cnf.coll_folder
             )
-        self.browse_colls.pack(fill="both", expand=1)
-
-        CSep(self).pack(pady=15, padx=50, fill="x")
+        self.browse_colls.pack(anchor="w", pady=(0, pader))
 
         self.browse_down = BrowsePathFrame(
             self, title=cnf.lng.down_path, path=cnf.down_folder
             )
-        self.browse_down.pack(fill="both", expand=1)
+        self.browse_down.pack(anchor="w")
 
-        CSep(self).pack(pady=15, padx=50, fill="x")
+        CSep(self).pack(fill="x", pady=pader)
+
+        self.scaner_wid = ScanerWid(self)
+        self.scaner_wid.pack(anchor="w", pady=(0, pader))
+
+        self.lang_wid = LangWid(self)
+        self.lang_wid.pack(anchor="w")
+
+        CSep(self).pack(fill="x", pady=pader)
 
         self.filters = FiltersWid(self)
-        self.filters.pack(fill="both", expand=1)
+        self.filters.pack(anchor="w")
 
-        CSep(self).pack(pady=15, padx=50, fill="x")
-
-        self.scan_btn = CButton(
-            self, width=28,
-            text=f"{cnf.lng.update_every} {cnf.scan_time} {cnf.lng.mins}",
-            )
-        self.scan_btn.cmd(self.scan_time_cmd)
-        self.scan_btn.pack()
-
-        CSep(self).pack(pady=15, padx=50, fill="x")
-
-        lang_lbl = CLabel(
-            self,
-            text=cnf.lng.lang_label + "\n" + cnf.lng.lang_descr,
-            anchor="w",
-            justify="left",
-            )
-        lang_lbl.pack(anchor="w")
-
-        self.lang_btn = CButton(self, text=cnf.lng.language)
-        self.lang_btn.pack(pady=(10, 0))
-        self.lang_btn.cmd(self.lang_cmd)
-
-        CSep(self).pack(fill="x", pady=15, padx=50)
+        CSep(self).pack(fill="x", pady=pader)
 
         cancel_frame = CFrame(self)
         cancel_frame.pack()
@@ -143,46 +187,17 @@ class Settings(CWindow):
         self.update_idletasks()
         self.grab_set_global()
 
-    def scan_time_cmd(self, e=None):
-        times = [5, 10, 30, 60]
-
-        if hasattr(self, "new_scan_time"):
-            ind = times.index(self.new_scan_time)
-        else:
-            try:
-                ind = times.index(cnf.scan_time)
-            except ValueError:
-                ind = 0
-
-        try:
-            self.new_scan_time = times[ind+1]
-        except IndexError:
-            self.new_scan_time = times[0]
-
-        self.scan_btn.configure(
-            text=f"{cnf.lng.update_every} {self.new_scan_time} {cnf.lng.mins}"
-            )
-
-    def lang_cmd(self, e=None):
-        from lang import Eng, Rus
-
-        for i in (Rus(), Eng()):
-            if cnf.lang != i.name:
-                self.new_lang = i.name
-                self.lang_btn.configure(text=i.language)
-                return
-
     def close_sett(self, e=None):
         self.grab_release()
         self.destroy()
         cnf.root.focus_force()
 
     def save_sett(self, e=None):
-        if hasattr(self, "new_scan_time"):
-            cnf.scan_time = self.new_scan_time
+        if hasattr(self.scaner_wid, "new_scan_time"):
+            cnf.scan_time = self.scaner_wid.new_scan_time
 
-        if hasattr(self, "new_lang"):
-            cnf.lang = self.new_lang
+        if hasattr(self.lang_wid, "new_lang"):
+            cnf.lang = self.lang_wid.new_lang
             cnf.set_lng()
 
         cnf.down_folder = self.browse_down.get_path()

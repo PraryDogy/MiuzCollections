@@ -77,7 +77,7 @@ class Rus:
         self.colls_path = "Расположение коллекций"
         self.down_path = "Папка загрузок"
         self.scan_time = "x"
-        self.update_every = f"Обновлять коллекции каждые"
+        self.update_every = f"Интервал обновления коллекций"
         self.show_more = "Позазать еще"
         self.no_photo = "Нет фотографий"
         self.with_name = "с именем"

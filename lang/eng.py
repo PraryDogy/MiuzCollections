@@ -75,7 +75,7 @@ class Eng:
         self.colls_path = "Collections location"
         self.down_path = "Downloads folder"
         self.scan_time = "x"
-        self.update_every = f"Update collections every"
+        self.update_every = "Collections update interval"
         self.show_more = "Show more"
         self.no_photo = "No photos"
         self.with_name = "with name"
