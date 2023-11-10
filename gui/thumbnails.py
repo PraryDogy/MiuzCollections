@@ -225,6 +225,7 @@ class SearchWid(CEntry):
                 self.search_task = cnf.root.after(1000, self.search_go)
 
     def search_go(self, e=None):
+        self.cancel_search_task()
         self.old_search_var = cnf.search_var.get()
         cnf.search_var.set(self.get())
         cnf.start, cnf.end = None, None
@@ -471,7 +472,7 @@ class Thumbs(CFrame):
                 i.get_parrent().bind("<ButtonRelease-2>", ContextFilter)
 
         self.thumbs_frame = CFrame(self.scroll)
-        self.thumbs_frame.pack(anchor="w", padx=(0, 15))
+        self.thumbs_frame.pack(anchor="w", padx=5)
         self.thumbs_frame.bind("<ButtonRelease-2>", ContextFilter)
 
         all_src = []
@@ -588,7 +589,7 @@ class Thumbs(CFrame):
         cnf.root.focus_force()
 
     def get_clmns_count(self):
-        padx = self.thumbs_frame.pack_info()["padx"][1]*2
+        padx = self.thumbs_frame.pack_info()["padx"]*2
         clmns = (cnf.root.winfo_width()-cnf.menu_w-padx)//(self.thumbsize)
         return 1 if clmns == 0 else clmns
 
