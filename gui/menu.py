@@ -32,14 +32,13 @@ class ContextMenu(Context):
 
 class Menu(CScroll):
     def __init__(self, master: tkinter):
-        self.sel_btn: tkinter.Label = None
         super().__init__(
             master, fg_color=cnf.bg_color_menu, corner_radius=0,
             width=cnf.menu_w
             )
 
         self.menu_frame = self.load_menu_buttons()
-        self.menu_frame.pack()
+        self.menu_frame.pack(anchor="w", fill="x")
         self.bind("<Enter>", lambda e: self.focus_force)
         self.bind_scroll_menu()
 
@@ -50,7 +49,7 @@ class Menu(CScroll):
             frame, text=cnf.lng.menu, font=("San Francisco Pro", 14, "bold"),
             bg=cnf.bg_color_menu, fg=cnf.tit_color_menu, anchor="w", padx=5
             )
-        title.pack(pady=(15,15), padx=10, fill="x")
+        title.pack(pady=(15,15))
 
         colls_list = Dbase.conn.execute(
             sqlalchemy.select(ThumbsMd.collection)
@@ -83,7 +82,7 @@ class Menu(CScroll):
         for fakename, collname in menus.items():
             btn = CButton(
                 frame, text=fakename, anchor="w", fg_color=cnf.bg_color_menu, 
-                text_color=cnf.fg_color_menu,
+                text_color=cnf.fg_color_menu
                 )
             btn.pack(fill="x", padx=10)
 
@@ -114,14 +113,16 @@ class Menu(CScroll):
     def reload_menu(self):
         self.menu_frame.destroy()
         self.menu_frame = self.load_menu_buttons()
-        self.menu_frame.pack()
+        self.menu_frame.pack(anchor="w", fill="x")
         self.bind("<Enter>", lambda e: self.focus_force)
         self.bind_scroll_menu()
     
     def show_coll(self, btn: CButton, collname):
         cnf.limit = 150
 
-        self.sel_btn.configure(fg_color=cnf.bg_color_menu)
+        if hasattr(self, "sel_btn"):
+            self.sel_btn.configure(fg_color=cnf.bg_color_menu)
+
         btn.configure(fg_color=cnf.sel_color_menu)
         self.sel_btn = btn
         cnf.curr_coll = collname

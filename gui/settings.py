@@ -208,6 +208,7 @@ class Settings(CWindow):
 
         if cnf.coll_folder != self.browse_colls.get_path():
             cnf.coll_folder = self.browse_colls.get_path()
+            cnf.curr_coll = cnf.all_colls
             if smb_check():
                 scaner.scaner_sheldue(1500)
             else:

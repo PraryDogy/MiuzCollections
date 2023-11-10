@@ -51,7 +51,7 @@ class ScanerGui(CWindow):
 
         if not cnf.scan_win_txt:
             cnf.root.after_cancel(self.live_task)
-            self.close_gui()
+            cnf.root.after(200, self.close_gui)
 
     def close_gui(self, e=None):
         self.grab_release()
