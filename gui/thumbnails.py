@@ -317,10 +317,11 @@ class TopBar(CFrame):
 
 
 class NotifyBar(CFrame):
-    def __init__(self, master: tkinter):
-        super().__init__(master)
+    def __init__(self, master: tkinter, fg_color=cnf.bg_color, **kw):
+        self.fg_color = fg_color
+        super().__init__(master, bg=fg_color, **kw)
 
-        self.btn_up = CButton(self, text=f"▲", fg_color=cnf.bg_color)
+        self.btn_up = CButton(self, text=f"▲", fg_color=fg_color)
         self.btn_up.pack(side="left", fill="x", expand=1)
 
     def notibar_text(self, text):
@@ -344,7 +345,7 @@ class NotifyBar(CFrame):
             print("thumbnails > no topbar cancel button")
             print(e)
         try:
-            self.btn_up.configure(text=f"▲", fg_color=cnf.bg_color)
+            self.btn_up.configure(text=f"▲", fg_color=self.fg_color)
         except RuntimeError as e:
             print("thumbnails > can't configure topbar to default")
             print(e)
@@ -432,7 +433,7 @@ class Thumbs(CFrame):
         self.topbar.pack(padx=15, fill="x")
 
         sep = CSep(self)
-        sep.pack(fill="x", pady=(5, 0), padx=1)
+        sep.pack(fill="x", padx=1, pady=(5, 0))
 
         self.clmns_count = 1
         self.thumbs_pad = 3

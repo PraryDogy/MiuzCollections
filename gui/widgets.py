@@ -47,8 +47,12 @@ class CEntry(customtkinter.CTkEntry, BaseCWid):
 
 
 class CScroll(customtkinter.CTkScrollableFrame, BaseCWid):
-    def __init__(self, master: tkinter, fg_color=cnf.bg_color, **kw):
-        super().__init__(master, fg_color=fg_color, **kw)
+    def __init__(
+            self, master: tkinter, fg_color=cnf.bg_color, corner_radius=0,
+            **kw
+            ):
+        super().__init__(
+            master, fg_color=fg_color, corner_radius=corner_radius, **kw)
 
         self.fg_color = fg_color
         self.old_scroll_bg = self.get_scrollbar().__dict__["_button_color"]

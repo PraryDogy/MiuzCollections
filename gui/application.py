@@ -53,6 +53,8 @@ class Application:
         self.menu = Menu(cnf.root)
         self.menu.pack(side="left", fill="y")
 
+        CSep(cnf.root, bg="black").pack(side="left", fill="y")
+
         r_frame = CFrame(cnf.root)
         r_frame.pack(fill="both", expand=1)
 
