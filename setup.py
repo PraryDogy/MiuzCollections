@@ -78,6 +78,8 @@ folder = os.path.join(os.path.expanduser("~/Desktop"), cnf.app_name)
 
 if not os.path.exists(folder):
     os.mkdir(folder)
+else:
+    shutil.rmtree(folder)
 
 subprocess.Popen(
     ["ln", "-s", "/Applications", os.path.join(folder, "Программы")]
