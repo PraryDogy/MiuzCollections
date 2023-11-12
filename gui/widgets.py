@@ -1,16 +1,14 @@
+import abc
 import sys
 import tkinter
-from typing import Literal, Optional, Tuple, Union
-# from typing_extensions import Literal
+from typing import Literal, Tuple
 
+import customtkinter
 from customtkinter.windows.widgets.font import CTkFont
 
 from cfg import cnf
 
 from .utils import *
-import customtkinter
-import abc
-
 
 __all__ = (
     "CEntry",
@@ -35,26 +33,17 @@ class BaseCWid(abc.ABC):
 class CEntry(customtkinter.CTkEntry, BaseCWid):
     def __init__(self, master: any,
                  width: int = 200,
-                 height: int = 28,
                  corner_radius: int | None = cnf.corner,
                  border_width: int | None = 0,
-                 bg_color: str | Tuple[str, str] = "transparent",
                  fg_color: str | Tuple[str, str] | None = cnf.btn_color,
-                 border_color: str | Tuple[str, str] | None = None,
-                 text_color: str | Tuple[str, str] | None = None,
-                 placeholder_text_color: str | Tuple[str, str] | None = None,
-                 textvariable: tkinter.Variable | None = None,
-                 placeholder_text: str | None = None,
-                 font: tuple | CTkFont | None = None,
                  justify="left",
-                 state: str = tkinter.NORMAL,
+                 textvariable=None,
                  **kwargs
                  ):
-        super().__init__(master, width, height, corner_radius, border_width,
-                         bg_color, fg_color, border_color, text_color,
-                         placeholder_text_color, textvariable,
-                         placeholder_text, font, state, 
-                         justify=justify, **kwargs
+        super().__init__(master, width=width, corner_radius=corner_radius,
+                         border_width=border_width, fg_color=fg_color,
+                         justify=justify, textvariable=textvariable,
+                         **kwargs
                          )
         
     def get_parrent(self):
@@ -65,29 +54,13 @@ class CScroll(customtkinter.CTkScrollableFrame, BaseCWid):
     def __init__(self,
                  master: any,
                  width: int = 200,
-                 height: int = 200,
                  corner_radius: int | str | None = 0,
-                 border_width: int | str | None = None,
-                 bg_color: str | Tuple[str, str] = "transparent",
                  fg_color: str | Tuple[str, str] | None = cnf.bg_color,
-                 border_color: str | Tuple[str, str] | None = None,
-                 scrollbar_fg_color: str | Tuple[str, str] | None = None,
-                 scrollbar_button_color: str | Tuple[str, str] | None = None,
-                 scrollbar_button_hover_color: str | Tuple[str, str] | None = None,
-                 label_fg_color: str | Tuple[str, str] | None = None,
-                 label_text_color: str | Tuple[str, str] | None = None,
-                 label_text: str = "",
-                 label_font: tuple | CTkFont | None = None,
-                 label_anchor: str = "center",
-                 orientation: Literal['vertical', 'horizontal'] = "vertical",
                  scroll_width=cnf.scroll_width,
                  ):
 
-        super().__init__(master, width, height, corner_radius, border_width,
-                         bg_color, fg_color, border_color, scrollbar_fg_color,
-                         scrollbar_button_color, scrollbar_button_hover_color,
-                         label_fg_color, label_text_color, label_text,
-                         label_font, label_anchor, orientation
+        super().__init__(master=master, width=width,
+                         corner_radius=corner_radius, fg_color=fg_color
                          )
 
         self.fg_color = fg_color
@@ -187,11 +160,16 @@ class CFrame(tkinter.Frame, BaseCWid):
 
 
 class CLabel(tkinter.Label, BaseCWid):
-    def __init__(
-            self, master, bg=cnf.bg_color, fg=cnf.fg_color,
-            font=("San Francisco Pro", 13, "normal"), **kwargs
-            ):
-        super().__init__(master, bg=bg, fg=fg, font=font, **kwargs)
+    def __init__(self,
+                 master,
+                 bg=cnf.bg_color,
+                 fg=cnf.fg_color,
+                 font=("San Francisco Pro", 13, "normal"),
+                 text=None,
+                 **kwargs
+                 ):
+        super().__init__(master=master, bg=bg, fg=fg, font=font, text=text,
+                         **kwargs)
 
     def get_parrent(self):
         return self
@@ -274,11 +252,11 @@ class Context(tkinter.Menu):
                 btn.configure(fg_color=cnf.bg_color_menu)
             self.grab_release()
 
-    def imgview(self, img_src, all_src):
+    def imgview(self, img_src):
         from .img_viewer import ImgViewer
         self.add_command(
             label=cnf.lng.view,
-            command=lambda: ImgViewer(img_src, all_src)
+            command=lambda: ImgViewer(img_src)
             )
 
     def imginfo(self, parrent: tkinter.Toplevel, img_src):

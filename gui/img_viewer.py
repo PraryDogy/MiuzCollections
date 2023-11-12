@@ -41,11 +41,10 @@ class ContextViewer(Context):
 
 
 class ImgViewer(CWindow):
-    def __init__(self, img_src: str, all_src: list):
+    def __init__(self, img_src: str):
         super().__init__(bg="black", pady=0, padx=0)
 
         self.img_src = img_src
-        self.all_src = all_src
 
         self.set_title()
         self.minsize(500, 300)
@@ -81,17 +80,20 @@ class ImgViewer(CWindow):
 
         self.bind(
             "<Left>",
-            lambda e: self.switch_img(self.all_src.index(self.img_src)-1)
+            lambda e: self.switch_img(cnf.all_src.index(self.img_src)-1)
             )
         self.bind(
             "<Right>",
-            lambda e: self.switch_img(self.all_src.index(self.img_src)+1)
+            lambda e: self.switch_img(cnf.all_src.index(self.img_src)+1)
             )
 
     def decect_resize(self, e: tkinter.Event):
-        if self.resize_task:
-            cnf.root.after_cancel(self.resize_task)
-        self.resize_task = cnf.root.after(300, lambda: self.resize_win(e))
+        try:
+            if self.resize_task:
+                cnf.root.after_cancel(self.resize_task)
+            self.resize_task = cnf.root.after(300, lambda: self.resize_win(e))
+        except tkinter.TclError:
+            print("img viewer > detect resize > no window")
 
     def resize_win(self, e: tkinter.Event):
         try:
@@ -144,9 +146,9 @@ class ImgViewer(CWindow):
     def switch_img(self, ind: int):
         cnf.root.after_cancel(self.img_task)
         try:
-            self.img_src = self.all_src[ind]
+            self.img_src = cnf.all_src[ind]
         except IndexError:
-            self.img_src = self.all_src[0]
+            self.img_src = cnf.all_src[0]
 
         self.set_title()
         self.bind(
@@ -159,9 +161,9 @@ class ImgViewer(CWindow):
 
     def l_click(self, e: tkinter.Event):
         if e.x <= cnf.imgview_g["w"]//2:
-            index = self.all_src.index(self.img_src) - 1
+            index = cnf.all_src.index(self.img_src) - 1
         else:
-            index = self.all_src.index(self.img_src) + 1
+            index = cnf.all_src.index(self.img_src) + 1
         self.switch_img(index)
 
     def set_title(self):

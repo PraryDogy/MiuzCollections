@@ -65,6 +65,7 @@ class Config:
         self.topbar_flag = True
         self.scan_win_txt = ""
         self.scaner_task: threading.Thread = None
+        self.all_src = []
 
         self.product_name = "IMG"
         self.catalog_name = "Обтравка"

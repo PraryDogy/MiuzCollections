@@ -57,10 +57,10 @@ class ContextAdvanced(Context):
 
 
 class ContextThumbs(Context):
-    def __init__(self, e: tkinter.Event, img_src, all_src):
+    def __init__(self, e: tkinter.Event, img_src):
         super().__init__()
 
-        self.imgview(img_src, all_src)
+        self.imgview(img_src)
         self.imginfo(e.widget.winfo_toplevel(), img_src)
 
         self.sep()
@@ -420,6 +420,58 @@ class ImgGridTitle(CLabel):
                 paths_list=[i[1] for i in img_list]: 
                 ContextTitles(e, title, paths_list)
                 ))
+        
+
+class ImgGrid(CLabel):
+    def __init__(self, master, thumbsize, w, h,
+                 bg=cnf.bg_color, fg=cnf.fg_color, anchor="w"):
+
+        super().__init__(master, bg, fg, anchor)
+
+        self.bind("<ButtonRelease-1>", self.__click)
+        self.bind("<ButtonRelease-2>", self.__r_click)
+        self.bind("<Command-ButtonRelease-2>", self.__r_cmd_click)
+
+        self.thumbsize = thumbsize
+        self.empty = Image.new("RGBA", (w, h), bg)
+        self.coords = {}
+
+    def set_tk_img(self):
+        img = ImageTk.PhotoImage(self.empty)
+        self.configure(image=img)
+        self.image_names = img
+
+    def grid_paste(self, img, clmn, row, src):
+        self.empty.paste(img, (clmn, row))
+
+        coord = (clmn//(self.thumbsize), row//(self.thumbsize))
+        self.coords[coord] = src
+        cnf.all_src.append(src)
+
+    def __get_coords(self, e: tkinter.Event):
+        try:
+            clmn = e.x//self.thumbsize
+            row = e.y//self.thumbsize
+            return self.coords[(clmn, row)]
+        except KeyError:
+            return False
+
+    def __click(self, e: tkinter.Event):
+        img_src = self.__get_coords(e)
+        if img_src:
+            ImgViewer(img_src)
+
+    def __r_cmd_click(self, e: tkinter.Event):
+        img_src = self.__get_coords(e)
+        if img_src:
+            ContextAdvanced(e, img_src)
+
+    def __r_click(self, e: tkinter.Event):
+        img_src = self.__get_coords(e)
+        if img_src:
+            ContextThumbs(e, img_src)
+        else:
+            ContextFilter(e)
 
 
 class Thumbs(CFrame):
@@ -475,7 +527,6 @@ class Thumbs(CFrame):
         self.thumbs_frame.pack(anchor="w", padx=5)
         self.thumbs_frame.bind("<ButtonRelease-2>", ContextFilter)
 
-        all_src = []
         limit = 500
         self.clmns_count = self.get_clmns_count()
         w = self.thumbsize*self.clmns_count
@@ -494,45 +545,21 @@ class Thumbs(CFrame):
 
                 chunk_ln = len(chunk)
                 rows = math.ceil(chunk_ln/self.clmns_count)
-                
                 h = (self.thumbsize) * rows
-
-                empty = Image.new("RGBA", (w, h), color=cnf.bg_color)
                 row, clmn = 0, 0
-                coords = {}
+
+                img_grid = ImgGrid(self.thumbs_frame, self.thumbsize, w, h)
+                img_grid.pack(anchor="w")
 
                 for x, (img, src) in enumerate(chunk, 1):
-
-                    all_src.append(src)
-
-                    coord = (clmn//(self.thumbsize), row//(self.thumbsize))
-                    coords[coord] = src
-
-                    empty.paste(img, (clmn, row))
+                    img_grid.grid_paste(img, clmn, row, src)
 
                     clmn += (self.thumbsize)
                     if x % self.clmns_count == 0:
                         row += (self.thumbsize)
                         clmn = 0
 
-                img = ImageTk.PhotoImage(empty)
-                img_lbl = CLabel(self.thumbs_frame, image=img, anchor="w")
-                img_lbl.pack(anchor="w")
-                img_lbl.image_names = img
-
-                img_lbl.bind("<ButtonRelease-1>", (
-                    lambda e, all_src=all_src, coords=coords:
-                    self.click(e, all_src, coords)
-                    ))
-
-                img_lbl.bind("<ButtonRelease-2>", (
-                    lambda e, all_src=all_src, coords=coords:
-                    self.r_click(e, all_src, coords)
-                    ))
-
-                img_lbl.bind("<Command-ButtonRelease-2>", (
-                    lambda e, coords=coords: self.r_cmd_click(e, coords)
-                    ))
+                img_grid.set_tk_img()
 
         ln_thumbs = sum(len(i) for i in list(thumbs_dict.values()))
 
@@ -548,7 +575,6 @@ class Thumbs(CFrame):
             ):
             self.scroll.set_scrolltag("thumbs_scroll", i.get_parrent())
         self.scroll.bind_autohide_scroll("thumbs_scroll")
-
 
     def show_more_cmd(self):
         cnf.limit += 150
@@ -575,6 +601,7 @@ class Thumbs(CFrame):
     def reload_scroll(self):
         for i in (self.scroll_parrent, self.scroll):
             i.destroy()
+        cnf.all_src.clear()
         self.topbar.filters.filters_configure()
         self.topbar.set_title()
         self.load_scroll()
@@ -585,6 +612,7 @@ class Thumbs(CFrame):
     def reload_thumbs(self):
         for i in (self.above_thumbsframe, self.thumbs_frame):
             i.destroy()
+        cnf.all_src.clear()
         self.load_thumbs()
         cnf.root.focus_force()
 
@@ -593,27 +621,3 @@ class Thumbs(CFrame):
         w = cnf.root.winfo_width() - cnf.menu_w - cnf.scroll_width - padx
         clmns = w // (self.thumbsize)
         return 1 if clmns == 0 else clmns
-
-    def get_coords(self, e: tkinter.Event, coords: dict):
-        try:
-            clmn, row = e.x//(self.thumbsize), e.y//(self.thumbsize)
-            return coords[(clmn, row)]
-        except KeyError:
-            return False
-
-    def click(self, e: tkinter.Event, all_src: list, coords: dict):
-        img_src = self.get_coords(e, coords)
-        if img_src:
-            ImgViewer(img_src, all_src)
-
-    def r_cmd_click(self, e: tkinter.Event, coords):
-        img_src = self.get_coords(e, coords)
-        if img_src:
-            ContextAdvanced(e, img_src)
-
-    def r_click(self, e: tkinter.Event, all_src: list, coords: dict):
-        img_src = self.get_coords(e, coords)
-        if img_src:
-            ContextThumbs(e, img_src, all_src)
-        else:
-            ContextFilter(e)
