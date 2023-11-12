@@ -361,10 +361,8 @@ class NoImages(CFrame):
         str_var = cnf.search_var.get()
         noimg_t = cnf.lng.no_photo
 
-        no_images = CLabel(
-            self, text=noimg_t,
-            font=("San Francisco Pro", 18, "bold")
-            )
+        no_images = CLabel(self, text=noimg_t,
+                           font=("San Francisco Pro", 18, "bold"))
         no_images.pack(pady=(15, 0))
 
         if str_var:
