@@ -546,7 +546,7 @@ class Thumbs(CFrame):
             self.scroll_parrent, self.scroll, self.thumbs_frame,
             *self.thumbs_frame.winfo_children()
             ):
-            self.scroll.set_tag("thumbs_scroll", i.get_parrent())
+            self.scroll.set_scrolltag("thumbs_scroll", i.get_parrent())
         self.scroll.bind_autohide_scroll("thumbs_scroll")
 
 

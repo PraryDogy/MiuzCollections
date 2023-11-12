@@ -108,7 +108,7 @@ class Menu(CScroll):
 
     def bind_scroll_menu(self):
         for i in (self, self.menu_frame, *self.menu_frame.winfo_children()):
-            self.set_tag("scroll_menu", i.get_parrent())
+            self.set_scrolltag("scroll_menu", i.get_parrent())
         self.bind_autohide_scroll("scroll_menu")
 
     def reload_menu(self):

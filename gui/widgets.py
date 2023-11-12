@@ -1,6 +1,9 @@
-import os
 import sys
 import tkinter
+from typing import Literal, Optional, Tuple, Union
+# from typing_extensions import Literal
+
+from customtkinter.windows.widgets.font import CTkFont
 
 from cfg import cnf
 
@@ -30,33 +33,66 @@ class BaseCWid(abc.ABC):
 
 
 class CEntry(customtkinter.CTkEntry, BaseCWid):
-    def __init__(
-            self, master, fg_color=cnf.btn_color, border_width=0, 
-            corner_radius=cnf.corner, textvariable=None, width=200,
-            justify="left",
-            **kw):
-
-        super().__init__(
-            master, fg_color=fg_color, border_width=border_width,
-            corner_radius=corner_radius, textvariable=textvariable,
-            width=width, justify=justify,
-            **kw)
+    def __init__(self, master: any,
+                 width: int = 200,
+                 height: int = 28,
+                 corner_radius: int | None = cnf.corner,
+                 border_width: int | None = 0,
+                 bg_color: str | Tuple[str, str] = "transparent",
+                 fg_color: str | Tuple[str, str] | None = cnf.btn_color,
+                 border_color: str | Tuple[str, str] | None = None,
+                 text_color: str | Tuple[str, str] | None = None,
+                 placeholder_text_color: str | Tuple[str, str] | None = None,
+                 textvariable: tkinter.Variable | None = None,
+                 placeholder_text: str | None = None,
+                 font: tuple | CTkFont | None = None,
+                 justify="left",
+                 state: str = tkinter.NORMAL,
+                 **kwargs
+                 ):
+        super().__init__(master, width, height, corner_radius, border_width,
+                         bg_color, fg_color, border_color, text_color,
+                         placeholder_text_color, textvariable,
+                         placeholder_text, font, state, 
+                         justify=justify, **kwargs
+                         )
         
     def get_parrent(self):
         return self._canvas
 
 
 class CScroll(customtkinter.CTkScrollableFrame, BaseCWid):
-    def __init__(
-            self, master: tkinter, fg_color=cnf.bg_color, corner_radius=0,
-            scroll_width=cnf.scroll_width,
-            **kw
-            ):
-        super().__init__(
-            master, fg_color=fg_color, corner_radius=corner_radius, **kw)
+    def __init__(self,
+                 master: any,
+                 width: int = 200,
+                 height: int = 200,
+                 corner_radius: int | str | None = 0,
+                 border_width: int | str | None = None,
+                 bg_color: str | Tuple[str, str] = "transparent",
+                 fg_color: str | Tuple[str, str] | None = cnf.bg_color,
+                 border_color: str | Tuple[str, str] | None = None,
+                 scrollbar_fg_color: str | Tuple[str, str] | None = None,
+                 scrollbar_button_color: str | Tuple[str, str] | None = None,
+                 scrollbar_button_hover_color: str | Tuple[str, str] | None = None,
+                 label_fg_color: str | Tuple[str, str] | None = None,
+                 label_text_color: str | Tuple[str, str] | None = None,
+                 label_text: str = "",
+                 label_font: tuple | CTkFont | None = None,
+                 label_anchor: str = "center",
+                 orientation: Literal['vertical', 'horizontal'] = "vertical",
+                 scroll_width=cnf.scroll_width,
+                 ):
+
+        super().__init__(master, width, height, corner_radius, border_width,
+                         bg_color, fg_color, border_color, scrollbar_fg_color,
+                         scrollbar_button_color, scrollbar_button_hover_color,
+                         label_fg_color, label_text_color, label_text,
+                         label_font, label_anchor, orientation
+                         )
 
         self.fg_color = fg_color
-        self.old_scroll_bg = self.get_scrollbar().__dict__["_button_color"]
+        self.old_scroll_bg = self.get_scrollbar()._button_color
+
         self.get_scrollbar().configure(
             width=scroll_width, button_color=fg_color
             )
@@ -74,7 +110,7 @@ class CScroll(customtkinter.CTkScrollableFrame, BaseCWid):
     def get_scrollbar(self):
         return self._scrollbar
 
-    def set_tag(self, tag, widget: tkinter.Label):
+    def set_scrolltag(self, tag: str, widget: tkinter.Label):
         widget.bindtags((tag,) + widget.bindtags())
 
     def bind_autohide_scroll(self, tag):
@@ -105,13 +141,13 @@ class CScroll(customtkinter.CTkScrollableFrame, BaseCWid):
                 cnf.autohide_scroll, self.hide_scroll)
 
 
-
 class CSep(tkinter.Frame, BaseCWid):
     def __init__(self, master: tkinter, bg=cnf.btn_color, height=1, **kw):
         super().__init__(master, bg=bg, height=height, **kw)
 
     def get_parrent(self):
         return self
+
 
 class CButton(customtkinter.CTkButton, BaseCWid):
     def __init__(
