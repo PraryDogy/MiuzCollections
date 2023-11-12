@@ -484,7 +484,7 @@ class Thumbs(CFrame):
         self.topbar.pack(padx=15, fill="x")
 
         sep = CSep(self)
-        sep.pack(fill="x", padx=1, pady=(5, 0))
+        sep.pack(fill="x", padx=1, pady=(10, 0))
 
         cnf.root.update_idletasks()
 
