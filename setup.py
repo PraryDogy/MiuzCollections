@@ -74,15 +74,19 @@ for i in folders:
         os.path.join(f"dist/{cnf.app_name}.app/Contents/lib", i)
         )
 
-dest = os.path.expanduser(f"~/Desktop/{cnf.app_name}.app")
+folder = os.path.join(os.path.expanduser("~/Desktop"), cnf.app_name)
 
-shutil.move(f"dist/{cnf.app_name}.app", dest)
+if not os.path.exists(folder):
+    os.mkdir(folder)
+
+subprocess.Popen(
+    ["ln", "-s", "/Applications", os.path.join(folder, "Программы")]
+        )
+shutil.move(f"dist/{cnf.app_name}.app", f"{folder}/{cnf.app_name}.app")
+
 
 shutil.rmtree("build")
 shutil.rmtree(".eggs")
 shutil.rmtree("dist")
 
-# zip_cmd = f"cd ~/Desktop && zip -r -X {cnf.app_name}.zip {cnf.app_name}.app"
-# subprocess.call(zip_cmd, shell=True)
-
-subprocess.Popen(["open", "-R", dest])
+subprocess.Popen(["open", "-R", folder])
