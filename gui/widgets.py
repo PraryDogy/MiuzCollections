@@ -235,7 +235,7 @@ class Context(tkinter.Menu):
     def sep(self):
         self.add_separator()
 
-    def do_popup(self, e: tkinter.Event, ismenu=None):
+    def do_popup(self, e: tkinter.Event):
         try:
             self.tk_popup(e.x_root, e.y_root)
         finally:

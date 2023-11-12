@@ -31,52 +31,52 @@ class ContextFilter(Context):
 
         self.apply_filter_thumbs(label=cnf.lng.show_all, filter="all")
 
-        self.do_popup(e)
+        self.do_popup(e=e)
 
 
 class ContextTitles(Context):
-    def __init__(self, e: tkinter.Event, title, paths_list):
+    def __init__(self, e: tkinter.Event, title: str, img_path_list: list):
         super().__init__()
 
-        self.download_group(title, paths_list)
+        self.download_group(title=title, paths_list=img_path_list)
 
         self.sep()
-        self.download_group_tiffs(title, paths_list)
+        self.download_group_tiffs(title=title, paths_list=img_path_list)
 
         self.sep()
-        self.download_group_fullsize(title, paths_list)
+        self.download_group_fullsize(title=title, paths_list=img_path_list)
 
-        self.do_popup(e)
+        self.do_popup(e=e)
 
 
 class ContextAdvanced(Context):
-    def __init__(self, e: tkinter.Event, img_src):
+    def __init__(self, e: tkinter.Event, img_src: str):
         super().__init__()
-        self.db_remove_img(img_src)
-        self.do_popup(e)
+        self.db_remove_img(img_src=img_src)
+        self.do_popup(e=e)
 
 
 class ContextThumbs(Context):
-    def __init__(self, e: tkinter.Event, img_src):
+    def __init__(self, e: tkinter.Event, img_src: str):
         super().__init__()
 
-        self.imgview(img_src)
-        self.imginfo(e.widget.winfo_toplevel(), img_src)
+        self.imgview(img_src=img_src)
+        self.imginfo(parrent=e.widget.winfo_toplevel(), img_src=img_src)
 
         self.sep()
-        self.copy_jpg_path(img_src)
-        self.reveal_jpg(img_src)
-        self.download_onefile(img_src)
+        self.copy_jpg_path(img_src=img_src)
+        self.reveal_jpg(img_src=img_src)
+        self.download_onefile(img_src=img_src)
 
         self.sep()
-        self.copy_tiffs_paths(img_src)
-        self.reveal_tiffs(img_src)
-        self.download_tiffs(img_src)
+        self.copy_tiffs_paths(img_src=img_src)
+        self.reveal_tiffs(img_src=img_src)
+        self.download_tiffs(img_src=img_src)
 
         self.sep()
-        self.download_fullsize(img_src)
+        self.download_fullsize(img_src=img_src)
 
-        self.do_popup(e)
+        self.do_popup(e=e)
 
 
 class ContextSearch(Context):
@@ -84,23 +84,23 @@ class ContextSearch(Context):
         super().__init__()
         self.clear()
         self.pastesearch()
-        self.do_popup(e)
+        self.do_popup(e=e)
 
 
 class ThumbsDict(dict):
     def __init__(self):
         super().__init__()
         data = Dbase.conn.execute(self.get_query()).fetchall()
-        decoded = self.decode_thumbs(data)
-        self.update(self.create_thumbs_dict(decoded))
+        decoded = self.decode_thumbs(thumbs_raw=data)
+        self.update(self.create_thumbs_dict(thumbs_raw=decoded))
 
-    def decode_thumbs(self, thumbs_raw):
+    def decode_thumbs(self, thumbs_raw: Tuple[Tuple[bytes, str, int]]):
         result = []
         for blob, src, modified in thumbs_raw:
             try:
-                decoded = decode_image(blob)
-                cropped = crop_image(decoded)
-                img = convert_to_rgb(cropped)
+                decoded = decode_image(image=blob)
+                cropped = crop_image(img=decoded)
+                img = convert_to_rgb(image=cropped)
                 result.append((img, src, modified))
 
             except Exception:
@@ -108,7 +108,7 @@ class ThumbsDict(dict):
 
         return result
 
-    def create_thumbs_dict(self, thumbs_raw):
+    def create_thumbs_dict(self, thumbs_raw: Tuple[Tuple[bytes, str, int]]):
         thumbs_dict = {}
 
         for img, src, modified in thumbs_raw:
@@ -165,8 +165,10 @@ class ThumbsDict(dict):
 
 
 class ResetDatesBtn(CButton):
-    def __init__(self, master: tkinter, **kw):
-        super().__init__(master, text=cnf.lng.reset_dates, **kw)
+    def __init__(self, master: tkinter, fg_color: str = cnf.btn_color,
+                width: int = 75, **kw):
+        super().__init__(master=master, fg_color=fg_color, width=width,
+                         text=cnf.lng.reset_dates, **kw)
         self.cmd(self.reset_dates_cmd)
 
     def reset_dates_cmd(self, e):
@@ -396,44 +398,41 @@ class AboveThumbs(CFrame):
 
 
 class ImgGridTitle(CLabel):
-    def __init__(
-            self,
-            master: tkinter,
-            date_key: str,
-            img_list: Tuple[Tuple[str, str]]
-            ):
-        text = f"{date_key}, {cnf.lng.total}: {len(img_list)}"
+    def __init__(self, master: tkinter,
+                 title: str,img_src_list: list,
+                 bg=cnf.bg_color, fg=cnf.fg_color,
+                 font=("San Francisco Pro", 18, "bold"),
+                 ):
+
+        text = f"{title}, {cnf.lng.total}: {len(img_src_list)}"
         if cnf.search_var.get():
             text = (
                 f"{cnf.lng.photo} {cnf.lng.with_name} "
                 f"\"{cnf.search_var.get()}\"\n{text}"
                 )
 
-        super().__init__(
-            master, text=text, anchor="w", justify="left",
-            font=("San Francisco Pro", 18, "bold")
-            )
+        super().__init__(master, bg=bg, fg=fg, font=font,
+                         text=text, anchor="w", justify="left")
 
         self.bind(
             "<ButtonRelease-2>", (
-                lambda e, title=date_key,
-                paths_list=[i[1] for i in img_list]: 
+                lambda e, title=title,
+                paths_list=img_src_list: 
                 ContextTitles(e, title, paths_list)
                 ))
-        
+
 
 class ImgGrid(CLabel):
-    def __init__(self, master, thumbsize, w, h,
+    def __init__(self, master, grid_w, grid_h,
                  bg=cnf.bg_color, fg=cnf.fg_color, anchor="w"):
 
-        super().__init__(master, bg, fg, anchor)
+        super().__init__(master=master, bg=bg, fg=fg, anchor=anchor)
 
         self.bind("<ButtonRelease-1>", self.__click)
         self.bind("<ButtonRelease-2>", self.__r_click)
         self.bind("<Command-ButtonRelease-2>", self.__r_cmd_click)
 
-        self.thumbsize = thumbsize
-        self.empty = Image.new("RGBA", (w, h), bg)
+        self.empty = Image.new("RGBA", (grid_w, grid_h), bg)
         self.coords = {}
 
     def set_tk_img(self):
@@ -441,17 +440,18 @@ class ImgGrid(CLabel):
         self.configure(image=img)
         self.image_names = img
 
-    def grid_paste(self, img, clmn, row, src):
-        self.empty.paste(img, (clmn, row))
+    def grid_paste(self, img, grid_x, grid_y, src):
+        self.empty.paste(img, (grid_x, grid_y))
 
-        coord = (clmn//(self.thumbsize), row//(self.thumbsize))
+        coord = (grid_x // (cnf.thumbsize + cnf.thumbspad),
+                 grid_y // (cnf.thumbsize + cnf.thumbspad))
         self.coords[coord] = src
         cnf.all_src.append(src)
 
     def __get_coords(self, e: tkinter.Event):
         try:
-            clmn = e.x//self.thumbsize
-            row = e.y//self.thumbsize
+            clmn = e.x // (cnf.thumbsize + cnf.thumbspad)
+            row = e.y // (cnf.thumbsize + cnf.thumbspad)
             return self.coords[(clmn, row)]
         except KeyError:
             return False
@@ -488,9 +488,6 @@ class Thumbs(CFrame):
         sep = CSep(self)
         sep.pack(fill="x", padx=1, pady=(5, 0))
 
-        self.thumbs_pad = 3
-        self.thumbsize = cnf.thumb_size + self.thumbs_pad
-
         cnf.root.update_idletasks()
 
         self.resize_task = None
@@ -526,39 +523,42 @@ class Thumbs(CFrame):
         self.thumbs_frame.pack(anchor="w", padx=5)
         self.thumbs_frame.bind("<ButtonRelease-2>", ContextFilter)
 
-        limit = 500
-        self.clmns_count = self.get_clmns_count()
-        w = self.thumbsize*self.clmns_count
+        grid_limit = 500
+        self.clmns = self.get_clmns_count()
+        grid_w = self.clmns * (cnf.thumbsize + cnf.thumbspad)
 
         for x, (date_key, img_list) in enumerate(thumbs_dict.items()):
             chunks = [
-                img_list[i:i+limit]
-                for i in range(0, len(img_list), limit)
+                img_list[i:i + grid_limit]
+                for i in range(0, len(img_list), grid_limit)
                 ]
 
-            title = ImgGridTitle(self.thumbs_frame, date_key, img_list)
-            pad = 30 if x != 0 else 15
-            title.pack(anchor="w", pady=(pad, 0), padx=self.thumbs_pad)
+            grid_title = ImgGridTitle(master=self.thumbs_frame,
+                                      title=date_key,
+                                      img_src_list=[i[1] for i in img_list])
+            grid_title_pad = 30 if x != 0 else 15
+            grid_title.pack(anchor="w", pady=(grid_title_pad, 0))
 
             for chunk in chunks:
+                rows = math.ceil(len(chunk) / self.clmns)
+                grid_h = rows * (cnf.thumbsize + cnf.thumbspad)
+                grid_x, grid_y = 0, 0
 
-                chunk_ln = len(chunk)
-                rows = math.ceil(chunk_ln/self.clmns_count)
-                h = (self.thumbsize) * rows
-                row, clmn = 0, 0
+                grid_img = ImgGrid(master=self.thumbs_frame,
+                                   grid_w=grid_w, grid_h=grid_h)
+                grid_img.pack(anchor="w")
 
-                img_grid = ImgGrid(self.thumbs_frame, self.thumbsize, w, h)
-                img_grid.pack(anchor="w")
+                for img_num, (img_obj, img_src) in enumerate(chunk, 0):
+                    grid_img.grid_paste(img=img_obj, grid_x=grid_x,
+                                        grid_y=grid_y, src=img_src)
 
-                for x, (img, src) in enumerate(chunk, 1):
-                    img_grid.grid_paste(img, clmn, row, src)
+                    grid_x = grid_x + cnf.thumbsize + cnf.thumbspad
 
-                    clmn += (self.thumbsize)
-                    if x % self.clmns_count == 0:
-                        row += (self.thumbsize)
-                        clmn = 0
+                    if (img_num + 1) % self.clmns == 0:
+                        grid_y = grid_y + cnf.thumbsize + cnf.thumbspad
+                        grid_x = 0
 
-                img_grid.set_tk_img()
+                grid_img.set_tk_img()
 
         ln_thumbs = sum(len(i) for i in list(thumbs_dict.values()))
 
@@ -591,7 +591,7 @@ class Thumbs(CFrame):
         if new_w != old_w:
             cnf.root_g["w"] = new_w
 
-            if self.clmns_count != self.get_clmns_count():
+            if self.clmns != self.get_clmns_count():
                 w, h = cnf.root.winfo_width(), cnf.root.winfo_height()
                 cnf.root_g["w"], cnf.root_g["h"] = w, h
                 cnf.root.update_idletasks()
@@ -616,7 +616,5 @@ class Thumbs(CFrame):
         cnf.root.focus_force()
 
     def get_clmns_count(self):
-        padx = self.thumbs_frame.pack_info()["padx"]*2
-        w = cnf.root.winfo_width() - cnf.menu_w - cnf.scroll_width - padx
-        clmns = w // (self.thumbsize)
-        return 1 if clmns == 0 else clmns
+        w = cnf.root.winfo_width() - cnf.menu_w - cnf.scroll_width
+        return w // (cnf.thumbsize + cnf.thumbspad)

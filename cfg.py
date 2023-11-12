@@ -44,7 +44,8 @@ class Config:
         self.corner = 8
         self.scroll_width = 17
         self.menu_w = 200
-        self.thumb_size = 150
+        self.thumbsize = 150
+        self.thumbspad = 3
         self.limit = 150
         self.autohide_scroll = 2000
         self.all_colls = "all"
