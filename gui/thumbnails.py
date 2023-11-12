@@ -488,7 +488,6 @@ class Thumbs(CFrame):
         sep = CSep(self)
         sep.pack(fill="x", padx=1, pady=(5, 0))
 
-        self.clmns_count = 1
         self.thumbs_pad = 3
         self.thumbsize = cnf.thumb_size + self.thumbs_pad
 
@@ -523,7 +522,7 @@ class Thumbs(CFrame):
             for i in (self.scroll, self.above_thumbsframe):
                 i.get_parrent().bind("<ButtonRelease-2>", ContextFilter)
 
-        self.thumbs_frame = CFrame(self.scroll)
+        self.thumbs_frame = CFrame(self.scroll, width=10)
         self.thumbs_frame.pack(anchor="w", padx=5)
         self.thumbs_frame.bind("<ButtonRelease-2>", ContextFilter)
 
