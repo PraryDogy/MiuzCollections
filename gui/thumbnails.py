@@ -558,12 +558,12 @@ class Thumbs(CFrame):
 
                 grid_img.set_tk_img()
 
-        ln_thumbs = sum(len(i) for i in list(thumbs_dict.values()))
+        ln_thumbs = len([item for val in thumbs_dict.values() for item in val])
 
         if ln_thumbs == cnf.limit:
             more_btn = CButton(self.thumbs_frame, text=cnf.lng.show_more)
             more_btn.cmd(lambda e: self.show_more_cmd())
-            more_btn.pack(pady=(15, 0))
+            more_btn.pack(pady=15)
 
     def bind_scroll_thumbs(self):
         for i in (
