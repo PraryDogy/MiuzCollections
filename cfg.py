@@ -83,7 +83,8 @@ class Config:
 
         self.scan_time = 10
 
-        self.filter_values = {"prod": True, "mod": True, "cat": False}
+        self.filter_values = {"prod": True, "mod": True, "cat": False,
+                              "other": False}
 
         self.filter_true_names = {
             "prod": "1 IMG", "mod": "2 Model IMG", "cat": "5 Обтравка"}
@@ -93,6 +94,16 @@ class Config:
     def load_cfg(self):
         with open(file=self.json_dir, encoding="utf8", mode="r") as file:
             data: dict = json.loads(file.read())
+
+        for k, v in self.filter_values.items():
+            if k not in data["filter_values"]:
+                data["filter_values"][k] = v
+
+        new_data_dict = {}
+        for k, v in data["filter_values"].items():
+            if k in self.filter_values:
+                new_data_dict[k] = v
+        data["filter_values"] = new_data_dict
 
         for k, v in data.items():
             if k in self.__dict__:

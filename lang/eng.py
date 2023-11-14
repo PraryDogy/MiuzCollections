@@ -2,7 +2,8 @@ class Eng:
     def __init__(self):
         self.name = "en"
 
-        self.filter_names = {"prod": "Product", "mod": "Models", "cat": "Catalog"}
+        self.filter_names = {"prod": "Product", "mod": "Models",
+                             "cat": "Catalog", "other": "Other"}
 
         self.language = "English"
         self.lang_label = "Language/Язык"

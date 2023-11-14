@@ -2,7 +2,8 @@ class Rus:
     def __init__(self):
         self.name = "ru"
 
-        self.filter_names = {"prod": "Имиджи", "mod": "Модели", "cat": "Каталог"}
+        self.filter_names = {"prod": "Имиджи", "mod": "Модели",
+                             "cat": "Каталог", "other": "Другое"}
 
         self.language = "Русский"
         self.lang_label = "Язык/Language"
