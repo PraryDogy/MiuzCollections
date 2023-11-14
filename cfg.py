@@ -139,7 +139,7 @@ class Config(ConfigGui):
         start = slice_keys.index("coll_folder")
         slice_keys = slice_keys[start:]
 
-        data = {i: self.__dict__[i] for i in slice_keys}
+        data = {i: getattr(self, i) for i in slice_keys}
 
         with open(file=self.json_dir, encoding="utf8", mode="w") as file:
             json.dump(obj=data, fp=file, indent=4, ensure_ascii=False)
