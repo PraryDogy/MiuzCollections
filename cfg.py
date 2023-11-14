@@ -13,7 +13,41 @@ __all__ = (
     )
 
 
-class Config:
+class ConfigGui:
+    def reload_strbar(self):
+        from gui.application import app
+        app.stbar.reload_stbar()
+
+    def reload_menu(self):
+        from gui.application import app
+        app.menu.reload_menu()
+
+    def show_coll(self, btn, collname):
+        from gui.application import app
+        app.menu.show_coll(btn, collname)
+
+    def notibar_text(self, text):
+        from gui.application import app
+        app.thumbs.notibar.notibar_text(text)
+
+    def notibar_default(self):
+        from gui.application import app
+        app.thumbs.notibar.notibar_default()
+
+    def reload_thumbs(self):
+        from gui.application import app
+        app.thumbs.reload_thumbs()
+
+    def reload_scroll(self):
+        try:
+            from gui.application import app
+            app.thumbs.reload_scroll()
+        except Exception as ex:
+            print("cfg > reload scroll import err")
+            traceback.print_exception(type(ex), ex, ex.__traceback__)
+
+
+class Config(ConfigGui):
     def __init__(self):
         self.app_name = "MiuzCollections"
         self.app_ver = "3.9.3"
@@ -86,27 +120,18 @@ class Config:
         self.filter_values = {"prod": True, "mod": True, "cat": False,
                               "other": False}
 
-        self.filter_true_names = {
-            "prod": "1 IMG", "mod": "2 Model IMG", "cat": "5 Обтравка"}
-
+        self.filter_true_names = {"prod": "1 IMG", "mod": "2 Model IMG",
+                                  "cat": "5 Обтравка"}
         self.user_lang = None
 
     def load_cfg(self):
         with open(file=self.json_dir, encoding="utf8", mode="r") as file:
-            data: dict = json.loads(file.read())
-
-        for k, v in self.filter_values.items():
-            if k not in data["filter_values"]:
-                data["filter_values"][k] = v
-
-        new_data_dict = {}
-        for k, v in data["filter_values"].items():
-            if k in self.filter_values:
-                new_data_dict[k] = v
-        data["filter_values"] = new_data_dict
+            data: dict = json.loads(s=file.read())
 
         for k, v in data.items():
-            if k in self.__dict__:
+            if getattr(self, k):
+                if isinstance(v, dict):
+                    v = self.__fix_dict(namedict=k, userdict=v)
                 setattr(self, k, v)
 
     def write_cfg(self):
@@ -117,7 +142,7 @@ class Config:
         data = {i: self.__dict__[i] for i in slice_keys}
 
         with open(file=self.json_dir, encoding="utf8", mode="w") as file:
-            json.dump(data, file, indent=4, ensure_ascii=False)
+            json.dump(obj=data, fp=file, indent=4, ensure_ascii=False)
 
     def set_lng(self):
         from lang import Rus, Eng
@@ -127,11 +152,35 @@ class Config:
                 break
 
         if not self.lng:
-            self.set_system_lng()
+            self.__set_system_lng()
 
-    def set_system_lng(self):
+    def check_dir(self):
+        if not os.path.exists(path=self.cfg_dir):
+            os.mkdir(path=self.cfg_dir)
+
+        if not os.path.exists(path=self.json_dir):
+            self.__set_system_lng()
+            self.write_cfg()
+
+        if not os.path.exists(path=self.db_dir):
+            shutil.copyfile(src=self.db_name, dst=self.db_dir)
+
+    def __fix_dict(self, namedict: str, userdict: dict):
+        cnf_dict: dict = getattr(self, namedict)
+
+        for k, v in cnf_dict.items():
+            if k not in userdict:
+                userdict[k] = v
+
+        return {
+            k: v
+            for k, v in userdict.items()
+            if k in cnf_dict
+            }
+
+    def __set_system_lng(self):
         cmd = "return user locale of (get system info)"
-        l = subprocess.check_output(["osascript", "-e", cmd], text=True)
+        l = subprocess.check_output(args=["osascript", "-e", cmd], text=True)
         l = l.split("\n")[0]
         if "ru_RU" == l:
             self.lng = Rus()
@@ -139,49 +188,6 @@ class Config:
         else:
             self.lng = Eng()
             self.user_lang = self.lng.name
-
-    def check_dir(self):
-        if not os.path.exists(self.cfg_dir):
-            os.mkdir(self.cfg_dir)
-
-        if not os.path.exists(self.json_dir):
-            self.set_system_lng()
-            self.write_cfg()
-
-        if not os.path.exists(self.db_dir):
-            shutil.copyfile(self.db_name, self.db_dir)
-
-    def reload_thumbs(self):
-        from gui.application import app
-        app.thumbs.reload_thumbs()
-
-    def reload_scroll(self):
-        try:
-            from gui.application import app
-            app.thumbs.reload_scroll()
-        except Exception as ex:
-            print("cfg > reload scroll import err")
-            traceback.print_exception(type(ex), ex, ex.__traceback__)
-
-    def reload_strbar(self):
-        from gui.application import app
-        app.stbar.reload_stbar()
-
-    def reload_menu(self):
-        from gui.application import app
-        app.menu.reload_menu()
-
-    def show_coll(self, btn, collname):
-        from gui.application import app
-        app.menu.show_coll(btn, collname)
-
-    def notibar_text(self, text):
-        from gui.application import app
-        app.thumbs.notibar.notibar_text(text)
-
-    def notibar_default(self):
-        from gui.application import app
-        app.thumbs.notibar.notibar_default()
 
 
 cnf = Config()
