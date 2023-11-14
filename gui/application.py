@@ -39,12 +39,12 @@ class Application:
         mac_ver = float(".".join(mac_ver.split(".")[:2]))
 
         if mac_ver > 12:
-            cnf.root.bind("<Command-w>", self.minim)
+            cnf.root.bind_all("<Command-w>", self.minim)
             cnf.root.protocol("WM_DELETE_WINDOW", self.minim)
             cnf.root.createcommand("tk::mac::ReopenApplication", self.maxim)
 
         else:
-            cnf.root.bind("<Command-w>", lambda e: cnf.root.withdraw())
+            cnf.root.bind_all("<Command-w>", lambda e: cnf.root.withdraw())
             cnf.root.protocol("WM_DELETE_WINDOW", cnf.root.withdraw)
             cnf.root.createcommand(
                 "tk::mac::ReopenApplication", cnf.root.deiconify
