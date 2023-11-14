@@ -137,7 +137,7 @@ class ThumbsDict(dict):
         search = cnf.search_var.get()
         if search:
             search.replace("\n", "").strip()
-            q = q.filter(ThumbsMd.src.like("%" + search + "%"))
+            q = q.filter(ThumbsMd.src.like(f"%{search}%"))
 
         if cnf.curr_coll != cnf.all_colls:
             q = q.filter(ThumbsMd.collection == cnf.curr_coll)
@@ -146,12 +146,18 @@ class ThumbsDict(dict):
         for k, v in cnf.filter_true_names.items():
             if cnf.filter_values[k]:
                 if cnf.filter_true_names[k]:
-                    filters.append(
-                        ThumbsMd.src.like(
-                            "%" + f"/{cnf.filter_true_names[k]}/" + "%"
-                            )
-                            )
-        q = q.filter(sqlalchemy.or_(*filters))
+                    examp = f"%/{cnf.filter_true_names[k]}/%"
+                    filters.append(ThumbsMd.src.like(examp))
+        filters = sqlalchemy.or_(*filters)
+
+        other_filter = []
+        if cnf.filter_values["other"]:
+            for k, v in cnf.filter_true_names.items():
+                examp = f"%/{cnf.filter_true_names[k]}/%"
+                other_filter.append(ThumbsMd.src.not_like(examp))
+        other_filter = sqlalchemy.and_(*other_filter)
+
+        q = q.filter(sqlalchemy.or_(filters, other_filter))
 
         if not any((cnf.start, cnf.end)):
             q = q.limit(cnf.limit)
@@ -531,7 +537,8 @@ class Thumbs(CFrame):
                                       title=date_key,
                                       img_src_list=[i[1] for i in img_list])
             grid_title_pad = 30 if x != 0 else 15
-            grid_title.pack(anchor="w", pady=(grid_title_pad, 0))
+            grid_title.pack(anchor="w", pady=(grid_title_pad, 0),
+                            padx=(cnf.thumbspad, 0))
 
             for chunk in chunks:
                 rows = math.ceil(len(chunk) / self.clmns)
