@@ -253,25 +253,21 @@ class FiltersWid(CFrame):
         self.dates_btn.pack(side="left", fill="x", padx=(0, 5))
         self.dates_btn.cmd(lambda e: Filter())
 
-        self.filters_configure()
+        self.reload_filters()
 
     def filters_cmd(self, v):
         cnf.filter_values[v] = False if cnf.filter_values[v] else True
         cnf.reload_scroll()
 
-    def filters_configure(self):
+    def reload_filters(self):
         for k, v in self.filter_btns.items():
             k: CButton
             if cnf.filter_values[v]:
-                k.configure(
-                    fg_color=cnf.btn_color,
-                    text=cnf.lng.filter_names[v] + " ⨂"
-                    )
+                k.configure(fg_color=cnf.btn_color,
+                            text=cnf.lng.filter_names[v] + " ⨂")
             else:
-                k.configure(
-                    fg_color=cnf.bg_color,
-                    text=cnf.lng.filter_names[v] + " ⨁"
-                    )
+                k.configure(fg_color=cnf.bg_color,
+                    text=cnf.lng.filter_names[v] + " ⨁")
 
         if any((cnf.start, cnf.end)):
             self.dates_btn.configure(
@@ -599,7 +595,7 @@ class Thumbs(CFrame):
         for i in (self.scroll_parrent, self.scroll):
             i.destroy()
         cnf.all_src.clear()
-        self.topbar.filters.filters_configure()
+        self.topbar.filters.reload_filters()
         self.topbar.set_title()
         self.load_scroll()
         self.load_thumbs()
