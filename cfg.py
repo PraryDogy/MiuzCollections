@@ -172,11 +172,9 @@ class Config(ConfigGui):
             if k not in userdict:
                 userdict[k] = v
 
-        return {
-            k: v
-            for k, v in userdict.items()
-            if k in cnf_dict
-            }
+        return {k: v
+                for k, v in userdict.items()
+                if k in cnf_dict}
 
     def __set_system_lng(self):
         cmd = "return user locale of (get system info)"
