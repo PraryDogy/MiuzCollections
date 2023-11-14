@@ -96,6 +96,7 @@ class Eng:
         self.group_fullsize = "Download fullsize jpg"
         self.show_all = "Show all"
         self.reset_search = "Reset search"
+        self.no_photo_filter = "No photos in cathegory"
 
         self.colls_case = "collections"
         self.new_photo_case = "new_photos"

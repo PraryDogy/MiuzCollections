@@ -98,7 +98,7 @@ class Rus:
         self.group_fullsize = "Скачать полноразмерные jpg"
         self.show_all = "Показать все"
         self.reset_search = "Очистить поиск"
-
+        self.no_photo_filter = "Нет фотографий в категории"
 
         self.colls_case = "коллекций"
         self.new_photo_case = "новых фото"

@@ -157,7 +157,8 @@ class ThumbsDict(dict):
                 other_filter.append(ThumbsMd.src.not_like(examp))
         other_filter = sqlalchemy.and_(*other_filter)
 
-        q = q.filter(sqlalchemy.or_(filters, other_filter))
+        if any((str(filters), str(other_filter))):
+            q = q.filter(sqlalchemy.or_(filters, other_filter))
 
         if not any((cnf.start, cnf.end)):
             q = q.limit(cnf.limit)
@@ -361,29 +362,29 @@ class NoImages(CFrame):
         super().__init__(master, **kw)
 
         str_var = cnf.search_var.get()
-        noimg_t = cnf.lng.no_photo
-
-        no_images = CLabel(self, text=noimg_t,
+        no_images = CLabel(self, text=cnf.lng.no_photo,
                            font=("San Francisco Pro", 18, "bold"))
         no_images.pack(pady=(15, 0))
 
         if str_var:
-            noimg_t = (
-                f"{cnf.lng.no_photo} {cnf.lng.with_name}"
-                f"\n\"{str_var}\""
-                )
+            noimg_t = (f"{cnf.lng.no_photo} {cnf.lng.with_name}"
+                       f"\n\"{str_var}\"")
             no_images.configure(text=noimg_t)
             ResetSearchBtn(self).pack(pady=(15, 0))
 
         elif any((cnf.start, cnf.end)):
-            noimg_t = (
-                f"{cnf.lng.no_photo}"
-                f"\n{cnf.named_start} - {cnf.named_end}"
-                )
+            noimg_t = (f"{cnf.lng.no_photo}"
+                       f"\n{cnf.named_start} - {cnf.named_end}")
             no_images.configure(text=noimg_t)
             ResetDatesBtn(self).pack(pady=(15, 0))
 
         else:
+            filters = (f"\"{cnf.lng.filter_names[k].lower()}\""
+                       for k, v in cnf.filter_values.items()
+                       if v)
+            filters = ",  ".join(filters)
+            noimg_t = (f"{cnf.lng.no_photo_filter}\n{filters}")
+            no_images.configure(text=noimg_t)
             ResetFiltersBtn(self).pack(pady=(15, 0))
 
 
