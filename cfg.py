@@ -124,7 +124,7 @@ class Config(ConfigGui, User):
             data: dict = json.loads(s=file.read())
 
         for k, v in data.items():
-            if getattr(self, k):
+            if hasattr(self, k):
                 if isinstance(v, dict):
                     v = self.__fix_dict(namedict=k, userdict=v)
                 setattr(self, k, v)
