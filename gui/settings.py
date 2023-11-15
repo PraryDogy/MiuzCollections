@@ -198,7 +198,7 @@ class Settings(CWindow):
 
         if hasattr(self.lang_wid, "new_lang"):
             cnf.user_lang = self.lang_wid.new_lang
-            cnf.set_lng()
+            cnf.set_language()
 
         cnf.down_folder = self.browse_down.get_path()
 

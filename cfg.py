@@ -47,8 +47,27 @@ class ConfigGui:
             traceback.print_exception(type(ex), ex, ex.__traceback__)
 
 
-class Config(ConfigGui):
+class User:
+    def __init__(self) -> None:
+        self.coll_folder = "/Volumes/Shares/Marketing/Photo/_Collections"
+        self.down_folder = f"{os.path.expanduser('~')}/Downloads"
+        self.curr_coll = "None"
+        self.user_lang = "None"
+        self.scan_time = 10
+
+        self.root_g = {"w": 700, "h": 500, "x": 100, "y": 100}
+        self.imgview_g = {"w": 700, "h": 500, "x": 100, "y": 100}
+
+        self.filter_values = {"prod": False, "mod": False, "cat": False,
+                              "other": False}
+
+        self.filter_true_names = {"prod": "1 IMG", "mod": "2 Model IMG",
+                                  "cat": "5 Обтравка"}
+
+
+class Config(ConfigGui, User):
     def __init__(self):
+        User.__init__(self)
         self.app_name = "MiuzCollections"
         self.app_ver = "3.9.3"
         self.db_name = "db.db"
@@ -56,10 +75,8 @@ class Config(ConfigGui):
         self.thumb_err = "thumb.jpg"
         self.lng = None
 
-        self.cfg_dir = os.path.join(
-            os.path.expanduser("~"),
-            f"Library", "Application Support", self.app_name
-            )
+        self.cfg_dir = os.path.join(os.path.expanduser("~"),
+            f"Library", "Application Support", self.app_name)
         self.json_dir = os.path.join(self.cfg_dir, self.cfg_name)
         self.db_dir = os.path.join(self.cfg_dir, self.db_name)
 
@@ -102,28 +119,6 @@ class Config(ConfigGui):
         self.scaner_task: threading.Thread = None
         self.all_src = []
 
-        self.product_name = "IMG"
-        self.catalog_name = "Обтравка"
-        self.models_name = "Model IMG"
-
-        # user settings for json
-        self.coll_folder = "/Volumes/Shares/Marketing/Photo/_Collections"
-        self.down_folder = f"{os.path.expanduser('~')}/Downloads"
-
-        self.curr_coll = self.all_colls
-
-        self.root_g = {"w": 700, "h": 500, "x": 100, "y": 100}
-        self.imgview_g = {"w": 700, "h": 500, "x": 100, "y": 100}
-
-        self.scan_time = 10
-
-        self.filter_values = {"prod": True, "mod": True, "cat": False,
-                              "other": False}
-
-        self.filter_true_names = {"prod": "1 IMG", "mod": "2 Model IMG",
-                                  "cat": "5 Обтравка"}
-        self.user_lang = None
-
     def load_cfg(self):
         with open(file=self.json_dir, encoding="utf8", mode="r") as file:
             data: dict = json.loads(s=file.read())
@@ -134,32 +129,32 @@ class Config(ConfigGui):
                     v = self.__fix_dict(namedict=k, userdict=v)
                 setattr(self, k, v)
 
-    def write_cfg(self):
-        slice_keys = list(self.__dict__)
-        start = slice_keys.index("coll_folder")
-        slice_keys = slice_keys[start:]
+        if not os.path.exists(os.path.join(self.coll_folder, self.curr_coll)):
+            self.curr_coll = self.all_colls
 
-        data = {i: getattr(self, i) for i in slice_keys}
+        self.set_language()
+
+    def write_cfg(self):
+        data = {i: getattr(self, i) for i in list(User().__dict__)}
 
         with open(file=self.json_dir, encoding="utf8", mode="w") as file:
             json.dump(obj=data, fp=file, indent=4, ensure_ascii=False)
 
-    def set_lng(self):
+    def set_language(self):
         from lang import Rus, Eng
-        for i in (Rus(), Eng()):
-            if i.name == self.user_lang:
-                self.lng = i
-                break
 
-        if not self.lng:
-            self.__set_system_lng()
+        ru, en = Rus(), Eng()
+        if self.user_lang not in (ru.name, en.name):
+            self.lng = en
+            self.user_lang = en.name
+        else:
+            self.lng = [i for i in (ru, en) if self.user_lang == i.name][0]
 
     def check_dir(self):
         if not os.path.exists(path=self.cfg_dir):
             os.mkdir(path=self.cfg_dir)
 
         if not os.path.exists(path=self.json_dir):
-            self.__set_system_lng()
             self.write_cfg()
 
         if not os.path.exists(path=self.db_dir):
@@ -176,20 +171,8 @@ class Config(ConfigGui):
                 for k, v in userdict.items()
                 if k in cnf_dict}
 
-    def __set_system_lng(self):
-        cmd = "return user locale of (get system info)"
-        l = subprocess.check_output(args=["osascript", "-e", cmd], text=True)
-        l = l.split("\n")[0]
-        if "ru_RU" == l:
-            self.lng = Rus()
-            self.user_lang = self.lng.name
-        else:
-            self.lng = Eng()
-            self.user_lang = self.lng.name
-
 
 cnf = Config()
 cnf.check_dir()
 cnf.load_cfg()
-cnf.set_lng()
 cnf.write_cfg()
