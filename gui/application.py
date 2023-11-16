@@ -72,10 +72,6 @@ class Application:
             scaner.scaner_sheldue()
             SmbAlert()
 
-
-        from .lang_win import LangWin
-        LangWin()
-
     def minim(self, e=None):
         applescript = f"""
             set appName to "{cnf.app_name}"

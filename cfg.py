@@ -46,13 +46,17 @@ class ConfigGui:
             print("cfg > reload scroll import err")
             traceback.print_exception(type(ex), ex, ex.__traceback__)
 
+    def load_langwin(self):
+        from gui.lang_win import LangWin
+        LangWin()
+
 
 class User:
     def __init__(self) -> None:
         self.coll_folder = "/Volumes/Shares/Marketing/Photo/_Collections"
         self.down_folder = f"{os.path.expanduser('~')}/Downloads"
         self.curr_coll = "None"
-        self.user_lang = "None"
+        self.user_lng = "None"
         self.scan_time = 10
 
         self.root_g = {"w": 700, "h": 500, "x": 100, "y": 100}
@@ -144,11 +148,11 @@ class Config(ConfigGui, User):
         from lang import Rus, Eng
 
         ru, en = Rus(), Eng()
-        if self.user_lang not in (ru.name, en.name):
-            self.lng = en
-            self.user_lang = en.name
+        if self.user_lng not in (ru.name, en.name):
+            self.lng, self.user_lng = en, en.name
+            self.load_langwin()
         else:
-            self.lng = [i for i in (ru, en) if self.user_lang == i.name][0]
+            self.lng = [i for i in (ru, en) if self.user_lng == i.name][0]
 
     def check_dir(self):
         if not os.path.exists(path=self.cfg_dir):
