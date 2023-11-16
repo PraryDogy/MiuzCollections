@@ -71,11 +71,6 @@ class CScroll(customtkinter.CTkScrollableFrame, BaseCWid):
             )
 
         self.scrolltask = None
-        self.get_scrollbar().bind("<Enter>", self.hovered)
-        self.get_scrollbar().unbind("<Leave>")
-
-    def hovered(self, e=None):
-        self.show_scroll()
 
     def get_parrent(self):
         return self._parent_canvas
@@ -91,27 +86,28 @@ class CScroll(customtkinter.CTkScrollableFrame, BaseCWid):
 
     def moveup(self, e=None):
         try:
-            self._parent_canvas.yview_moveto("0.0")
+            self.get_parrent().yview_moveto("0.0")
         except Exception as e:
             print("widgets > CScroll > cant move up")
             print(e)
 
-    def hide_scroll(self, e=None):
+    def cancel_scrolltask(self):
         if self.scrolltask:
-            try:
-                self.get_scrollbar().configure(button_color=self.fg_color)
-            except tkinter.TclError:
-                print("widgets > scroll > hide scroll > no scroll")
-            self.scrolltask = None
+            cnf.root.after_cancel(self.scrolltask)
+
+    def hide_scroll(self, e=None):
+        try:
+            self.get_scrollbar().configure(button_color=self.fg_color)
+        except tkinter.TclError:
+            print("widgets > scroll > hide scroll > no scroll")
 
     def show_scroll(self, e=None):
         if e:
             self._mouse_wheel_all(e)
 
-        if not self.scrolltask:
-            self.get_scrollbar().configure(button_color=self.old_scroll_bg)
-            self.scrolltask = cnf.root.after(
-                cnf.autohide_scroll, self.hide_scroll)
+        self.cancel_scrolltask()
+        self.get_scrollbar().configure(button_color=self.old_scroll_bg)
+        self.scrolltask = cnf.root.after(cnf.hidescroll_ms, self.hide_scroll)
 
 
 class CSep(tkinter.Frame, BaseCWid):

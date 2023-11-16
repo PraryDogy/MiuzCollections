@@ -105,7 +105,7 @@ class Config(ConfigGui, User):
         self.thumbsize = 150
         self.thumbspad = 3
         self.limit = 150
-        self.autohide_scroll = 2000
+        self.hidescroll_ms = 1000
         self.all_colls = "all"
 
         # root
