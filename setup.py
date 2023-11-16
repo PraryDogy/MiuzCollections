@@ -80,6 +80,7 @@ if not os.path.exists(folder):
     os.mkdir(folder)
 else:
     shutil.rmtree(folder)
+    os.mkdir(folder)
 
 subprocess.Popen(
     ["ln", "-s", "/Applications", os.path.join(folder, "Программы")]
