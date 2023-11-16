@@ -39,7 +39,6 @@ class Menu(CScroll):
 
         self.menu_frame = self.load_menu_buttons()
         self.menu_frame.pack(anchor="w", fill="x")
-        self.bind("<Enter>", lambda e: self.focus_force)
         self.bind_scroll_menu()
 
     def load_menu_buttons(self):
@@ -115,7 +114,6 @@ class Menu(CScroll):
         self.menu_frame.destroy()
         self.menu_frame = self.load_menu_buttons()
         self.menu_frame.pack(anchor="w", fill="x")
-        self.bind("<Enter>", lambda e: self.focus_force)
         self.bind_scroll_menu()
     
     def show_coll(self, btn: CButton, collname):

@@ -493,7 +493,6 @@ class Thumbs(CFrame):
 
         self.resize_task = None
         cnf.root.bind("<Configure>", self.decect_resize)
-        # self.bind("<Enter>", lambda e: self.focus_force())
 
         self.load_scroll()
         self.load_thumbs()
