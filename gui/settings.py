@@ -197,8 +197,7 @@ class Settings(CWindow):
             cnf.scan_time = self.scaner_wid.new_scan_time
 
         if hasattr(self.lang_wid, "new_lang"):
-            cnf.user_lng = self.lang_wid.new_lang
-            cnf.set_language()
+            cnf.set_language(lang_name=self.lang_wid.new_lang)
 
         cnf.down_folder = self.browse_down.get_path()
 

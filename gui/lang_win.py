@@ -21,7 +21,7 @@ class LangWin(CWindow):
 
             btn = CButton(self, text=i.language)
             btn.pack(pady=(10, 0), fill="x")
-            btn.cmd(lambda e: self.set_lng(i.name))
+            btn.cmd(lambda e: self.set_lng(lng_name=i.name))
 
         self.update_idletasks()
         self.grab_set_global()
@@ -33,7 +33,7 @@ class LangWin(CWindow):
         for i in (en, ru):
             if i.name == lng_name:
                 cnf.user_lng = lng_name
-                cnf.set_language()
+                cnf.set_language(lang_name=lng_name)
                 self.destroy()
                 cnf.reload_menu()
                 cnf.reload_strbar()

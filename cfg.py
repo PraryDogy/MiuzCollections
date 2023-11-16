@@ -1,12 +1,15 @@
 import json
 import os
 import shutil
-import subprocess
 import threading
 import tkinter
 from datetime import datetime
 import traceback
-from lang import Eng, Rus
+try:
+    from typing_extensions import Literal
+except Exception:
+    from typing import Literal
+
 
 __all__ = (
     "cnf",
@@ -136,7 +139,7 @@ class Config(ConfigGui, User):
         if not os.path.exists(os.path.join(self.coll_folder, self.curr_coll)):
             self.curr_coll = self.all_colls
 
-        self.set_language()
+        self.set_language(lang_name=self.user_lng)
 
     def write_cfg(self):
         data = {i: getattr(self, i) for i in list(User().__dict__)}
@@ -144,15 +147,17 @@ class Config(ConfigGui, User):
         with open(file=self.json_dir, encoding="utf8", mode="w") as file:
             json.dump(obj=data, fp=file, indent=4, ensure_ascii=False)
 
-    def set_language(self):
+    def set_language(self, lang_name: Literal["en", "ru"]):
         from lang import Rus, Eng
 
         ru, en = Rus(), Eng()
-        if self.user_lng not in (ru.name, en.name):
-            self.lng, self.user_lng = en, en.name
+        if lang_name not in (ru.name, en.name):
+            self.lng = en
+            self.user_lng = en.name
             self.load_langwin()
         else:
-            self.lng = [i for i in (ru, en) if self.user_lng == i.name][0]
+            self.lng = [i for i in (ru, en) if i.name==lang_name][0]
+            self.user_lng = lang_name
 
     def check_dir(self):
         if not os.path.exists(path=self.cfg_dir):
