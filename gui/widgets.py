@@ -64,9 +64,9 @@ class CScroll(customtkinter.CTkScrollableFrame, BaseCWid):
                          )
 
         self.fg_color = fg_color
-        self.old_scroll_bg = self.get_scrollbar()._button_color
+        self.old_scroll_bg = self._scrollbar._button_color
 
-        self.get_scrollbar().configure(
+        self._scrollbar.configure(
             width=scroll_width, button_color=fg_color
             )
 
@@ -74,9 +74,6 @@ class CScroll(customtkinter.CTkScrollableFrame, BaseCWid):
 
     def get_parrent(self):
         return self._parent_canvas
-    
-    def get_scrollbar(self):
-        return self._scrollbar
 
     def set_scrolltag(self, tag: str, widget: tkinter.Label):
         widget.bindtags((tag,) + widget.bindtags())
@@ -97,7 +94,7 @@ class CScroll(customtkinter.CTkScrollableFrame, BaseCWid):
 
     def hide_scroll(self, e=None):
         try:
-            self.get_scrollbar().configure(button_color=self.fg_color)
+            self._scrollbar.configure(button_color=self.fg_color)
         except tkinter.TclError:
             print("widgets > scroll > hide scroll > no scroll")
 
@@ -106,7 +103,7 @@ class CScroll(customtkinter.CTkScrollableFrame, BaseCWid):
             self._mouse_wheel_all(e)
 
         self.cancel_scrolltask()
-        self.get_scrollbar().configure(button_color=self.old_scroll_bg)
+        self._scrollbar.configure(button_color=self.old_scroll_bg)
         self.scrolltask = cnf.root.after(cnf.hidescroll_ms, self.hide_scroll)
 
 
