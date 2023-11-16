@@ -28,14 +28,16 @@ class ConfigGui:
     def show_coll(self, btn, collname):
         from gui.application import app
         app.menu.show_coll(btn, collname)
+        self.set_topbar_title()
+        self.reload_scroll()
 
     def notibar_text(self, text):
         from gui.application import app
-        app.thumbs.notibar.notibar_text(text)
+        app.topbar.notibar.notibar_text(text)
 
     def notibar_default(self):
         from gui.application import app
-        app.thumbs.notibar.notibar_default()
+        app.topbar.notibar.notibar_default()
 
     def reload_thumbs(self):
         from gui.application import app
