@@ -53,6 +53,14 @@ class ConfigGui:
         from gui.lang_win import LangWin
         LangWin()
 
+    def set_topbar_title(self):
+        from gui.application import app
+        app.topbar.funcbar.set_topbar_title()
+
+    def reload_filters(self):
+        from gui.application import app
+        app.topbar.funcbar.filters_wid.reload_filters()
+
 
 class User:
     def __init__(self) -> None:

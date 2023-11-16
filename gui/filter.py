@@ -378,6 +378,7 @@ class Filter(CWindow):
         self.destroy()
         cnf.root.focus_force()
         cnf.search_var.set("")
+        cnf.reload_filters()
         cnf.reload_scroll()
 
     def close_filter(self, e=None):

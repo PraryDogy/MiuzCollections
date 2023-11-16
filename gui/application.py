@@ -9,6 +9,8 @@ from .stbar import StBar
 from .thumbnails import Thumbs
 from .utils import on_exit, run_applescript, smb_check
 from .widgets import *
+from .topbar import TopBar
+
 
 __all__ = (
     "Application",
@@ -54,6 +56,11 @@ class Application:
 
         r_frame = CFrame(cnf.root)
         r_frame.pack(fill="both", expand=1)
+
+        self.topbar = TopBar(r_frame)
+        self.topbar.pack(fill="x")
+
+        CSep(r_frame).pack(fill="x", padx=1, pady=(10, 0))
 
         self.thumbs = Thumbs(r_frame)
         self.thumbs.pack(fill="both", expand=1)

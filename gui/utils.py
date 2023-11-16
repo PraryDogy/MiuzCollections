@@ -352,8 +352,10 @@ def apply_filter(filter, btn=None, collname=None):
         cnf.filter_values[filter] = True
 
     if collname and btn:
+        cnf.reload_filters()
         cnf.show_coll(btn, collname)
     else:
+        cnf.reload_filters()
         cnf.reload_scroll()
 
 

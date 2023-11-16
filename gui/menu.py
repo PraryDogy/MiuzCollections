@@ -128,4 +128,5 @@ class Menu(CScroll):
 
         cnf.start, cnf.end = None, None
         cnf.search_var.set("")
+        cnf.set_topbar_title()
         cnf.reload_scroll()

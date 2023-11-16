@@ -35,6 +35,8 @@ class LangWin(CWindow):
                 cnf.user_lng = lng_name
                 cnf.set_language(lang_name=lng_name)
                 self.destroy()
+                cnf.set_topbar_title()
+                cnf.reload_filters()
                 cnf.reload_menu()
                 cnf.reload_strbar()
                 cnf.reload_scroll()

@@ -1,10 +1,9 @@
 import abc
 import sys
 import tkinter
-from typing import Literal, Tuple
+from typing import Tuple
 
 import customtkinter
-from customtkinter.windows.widgets.font import CTkFont
 
 from cfg import cnf
 

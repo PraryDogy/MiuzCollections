@@ -220,6 +220,8 @@ class Settings(CWindow):
         self.destroy()
         cnf.root.focus_force()
 
+        cnf.set_topbar_title()
+        cnf.reload_filters()
         cnf.reload_menu()
         cnf.reload_strbar()
         cnf.reload_scroll()
