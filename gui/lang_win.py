@@ -1,7 +1,11 @@
 from cfg import cnf
-from .widgets import *
-from lang import Rus, Eng
+from lang import Eng, Rus
+
 from .utils import *
+from .widgets import *
+
+__all__ = ("LangWin", )
+
 
 class LangWin(CWindow):
     def __init__(self, bg=cnf.bg_color, padx=15, pady=15, **kwargs):
