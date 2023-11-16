@@ -13,7 +13,7 @@ from database import Dbase, ThumbsMd
 from .img_viewer import ImgViewer
 from .utils import *
 from .widgets import *
-
+from .context import *
 __all__ = (
     "Thumbs",
     )
@@ -63,12 +63,12 @@ class ContextThumbs(Context):
         self.sep()
         self.copy_jpg_path(img_src=img_src)
         self.reveal_jpg(img_src=img_src)
-        self.download_onefile(img_src=img_src)
+        self.download_jpg(img_src=img_src)
 
         self.sep()
-        self.copy_tiffs_paths(img_src=img_src)
-        self.reveal_tiffs(img_src=img_src)
-        self.download_tiffs(img_src=img_src)
+        self.copy_tiff_path(img_src=img_src)
+        self.reveal_tiff(img_src=img_src)
+        self.download_tiff(img_src=img_src)
 
         self.sep()
         self.download_fullsize(img_src=img_src)

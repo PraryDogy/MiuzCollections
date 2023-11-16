@@ -6,6 +6,7 @@ import threading
 import tkinter
 import traceback
 from time import sleep
+from typing import Literal
 
 import cv2
 import numpy
@@ -16,7 +17,6 @@ from PIL import Image, ImageChops
 
 from cfg import cnf
 from database import *
-
 
 __all__ = (
     "apply_filter",
@@ -158,9 +158,9 @@ def place_center(parrent: tkinter.Toplevel, win: tkinter.Toplevel, w, h):
     win.geometry(f"+{xx}+{yy}")
 
 
-def reveal_coll(coll_name):
-    if coll_name != cnf.all_colls:
-        coll_path = os.path.join(cnf.coll_folder, coll_name)
+def reveal_coll(collname):
+    if collname != cnf.all_colls:
+        coll_path = os.path.join(cnf.coll_folder, collname)
     else:
         coll_path = cnf.coll_folder
 
@@ -328,18 +328,18 @@ def reveal_files(list_paths: list):
     run_applescript(applescript)
 
 
-def db_remove_img(src):
+def db_remove_img(img_src: Literal["file path"]):
     q = (
         sqlalchemy.delete(ThumbsMd).filter(
-            ThumbsMd.src==src
+            ThumbsMd.src==img_src
             ))
     Dbase.conn.execute(q)
     cnf.reload_thumbs()
 
 
-def copy_text(text):
+def copy_text(text: str):
     cnf.root.clipboard_clear()
-    cnf.root.clipboard_append(text)
+    cnf.root.clipboard_append(string=text)
 
 
 def apply_filter(filter, btn=None, collname=None):
@@ -361,14 +361,14 @@ def apply_filter(filter, btn=None, collname=None):
 
 @dec_utils_task
 def finder_actions(
-    src, tiff=False, reveal=False, copy_path=False, download=False, 
-    fullsize=False
-    ):
+    img_src: Literal["file path"] | tuple[Literal["filepath"], ...],
+    tiff: bool = False, reveal: bool = False,
+    copy_path: bool = False, download: bool = False, fullsize: bool = False):
 
-    if not isinstance(src, list):
-        src = [src]
+    if not isinstance(img_src, list):
+        img_src = [img_src]
 
-    if not [i for i in src if os.path.exists(i)]:
+    if not [i for i in img_src if os.path.exists(i)]:
         cnf.notibar_text(cnf.lng.no_jpg)
         delay()
         return
@@ -377,7 +377,7 @@ def finder_actions(
         tiffs = []
         cnf.notibar_text(cnf.lng.please_wait)
 
-        for i in src:
+        for i in img_src:
     
             if not cnf.topbar_flag:
                 return
@@ -387,7 +387,7 @@ def finder_actions(
             if found_tiffs:
                 tiffs = tiffs + found_tiffs
     
-        src = tiffs.copy()
+        img_src = tiffs.copy()
         if not tiffs:
             cnf.notibar_text(cnf.lng.no_tiff)
             delay()
@@ -395,23 +395,23 @@ def finder_actions(
 
     if reveal:
         cnf.notibar_text(cnf.lng.please_wait)
-        reveal_files(src)
+        reveal_files(img_src)
         delay()
         return
     
     if copy_path:
         cnf.notibar_text(cnf.lng.please_wait)
         cnf.root.clipboard_clear()
-        cnf.root.clipboard_append("\n".join(src))
+        cnf.root.clipboard_append("\n".join(img_src))
         delay()
         return
 
     if download or fullsize:
         downloads = os.path.join(cnf.down_folder, cnf.app_name)
         os.makedirs(downloads, exist_ok=True)
-        ln_src = len(src)
+        ln_src = len(img_src)
 
-        for num, img_src in enumerate(src, 1):
+        for num, img_src in enumerate(img_src, 1):
             if not cnf.topbar_flag:
                 return
 

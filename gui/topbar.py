@@ -5,7 +5,7 @@ from cfg import cnf
 from .filter import Filter
 from .utils import *
 from .widgets import *
-
+from .context import *
 
 class ContextSearch(Context):
     def __init__(self, e: tkinter.Event):

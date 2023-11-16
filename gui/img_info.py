@@ -2,6 +2,7 @@ import os
 import re
 import tkinter
 from datetime import datetime
+from typing import Literal
 
 from PIL import Image
 
@@ -9,6 +10,7 @@ from cfg import cnf
 
 from .utils import *
 from .widgets import *
+from .context import *
 
 
 class ContextInfo(Context):
@@ -21,7 +23,7 @@ class ContextInfo(Context):
 
 
 class ImageInfo(CWindow):
-    def __init__(self, parrent: tkinter.Toplevel, src: str):
+    def __init__(self, parrent: tkinter.Toplevel, img_src: Literal["file path"]):
         super().__init__()
         self.title(cnf.lng.info)
         self.minsize(416, 155)
@@ -29,12 +31,12 @@ class ImageInfo(CWindow):
         self.protocol("WM_DELETE_WINDOW", lambda: self.close_info(parrent))
         self.bind("<Escape>", lambda e: self.close_info(parrent))
 
-        name = src.split(os.sep)[-1]
+        name = img_src.split(os.sep)[-1]
         try:
-            filemod = datetime.fromtimestamp(os.path.getmtime(src))
+            filemod = datetime.fromtimestamp(os.path.getmtime(img_src))
             filemod = filemod.strftime("%d-%m-%Y, %H:%M:%S")
-            w, h = Image.open(src).size
-            filesize = round(os.path.getsize(src)/(1024*1024), 2)
+            w, h = Image.open(img_src).size
+            filesize = round(os.path.getsize(img_src)/(1024*1024), 2)
         except FileNotFoundError:
             filemod = ""
             filemod = ""
@@ -52,12 +54,12 @@ class ImageInfo(CWindow):
         l_name = cnf.lng.file_name + "\n"*r_name.count("\n")
 
         r_path = "\n".join(
-            re.findall(r".{1,%i}" % max_ln, os.path.split(src)[0])
+            re.findall(r".{1,%i}" % max_ln, os.path.split(img_src)[0])
             )
         l_path = cnf.lng.file_path + "\n"*r_path.count("\n")
 
         labels = {
-            cnf.lng.collection: get_coll_name(src),
+            cnf.lng.collection: get_coll_name(img_src),
             l_name: r_name,
             cnf.lng.date_changed: filemod,
             cnf.lng.resolution: f"{w}x{h}",

@@ -7,9 +7,10 @@ from PIL import ImageTk
 
 from cfg import cnf
 from database import Dbase, ThumbsMd
+
+from .context import *
 from .utils import *
 from .utils import place_center
-
 from .widgets import *
 
 __all__ = (
@@ -27,12 +28,12 @@ class ContextViewer(Context):
         self.sep()
         self.copy_jpg_path(img_src)
         self.reveal_jpg(img_src)
-        self.download_onefile(img_src)
+        self.download_jpg(img_src)
 
         self.sep()
-        self.copy_tiffs_paths(img_src)
-        self.reveal_tiffs(img_src)
-        self.download_tiffs(img_src)
+        self.copy_tiff_path(img_src)
+        self.reveal_tiff(img_src)
+        self.download_tiff(img_src)
 
         self.sep()
         self.download_fullsize(img_src)
