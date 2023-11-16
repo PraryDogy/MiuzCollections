@@ -4,7 +4,7 @@ from tkinter import filedialog
 from cfg import cnf
 from .scaner import scaner
 from .utils import *
-
+from .smb_alert import SmbAlert
 from .widgets import *
 
 __all__ = (

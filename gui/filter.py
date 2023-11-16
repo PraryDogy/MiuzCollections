@@ -23,10 +23,10 @@ class CalendarBase(CFrame):
 
         self.yy, self.mm, self.dd = tuple(self.my_date.timetuple())[:3]
 
-        self.calendar = self.load_calendar(master)
+        self.calendar = self.load_calendar()
         self.calendar.pack()
 
-    def load_calendar(self, master: tkinter.Frame):
+    def load_calendar(self):
         parrent = CFrame(self)
 
         self.all_btns = []

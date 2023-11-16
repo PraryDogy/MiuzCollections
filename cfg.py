@@ -63,6 +63,10 @@ class ConfigGui:
         from gui.application import app
         app.topbar.funcbar.filters_wid.reload_filters()
 
+    def move_up(self):
+        from gui.application import app
+        app.thumbs.scroll.moveup()
+
 
 class User:
     def __init__(self) -> None:
@@ -84,6 +88,7 @@ class User:
 
 class Config(ConfigGui, User):
     def __init__(self):
+        ConfigGui.__init__(self)
         User.__init__(self)
         self.app_name = "MiuzCollections"
         self.app_ver = "3.9.3"

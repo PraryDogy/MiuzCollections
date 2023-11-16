@@ -1,4 +1,4 @@
-import tkinter
+from .smb_alert import SmbAlert
 
 from cfg import cnf
 from .scaner import scaner

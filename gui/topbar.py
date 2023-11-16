@@ -141,6 +141,7 @@ class NotifyBar(CFrame):
 
         self.btn_up = CButton(self, text=f"▲", fg_color=fg_color)
         self.btn_up.pack(side="left", fill="x", expand=1)
+        self.btn_up.cmd(lambda e: cnf.move_up())
 
     def notibar_text(self, text):
         try:

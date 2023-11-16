@@ -1,4 +1,3 @@
-import os
 import platform
 
 from cfg import cnf
@@ -10,6 +9,7 @@ from .thumbnails import Thumbs
 from .utils import on_exit, run_applescript, smb_check
 from .widgets import *
 from .topbar import TopBar
+from .smb_alert import SmbAlert
 
 
 __all__ = (
@@ -26,10 +26,8 @@ class Application:
         if cnf.root_g["w"] < 50 or cnf.root_g["h"] < 50:
             cnf.root_g["w"], cnf.root_g["h"] = 700, 500
 
-        cnf.root.geometry(
-            (f"{cnf.root_g['w']}x{cnf.root_g['h']}"
-            f"+{cnf.root_g['x']}+{cnf.root_g['y']}")
-            )
+        cnf.root.geometry((f"{cnf.root_g['w']}x{cnf.root_g['h']}"
+                           f"+{cnf.root_g['x']}+{cnf.root_g['y']}"))
 
         cnf.root.minsize(700, 300)
         cnf.root.deiconify()
@@ -49,32 +47,27 @@ class Application:
                 "tk::mac::ReopenApplication", cnf.root.deiconify
                 )
 
-        self.menu = Menu(cnf.root)
+        self.menu = Menu(master=cnf.root)
         self.menu.pack(side="left", fill="y")
+        CSep(master=cnf.root, bg="black").pack(side="left", fill="y")
 
-        CSep(cnf.root, bg="black").pack(side="left", fill="y")
-
-        r_frame = CFrame(cnf.root)
+        r_frame = CFrame(master=cnf.root)
         r_frame.pack(fill="both", expand=1)
 
-        self.topbar = TopBar(r_frame)
+        self.topbar = TopBar(master=r_frame)
         self.topbar.pack(fill="x")
-
-        CSep(r_frame).pack(fill="x", padx=1, pady=(10, 0))
-
-        self.thumbs = Thumbs(r_frame)
+        CSep(master=r_frame).pack(fill="x", padx=1, pady=(10, 0))
+        self.thumbs = Thumbs(master=r_frame)
         self.thumbs.pack(fill="both", expand=1)
-
-        sep = CSep(r_frame)
+        sep = CSep(master=r_frame)
         sep.pack(fill="x", padx=1)
-
-        self.stbar = StBar(r_frame)
+        self.stbar = StBar(master=r_frame)
         self.stbar.pack(pady=10)
 
         MacMenu()
 
         if smb_check():
-            cnf.root.after(100, scaner.scaner_start)
+            cnf.root.after(ms=100, func=scaner.scaner_start)
         else:
             scaner.scaner_sheldue()
             SmbAlert()
@@ -96,7 +89,7 @@ class Application:
             end tell
             """
 
-        run_applescript(applescript)
+        run_applescript(applescript=applescript)
         cnf.root.focus_force()
 
 

@@ -331,9 +331,6 @@ class Thumbs(CFrame):
         self.scroll = CScroll(self.scroll_parrent)
         self.scroll.pack(expand=1, fill="both")
 
-        # self.notibar.btn_up.uncmd()
-        # self.notibar.btn_up.cmd(self.scroll.moveup)
-
     def load_thumbs(self):
         thumbs_dict = ThumbsDict()
 
