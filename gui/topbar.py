@@ -134,9 +134,7 @@ class FuncBar(CFrame):
             coll_title = cnf.curr_coll
 
         self.__topbar_title.configure(text=coll_title)
-
    
-
 
 class NotifyBar(CFrame):
     def __init__(self, master: tkinter, bg: str = cnf.bg_color, **kwargs):

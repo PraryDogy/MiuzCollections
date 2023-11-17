@@ -2,7 +2,11 @@ import math
 import tkinter
 import traceback
 from datetime import datetime
-from typing import Tuple
+
+try:
+    from typing_extensions import Callable, Literal, Dict
+except ImportError:
+    from typing import Callable, Literal, Dict
 
 import sqlalchemy
 from PIL import Image, ImageTk
@@ -10,10 +14,11 @@ from PIL import Image, ImageTk
 from cfg import cnf
 from database import Dbase, ThumbsMd
 
+from .context import *
 from .img_viewer import ImgViewer
 from .utils import *
 from .widgets import *
-from .context import *
+
 __all__ = (
     "Thumbs",
     )
@@ -21,41 +26,41 @@ __all__ = (
 
 class ContextFilter(Context):
     def __init__(self, e: tkinter.Event):
-        super().__init__()
+        Context.__init__(self)
 
         for k, v in cnf.lng.filter_names.items():
             self.apply_filter_thumbs(label=v, filter=k)
 
         self.apply_filter_thumbs(label=cnf.lng.show_all, filter="all")
-
         self.do_popup(e=e)
 
 
 class ContextTitles(Context):
-    def __init__(self, e: tkinter.Event, title: str, img_path_list: list):
-        super().__init__()
+    def __init__(self, e: tkinter.Event, title: str,
+                 path_list: tuple[Literal["image path"], ...]):
 
-        self.download_group(title=title, paths_list=img_path_list)
-
-        self.sep()
-        self.download_group_tiffs(title=title, paths_list=img_path_list)
+        Context.__init__(self)
+        self.download_group(title=title, paths_list=path_list)
 
         self.sep()
-        self.download_group_fullsize(title=title, paths_list=img_path_list)
+        self.download_group_tiffs(title=title, paths_list=path_list)
+
+        self.sep()
+        self.download_group_fullsize(title=title, paths_list=path_list)
 
         self.do_popup(e=e)
 
 
 class ContextAdvanced(Context):
-    def __init__(self, e: tkinter.Event, img_src: str):
-        super().__init__()
+    def __init__(self, e: tkinter.Event, img_src: Literal["image path"]):
+        Context.__init__(self)
         self.db_remove_img(img_src=img_src)
         self.do_popup(e=e)
 
 
 class ContextThumbs(Context):
-    def __init__(self, e: tkinter.Event, img_src: str):
-        super().__init__()
+    def __init__(self, e: tkinter.Event, img_src: Literal["image path"]):
+        Context.__init__(self)
 
         self.imgview(img_src=img_src)
         self.imginfo(parrent=e.widget.winfo_toplevel(), img_src=img_src)
@@ -83,7 +88,10 @@ class ThumbsDict(dict):
         decoded = self.decode_thumbs(thumbs_raw=data)
         self.update(self.create_thumbs_dict(thumbs_raw=decoded))
 
-    def decode_thumbs(self, thumbs_raw: Tuple[Tuple[bytes, str, int]]):
+    def decode_thumbs(
+            self,
+            thumbs_raw: tuple[tuple[bytes, str, int], ...]
+            ) -> tuple[tuple[bytes, str, int], ...]:
         result = []
         for blob, src, modified in thumbs_raw:
             try:
@@ -97,7 +105,10 @@ class ThumbsDict(dict):
 
         return result
 
-    def create_thumbs_dict(self, thumbs_raw: Tuple[Tuple[bytes, str, int]]):
+    def create_thumbs_dict(
+            self,
+            thumbs_raw: tuple[tuple[bytes, str, int], ...]
+            ) -> dict[Literal["key: month year, value: [(PIL image, path image), ...]"]]:
         thumbs_dict = {}
 
         for img, src, modified in thumbs_raw:
@@ -113,11 +124,10 @@ class ThumbsDict(dict):
 
         return thumbs_dict
 
-    def stamp_dates(self):
-        start = datetime.combine(cnf.start, datetime.min.time())
-        end = datetime.combine(
-            cnf.end, datetime.max.time().replace(microsecond=0)
-            )
+    def stamp_dates(self) -> tuple[datetime, datetime]:
+        start = datetime.combine(date=cnf.start, time=datetime.min.time())
+        end = datetime.combine(date=cnf.end,
+                               time=datetime.max.time().replace(microsecond=0))
         return (datetime.timestamp(start), datetime.timestamp(end))
 
     def get_query(self):
@@ -161,34 +171,32 @@ class ThumbsDict(dict):
 
 
 class ResetDatesBtn(CButton):
-    def __init__(self, master: tkinter, fg_color: str = cnf.btn_color,
-                width: int = 75, **kw):
-        super().__init__(master=master, fg_color=fg_color, width=width,
-                         text=cnf.lng.reset_dates, **kw)
+    def __init__(self, master: tkinter):
+        CButton.__init__(self, master=master, text=cnf.lng.reset_dates)
         self.cmd(self.reset_dates_cmd)
 
-    def reset_dates_cmd(self, e):
+    def reset_dates_cmd(self, e: tkinter.Event):
         cnf.start, cnf.end = None, None
         cnf.reload_filters()
         cnf.reload_scroll()
 
 
 class ResetSearchBtn(CButton):
-    def __init__(self, master: tkinter, **kw):
-        super().__init__(master, text=cnf.lng.reset_search, **kw)
+    def __init__(self, master: tkinter):
+        CButton.__init__(self, master=master, text=cnf.lng.reset_search)
         self.cmd(self.reset_search_cmd)
 
-    def reset_search_cmd(self, e):
-        cnf.search_var.set("")
+    def reset_search_cmd(self, e: tkinter.Event):
+        cnf.search_var.set(value="")
         cnf.reload_scroll()
 
 
 class ResetFiltersBtn(CButton):
-    def __init__(self, master: tkinter, **kw):
-        super().__init__(master, text=cnf.lng.show_all, **kw)
+    def __init__(self, master: tkinter):
+        CButton.__init__(self, master=master, text=cnf.lng.show_all)
         self.cmd(self.reset_filters_cmd)
 
-    def reset_filters_cmd(self, e):
+    def reset_filters_cmd(self, e: tkinter.Event):
         for k, v in cnf.filter_values.items():
             cnf.filter_values[k] = False
         cnf.reload_filters()
@@ -196,8 +204,8 @@ class ResetFiltersBtn(CButton):
 
 
 class NoImages(CFrame):
-    def __init__(self, master: tkinter, **kw):
-        super().__init__(master, **kw)
+    def __init__(self, master: tkinter):
+        CButton.__init__(self, master=master)
 
         str_var = cnf.search_var.get()
         no_images = CLabel(self, text=cnf.lng.no_photo,
@@ -340,12 +348,12 @@ class Thumbs(CFrame):
         else:
             self.above_thumbsframe = NoImages(self.scroll)
             self.above_thumbsframe.pack()
-            for i in (self.scroll, self.above_thumbsframe):
-                i.get_parrent().bind("<ButtonRelease-2>", ContextFilter)
 
         self.thumbs_frame = CFrame(self.scroll, width=10)
         self.thumbs_frame.pack(anchor="w", padx=5)
-        self.thumbs_frame.bind("<ButtonRelease-2>", ContextFilter)
+
+        for i in (self.scroll, self.thumbs_frame, self.above_thumbsframe):
+            i.bind("<ButtonRelease-2>", ContextFilter)
 
         grid_limit = 500
         self.clmns = self.get_clmns_count()
