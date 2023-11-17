@@ -7,7 +7,7 @@ from datetime import datetime
 import traceback
 try:
     from typing_extensions import Literal
-except Exception:
+except ImportError:
     from typing import Literal
 
 

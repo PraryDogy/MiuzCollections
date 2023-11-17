@@ -12,7 +12,7 @@ class SmbAlert(CWindow):
         self.minsize(420, 85)
         self.protocol("WM_DELETE_WINDOW", self.close_smb)
         self.bind("<Escape>", self.close_smb)
-        place_center(cnf.root, self, 420, 85)
+        place_center(self, 420, 85)
 
         txt = cnf.lng.no_connection
         title_lbl = CLabel(

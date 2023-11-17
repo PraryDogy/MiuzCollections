@@ -2,26 +2,25 @@ import tkinter
 
 from cfg import cnf
 
+from .context import *
 from .filter import Filter
 from .utils import *
 from .widgets import *
-from .context import *
+
 
 class ContextSearch(Context):
     def __init__(self, e: tkinter.Event):
-        super().__init__()
+        Context.__init__(self)
         self.clear()
         self.pastesearch()
         self.do_popup(e=e)
 
 
 class SearchWid(CEntry):
-    def __init__(self, master: tkinter, **kw):
-        super().__init__(
-            master,
-            textvariable=cnf.search_var,
-            width=200,
-            **kw)
+    def __init__(self, master: tkinter, width: int =200,
+                 textvariable: tkinter.Variable = cnf.search_var, **kw):
+        CEntry.__init__(self, master=master, width=width,
+                        textvariable=textvariable, **kw)
 
         self.bind("<Escape>", lambda e: cnf.root.focus_force())
         cnf.root.bind("<Command-f>", lambda e: self.focus_force())
@@ -43,6 +42,9 @@ class SearchWid(CEntry):
             if search_var != self.old_search_var:
                 self.__cancel_search_task()
                 self.search_task = cnf.root.after(1000, self.__search_go)
+        else:
+            cnf.reload_scroll()
+            cnf.root.focus_force()
 
     def __search_go(self, e=None):
         self.__cancel_search_task()

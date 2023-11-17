@@ -87,9 +87,9 @@ class ThumbsDict(dict):
         result = []
         for blob, src, modified in thumbs_raw:
             try:
-                decoded = decode_image(image=blob)
+                decoded = decode_image(img=blob)
                 cropped = crop_image(img=decoded)
-                img = convert_to_rgb(image=cropped)
+                img = convert_to_rgb(img=cropped)
                 result.append((img, src, modified))
 
             except Exception:

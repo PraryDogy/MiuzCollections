@@ -1,7 +1,11 @@
 import abc
 import sys
 import tkinter
-from typing import Callable, Literal
+
+try:
+    from typing_extensions import Callable, Literal
+except ImportError:
+    from typing import Literal, Callable
 
 import customtkinter
 
@@ -53,10 +57,10 @@ class CScroll(customtkinter.CTkScrollableFrame, BaseCWid):
             self, master=master, width=width, corner_radius=corner_radius,
             fg_color=fg_color)
 
-        self.fg_color = fg_color
-        self.old_scroll_bg = self._scrollbar._button_color
+        self.__fg_color = fg_color
+        self.__old_scroll_bg = self._scrollbar._button_color
         self._scrollbar.configure(width=scroll_width, button_color=fg_color)
-        self.scrolltask = None
+        self.__scrolltask = None
 
     def get_parrent(self):
         return self._parent_canvas
@@ -75,12 +79,12 @@ class CScroll(customtkinter.CTkScrollableFrame, BaseCWid):
             print(ex)
 
     def cancel_scrolltask(self):
-        if self.scrolltask:
-            cnf.root.after_cancel(self.scrolltask)
+        if self.__scrolltask:
+            cnf.root.after_cancel(self.__scrolltask)
 
     def hide_scroll(self, e=None):
         try:
-            self._scrollbar.configure(button_color=self.fg_color)
+            self._scrollbar.configure(button_color=self.__fg_color)
         except tkinter.TclError:
             print("widgets > scroll > hide scroll > no scroll")
 
@@ -89,8 +93,8 @@ class CScroll(customtkinter.CTkScrollableFrame, BaseCWid):
             self._mouse_wheel_all(e)
 
         self.cancel_scrolltask()
-        self._scrollbar.configure(button_color=self.old_scroll_bg)
-        self.scrolltask = cnf.root.after(cnf.hidescroll_ms, self.hide_scroll)
+        self._scrollbar.configure(button_color=self.__old_scroll_bg)
+        self.__scrolltask = cnf.root.after(cnf.hidescroll_ms, self.hide_scroll)
 
 
 class CSep(tkinter.Frame, BaseCWid):

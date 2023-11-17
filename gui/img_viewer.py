@@ -51,7 +51,7 @@ class ImgViewer(CWindow):
         self.minsize(500, 300)
         self.resizable(1, 1)
         self.geometry(f"{cnf.imgview_g['w']}x{cnf.imgview_g['h']}")
-        place_center(cnf.root, self, cnf.imgview_g["w"], cnf.imgview_g["h"])
+        place_center(self, cnf.imgview_g["w"], cnf.imgview_g["h"])
         self.protocol("WM_DELETE_WINDOW", self.close_view)
         self.bind("<Escape>", self.close_view)
 
@@ -117,7 +117,7 @@ class ImgViewer(CWindow):
             ThumbsMd.src==self.img_src)).first()[0]
         img = decode_image(img)
         img = resize_image(
-            img, cnf.imgview_g["w"], cnf.imgview_g["h"], thumbnail=False
+            img, cnf.imgview_g["w"], cnf.imgview_g["h"], is_thumb=False
             )
         img = convert_to_rgb(img)
         self.tk_img(img)
@@ -130,7 +130,7 @@ class ImgViewer(CWindow):
                 img = replace_bg(img, cnf.bg_color)
 
             img = resize_image(
-                img, cnf.imgview_g["w"], cnf.imgview_g["h"], thumbnail=False
+                img, cnf.imgview_g["w"], cnf.imgview_g["h"], is_thumb=False
                 )
             img = convert_to_rgb(img)
             self.tk_img(img)

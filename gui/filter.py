@@ -285,7 +285,7 @@ class Filter(CWindow):
         super().__init__()
         self.title(cnf.lng.filter)
         self.minsize(633, 490)
-        place_center(cnf.root, self, 633, 490)
+        place_center(self, 633, 490)
         self.protocol("WM_DELETE_WINDOW", self.close_filter)
         self.bind("<Escape>", self.close_filter)
         self.bind("<Return>", self.ok_filter)

@@ -6,7 +6,11 @@ import threading
 import tkinter
 import traceback
 from time import sleep
-from typing import Literal
+
+try:
+    from typing_extensions import Literal, Callable
+except ImportError:
+    from typing import Literal, Callable
 
 import cv2
 import numpy
@@ -29,7 +33,6 @@ __all__ = (
     "decode_image",
     "encode_image",
     "find_tiffs",
-    "focus_last_win",
     "get_coll_name",
     "on_exit",
     "paste_search",
@@ -43,14 +46,12 @@ __all__ = (
     )
 
 
-
-
 # ********************system utils********************
 
 utils_task = threading.Thread(target=None)
 
 
-def run_utils_task(fn, args=[], kwargs={}):
+def run_utils_task(fn: Callable, args: list = [], kwargs: dict = {}):
     global utils_task
     utils_task = threading.Thread(
         target=fn, args=args, kwargs=kwargs, daemon=True
@@ -73,10 +74,10 @@ def delay():
     sleep(2)
 
 
-def dec_utils_task(task):
+def dec_utils_task(task: Callable):
     def wrapper(*args, **kwargs):
         wait_utils_task()
-        run_utils_task(task, args, kwargs)
+        run_utils_task(fn=task, args=args, kwargs=kwargs)
         wait_utils_task()
         cnf.notibar_default()
         wait_utils_task()
@@ -84,36 +85,36 @@ def dec_utils_task(task):
     return wrapper
 
 
-def run_applescript(applescript: str):
+def run_applescript(applescript: Literal["applescript"]):
     args = [
         arg for row in applescript.split("\n")
         for arg in ("-e", row.strip())
         if row.strip()
         ]
-    subprocess.call(["osascript"] + args)
+    subprocess.call(args=["osascript"] + args)
 
 
 def write_err():
-    if not os.path.exists(cnf.cfg_dir):
-        os.mkdir(cnf.cfg_dir)
+    if not os.path.exists(path=cnf.cfg_dir):
+        os.mkdir(path=cnf.cfg_dir)
 
     file = os.path.join(cnf.cfg_dir, "err.txt")
 
-    if not os.path.exists(file):
-        with open(file, "w") as err_file:
+    if not os.path.exists(path=file):
+        with open(file=file, mode="w") as err_file:
             pass
 
-    with open(file, "r") as err_file:
+    with open(file=file, mode="r") as err_file:
         data = err_file.read()
 
     data = f"{data}\n\n{traceback.format_exc()}"
 
-    with open(file, "w") as err_file:
-        print(data, file=err_file)
+    with open(file=file, mode="w") as err_file:
+        print(values=data, file=err_file)
 
 
-def normalize_name(name: str):
-    name, ext = os.path.splitext(name)
+def normalize_name(name: str) -> Literal["file name"]:
+    name, ext = os.path.splitext(p=name)
     name = name.translate(str.maketrans("", "", string.punctuation))
 
     for i in ("preview", "1x1", "1х1", "crop", "копия", "copy", "small"):
@@ -122,18 +123,18 @@ def normalize_name(name: str):
     return name.replace(" ", "")
 
 
-def smb_check():
-    return bool(os.path.exists(cnf.coll_folder))
+def smb_check() -> bool:
+    return bool(os.path.exists(path=cnf.coll_folder))
 
 
-def on_exit(e=None):
-    w, h = cnf.root.winfo_width(), cnf.root.winfo_height()
-    x, y = cnf.root.winfo_x(), cnf.root.winfo_y()
+def on_exit(e: tkinter.Event = None):
+    new_g = {"w": cnf.root.winfo_width(),
+             "h": cnf.root.winfo_height(),
+             "x": cnf.root.winfo_x(),
+             "y": cnf.root.winfo_y()}
 
-    cnf.root_g["w"] = w
-    cnf.root_g["h"] = h
-    cnf.root_g["x"] = x
-    cnf.root_g["y"] = y
+    for k, v in new_g.items():
+        cnf.root_g[k] = v
 
     cnf.write_cfg()
 
@@ -142,7 +143,7 @@ def on_exit(e=None):
     quit()
 
 
-def get_coll_name(src: str):
+def get_coll_name(src: Literal["file path"]) -> Literal["collection name"]:
     coll = src.replace(cnf.coll_folder, "").strip(os.sep).split(os.sep)
 
     if len(coll) > 1:
@@ -151,14 +152,15 @@ def get_coll_name(src: str):
         return cnf.coll_folder.strip(os.sep).split(os.sep)[-1]
 
 
-def place_center(parrent: tkinter.Toplevel, win: tkinter.Toplevel, w, h):
-    x, y = parrent.winfo_x(), parrent.winfo_y()
-    xx = x + parrent.winfo_width()//2 - w//2
-    yy = y + parrent.winfo_height()//2 - h//2
+def place_center(win: tkinter.Toplevel, w: int, h: int,
+                 parrent_win: tkinter.Toplevel = cnf.root):
+    x, y = parrent_win.winfo_x(), parrent_win.winfo_y()
+    xx = x + parrent_win.winfo_width() // 2 - w // 2
+    yy = y + parrent_win.winfo_height() // 2 - h // 2
     win.geometry(f"+{xx}+{yy}")
 
 
-def reveal_coll(collname):
+def reveal_coll(collname: str):
     if collname != cnf.all_colls:
         coll_path = os.path.join(cnf.coll_folder, collname)
     else:
@@ -178,51 +180,40 @@ def paste_search():
         print("no clipboard")
 
 
-def focus_last_win():
-    for k, v in cnf.root.children.items():
-        if v.widgetName == "toplevel":
-            v.focus_force()
-            v.grab_set_global()
-            return
-    cnf.root.focus_force()
-
-
-
-
 # ********************image utils********************
 
-def resize_image(img, widget_w, widget_h, thumbnail: bool):
+def resize_image(img: Literal["cv2 image"], wid_w: int, wid_h: int,
+                 is_thumb: bool) -> Literal["cv2 image"]:
     h, w = img.shape[:2]
     aspect = w/h
-    if thumbnail:
+    if is_thumb:
         if aspect > 1:
-            new_h, new_w = widget_h, round(widget_h*aspect)
+            new_h, new_w = wid_h, round(wid_h*aspect)
         elif aspect < 1:
-            new_h, new_w = round(widget_w/aspect), widget_w
+            new_h, new_w = round(wid_w/aspect), wid_w
         elif aspect == 1:
-            new_h, new_w = widget_h, widget_h
+            new_h, new_w = wid_h, wid_h
     else:
-        f1 = widget_w / w
-        f2 = widget_h / h
-        # f = min(f1, f2)
+        f1 = wid_w / w
+        f2 = wid_h / h
         f = f2
         new_w, new_h = (int(w * f), int(h * f))
 
     return cv2.resize(img, (new_w, new_h), interpolation=cv2.INTER_AREA)
 
 
-def replace_bg(image, color: str):
+def replace_bg(img: Literal["cv2 image"], color: str) -> Literal["cv2 image"]:
     try:
-        trans_mask = image[:,:,3 ] == 0
+        trans_mask = img[:,:,3 ] == 0
         color = color.replace("#", "")
         bg_color = tuple(int(color[i:i+2], 16) for i in (0, 2, 4))
-        image[trans_mask] = [*bg_color, 255]
+        img[trans_mask] = [*bg_color, 255]
     except IndexError:
-        return image
-    return image
+        return img
+    return img
 
 
-def encode_image(src):
+def encode_image(src: Literal["file path"]) -> Literal["cv2 image"]:
     image = cv2.imread(src, cv2.IMREAD_UNCHANGED)
 
     if src.endswith((".png", ".PNG")):
@@ -236,23 +227,23 @@ def encode_image(src):
         print("too big img")
 
 
-def decode_image(image):
+def decode_image(img: bytes) -> Literal["cv2 image"]:
     try:
-        nparr = numpy.frombuffer(image, numpy.byte)
+        nparr = numpy.frombuffer(img, numpy.byte)
         return cv2.imdecode(nparr, cv2.IMREAD_ANYCOLOR)
     except TypeError:
         print("utils.py decode_image NoneType instead bytes like img")
         return decode_image(encode_image(cnf.thumb_err))
 
 
-def convert_to_rgb(image):
+def convert_to_rgb(img: Literal["cv2 image"]) -> Image:
     # convert cv2 color to rgb
-    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    image_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     # load numpy array image
     return Image.fromarray(image_rgb)
 
 
-def crop_image(img):
+def crop_image(img: Literal["cv2 image"]) -> Literal["cv2 image"]:
     width, height = img.shape[1], img.shape[0]
     if height >= width:
         delta = (height-width)//2
@@ -263,7 +254,7 @@ def crop_image(img):
     return cropped[0:cnf.thumbsize, 0:cnf.thumbsize]
 
 
-def black_borders(img: Image):
+def black_borders(img: Image) -> Image:
     try:
         bg = Image.new(img.mode, img.size, img.getpixel((0,0)))
         diff = ImageChops.difference(img, bg)
@@ -284,7 +275,7 @@ def black_borders(img: Image):
 
 # ********************finder utils********************
 
-def find_tiffs(src: str):
+def find_tiffs(src: Literal["file path"]) -> (tuple[Literal["file path tiff"], ...] | bool):
     path, filename = os.path.split(src)
     src_file_no_ext = normalize_name(filename)
     exts = (".tiff", ".TIFF", ".psd", ".PSD", ".psb", ".PSB", ".tif", ".TIF")
@@ -308,12 +299,12 @@ def find_tiffs(src: str):
         return False
 
 
-def reveal_files(list_paths: list):
+def reveal_files(paths: tuple[Literal["file path"], ...]):
     cnf.notibar_text(cnf.lng.please_wait)
 
     paths = (
         f"\"{i}\" as POSIX file"
-        for i in list_paths
+        for i in paths
         )
 
     paths = ", ".join(paths)
@@ -342,7 +333,8 @@ def copy_text(text: str):
     cnf.root.clipboard_append(string=text)
 
 
-def apply_filter(filter, btn=None, collname=None):
+def apply_filter(filter: Literal["all"] | Literal["cnf > filter values key"],
+                 btn: tkinter = None, collname: str = None):
     if filter == "all":
         for k, v in cnf.filter_values.items():
             cnf.filter_values[k] = False
@@ -353,7 +345,7 @@ def apply_filter(filter, btn=None, collname=None):
 
     if collname and btn:
         cnf.reload_filters()
-        cnf.show_coll(btn, collname)
+        cnf.show_coll(btn=btn, collname=collname)
     else:
         cnf.reload_filters()
         cnf.reload_scroll()
@@ -362,13 +354,16 @@ def apply_filter(filter, btn=None, collname=None):
 @dec_utils_task
 def finder_actions(
     img_src: Literal["file path"] | tuple[Literal["filepath"], ...],
-    tiff: bool = False, reveal: bool = False,
-    copy_path: bool = False, download: bool = False, fullsize: bool = False):
+    tiff: bool = False,
+    reveal: bool = False,
+    copy_path: bool = False,
+    download: bool = False,
+    fullsize: bool = False):
 
     if not isinstance(img_src, list):
         img_src = [img_src]
 
-    if not [i for i in img_src if os.path.exists(i)]:
+    if not [i for i in img_src if os.path.exists(path=i)]:
         cnf.notibar_text(cnf.lng.no_jpg)
         delay()
         return
@@ -382,25 +377,25 @@ def finder_actions(
             if not cnf.topbar_flag:
                 return
     
-            found_tiffs = find_tiffs(i)
+            found_tiffs = find_tiffs(src=i)
 
             if found_tiffs:
                 tiffs = tiffs + found_tiffs
     
         img_src = tiffs.copy()
         if not tiffs:
-            cnf.notibar_text(cnf.lng.no_tiff)
+            cnf.notibar_text(text=cnf.lng.no_tiff)
             delay()
             return
 
     if reveal:
-        cnf.notibar_text(cnf.lng.please_wait)
-        reveal_files(img_src)
+        cnf.notibar_text(text=cnf.lng.please_wait)
+        reveal_files(paths=img_src)
         delay()
         return
     
     if copy_path:
-        cnf.notibar_text(cnf.lng.please_wait)
+        cnf.notibar_text(text=cnf.lng.please_wait)
         cnf.root.clipboard_clear()
         cnf.root.clipboard_append("\n".join(img_src))
         delay()
@@ -408,22 +403,21 @@ def finder_actions(
 
     if download or fullsize:
         downloads = os.path.join(cnf.down_folder, cnf.app_name)
-        os.makedirs(downloads, exist_ok=True)
+        os.makedirs(name=downloads, exist_ok=True)
         ln_src = len(img_src)
 
-        for num, img_src in enumerate(img_src, 1):
+        for num, img_src in enumerate(iterable=img_src, start=1):
             if not cnf.topbar_flag:
                 return
 
-            cnf.notibar_text(
-                f"{cnf.lng.copying} {num} {cnf.lng.from_pretext} {ln_src}"
-                )
+            cnf.notibar_text(text=f"{cnf.lng.copying} {num} "
+                             f"{cnf.lng.from_pretext} {ln_src}")
 
-            name, ext = os.path.splitext(img_src.split("/")[-1])
+            name, ext = os.path.splitext(p=img_src.split("/")[-1])
 
             if download:
                 try:
-                    shutil.copy(img_src, f"{downloads}/{name}.{ext}")
+                    shutil.copy(src=img_src, dst=f"{downloads}/{name}.{ext}")
                 except FileNotFoundError:
                     print(f"utils > download file not found {img_src}")
                     continue
@@ -432,19 +426,19 @@ def finder_actions(
                 if img_src.endswith((".psd", ".PSD", ".psb", ".PSB")):
 
                     try:
-                        img = psd_tools.PSDImage.open(img_src).composite()
+                        img = psd_tools.PSDImage.open(fp=img_src).composite()
                     except Exception as e:
                         try:
-                            img = Image.open(img_src)
+                            img = Image.open(fp=img_src)
                         except Exception:
                             print(f"utils > fullsize psd open > {img_src}")
                             print(e)
                             continue
 
                     try:
-                        img = img.convert("RGB", colors=8)
+                        img = img.convert(mode="RGB", colors=8)
                         # img = black_borders(img)
-                        img.save(f"{downloads}/psd {name}.jpg")
+                        img.save(fp=f"{downloads}/psd {name}.jpg")
 
                     except Exception as e:
                         print(f"utils > fullsize psd save > {img_src}")
@@ -453,18 +447,18 @@ def finder_actions(
 
                 else:
                     try:
-                        img = tifffile.imread(img_src)[:,:,:3]
+                        img = tifffile.imread(files=img_src)[:,:,:3]
 
-                        if str(img.dtype) != "uint8":
-                            img = (img/256).astype("uint8")
+                        if str(object=img.dtype) != "uint8":
+                            img = (img/256).astype(dtype="uint8")
 
-                        img = Image.fromarray(img.astype("uint8"), "RGB")
+                        img = Image.fromarray(obj=img.astype("uint8"), mode="RGB")
                         # img = black_borders(img)
-                        img.save(f"{downloads}/tiff {name}.jpg")
+                        img.save(fp=f"{downloads}/tiff {name}.jpg")
 
                     except Exception as e:
                         print(f"utils > fullsize tiff > {img_src}")
                         print(e)
                         continue
 
-        subprocess.Popen(["open", downloads])
+        subprocess.Popen(args=["open", downloads])

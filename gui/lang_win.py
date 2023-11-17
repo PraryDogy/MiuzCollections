@@ -15,7 +15,7 @@ class LangWin(CWindow):
         super().__init__(bg, padx, pady, **kwargs)
         w, h = 200, 100
         self.minsize(w, h)
-        place_center(cnf.root, self, w, h)        
+        place_center(self, w, h)        
         self.title(en.lang_label)
 
         title = CLabel(self, text=en.lang_label)
