@@ -27,7 +27,7 @@ class ImageInfo(CWindow):
         super().__init__()
         self.title(cnf.lng.info)
         self.minsize(416, 155)
-        place_center(parrent, self, 416, 155)
+        place_center(win=self, w=416, h=155, parrent_win=parrent)
         self.protocol("WM_DELETE_WINDOW", lambda: self.close_info(parrent))
         self.bind("<Escape>", lambda e: self.close_info(parrent))
 

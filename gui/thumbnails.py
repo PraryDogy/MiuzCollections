@@ -82,7 +82,7 @@ class ContextThumbs(Context):
 
 
 class ThumbsDict(dict):
-    def __init__(self):
+    def __init__(self) -> dict[Literal["key: month year, value: [(PIL image, path image), ...]"]]:
         super().__init__()
         data = Dbase.conn.execute(self.get_query()).fetchall()
         decoded = self.decode_thumbs(thumbs_raw=data)
@@ -107,8 +107,7 @@ class ThumbsDict(dict):
 
     def create_thumbs_dict(
             self,
-            thumbs_raw: tuple[tuple[bytes, str, int], ...]
-            ) -> dict[Literal["key: month year, value: [(PIL image, path image), ...]"]]:
+            thumbs_raw: tuple[tuple[bytes, str, int], ...]) -> dict:
         thumbs_dict = {}
 
         for img, src, modified in thumbs_raw:
@@ -245,8 +244,7 @@ class AboveThumbs(CFrame):
 
 
 class ImgGridTitle(CLabel):
-    def __init__(self, master: tkinter,
-                 title: str,
+    def __init__(self, master: tkinter, title: str,
                  img_src_list: tuple[str, ...],
                  font=("San Francisco Pro", 18, "bold")):
 
@@ -257,37 +255,33 @@ class ImgGridTitle(CLabel):
                 f"\"{cnf.search_var.get()}\"\n{text}"
                 )
 
-        super().__init__(master, font=font, text=text, anchor="w",
+        CLabel.__init__(self, master=master, text=text, font=font, anchor="w",
                          justify="left")
 
-        self.bind(
-            "<ButtonRelease-2>", (
-                lambda e, title=title,
-                paths_list=img_src_list: 
-                ContextTitles(e, title, paths_list)
-                ))
+        self.bind(sequence="<ButtonRelease-2>", func=lambda e:
+                  ContextTitles(e=e, title=title, paths_list=img_src_list))
 
 
 class ImgGrid(CLabel):
-    def __init__(self, master, grid_w, grid_h,
+    def __init__(self, master: tkinter, grid_w: int, grid_h: int,
                  bg=cnf.bg_color, fg=cnf.fg_color, anchor="w"):
 
-        super().__init__(master=master, bg=bg, fg=fg, anchor=anchor)
+        CLabel.__init__(self, master=master, bg=bg, fg=fg, anchor=anchor)
 
-        self.bind("<ButtonRelease-1>", self.__click)
-        self.bind("<ButtonRelease-2>", self.__r_click)
-        self.bind("<Command-ButtonRelease-2>", self.__r_cmd_click)
+        self.bind(sequence="<ButtonRelease-1>", func=self.__click)
+        self.bind(sequence="<ButtonRelease-2>", func=self.__r_click)
+        self.bind(sequence="<Command-ButtonRelease-2>", func=self.__r_cmd_click)
 
-        self.empty = Image.new("RGBA", (grid_w, grid_h), bg)
+        self.empty = Image.new(mode="RGBA", size=(grid_w, grid_h), color=bg)
         self.coords = {}
 
     def set_tk_img(self):
-        img = ImageTk.PhotoImage(self.empty)
+        img = ImageTk.PhotoImage(image=self.empty)
         self.configure(image=img)
         self.image_names = img
 
-    def grid_paste(self, img, grid_x, grid_y, src):
-        self.empty.paste(img, (grid_x, grid_y))
+    def grid_paste(self, img: Image, grid_x: int, grid_y: int, src: str):
+        self.empty.paste(im=img, box=(grid_x, grid_y))
 
         coord = (grid_x // (cnf.thumbsize + cnf.thumbspad),
                  grid_y // (cnf.thumbsize + cnf.thumbspad))
@@ -305,54 +299,54 @@ class ImgGrid(CLabel):
     def __click(self, e: tkinter.Event):
         img_src = self.__get_coords(e)
         if img_src:
-            ImgViewer(img_src)
+            ImgViewer(img_src=img_src)
 
     def __r_cmd_click(self, e: tkinter.Event):
         img_src = self.__get_coords(e)
         if img_src:
-            ContextAdvanced(e, img_src)
+            ContextAdvanced(e=e, img_src=img_src)
 
     def __r_click(self, e: tkinter.Event):
-        img_src = self.__get_coords(e)
+        img_src = self.__get_coords(e=e)
         if img_src:
-            ContextThumbs(e, img_src)
+            ContextThumbs(e=e, img_src=img_src)
         else:
-            ContextFilter(e)
+            ContextFilter(e=e)
 
 
 class Thumbs(CFrame):
-    def __init__(self, master):
-        super().__init__(master)
+    def __init__(self, master: tkinter):
+        CFrame.__init__(self, master=master)
 
         self.resize_task = None
-        cnf.root.bind("<Configure>", self.decect_resize)
+        cnf.root.bind(sequence="<Configure>", func=self.decect_resize)
 
         self.load_scroll()
         self.load_thumbs()
         self.bind_scroll_thumbs()
 
     def load_scroll(self):
-        self.scroll_parrent = CFrame(self)
+        self.scroll_parrent = CFrame(master=self)
         self.scroll_parrent.pack(expand=1, fill="both")
 
-        self.scroll = CScroll(self.scroll_parrent)
+        self.scroll = CScroll(master=self.scroll_parrent)
         self.scroll.pack(expand=1, fill="both")
 
     def load_thumbs(self):
         thumbs_dict = ThumbsDict()
 
         if thumbs_dict:
-            self.above_thumbsframe = AboveThumbs(self.scroll)
+            self.above_thumbsframe = AboveThumbs(master=self.scroll)
             self.above_thumbsframe.pack()
         else:
-            self.above_thumbsframe = NoImages(self.scroll)
+            self.above_thumbsframe = NoImages(master=self.scroll)
             self.above_thumbsframe.pack()
 
-        self.thumbs_frame = CFrame(self.scroll, width=10)
+        self.thumbs_frame = CFrame(master=self.scroll, width=10)
         self.thumbs_frame.pack(anchor="w", padx=5)
 
         for i in (self.scroll, self.thumbs_frame, self.above_thumbsframe):
-            i.bind("<ButtonRelease-2>", ContextFilter)
+            i.bind(sequence="<ButtonRelease-2>", func=ContextFilter)
 
         grid_limit = 500
         self.clmns = self.get_clmns_count()
@@ -395,17 +389,16 @@ class Thumbs(CFrame):
         ln_thumbs = len([item for val in thumbs_dict.values() for item in val])
 
         if ln_thumbs == cnf.limit:
-            more_btn = CButton(self.thumbs_frame, text=cnf.lng.show_more)
+            more_btn = CButton(master=self.thumbs_frame, text=cnf.lng.show_more)
             more_btn.cmd(lambda e: self.show_more_cmd())
             more_btn.pack(pady=15)
 
     def bind_scroll_thumbs(self):
-        for i in (
-            self.scroll_parrent, self.scroll, self.thumbs_frame,
-            *self.thumbs_frame.winfo_children()
-            ):
-            self.scroll.set_scrolltag("thumbs_scroll", i.get_parrent())
-        self.scroll.bind_autohide_scroll("thumbs_scroll")
+        for i in (self.scroll_parrent, self.scroll, self.thumbs_frame,
+            *self.thumbs_frame.winfo_children()):
+
+            self.scroll.set_scrolltag(tag="thumbs_scroll", widget=i.get_parrent())
+        self.scroll.bind_autohide_scroll(tag="thumbs_scroll")
 
     def show_more_cmd(self):
         cnf.limit += 150
@@ -413,8 +406,8 @@ class Thumbs(CFrame):
 
     def decect_resize(self, e):
         if self.resize_task:
-            cnf.root.after_cancel(self.resize_task)
-        self.resize_task = cnf.root.after(500, self.thumbs_resize)
+            cnf.root.after_cancel(id=self.resize_task)
+        self.resize_task = cnf.root.after(ms=500, func=self.thumbs_resize)
 
     def thumbs_resize(self):
         old_w = cnf.root_g["w"]
