@@ -205,10 +205,10 @@ class ResetFiltersBtn(CButton):
 
 class NoImages(CFrame):
     def __init__(self, master: tkinter):
-        CButton.__init__(self, master=master)
+        CFrame.__init__(self, master=master)
 
         str_var = cnf.search_var.get()
-        no_images = CLabel(self, text=cnf.lng.no_photo,
+        no_images = CLabel(master=self, text=cnf.lng.no_photo,
                            font=("San Francisco Pro", 18, "bold"))
         no_images.pack(pady=(15, 0))
 
@@ -216,13 +216,13 @@ class NoImages(CFrame):
             noimg_t = (f"{cnf.lng.no_photo} {cnf.lng.with_name}"
                        f"\n\"{str_var}\"")
             no_images.configure(text=noimg_t)
-            ResetSearchBtn(self).pack(pady=(15, 0))
+            ResetSearchBtn(master=self).pack(pady=(15, 0))
 
         elif any((cnf.start, cnf.end)):
             noimg_t = (f"{cnf.lng.no_photo}"
                        f"\n{cnf.named_start} - {cnf.named_end}")
             no_images.configure(text=noimg_t)
-            ResetDatesBtn(self).pack(pady=(15, 0))
+            ResetDatesBtn(master=self).pack(pady=(15, 0))
 
         else:
             filters = (f"\"{cnf.lng.filter_names[k].lower()}\""
@@ -231,25 +231,24 @@ class NoImages(CFrame):
             filters = ",  ".join(filters)
             noimg_t = (f"{cnf.lng.no_photo_filter}\n{filters}")
             no_images.configure(text=noimg_t)
-            ResetFiltersBtn(self).pack(pady=(15, 0))
+            ResetFiltersBtn(master=self).pack(pady=(15, 0))
 
 
 class AboveThumbs(CFrame):
-    def __init__(self, master: tkinter, **kw):
-        super().__init__(master, **kw)
+    def __init__(self, master: tkinter):
+        CFrame.__init__(self, master=master)
 
         if any((cnf.start, cnf.end)):
-            ResetDatesBtn(self).pack(pady=(15, 0))
+            ResetDatesBtn(master=self).pack(pady=(15, 0))
         elif cnf.search_var.get():
-            ResetSearchBtn(self).pack(pady=(15, 0))
+            ResetSearchBtn(master=self).pack(pady=(15, 0))
 
 
 class ImgGridTitle(CLabel):
     def __init__(self, master: tkinter,
-                 title: str,img_src_list: list,
-                 bg=cnf.bg_color, fg=cnf.fg_color,
-                 font=("San Francisco Pro", 18, "bold"),
-                 ):
+                 title: str,
+                 img_src_list: tuple[str, ...],
+                 font=("San Francisco Pro", 18, "bold")):
 
         text = f"{title}, {cnf.lng.total}: {len(img_src_list)}"
         if cnf.search_var.get():
@@ -258,8 +257,8 @@ class ImgGridTitle(CLabel):
                 f"\"{cnf.search_var.get()}\"\n{text}"
                 )
 
-        super().__init__(master, bg=bg, fg=fg, font=font,
-                         text=text, anchor="w", justify="left")
+        super().__init__(master, font=font, text=text, anchor="w",
+                         justify="left")
 
         self.bind(
             "<ButtonRelease-2>", (
