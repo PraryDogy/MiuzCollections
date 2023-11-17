@@ -7,6 +7,10 @@ from .filter import Filter
 from .utils import *
 from .widgets import *
 
+try:
+    from typing_extensions import Callable, Literal
+except ImportError:
+    from typing import Callable, Literal
 
 class ContextSearch(Context):
     def __init__(self, e: tkinter.Event):
@@ -17,38 +21,39 @@ class ContextSearch(Context):
 
 
 class SearchWid(CEntry):
-    def __init__(self, master: tkinter, width: int =200,
+    def __init__(self, master: tkinter, width: int = 200,
                  textvariable: tkinter.Variable = cnf.search_var, **kw):
         CEntry.__init__(self, master=master, width=width,
                         textvariable=textvariable, **kw)
 
-        self.bind("<Escape>", lambda e: cnf.root.focus_force())
-        cnf.root.bind("<Command-f>", lambda e: self.focus_force())
+        self.bind(sequence="<Escape>", command=lambda e: cnf.root.focus_force())
+        cnf.root.bind(sequence="<Command-f>", command=lambda e: self.focus_force())
 
-        self.bind("<Return>", self.__search_go)
-        self.bind("<ButtonRelease-2>", ContextSearch)
+        self.bind(sequence="<Return>", command=self.__search_go)
+        self.bind(sequence="<ButtonRelease-2>", command=ContextSearch)
 
-        cnf.search_var.trace("w", lambda *args: self.__create_search_task(args))
-        self.search_task = None
-        self.old_search_var = None
+        cnf.search_var.trace(mode="w", callback=lambda *args:
+                             self.__create_search_task(args))
+        self.__search_task = None
+        self.__old_search_var = None
 
     def __cancel_search_task(self):
-        if self.search_task:
-            cnf.root.after_cancel(self.search_task)
+        if self.__search_task:
+            cnf.root.after_cancel(self.__search_task)
 
     def __create_search_task(self, *args):
         search_var = cnf.search_var.get()
         if search_var:
-            if search_var != self.old_search_var:
+            if search_var != self.__old_search_var:
                 self.__cancel_search_task()
-                self.search_task = cnf.root.after(1000, self.__search_go)
+                self.__search_task = cnf.root.after(1000, self.__search_go)
         else:
             cnf.reload_scroll()
             cnf.root.focus_force()
 
     def __search_go(self, e=None):
         self.__cancel_search_task()
-        self.old_search_var = cnf.search_var.get()
+        self.__old_search_var = cnf.search_var.get()
         cnf.search_var.set(self.get())
         cnf.start, cnf.end = None, None
         cnf.reload_scroll()
