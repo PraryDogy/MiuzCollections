@@ -8,9 +8,7 @@ from .smb_alert import SmbAlert
 from .utils import *
 from .widgets import *
 
-__all__ = (
-    "StBar",
-    )
+__all__ = ("StBar",)
 
 
 class ScanerGui(CWindow):

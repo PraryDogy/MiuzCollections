@@ -13,9 +13,7 @@ try:
 except ImportError:
     from typing import Literal
 
-__all__ = (
-    "Settings",
-    )
+__all__ = ("Settings",)
 
 
 class BrowsePathFrame(CFrame):

@@ -12,6 +12,8 @@ from .context import *
 from .utils import *
 from .widgets import *
 
+__all__ = ("ImageInfo",)
+
 
 class ContextInfo(Context):
     def __init__(self, e: tkinter.Event):

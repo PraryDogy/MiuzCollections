@@ -12,9 +12,7 @@ from .topbar import TopBar
 from .smb_alert import SmbAlert
 
 
-__all__ = (
-    "Application",
-    )
+__all__ = ("Application",)
 
 
 class Application:

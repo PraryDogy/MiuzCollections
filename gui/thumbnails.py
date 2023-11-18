@@ -4,9 +4,9 @@ import traceback
 from datetime import datetime
 
 try:
-    from typing_extensions import Callable, Literal, Dict
+    from typing_extensions import Literal
 except ImportError:
-    from typing import Callable, Literal, Dict
+    from typing import Literal
 
 import sqlalchemy
 from PIL import Image, ImageTk
@@ -19,9 +19,7 @@ from .img_viewer import ImgViewer
 from .utils import *
 from .widgets import *
 
-__all__ = (
-    "Thumbs",
-    )
+__all__ = ("Thumbs",)
 
 
 class ContextFilter(Context):

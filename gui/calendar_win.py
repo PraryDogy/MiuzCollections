@@ -13,6 +13,8 @@ try:
 except ImportError:
     from typing import Literal
 
+__all__ = ("CalendarWin",)
+
 
 class CalendarBase(CFrame):
     def __init__(self, master: tkinter.Frame, my_date: datetime):

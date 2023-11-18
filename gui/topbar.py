@@ -2,15 +2,13 @@ import tkinter
 
 from cfg import cnf
 
-from .context import *
 from .calendar_win import CalendarWin
+from .context import *
 from .utils import *
 from .widgets import *
 
-try:
-    from typing_extensions import Callable, Literal
-except ImportError:
-    from typing import Callable, Literal
+__all__ = ("TopBar", )
+
 
 class ContextSearch(Context):
     def __init__(self, e: tkinter.Event):

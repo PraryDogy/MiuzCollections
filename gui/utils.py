@@ -42,7 +42,7 @@ __all__ = (
     "reveal_coll",
     "run_applescript",
     "smb_check",
-    "finder_actions"
+    "finder_actions",
     )
 
 

@@ -8,15 +8,7 @@ from database import Dbase, ThumbsMd
 
 from .utils import *
 
-try:
-    from typing_extensions import Literal
-except ImportError:
-    from typing import Literal
-
-
-__all__ = (
-    "scaner",
-    )
+__all__ = ("scaner",)
 
 
 class Scaner:

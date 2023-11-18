@@ -8,9 +8,7 @@ from database import Dbase, ThumbsMd
 from .context import *
 from .widgets import *
 
-__all__ = (
-    "Menu",
-    )
+__all__ = ("Menu",)
 
 
 class ContextMenu(Context):

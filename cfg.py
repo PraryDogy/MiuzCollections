@@ -11,9 +11,7 @@ except ImportError:
     from typing import Literal
 
 
-__all__ = (
-    "cnf",
-    )
+__all__ = ("cnf",)
 
 
 class ConfigGui:

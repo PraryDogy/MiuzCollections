@@ -18,9 +18,7 @@ try:
 except ImportError:
     from typing import Literal
 
-__all__ = (
-    "ImgViewer",
-    )
+__all__ = ("ImgViewer",)
 
 
 class ContextViewer(Context):
