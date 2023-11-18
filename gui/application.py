@@ -48,11 +48,9 @@ class Application:
                 )
 
         self.menu = Menu(master=cnf.root)
-        self.menu.pack(side="left", fill="y")
-        CSep(master=cnf.root, bg="black").pack(side="left", fill="y")
+        menusep = CSep(master=cnf.root, bg="black")
 
         r_frame = CFrame(master=cnf.root)
-        r_frame.pack(fill="both", expand=1)
 
         self.topbar = TopBar(master=r_frame)
         self.topbar.pack(fill="x")
@@ -63,6 +61,10 @@ class Application:
         sep.pack(fill="x", padx=1)
         self.stbar = StBar(master=r_frame)
         self.stbar.pack(pady=10)
+
+        self.menu.pack(side="left", fill="y")
+        menusep.pack(side="left", fill="y")
+        r_frame.pack(fill="both", expand=1)
 
         MacMenu()
 

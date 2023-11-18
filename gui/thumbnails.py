@@ -82,7 +82,11 @@ class ContextThumbs(Context):
 
 
 class ThumbsDict(dict):
-    def __init__(self) -> dict[Literal["key: month year, value: [(PIL image, path image), ...]"]]:
+    def __init__(self) -> dict[str, tuple]:
+        """
+        dict key: str(month year)
+        dict value: list of tuples(PIL Image, image path)
+        """
         super().__init__()
         data = Dbase.conn.execute(self.get_query()).fetchall()
         decoded = self.decode_thumbs(thumbs_raw=data)
@@ -264,6 +268,7 @@ class ImgGridTitle(CLabel):
 
 class ImgGrid(CLabel):
     def __init__(self, master: tkinter, grid_w: int, grid_h: int,
+                 thumbsize: Literal["cnf.thumbsize + cnf.thumbspad"],
                  bg=cnf.bg_color, fg=cnf.fg_color, anchor="w"):
 
         CLabel.__init__(self, master=master, bg=bg, fg=fg, anchor=anchor)
@@ -272,27 +277,28 @@ class ImgGrid(CLabel):
         self.bind(sequence="<ButtonRelease-2>", func=self.__r_click)
         self.bind(sequence="<Command-ButtonRelease-2>", func=self.__r_cmd_click)
 
-        self.empty = Image.new(mode="RGBA", size=(grid_w, grid_h), color=bg)
-        self.coords = {}
+        self.__empty_grid = Image.new(mode="RGBA", size=(grid_w, grid_h),
+                                      color=bg)
+        self.__coords = {}
+        self.__thumbsize = thumbsize
 
     def set_tk_img(self):
-        img = ImageTk.PhotoImage(image=self.empty)
+        img = ImageTk.PhotoImage(image=self.__empty_grid)
         self.configure(image=img)
         self.image_names = img
 
-    def grid_paste(self, img: Image, grid_x: int, grid_y: int, src: str):
-        self.empty.paste(im=img, box=(grid_x, grid_y))
+    def grid_paste(self, img: Image, img_src: str, grid_x: int, grid_y: int):
+        self.__empty_grid.paste(im=img, box=(grid_x, grid_y))
 
-        coord = (grid_x // (cnf.thumbsize + cnf.thumbspad),
-                 grid_y // (cnf.thumbsize + cnf.thumbspad))
-        self.coords[coord] = src
-        cnf.all_src.append(src)
+        coord = (grid_x // self.__thumbsize, grid_y // self.__thumbsize)
+        self.__coords[coord] = img_src
+        cnf.all_src.append(img_src)
 
-    def __get_coords(self, e: tkinter.Event):
+    def __get_coords(self, e: tkinter.Event) -> Literal["str img src"] | bool:
         try:
-            clmn = e.x // (cnf.thumbsize + cnf.thumbspad)
-            row = e.y // (cnf.thumbsize + cnf.thumbspad)
-            return self.coords[(clmn, row)]
+            clmn = e.x // self.__thumbsize
+            row = e.y // self.__thumbsize
+            return self.__coords[(clmn, row)]
         except KeyError:
             return False
 
@@ -318,7 +324,8 @@ class Thumbs(CFrame):
     def __init__(self, master: tkinter):
         CFrame.__init__(self, master=master)
 
-        self.resize_task = None
+        self.__resize_task = None
+        self.__thumbsize = cnf.thumbsize + cnf.thumbspad
         cnf.root.bind(sequence="<Configure>", func=self.decect_resize)
 
         self.load_scroll()
@@ -326,62 +333,62 @@ class Thumbs(CFrame):
         self.bind_scroll_thumbs()
 
     def load_scroll(self):
-        self.scroll_parrent = CFrame(master=self)
-        self.scroll_parrent.pack(expand=1, fill="both")
+        self.__scroll_parrent = CFrame(master=self)
+        self.__scroll_parrent.pack(expand=1, fill="both")
 
-        self.scroll = CScroll(master=self.scroll_parrent)
+        self.scroll = CScroll(master=self.__scroll_parrent)
         self.scroll.pack(expand=1, fill="both")
 
     def load_thumbs(self):
         thumbs_dict = ThumbsDict()
 
         if thumbs_dict:
-            self.above_thumbsframe = AboveThumbs(master=self.scroll)
-            self.above_thumbsframe.pack()
+            self.__above_thumbs = AboveThumbs(master=self.scroll)
+            self.__above_thumbs.pack()
         else:
-            self.above_thumbsframe = NoImages(master=self.scroll)
-            self.above_thumbsframe.pack()
+            self.__above_thumbs = NoImages(master=self.scroll)
+            self.__above_thumbs.pack()
 
-        self.thumbs_frame = CFrame(master=self.scroll, width=10)
-        self.thumbs_frame.pack(anchor="w", padx=5)
+        self.__thumbsframe = CFrame(master=self.scroll, width=10)
+        self.__thumbsframe.pack(anchor="w", padx=5)
 
-        for i in (self.scroll, self.thumbs_frame, self.above_thumbsframe):
+        for i in (self.scroll, self.__thumbsframe, self.__above_thumbs):
             i.bind(sequence="<ButtonRelease-2>", func=ContextFilter)
 
         grid_limit = 500
-        self.clmns = self.get_clmns_count()
-        grid_w = self.clmns * (cnf.thumbsize + cnf.thumbspad)
+        self.__clmns = self.get_clmns_count()
+        grid_w = self.__clmns * self.__thumbsize
 
         for x, (date_key, img_list) in enumerate(thumbs_dict.items()):
-            chunks = [
-                img_list[i:i + grid_limit]
-                for i in range(0, len(img_list), grid_limit)
-                ]
+            chunks = [img_list[i:i + grid_limit]
+                      for i in range(0, len(img_list), grid_limit)]
 
-            grid_title = ImgGridTitle(master=self.thumbs_frame,
-                                      title=date_key,
-                                      img_src_list=[i[1] for i in img_list])
+            grid_title = ImgGridTitle(
+                master=self.__thumbsframe, title=date_key,
+                img_src_list=[i[1] for i in img_list])
             grid_title_pad = 30 if x != 0 else 15
             grid_title.pack(anchor="w", pady=(grid_title_pad, 0),
                             padx=(cnf.thumbspad, 0))
 
             for chunk in chunks:
-                rows = math.ceil(len(chunk) / self.clmns)
-                grid_h = rows * (cnf.thumbsize + cnf.thumbspad)
+                rows = math.ceil(len(chunk) / self.__clmns)
+                grid_h = rows * self.__thumbsize
                 grid_x, grid_y = 0, 0
 
-                grid_img = ImgGrid(master=self.thumbs_frame,
-                                   grid_w=grid_w, grid_h=grid_h)
+                grid_img = ImgGrid(master=self.__thumbsframe,
+                                   grid_w=grid_w, grid_h=grid_h,
+                                   thumbsize=self.__thumbsize)
                 grid_img.pack(anchor="w")
 
-                for img_num, (img_obj, img_src) in enumerate(chunk, 0):
-                    grid_img.grid_paste(img=img_obj, grid_x=grid_x,
-                                        grid_y=grid_y, src=img_src)
+                for img_num, (img_obj, img_src) in enumerate(iterable=chunk, start=1):
 
-                    grid_x = grid_x + cnf.thumbsize + cnf.thumbspad
+                    grid_img.grid_paste(img=img_obj, img_src=img_src,
+                                        grid_x=grid_x, grid_y=grid_y)
 
-                    if (img_num + 1) % self.clmns == 0:
-                        grid_y = grid_y + cnf.thumbsize + cnf.thumbspad
+                    grid_x = grid_x + self.__thumbsize
+
+                    if img_num % self.__clmns == 0:
+                        grid_y = grid_y + self.__thumbsize
                         grid_x = 0
 
                 grid_img.set_tk_img()
@@ -389,14 +396,13 @@ class Thumbs(CFrame):
         ln_thumbs = len([item for val in thumbs_dict.values() for item in val])
 
         if ln_thumbs == cnf.limit:
-            more_btn = CButton(master=self.thumbs_frame, text=cnf.lng.show_more)
+            more_btn = CButton(master=self.__thumbsframe, text=cnf.lng.show_more)
             more_btn.cmd(lambda e: self.show_more_cmd())
             more_btn.pack(pady=15)
 
     def bind_scroll_thumbs(self):
-        for i in (self.scroll_parrent, self.scroll, self.thumbs_frame,
-            *self.thumbs_frame.winfo_children()):
-
+        for i in (self.__scroll_parrent, self.scroll, self.__thumbsframe,
+                  *self.__thumbsframe.winfo_children()):
             self.scroll.set_scrolltag(tag="thumbs_scroll", widget=i.get_parrent())
         self.scroll.bind_autohide_scroll(tag="thumbs_scroll")
 
@@ -404,26 +410,21 @@ class Thumbs(CFrame):
         cnf.limit += 150
         cnf.reload_thumbs()
 
-    def decect_resize(self, e):
-        if self.resize_task:
-            cnf.root.after_cancel(id=self.resize_task)
-        self.resize_task = cnf.root.after(ms=500, func=self.thumbs_resize)
+    def decect_resize(self, e: tkinter.Event):
+        if self.__resize_task:
+            cnf.root.after_cancel(id=self.__resize_task)
+        self.__resize_task = cnf.root.after(ms=500, func=self.thumbs_resize)
 
     def thumbs_resize(self):
-        old_w = cnf.root_g["w"]
-        new_w = cnf.root.winfo_width()
+        if cnf.root.winfo_width() != cnf.root_g["w"]:
+            if self.__clmns != self.get_clmns_count():
 
-        if new_w != old_w:
-            cnf.root_g["w"] = new_w
-
-            if self.clmns != self.get_clmns_count():
-                w, h = cnf.root.winfo_width(), cnf.root.winfo_height()
-                cnf.root_g["w"], cnf.root_g["h"] = w, h
-                cnf.root.update_idletasks()
+                cnf.root_g.update({"w": cnf.root.winfo_width(),
+                                   "h": cnf.root.winfo_height()})
                 cnf.reload_thumbs()
 
     def reload_scroll(self):
-        for i in (self.scroll_parrent, self.scroll):
+        for i in (self.__scroll_parrent, self.scroll):
             i.destroy()
         cnf.all_src.clear()
         self.load_scroll()
@@ -432,12 +433,12 @@ class Thumbs(CFrame):
         cnf.root.focus_force()
 
     def reload_thumbs(self):
-        for i in (self.above_thumbsframe, self.thumbs_frame):
+        for i in (self.__above_thumbs, self.__thumbsframe):
             i.destroy()
         cnf.all_src.clear()
         self.load_thumbs()
         cnf.root.focus_force()
 
-    def get_clmns_count(self):
+    def get_clmns_count(self) -> int:
         w = cnf.root.winfo_width() - cnf.menu_w - cnf.scroll_width
-        return w // (cnf.thumbsize + cnf.thumbspad)
+        return w // self.__thumbsize
