@@ -135,7 +135,7 @@ class Config(ConfigGui, User):
         self.named_start: str = None # datetime as readable text
         self.named_end: str = None # datetime as readable text
         self.set_calendar_title = None # filter > Filter().set_calendar_title()
-        self.scan_flag = False
+        self.scan_status: bool = False
         self.topbar_flag = True
         self.scan_win_txt = ""
         self.scaner_task: threading.Thread = None

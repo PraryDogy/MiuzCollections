@@ -139,7 +139,7 @@ def on_exit(e: tkinter.Event = None):
     cnf.write_cfg()
 
     cnf.topbar_flag = False
-    cnf.scan_flag = False
+    cnf.scan_status = False
     quit()
 
 

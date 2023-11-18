@@ -26,7 +26,7 @@ class Scaner:
 
     def scaner_start(self):
 
-        cnf.scan_flag = True
+        cnf.scan_status = True
         cnf.stbar_btn.configure(text=cnf.lng.updating, fg_color=cnf.blue_color)
 
         cnf.scaner_task = threading.Thread(target=self.task, daemon=True)
@@ -42,7 +42,7 @@ class Scaner:
             cnf.reload_menu()
             self.need_update = False
 
-        cnf.scan_flag = False
+        cnf.scan_status = False
         cnf.stbar_btn.configure(text=cnf.lng.update, fg_color=cnf.btn_color)
 
         self.scaner_sheldue()
@@ -93,12 +93,12 @@ class Scaner:
 
             for root, dirs, files in os.walk(collection):
 
-                if not cnf.scan_flag:
+                if not cnf.scan_status:
                     return
 
                 for file in files:
 
-                    if not cnf.scan_flag:
+                    if not cnf.scan_status:
                         return
 
                     if file.endswith(exts):
@@ -135,7 +135,7 @@ class Scaner:
                         )
                     }
                 for x, (src, size, created, modified) in enumerate(new_images, 1)
-                if cnf.scan_flag
+                if cnf.scan_status
                 ]
 
             limit = 300
@@ -146,7 +146,7 @@ class Scaner:
 
             for vals in values:
                 
-                if not cnf.scan_flag:
+                if not cnf.scan_status:
                     return
 
                 q = sqlalchemy.insert(ThumbsMd).values(
@@ -163,7 +163,7 @@ class Scaner:
         remove_images = []
 
         for src, size, created, modified in db_images:
-            if not cnf.scan_flag:
+            if not cnf.scan_status:
                 return
 
             if (src, size, created, modified) not in found_images:
@@ -181,7 +181,7 @@ class Scaner:
                 "b_modified": modified,
                 }
                 for src, size, created, modified in remove_images
-                if cnf.scan_flag
+                if cnf.scan_status
                 ]
 
             limit = 300
@@ -197,7 +197,7 @@ class Scaner:
                     )
 
 
-                if not cnf.scan_flag:
+                if not cnf.scan_status:
                     return
 
                 q = sqlalchemy.delete(ThumbsMd).filter(
