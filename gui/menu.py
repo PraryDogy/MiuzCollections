@@ -116,5 +116,5 @@ class Menu(CScroll):
         self.sel_btn = btn
         cnf.curr_coll = collname
 
-        cnf.start, cnf.end = None, None
+        cnf.date_start, cnf.date_end = None, None
         cnf.search_var.set(value="")

@@ -291,7 +291,7 @@ class CalendarWin(CWindow):
         left_title = CLabel(master=left_frame, text=cnf.lng.start, font=f)
         left_title.pack()
 
-        self.l_calendar = CCalendar(master=left_frame, my_date=cnf.start)
+        self.l_calendar = CCalendar(master=left_frame, my_date=cnf.date_start)
         self.l_calendar.pack()
 
         right_frame = CFrame(master=calendar_frames)
@@ -300,10 +300,10 @@ class CalendarWin(CWindow):
         right_title = CLabel(master=right_frame, text=cnf.lng.end, font=f)
         right_title.pack()
 
-        self.r_calendar = CCalendar(master=right_frame, my_date=cnf.end)
+        self.r_calendar = CCalendar(master=right_frame, my_date=cnf.date_end)
         self.r_calendar.pack()
 
-        if any((cnf.start, cnf.end)):
+        if any((cnf.date_start, cnf.date_end)):
             cals_t = f"{cnf.named_start} - {cnf.named_end}"
         else:
             cals_t = cnf.lng.dates_not_sel
@@ -352,14 +352,14 @@ class CalendarWin(CWindow):
 
     def ok_filter(self, e: tkinter.Event = None):
         if self.date_changed:
-            cnf.start = self.l_calendar.my_date
-            cnf.end = self.r_calendar.my_date
-            cnf.named_start = self.named_date(date=cnf.start)
-            cnf.named_end = self.named_date(date=cnf.end)
+            cnf.date_start = self.l_calendar.my_date
+            cnf.date_end = self.r_calendar.my_date
+            cnf.named_start = self.named_date(date=cnf.date_start)
+            cnf.named_end = self.named_date(date=cnf.date_end)
 
         if self.reseted:
-            cnf.start = None
-            cnf.end = None
+            cnf.date_start = None
+            cnf.date_end = None
 
         self.grab_release()
         self.destroy()

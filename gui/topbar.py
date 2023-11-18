@@ -55,7 +55,7 @@ class SearchWid(CEntry):
         self.__cancel_search_task()
         self.__old_search_var = cnf.search_var.get()
         cnf.search_var.set(value=self.get())
-        cnf.start, cnf.end = None, None
+        cnf.date_start, cnf.date_end = None, None
         cnf.reload_scroll()
         self.focus_force()
 
@@ -98,7 +98,7 @@ class FiltersWid(CFrame):
                 k.configure(fg_color=cnf.bg_color,
                             text=cnf.lng.filter_names[v] + " ⨁")
 
-        if any((cnf.start, cnf.end)):
+        if any((cnf.date_start, cnf.date_end)):
             self.dates_btn.configure(fg_color=cnf.btn_color,
                                      text=cnf.lng.dates + " ⨂")
         else:

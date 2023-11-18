@@ -117,7 +117,7 @@ class ThumbsDict(dict):
         for img, src, modified in thumbs_raw:
             date_key = datetime.fromtimestamp(modified).date()
 
-            if not any((cnf.start, cnf.end)):
+            if not any((cnf.date_start, cnf.date_end)):
                 date_key = f"{cnf.lng.months[date_key.month]} {date_key.year}"
             else:
                 date_key = f"{cnf.named_start} - {cnf.named_end}"
@@ -128,8 +128,8 @@ class ThumbsDict(dict):
         return thumbs_dict
 
     def stamp_dates(self) -> tuple[datetime, datetime]:
-        start = datetime.combine(date=cnf.start, time=datetime.min.time())
-        end = datetime.combine(date=cnf.end,
+        start = datetime.combine(date=cnf.date_start, time=datetime.min.time())
+        end = datetime.combine(date=cnf.date_end,
                                time=datetime.max.time().replace(microsecond=0))
         return (datetime.timestamp(start), datetime.timestamp(end))
 
@@ -162,7 +162,7 @@ class ThumbsDict(dict):
         if any((str(filters), str(other_filter))):
             q = q.filter(sqlalchemy.or_(filters, other_filter))
 
-        if not any((cnf.start, cnf.end)):
+        if not any((cnf.date_start, cnf.date_end)):
             q = q.limit(cnf.limit)
         else:
             t = self.stamp_dates()
@@ -179,7 +179,7 @@ class ResetDatesBtn(CButton):
         self.cmd(self.reset_dates_cmd)
 
     def reset_dates_cmd(self, e: tkinter.Event):
-        cnf.start, cnf.end = None, None
+        cnf.date_start, cnf.date_end = None, None
         cnf.reload_filters()
         cnf.reload_scroll()
 
@@ -221,7 +221,7 @@ class NoImages(CFrame):
             no_images.configure(text=noimg_t)
             ResetSearchBtn(master=self).pack(pady=(15, 0))
 
-        elif any((cnf.start, cnf.end)):
+        elif any((cnf.date_start, cnf.date_end)):
             noimg_t = (f"{cnf.lng.no_photo}"
                        f"\n{cnf.named_start} - {cnf.named_end}")
             no_images.configure(text=noimg_t)
@@ -241,7 +241,7 @@ class AboveThumbs(CFrame):
     def __init__(self, master: tkinter):
         CFrame.__init__(self, master=master)
 
-        if any((cnf.start, cnf.end)):
+        if any((cnf.date_start, cnf.date_end)):
             ResetDatesBtn(master=self).pack(pady=(15, 0))
         elif cnf.search_var.get():
             ResetSearchBtn(master=self).pack(pady=(15, 0))

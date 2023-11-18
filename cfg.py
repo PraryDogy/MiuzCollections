@@ -136,13 +136,16 @@ class Config(ConfigGui, User):
         self.root.withdraw()
 
         # global variables
-        self.search_var = tkinter.StringVar(value="") # thumbnails > ThumbsSearch()
-        self.start: datetime = None
-        self.end: datetime = None
+        self.search_var = tkinter.StringVar(value="")
+
+        self.date_start: datetime = None
+        self.date_end: datetime = None
         self.named_start: str = None # datetime as readable text
         self.named_end: str = None # datetime as readable text
-        self.scan_status: bool = False
+
+        self.scan_status = False
         self.notibar_status = True
+
         self.scan_win_txt = ""
         self.scaner_thread: threading.Thread = None
         self.all_img_src = []
