@@ -67,6 +67,10 @@ class ConfigGui:
         from gui.application import app
         app.thumbs.scroll.moveup()
 
+    def set_calendar_title(self):
+        from gui.application import app
+        app.topbar.funcbar.filters_wid.calendar_win.set_calendar_title()
+
 
 class User:
     def __init__(self) -> None:
@@ -134,7 +138,6 @@ class Config(ConfigGui, User):
         self.end: datetime = None
         self.named_start: str = None # datetime as readable text
         self.named_end: str = None # datetime as readable text
-        self.set_calendar_title = None # filter > Filter().set_calendar_title()
         self.scan_status: bool = False
         self.topbar_flag = True
         self.scan_win_txt = ""

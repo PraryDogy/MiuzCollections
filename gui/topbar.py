@@ -3,7 +3,7 @@ import tkinter
 from cfg import cnf
 
 from .context import *
-from .filter import Filter
+from .calendar_win import CalendarWin
 from .utils import *
 from .widgets import *
 
@@ -76,9 +76,12 @@ class FiltersWid(CFrame):
 
         self.dates_btn = CButton(master=self, text=cnf.lng.dates)
         self.dates_btn.pack(side="left", fill="x", padx=(0, 5))
-        self.dates_btn.cmd(lambda e: Filter())
+        self.dates_btn.cmd(self.open_calendar)
 
         self.reload_filters()
+
+    def open_calendar(self, e: tkinter.Event = None):
+        self.calendar_win = CalendarWin()
 
     def __filter_btn_cmd(self, v):
         cnf.filter_values[v] = False if cnf.filter_values[v] else True

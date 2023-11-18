@@ -19,33 +19,32 @@ __all__ = (
 
 class Application:
     def __init__(self):
-        cnf.root.title(cnf.app_name)
+        cnf.root.title(string=cnf.app_name)
         cnf.root.configure(bg=cnf.bg_color)
         cnf.root.createcommand("tk::mac::Quit", on_exit)
 
-        if cnf.root_g["w"] < 50 or cnf.root_g["h"] < 50:
-            cnf.root_g["w"], cnf.root_g["h"] = 700, 500
+        if cnf.root_g["w"] < 700 or cnf.root_g["h"] < 300:
+            cnf.root_g.update({"w": 700, "h": 300})
 
-        cnf.root.geometry((f"{cnf.root_g['w']}x{cnf.root_g['h']}"
-                           f"+{cnf.root_g['x']}+{cnf.root_g['y']}"))
+        cnf.root.geometry(newGeometry=(f"{cnf.root_g['w']}x{cnf.root_g['h']}"
+                                       f"+{cnf.root_g['x']}+{cnf.root_g['y']}"))
 
-        cnf.root.minsize(700, 300)
+        cnf.root.minsize(width=700, height=300)
         cnf.root.deiconify()
 
         mac_ver, _, _ = platform.mac_ver()
         mac_ver = float(".".join(mac_ver.split(".")[:2]))
 
         if mac_ver > 12:
-            cnf.root.bind_all("<Command-w>", self.minim)
-            cnf.root.protocol("WM_DELETE_WINDOW", self.minim)
+            cnf.root.bind_all(sequence="<Command-w>", func=self.minim)
+            cnf.root.protocol(name="WM_DELETE_WINDOW", func=self.minim)
             cnf.root.createcommand("tk::mac::ReopenApplication", self.maxim)
 
         else:
-            cnf.root.bind_all("<Command-w>", lambda e: cnf.root.withdraw())
-            cnf.root.protocol("WM_DELETE_WINDOW", cnf.root.withdraw)
-            cnf.root.createcommand(
-                "tk::mac::ReopenApplication", cnf.root.deiconify
-                )
+            cnf.root.bind_all(sequence="<Command-w>",
+                              func=lambda e: cnf.root.withdraw())
+            cnf.root.protocol(name="WM_DELETE_WINDOW", func=cnf.root.withdraw)
+            cnf.root.createcommand("tk::mac::ReopenApplication", cnf.root.deiconify)
 
         self.menu = Menu(master=cnf.root)
         menusep = CSep(master=cnf.root, bg="black")
