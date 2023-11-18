@@ -1,4 +1,5 @@
 import os
+import threading
 
 import sqlalchemy
 
@@ -6,7 +7,11 @@ from cfg import cnf
 from database import Dbase, ThumbsMd
 
 from .utils import *
-import threading
+
+try:
+    from typing_extensions import Literal
+except ImportError:
+    from typing import Literal
 
 
 __all__ = (
@@ -16,31 +21,32 @@ __all__ = (
 
 class Scaner:
     def __init__(self) -> None:
-        self.need_update = False
-        self.scaner_task = None
+        self.__need_update = False
+        self.__scaner_task = None
 
-    def scaner_sheldue(self, default_time=cnf.scan_time*60000):
-        cnf.root.after_cancel(self.task)
+    def scaner_sheldue(self, default_time: int = cnf.scan_time*60000):
+        if self.__scaner_task:
+            cnf.root.after_cancel(id=self.__scaner_task)
         ms = default_time
-        self.scaner_task = cnf.root.after(ms, self.scaner_start)
+        self.__scaner_task = cnf.root.after(ms=ms, func=self.scaner_start_now)
 
-    def scaner_start(self):
+    def scaner_start_now(self):
 
         cnf.scan_status = True
         cnf.stbar_btn.configure(text=cnf.lng.updating, fg_color=cnf.blue_color)
 
-        cnf.scaner_task = threading.Thread(target=self.task, daemon=True)
-        cnf.scaner_task.start()
+        cnf.scaner_thread = threading.Thread(target=self.task, daemon=True)
+        cnf.scaner_thread.start()
 
-        while cnf.scaner_task.is_alive():
+        while cnf.scaner_thread.is_alive():
             cnf.root.update()
 
         self.__change_live_text("")
 
-        if self.need_update:
+        if self.__need_update:
             cnf.reload_thumbs()
             cnf.reload_menu()
-            self.need_update = False
+            self.__need_update = False
 
         cnf.scan_status = False
         cnf.stbar_btn.configure(text=cnf.lng.update, fg_color=cnf.btn_color)
@@ -50,48 +56,37 @@ class Scaner:
     def task(self):
         self.__change_live_text(cnf.lng.preparing)
 
-        db_images = Dbase.conn.execute(
-            sqlalchemy.select(
-            ThumbsMd.src, ThumbsMd.size, ThumbsMd.created, ThumbsMd.modified
-            )
+        db_images = Dbase.conn.execute(sqlalchemy.select(
+            ThumbsMd.src, ThumbsMd.size, ThumbsMd.created, ThumbsMd.modified)
             ).fetchall()
 
+        collections = [os.path.join(cnf.coll_folder, i)
+                       for i in os.listdir(path=cnf.coll_folder)
+                       if not i.startswith((".", "_"))]
+
         exts = (".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG")
-
-        collections = [
-            os.path.join(cnf.coll_folder, i)
-            for i in os.listdir(cnf.coll_folder)
-            if not i.startswith((".", "_"))
-            ]
-
         ln = len(collections)
-
         new_images = []
         found_images = []
 
-        for x, collection in enumerate(collections, 1):
+        for x, collection in enumerate(iterable=collections, start=1):
             self.__change_live_text(
-                    f"{cnf.lng.scaning} "
-                    f"{x} "
-                    f"{cnf.lng.from_pretext} "
-                    f"{ln} "
-                    f"{cnf.lng.colls_case}."
+                    f"{cnf.lng.scaning} {x} {cnf.lng.from_pretext} "
+                    f"{ln} {cnf.lng.colls_case}."
                     )
 
-            if not os.path.isdir(collection):
+            if not os.path.isdir(s=collection):
                 if collection.endswith(exts):
-                    data = (
-                        collection,
-                        int(os.path.getsize(collection)),
-                        int(os.stat(collection).st_birthtime),
-                        int(os.stat(collection).st_mtime)
-                        )
+                    data = (collection,
+                            int(os.path.getsize(filename=collection)),
+                            int(os.stat(path=collection).st_birthtime),
+                            int(os.stat(path=collection).st_mtime))
                     found_images.append(data)
 
                     if data not in db_images:
                         new_images.append(data)
 
-            for root, dirs, files in os.walk(collection):
+            for root, dirs, files in os.walk(top=collection):
 
                 if not cnf.scan_status:
                     return
@@ -103,46 +98,37 @@ class Scaner:
 
                     if file.endswith(exts):
                         src = os.path.join(root, file)
-                        data = (
-                            src,
-                            int(os.path.getsize(src)),
-                            int(os.stat(src).st_birthtime),
-                            int(os.stat(src).st_mtime)
-                            )
+                        data = (src,
+                                int(os.path.getsize(filename=src)),
+                                int(os.stat(path=src).st_birthtime),
+                                int(os.stat(path=src).st_mtime))
                         found_images.append(data)
 
                         if data not in db_images:
                             new_images.append(data)
 
         if new_images:
-            self.need_update = True
+            self.__need_update = True
             ln = len(new_images)
 
             values = [
-                {
-                "b_img150": encode_image(src),
-                "b_src": src,
-                "b_size": size,
-                "b_created": created,
-                "b_modified": modified,
-                "b_collection": get_coll_name(src),
-                "temp": self.__change_live_text(
-                        f"{cnf.lng.added} "
-                        f"{x} "
-                        f"{cnf.lng.from_pretext} "
-                        f"{ln} "
-                        f"{cnf.lng.new_photo_case}."
-                        )
-                    }
-                for x, (src, size, created, modified) in enumerate(new_images, 1)
+                {"b_img150": encode_image(src=src),
+                 "b_src": src,
+                 "b_size": size,
+                 "b_created": created,
+                 "b_modified": modified,
+                 "b_collection": get_coll_name(src=src),
+                 "temp": self.__change_live_text(
+                        f"{cnf.lng.added} {x} {cnf.lng.from_pretext} "
+                        f"{ln} {cnf.lng.new_photo_case}.")
+                        }
+                for x, (src, size, created, modified) in enumerate(iterable=new_images, start=1)
                 if cnf.scan_status
                 ]
 
             limit = 300
-            values = [
-                values[i:i+limit]
-                for i in range(0, len(values), limit)
-                ]
+            values = [values[i : i + limit]
+                      for i in range(0, len(values), limit)]
 
             for vals in values:
                 
@@ -150,14 +136,13 @@ class Scaner:
                     return
 
                 q = sqlalchemy.insert(ThumbsMd).values(
-                    {
-                        "img150": sqlalchemy.bindparam("b_img150"),
-                        "src": sqlalchemy.bindparam("b_src"),
-                        "size": sqlalchemy.bindparam("b_size"),
-                        "created": sqlalchemy.bindparam("b_created"),
-                        "modified": sqlalchemy.bindparam("b_modified"),
-                        "collection": sqlalchemy.bindparam("b_collection")
-                        })
+                    {"img150": sqlalchemy.bindparam("b_img150"),
+                     "src": sqlalchemy.bindparam("b_src"),
+                     "size": sqlalchemy.bindparam("b_size"),
+                     "created": sqlalchemy.bindparam("b_created"),
+                     "modified": sqlalchemy.bindparam("b_modified"),
+                     "collection": sqlalchemy.bindparam("b_collection")}
+                     )
                 Dbase.conn.execute(q, vals)
 
         remove_images = []
@@ -171,31 +156,27 @@ class Scaner:
 
         if remove_images:
 
-            self.need_update = True
+            self.__need_update = True
 
             values = [
-                {
-                "b_src": src,
-                "b_size": size,
-                "b_created": created,
-                "b_modified": modified,
-                }
-                for src, size, created, modified in remove_images
-                if cnf.scan_status
-                ]
+                {"b_src": src,
+                 "b_size": size,
+                 "b_created": created,
+                 "b_modified": modified
+                 }
+                 for src, size, created, modified in remove_images
+                 if cnf.scan_status
+                 ]
 
             limit = 300
-            values = [
-                values[i:i+limit]
-                for i in range(0, len(values), limit)
-                ]
+            values = [values[i : i + limit]
+                      for i in range(0, len(values), limit)]
 
             ln_vals = len(values)
-            for x, vals in enumerate(values, 1):
+            for x, vals in enumerate(iterable=values, start=1):
                 self.__change_live_text(
                     f"{cnf.lng.finishing} {x} {cnf.lng.from_pretext} {ln_vals}"
                     )
-
 
                 if not cnf.scan_status:
                     return
@@ -207,7 +188,6 @@ class Scaner:
                     ThumbsMd.modified == sqlalchemy.bindparam("b_modified")
                     )
                 Dbase.conn.execute(q, vals)
-
 
     def __change_live_text(self, text):
         cnf.scan_win_txt = text

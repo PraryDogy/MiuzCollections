@@ -138,7 +138,7 @@ class Config(ConfigGui, User):
         self.scan_status: bool = False
         self.topbar_flag = True
         self.scan_win_txt = ""
-        self.scaner_task: threading.Thread = None
+        self.scaner_thread: threading.Thread = None
         self.all_src = []
 
     def load_cfg(self):

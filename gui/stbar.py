@@ -40,7 +40,7 @@ class ScanerGui(CWindow):
         cnf.scan_status = False
         cnf.root.after_cancel(id=self.__live_task)
         self.__live_lbl.configure(text=cnf.lng.please_wait)
-        while cnf.scaner_task.is_alive():
+        while cnf.scaner_thread.is_alive():
             cnf.root.update()
         self.__close_scangui()
 
@@ -90,7 +90,7 @@ class StBar(CFrame):
     def __stbar_run_scan(self, e: tkinter.Event = None):
         if not cnf.scan_status:
             if smb_check():
-                scaner.scaner_start()
+                scaner.scaner_start_now()
             else:
                 scaner.scaner_sheldue()
                 SmbAlert()
