@@ -71,6 +71,10 @@ class ConfigGui:
         from gui.application import app
         app.topbar.funcbar.filters_wid.calendar_win.set_calendar_title()
 
+    def stbar_btn(self) -> Literal["type: gui > widgets > CButton"]:
+        from gui.application import app
+        return app.stbar.stbar_btn
+
 
 class User:
     def __init__(self) -> None:
@@ -132,17 +136,16 @@ class Config(ConfigGui, User):
         self.root.withdraw()
 
         # global variables
-        self.stbar_btn: tkinter.Label = None
         self.search_var = tkinter.StringVar(value="") # thumbnails > ThumbsSearch()
         self.start: datetime = None
         self.end: datetime = None
         self.named_start: str = None # datetime as readable text
         self.named_end: str = None # datetime as readable text
         self.scan_status: bool = False
-        self.topbar_flag = True
+        self.notibar_status = True
         self.scan_win_txt = ""
         self.scaner_thread: threading.Thread = None
-        self.all_src = []
+        self.all_img_src = []
 
     def load_cfg(self):
         with open(file=self.json_dir, encoding="utf8", mode="r") as file:

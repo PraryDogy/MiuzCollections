@@ -292,7 +292,7 @@ class ImgGrid(CLabel):
 
         coord = (grid_x // self.__thumbsize, grid_y // self.__thumbsize)
         self.__coords[coord] = img_src
-        cnf.all_src.append(img_src)
+        cnf.all_img_src.append(img_src)
 
     def __get_coords(self, e: tkinter.Event) -> Literal["str img src"] | bool:
         try:
@@ -426,7 +426,7 @@ class Thumbs(CFrame):
     def reload_scroll(self):
         for i in (self.__scroll_parrent, self.scroll):
             i.destroy()
-        cnf.all_src.clear()
+        cnf.all_img_src.clear()
         self.load_scroll()
         self.load_thumbs()
         self.bind_scroll_thumbs()
@@ -435,7 +435,7 @@ class Thumbs(CFrame):
     def reload_thumbs(self):
         for i in (self.__above_thumbs, self.__thumbsframe):
             i.destroy()
-        cnf.all_src.clear()
+        cnf.all_img_src.clear()
         self.load_thumbs()
         cnf.root.focus_force()
 

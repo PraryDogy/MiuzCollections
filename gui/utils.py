@@ -65,7 +65,7 @@ def wait_utils_task():
 
 
 def cancel_utils_task():
-    cnf.topbar_flag = False
+    cnf.notibar_status = False
     wait_utils_task()
     cnf.notibar_default()
 
@@ -81,7 +81,7 @@ def dec_utils_task(task: Callable):
         wait_utils_task()
         cnf.notibar_default()
         wait_utils_task()
-        cnf.topbar_flag = True
+        cnf.notibar_status = True
     return wrapper
 
 
@@ -138,7 +138,7 @@ def on_exit(e: tkinter.Event = None):
 
     cnf.write_cfg()
 
-    cnf.topbar_flag = False
+    cnf.notibar_status = False
     cnf.scan_status = False
     quit()
 
@@ -374,7 +374,7 @@ def finder_actions(
 
         for i in img_src:
     
-            if not cnf.topbar_flag:
+            if not cnf.notibar_status:
                 return
     
             found_tiffs = find_tiffs(src=i)
@@ -407,7 +407,7 @@ def finder_actions(
         ln_src = len(img_src)
 
         for num, img_src in enumerate(iterable=img_src, start=1):
-            if not cnf.topbar_flag:
+            if not cnf.notibar_status:
                 return
 
             cnf.notibar_text(text=f"{cnf.lng.copying} {num} "

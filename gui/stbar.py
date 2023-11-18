@@ -73,9 +73,9 @@ class StBar(CFrame):
         btn.cmd(lambda e: self.__open_settings(btn))
         btn.pack(side="left", padx=(0, 20))
 
-        cnf.stbar_btn = CButton(master=frame, text=cnf.lng.update, width=90)
-        cnf.stbar_btn.cmd(self.__stbar_run_scan)
-        cnf.stbar_btn.pack(side="right")
+        self.stbar_btn = CButton(master=frame, text=cnf.lng.update, width=90)
+        self.stbar_btn.cmd(self.__stbar_run_scan)
+        self.stbar_btn.pack(side="right")
 
         return frame
 

@@ -79,9 +79,9 @@ class ImgViewer(CWindow):
         self.grab_set_global()
 
         self.bind(sequence="<Left>", func=lambda e:
-                  self.__switch_img(ind=cnf.all_src.index(self.__img_src)-1))
+                  self.__switch_img(ind=cnf.all_img_src.index(self.__img_src)-1))
         self.bind(sequence="<Right>", func=lambda e:
-                  self.__switch_img(ind=cnf.all_src.index(self.__img_src)+1))
+                  self.__switch_img(ind=cnf.all_img_src.index(self.__img_src)+1))
 
     def __decect_resize(self, e: tkinter.Event):
         try:
@@ -141,9 +141,9 @@ class ImgViewer(CWindow):
     def __switch_img(self, ind: int):
         cnf.root.after_cancel(id=self.__img_task)
         try:
-            self.__img_src = cnf.all_src[ind]
+            self.__img_src = cnf.all_img_src[ind]
         except IndexError:
-            self.__img_src = cnf.all_src[0]
+            self.__img_src = cnf.all_img_src[0]
 
         self.__set_title()
         self.img.unbind(sequence="<ButtonRelease-2>")
@@ -155,9 +155,9 @@ class ImgViewer(CWindow):
 
     def __l_click(self, e: tkinter.Event):
         if e.x <= cnf.imgview_g["w"] // 2:
-            index = cnf.all_src.index(self.__img_src) - 1
+            index = cnf.all_img_src.index(self.__img_src) - 1
         else:
-            index = cnf.all_src.index(self.__img_src) + 1
+            index = cnf.all_img_src.index(self.__img_src) + 1
         self.__switch_img(ind=index)
 
     def __set_title(self):
