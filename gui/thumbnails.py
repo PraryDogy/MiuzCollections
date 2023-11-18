@@ -37,7 +37,7 @@ class ContextFilter(Context):
 
 class ContextTitles(Context):
     def __init__(self, e: tkinter.Event, title: str,
-                 path_list: tuple[Literal["image path"], ...]):
+                 path_list: tuple[Literal["file path"], ...]):
 
         Context.__init__(self)
         self.download_group(title=title, paths_list=path_list)
@@ -52,14 +52,14 @@ class ContextTitles(Context):
 
 
 class ContextAdvanced(Context):
-    def __init__(self, e: tkinter.Event, img_src: Literal["image path"]):
+    def __init__(self, e: tkinter.Event, img_src: Literal["file path"]):
         Context.__init__(self)
         self.db_remove_img(img_src=img_src)
         self.do_popup(e=e)
 
 
 class ContextThumbs(Context):
-    def __init__(self, e: tkinter.Event, img_src: Literal["image path"]):
+    def __init__(self, e: tkinter.Event, img_src: Literal["file path"]):
         Context.__init__(self)
 
         self.imgview(img_src=img_src)
@@ -85,7 +85,7 @@ class ThumbsDict(dict):
     def __init__(self) -> dict[str, tuple]:
         """
         dict key: str(month year)
-        dict value: list of tuples(PIL Image, image path)
+        dict value: list of tuples(PIL Image, file path)
         """
         super().__init__()
         data = Dbase.conn.execute(self.get_query()).fetchall()
