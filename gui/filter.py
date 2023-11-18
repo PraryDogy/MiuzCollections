@@ -8,6 +8,10 @@ from cfg import cnf
 from .utils import *
 from .widgets import *
 
+try:
+    from typing_extensions import Literal
+except ImportError:
+    from typing import Literal
 
 class CalendarBase(CFrame):
     def __init__(self, master: tkinter.Frame, my_date: datetime):

@@ -45,6 +45,7 @@ class Eng:
         self.file_path = "Location"
         self.collection = "Collection"
         self.dates = "Dates"
+        self.mb = "mb"
 
         self.sett_descr = (
             "If the collection name starts with _ or ."

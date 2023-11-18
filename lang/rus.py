@@ -45,7 +45,7 @@ class Rus:
         self.file_path = "Расположение"
         self.collection = "Коллеция"
         self.dates = "Даты"
-
+        self.mb = "мб"
 
         self.sett_descr = (
             "Если имя коллекции начинается с _ или ."
