@@ -8,29 +8,29 @@ __all__ = ("LangWin", )
 
 
 class LangWin(CWindow):
-    def __init__(self, bg=cnf.bg_color, padx=15, pady=15, **kwargs):
+    def __init__(self, bg=cnf.bg_color, padx=15, pady=15):
 
         en, ru = Eng(), Rus()
 
-        super().__init__(bg, padx, pady, **kwargs)
+        CWindow.__init__(self, bg=bg, padx=padx, pady=pady)
         w, h = 200, 100
-        self.minsize(w, h)
-        place_center(self, w, h)        
-        self.title(en.lang_label)
+        self.minsize(width=w, height=h)
+        place_center(win=self, width=w, height=h)        
+        self.title(string=en.lang_label)
 
-        title = CLabel(self, text=en.lang_label)
+        title = CLabel(master=self, text=en.lang_label)
         title.pack()
 
         for i in (en, ru):
 
-            btn = CButton(self, text=i.language)
+            btn = CButton(master=self, text=i.language)
             btn.pack(pady=(10, 0), fill="x")
-            btn.cmd(lambda e: self.set_lng(lng_name=i.name))
+            btn.cmd(lambda e: self.__set_lng(lng_name=i.name))
 
         self.update_idletasks()
         self.grab_set_global()
 
-    def set_lng(self, lng_name: str):
+    def __set_lng(self, lng_name: str):
         from lang import Eng, Rus
         en, ru = Eng(), Rus()
 

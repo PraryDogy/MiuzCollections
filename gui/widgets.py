@@ -151,7 +151,8 @@ class CLabel(tkinter.Label, BaseCWid):
 
 
 class CWindow(tkinter.Toplevel, BaseCWid):
-    def __init__(self, bg: str = cnf.bg_color, padx: int | tuple[int, int]=15,
+    def __init__(self, bg: str = cnf.bg_color,
+                 padx: int | tuple[int, int] = 15,
                  pady: int | tuple[int, int] = 15, **kwargs):
 
         tkinter.Toplevel.__init__(self, bg=bg, padx=padx, pady=pady, **kwargs)

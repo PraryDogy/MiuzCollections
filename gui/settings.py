@@ -146,7 +146,7 @@ class Settings(CWindow):
         self.title(string=cnf.lng.settings)
         w, h = 440, 490
         self.minsize(width=w, height=h)
-        place_center(win=self, w=w, h=h)
+        place_center(win=self, width=w, height=h)
 
         pader = 15
 

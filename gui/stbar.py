@@ -18,7 +18,7 @@ class ScanerGui(CWindow):
         CWindow.__init__(self)
         self.title(string=cnf.lng.updating)
         self.geometry(newGeometry="300x90")
-        place_center(win=self, w=300, h=90)
+        place_center(win=self, width=300, height=90)
         self.protocol(name="WM_DELETE_WINDOW", func=self.__close_scangui)
         self.bind(sequence="<Escape>", func=self.__close_scangui)
 

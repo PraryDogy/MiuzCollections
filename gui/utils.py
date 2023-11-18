@@ -152,11 +152,11 @@ def get_coll_name(src: Literal["file path"]) -> Literal["collection name"]:
         return cnf.coll_folder.strip(os.sep).split(os.sep)[-1]
 
 
-def place_center(win: tkinter.Toplevel, w: int, h: int,
+def place_center(win: tkinter.Toplevel, width: int, height: int,
                  parrent_win: tkinter.Toplevel = cnf.root):
     x, y = parrent_win.winfo_x(), parrent_win.winfo_y()
-    xx = x + parrent_win.winfo_width() // 2 - w // 2
-    yy = y + parrent_win.winfo_height() // 2 - h // 2
+    xx = x + parrent_win.winfo_width() // 2 - width // 2
+    yy = y + parrent_win.winfo_height() // 2 - height // 2
     win.geometry(f"+{xx}+{yy}")
 
 
