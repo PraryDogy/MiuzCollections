@@ -1,5 +1,3 @@
-import os
-
 import sqlalchemy
 import sqlalchemy.ext.declarative
 
@@ -7,7 +5,7 @@ from cfg import cnf
 
 __all__ = (
     "Dbase",
-    "ThumbsMd"
+    "ThumbsMd",
     )
 
 

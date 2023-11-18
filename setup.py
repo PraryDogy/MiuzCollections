@@ -13,22 +13,6 @@ from setuptools import setup
 
 from cfg import cnf
 
-packages = [
-    "cffi",
-        "colour",
-        "greenlet",
-        "icnsutil",
-        "importlib-metadata",
-        "numpy",
-        "opencv-python",
-        "Pillow",
-        "pycparser",
-        "SQLAlchemy",
-        "customtkinter",
-        "typing-extensions",
-        "zipp",
-        ]
-
 src = "icon.png"
 img = icnsutil.IcnsFile()
 img.add_media(file=src)
@@ -36,24 +20,17 @@ img.write(f"icon.icns")
 
 APP = ["start.py"]
 
-DATA_FILES = [
-    cnf.db_name, cnf.thumb_err
-    ]
+DATA_FILES = [cnf.db_name, cnf.thumb_err]
 
-OPTIONS = {
-    "iconfile": "icon.icns",
-    "plist": {
-        "CFBundleName": cnf.app_name,
-        "CFBundleShortVersionString": cnf.app_ver,
-        "CFBundleVersion": cnf.app_ver,
-        "CFBundleIdentifier":f"com.evlosh.{cnf.app_name}",
-        "NSHumanReadableCopyright": (
-            "Created by Evgeny Loshkarev"
-            "\nCopyright © 2023 MIUZ Diamonds."
-            "\nAll rights reserved."
-            )
-            }
-            }
+OPTIONS = {"iconfile": "icon.icns",
+           "plist": {"CFBundleName": cnf.app_name,
+                     "CFBundleShortVersionString": cnf.app_ver,
+                     "CFBundleVersion": cnf.app_ver,
+                     "CFBundleIdentifier":f"com.evlosh.{cnf.app_name}",
+                     "NSHumanReadableCopyright": (
+                         "Created by Evgeny Loshkarev"
+                         "\nCopyright © 2023 MIUZ Diamonds."
+                         "\nAll rights reserved.")}}
 
 setup(
     app = APP,
