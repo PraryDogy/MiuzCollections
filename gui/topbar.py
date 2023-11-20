@@ -50,10 +50,9 @@ class SearchWid(CEntry):
             cnf.root.focus_force()
 
     def __search_go(self, e=None):
-        print("go")
         self.__cancel_search_task()
         self.__old_search_var = cnf.search_var.get()
-        # cnf.search_var.set(value=self.get())
+        cnf.search_var.set(value=self.get())
         cnf.date_start, cnf.date_end = None, None
         cnf.reload_scroll()
         self.focus_force()
