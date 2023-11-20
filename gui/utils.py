@@ -219,12 +219,15 @@ def encode_image(src: Literal["file path"]) -> Literal["cv2 image"]:
     if src.endswith((".png", ".PNG")):
         image = replace_bg(image, cnf.bg_color)
 
-    resized = resize_image(image, cnf.thumbsize, cnf.thumbsize, True)
-
     try:
+        resized = resize_image(image, cnf.thumbsize, cnf.thumbsize, True)
         return cv2.imencode(".jpg", resized)[1].tobytes()
-    except cv2.error:
-        print("too big img")
+
+    except (cv2.error, UnboundLocalError, AttributeError) as e:
+        print("utils > encode img > encode img, i'm return default thumb")
+        print(e)
+        image = cv2.imread("thumb.jpg", cv2.IMREAD_UNCHANGED)
+        return cv2.imencode(".jpg", image)[1].tobytes()
 
 
 def decode_image(img: bytes) -> Literal["cv2 image"]:
