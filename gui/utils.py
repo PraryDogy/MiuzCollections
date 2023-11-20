@@ -175,7 +175,7 @@ def reveal_coll(collname: str):
 def paste_search():
     try:
         pasted = cnf.root.clipboard_get().strip()
-        cnf.search_var.set(pasted)
+        cnf.search_var.set(value=pasted)
     except tkinter.TclError:
         print("no clipboard")
 
