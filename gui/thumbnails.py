@@ -38,13 +38,13 @@ class ContextTitles(Context):
                  path_list: tuple[Literal["file path"], ...]):
 
         Context.__init__(self)
-        self.download_group(title=title, paths_list=path_list)
+        self.download_group(title=title, path_list=path_list)
 
         self.sep()
-        self.download_group_tiffs(title=title, paths_list=path_list)
+        self.download_group_tiffs(title=title, path_list=path_list)
 
         self.sep()
-        self.download_group_fullsize(title=title, paths_list=path_list)
+        self.download_group_fullsize(title=title, path_list=path_list)
 
         self.do_popup(e=e)
 
