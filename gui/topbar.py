@@ -25,7 +25,6 @@ class SearchWid(CEntry):
                         textvariable=textvariable, **kw)
 
         self.bind(sequence="<Escape>", command=lambda e: cnf.root.focus_force())
-        self.bind(sequence="<Command-v>", command=self.__test)
         cnf.root.bind(sequence="<Command-f>", func=lambda e: self.focus_force())
 
         self.bind(sequence="<Return>", command=self.__search_go)
@@ -35,9 +34,6 @@ class SearchWid(CEntry):
                              self.__create_search_task(args))
         self.__search_task = None
         self.__old_search_var = None
-
-    def __test(self, e: tkinter.Event):
-        paste_search()
 
     def __cancel_search_task(self):
         if self.__search_task:
