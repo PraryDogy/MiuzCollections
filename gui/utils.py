@@ -314,8 +314,8 @@ def reveal_files(paths: tuple[Literal["file path"], ...]):
 
     applescript = f"""
         tell application \"Finder\"
-        reveal {{{paths}}}
         activate
+        reveal {{{paths}}}
         end tell
         """
 
