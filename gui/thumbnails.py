@@ -261,7 +261,7 @@ class ImgGridTitle(CLabel):
                          justify="left")
 
         self.bind(sequence="<ButtonRelease-2>", func=lambda e:
-                  ContextTitles(e=e, title=title, paths_list=img_src_list))
+                  ContextTitles(e=e, title=title, path_list=img_src_list))
 
 
 class ImgGrid(CLabel):
