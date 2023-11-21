@@ -73,13 +73,13 @@ class ImgSingle:
 
     def download_jpg(self, img_src: Literal["file path"]):
         self.add_command(
-            label=f"{cnf.lng.copy} jpg {cnf.lng.to_downloads}",
+            label=f"{cnf.lng.download} jpg {cnf.lng.to_downloads}",
             command=lambda:
             finder_actions(img_src=img_src, download=True))
 
     def download_tiff(self, img_src: Literal["file path"]):
         self.add_command(
-            label=f"{cnf.lng.copy} tiff {cnf.lng.to_downloads}",
+            label=f"{cnf.lng.download} tiff {cnf.lng.to_downloads}",
             command=lambda:
             finder_actions(img_src=img_src, tiff=True, download=True))
 

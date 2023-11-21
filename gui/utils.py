@@ -398,7 +398,7 @@ def finder_actions(
         return
     
     if copy_path:
-        cnf.notibar_text(text=cnf.lng.please_wait)
+        cnf.notibar_text(text=cnf.lng.done)
         cnf.root.clipboard_clear()
         cnf.root.clipboard_append("\n".join(img_src))
         delay()

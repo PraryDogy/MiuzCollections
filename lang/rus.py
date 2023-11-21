@@ -46,6 +46,8 @@ class Rus:
         self.collection = "Коллеция"
         self.dates = "Даты"
         self.mb = "мб"
+        self.download = "Скачать"
+        self.done = "Готово"
 
         self.sett_descr = (
             "Если имя коллекции начинается с _ или ."

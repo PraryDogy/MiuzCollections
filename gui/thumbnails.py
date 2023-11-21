@@ -49,13 +49,6 @@ class ContextTitles(Context):
         self.do_popup(e=e)
 
 
-class ContextAdvanced(Context):
-    def __init__(self, e: tkinter.Event, img_src: Literal["file path"]):
-        Context.__init__(self)
-        self.db_remove_img(img_src=img_src)
-        self.do_popup(e=e)
-
-
 class ContextThumbs(Context):
     def __init__(self, e: tkinter.Event, img_src: Literal["file path"]):
         Context.__init__(self)
@@ -64,17 +57,20 @@ class ContextThumbs(Context):
         self.imginfo(parrent=e.widget.winfo_toplevel(), img_src=img_src)
 
         self.sep()
-        self.copy_jpg_path(img_src=img_src)
         self.reveal_jpg(img_src=img_src)
-        self.download_jpg(img_src=img_src)
+        self.reveal_tiff(img_src=img_src)
 
         self.sep()
+        self.copy_jpg_path(img_src=img_src)
         self.copy_tiff_path(img_src=img_src)
-        self.reveal_tiff(img_src=img_src)
+
+        self.sep()
+        self.download_jpg(img_src=img_src)
         self.download_tiff(img_src=img_src)
 
         self.sep()
         self.download_fullsize(img_src=img_src)
+        self.db_remove_img(img_src=img_src)
 
         self.do_popup(e=e)
 
@@ -273,7 +269,6 @@ class ImgGrid(CLabel):
 
         self.bind(sequence="<ButtonRelease-1>", func=self.__click)
         self.bind(sequence="<ButtonRelease-2>", func=self.__r_click)
-        self.bind(sequence="<Command-ButtonRelease-2>", func=self.__r_cmd_click)
 
         self.__empty_grid = Image.new(mode="RGBA", size=(grid_w, grid_h),
                                       color=bg)
@@ -304,11 +299,6 @@ class ImgGrid(CLabel):
         img_src = self.__get_coords(e)
         if img_src:
             ImgViewer(img_src=img_src)
-
-    def __r_cmd_click(self, e: tkinter.Event):
-        img_src = self.__get_coords(e)
-        if img_src:
-            ContextAdvanced(e=e, img_src=img_src)
 
     def __r_click(self, e: tkinter.Event):
         img_src = self.__get_coords(e=e)

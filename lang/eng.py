@@ -46,6 +46,8 @@ class Eng:
         self.collection = "Collection"
         self.dates = "Dates"
         self.mb = "mb"
+        self.download = "Download"
+        self.done = "Done"
 
         self.sett_descr = (
             "If the collection name starts with _ or ."
