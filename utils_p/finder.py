@@ -203,13 +203,11 @@ class FinderActions(FinderUtils):
                 name, ext = os.path.splitext(p=img_src.split("/")[-1])
 
                 if download:
-                    if not self._copy_img(
-                        src=img_src, dest=downloads, name=name, ext=ext):
+                    if not self._copy_img(src=img_src, dest=downloads, name=name, ext=ext):
                         continue
 
-                elif fullsize:
-                    if not self._fullsize_img(
-                        src=img_src, dest=downloads, name=name):
+                else:
+                    if not self._fullsize_img(src=img_src, dest=downloads, name=name):
                         continue
                 
             subprocess.Popen(args=["open", downloads])
