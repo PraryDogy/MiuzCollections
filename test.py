@@ -1,11 +1,5 @@
-a = [i for i in range(1, 5)]
+a, b = True, True
 
 
-
-b = [x
-     for i in range(5)
-     for x in a
-     ]
-
-
-print(b)
+if any((a, b)):
+    print(1)

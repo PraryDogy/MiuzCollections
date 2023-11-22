@@ -5,6 +5,7 @@ from cfg import cnf
 
 from .utils import *
 from .widgets import *
+from utils_p import FinderActions
 
 __all__ = ("Context", )
 
@@ -50,56 +51,56 @@ class ImgSingle:
         self.add_command(
             label=cnf.lng.view,
             command=lambda:
-            ImgViewer(img_src=img_src))
+            ImgViewer(src=img_src))
 
     def imginfo(self, parrent: CWindow, img_src: Literal["file path"]):
         from .img_info import ImageInfo
         self.add_command(
             label=cnf.lng.info,
             command=lambda:
-            ImageInfo(parrent=parrent, img_src=img_src))
+            ImageInfo(parrent=parrent, src=img_src))
 
     def reveal_jpg(self, img_src: Literal["file path"]):
         self.add_command(
             label=cnf.lng.find_jpg,
             command=lambda:
-            finder_actions(img_src=img_src, reveal=True))
+            FinderActions(src=img_src, reveal=True))
 
     def reveal_tiff(self, img_src: Literal["file path"]):
         self.add_command(
             label=cnf.lng.find_tiff,
             command=lambda:
-            finder_actions(img_src=img_src, tiff=True,reveal=True))
+            FinderActions(src=img_src, tiff=True,reveal=True))
 
     def download_jpg(self, img_src: Literal["file path"]):
         self.add_command(
             label=f"{cnf.lng.download} jpg {cnf.lng.to_downloads}",
             command=lambda:
-            finder_actions(img_src=img_src, download=True))
+            FinderActions(src=img_src, download=True))
 
     def download_tiff(self, img_src: Literal["file path"]):
         self.add_command(
             label=f"{cnf.lng.download} tiff {cnf.lng.to_downloads}",
             command=lambda:
-            finder_actions(img_src=img_src, tiff=True, download=True))
+            FinderActions(src=img_src, tiff=True, download=True))
 
     def copy_jpg_path(self, img_src: Literal["file path"]):
         self.add_command(
             label=cnf.lng.copy_path_jpg,
             command=lambda:
-            finder_actions(img_src=img_src, copy_path=True))
+            FinderActions(src=img_src, copy_path=True))
 
     def copy_tiff_path(self, img_src: Literal["file path"]):
         self.add_command(
             label=cnf.lng.copy_path_tiff,
             command=lambda:
-            finder_actions(img_src=img_src, tiff=True, copy_path=True))
+            FinderActions(src=img_src, tiff=True, copy_path=True))
 
     def download_fullsize(self, img_src: Literal["file path"]):
         self.add_command(
             label=cnf.lng.fullsize,
             command=lambda:
-            finder_actions(img_src=img_src, tiff=True, fullsize=True))
+            FinderActions(src=img_src, tiff=True, fullsize=True))
 
 class ImgGroup:
     def download_group(
@@ -111,7 +112,7 @@ class ImgGroup:
                    f"{cnf.lng.from_pretext} \"{title}\" "
                    f"{cnf.lng.to_downloads}"),
             command=lambda:
-            finder_actions(img_src=path_list, download=True))
+            FinderActions(img_src=path_list, download=True))
 
     def download_group_tiffs(
             self, title: str,
@@ -122,7 +123,7 @@ class ImgGroup:
                    f"{cnf.lng.from_pretext} \"{title}\" "
                    f"{cnf.lng.to_downloads}"),
             command=lambda:
-            finder_actions(img_src=path_list, tiff=True, download=True))
+            FinderActions(img_src=path_list, tiff=True, download=True))
 
     def download_group_fullsize(
             self, title: str,
@@ -132,7 +133,7 @@ class ImgGroup:
                    f"{cnf.lng.from_pretext} \"{title}\" "
                    f"{cnf.lng.to_downloads}"),
             command=lambda:
-            finder_actions(img_src=path_list, tiff=True, fullsize=True))
+            FinderActions(img_src=path_list, tiff=True, fullsize=True))
 
 
 class ImgInfo:
@@ -176,7 +177,7 @@ class Context(tkinter.Menu, MenuCollections, SearchThumbs, ImgSingle, ImgGroup, 
     def db_remove_img(self, img_src: Literal["file path"]):
         self.add_command(
             label=cnf.lng.remove_fromapp,
-            command=lambda: db_remove_img(img_src=img_src)
+            command=lambda: db_remove_img(src=img_src)
             )
 
     def apply_filter_thumbs(self, label: str,
