@@ -37,7 +37,7 @@ class System:
 
         return name.replace(" ", "")
 
-    def find_tiffs(self, src: Literal["file path"]) -> (tuple[Literal["file path tiff"], ...] | bool):
+    def find_tiff(self, src: Literal["file path"]) -> (tuple[Literal["file path tiff"], ...] | list):
         path, filename = os.path.split(src)
         src_file_no_ext = self.normalize_name(filename)
         exts = (".tiff", ".TIFF", ".psd", ".PSD", ".psb", ".PSB", ".tif", ".TIF")
@@ -51,65 +51,41 @@ class System:
                         images.append(os.path.join(root, file))
                     elif file_no_ext in src_file_no_ext and len(file_no_ext) > 5:
                         images.append(os.path.join(root, file))
-        if images:
-            return images
-        return False
+        return images
 
 
 class FinderActions(System):
-    def __init__(self, img_src: Literal["path"] | tuple[Literal["path"], ...],
+    def __init__(self, src: Literal["path"] | tuple[Literal["path"], ...],
                  copy_path: bool = False, download: bool = False,
                  fullsize: bool = False, reveal: bool = False,
                  tiff: bool = False):
 
-        if not isinstance(img_src, list):
-            img_src = [img_src]
+        if not isinstance(src, list):
+            src = [src]
 
-        if not self.jpg_check(path_list=img_src):
+        if not self.jpg_check(path_list=src):
             cnf.notibar_text(cnf.lng.no_jpg)
             self.delay()
             return
 
         if tiff:
             cnf.notibar_text(cnf.lng.please_wait)
-
-            tiffs = []
-            for i in img_src:
-        
-                if not cnf.notibar_status:
-                    return
-        
-                found_tiffs = find_tiffs(src=i)
-
-                if found_tiffs:
-                    tiffs = tiffs + found_tiffs
-        
-            img_src = tiffs.copy()
-            if not tiffs:
+            src = self.get_tiff(path_list=src)
+            if not src:
                 cnf.notibar_text(text=cnf.lng.no_tiff)
                 delay()
                 return
 
-    def get_tiff(self, path_list: tuple[str, str]):
-        tiffs = []
-        for i in path_list:
-    
-            if not cnf.notibar_status:
-                return
-    
-            found_tiffs = self.find_tiffs(src=i)
-
-            if found_tiffs:
-                tiffs = tiffs + found_tiffs
-
-
-
-
-    def jpg_check(self, path_list: tuple[str, str]):
+    def jpg_check(self, path_list: tuple[str, ...]) -> bool:
         if not [i for i in path_list if os.path.exists(path=i)]:
             return False
         return True
 
+    def get_tiff(self, path_list: tuple[str, ...]) -> tuple[str, ...]:
+        return [tiff
+                for src in path_list
+                for tiff in self.find_tiff(src=src)
+                if cnf.notibar_status]
 
 
 
