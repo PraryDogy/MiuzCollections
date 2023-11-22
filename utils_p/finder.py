@@ -5,7 +5,7 @@ import subprocess
 from time import sleep
 
 try:
-    from typing_extensions import Literal, Callable
+    from typing_extensions import Callable, Literal
 except ImportError:
     from typing import Literal, Callable
 
@@ -20,8 +20,8 @@ from database import *
 
 from .system import SysUtils
 
-
 utils_task = threading.Thread(target=None)
+
 
 class FinderThread:
     def __init__(self, fn: Callable):
