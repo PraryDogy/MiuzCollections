@@ -1,5 +1,9 @@
-a, b = True, True
+class Test:
+    def __init__(self) -> None:
+        self._abc = 000
 
 
-if any((a, b)):
+a = Test()
+
+if hasattr(a, "_abc"):
     print(1)

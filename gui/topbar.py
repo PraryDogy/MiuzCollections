@@ -151,25 +151,18 @@ class NotifyBar(CFrame):
         try:
             self.__btn_up.configure(text=text, fg_color=cnf.blue_color)
             if len(self.children) < 2:
-                self.__topbar_can = CButton(master=self, text=cnf.lng.cancel,
+                self._topbar_can = CButton(master=self, text=cnf.lng.cancel,
                                           fg_color=cnf.blue_color)
-                self.__topbar_can.cmd(lambda e: cancel_utils_task())
-                self.__topbar_can.pack(side="left", padx=(1, 0))
+                self._topbar_can.cmd(lambda e: cancel_utils_task())
+                self._topbar_can.pack(side="left", padx=(1, 0))
         except RuntimeError as e:
             print("thumbnails > topbar text error")
             print(e)
 
     def notibar_default(self):
-        try:
-            self.__topbar_can.destroy()
-        except AttributeError as e:
-            print("thumbnails > no topbar cancel button")
-            print(e)
-        try:
+        if hasattr(self, "_topbar_can"):
+            self._topbar_can.destroy()
             self.__btn_up.configure(text=f"▲", fg_color=self.__fg_color)
-        except RuntimeError as e:
-            print("thumbnails > can't configure topbar to default")
-            print(e)
 
 
 class TopBar(CFrame):

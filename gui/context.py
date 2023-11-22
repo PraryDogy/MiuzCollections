@@ -70,7 +70,7 @@ class ImgSingle:
         self.add_command(
             label=cnf.lng.find_tiff,
             command=lambda:
-            FinderActions(src=img_src, tiff=True,reveal=True))
+            FinderActions(src=img_src, tiff=True, reveal=True))
 
     def download_jpg(self, img_src: Literal["file path"]):
         self.add_command(
@@ -88,13 +88,13 @@ class ImgSingle:
         self.add_command(
             label=cnf.lng.copy_path_jpg,
             command=lambda:
-            FinderActions(src=img_src, copy_path=True))
+            FinderActions(src=img_src, clipboard=True))
 
     def copy_tiff_path(self, img_src: Literal["file path"]):
         self.add_command(
             label=cnf.lng.copy_path_tiff,
             command=lambda:
-            FinderActions(src=img_src, tiff=True, copy_path=True))
+            FinderActions(src=img_src, tiff=True, clipboard=True))
 
     def download_fullsize(self, img_src: Literal["file path"]):
         self.add_command(
@@ -112,7 +112,7 @@ class ImgGroup:
                    f"{cnf.lng.from_pretext} \"{title}\" "
                    f"{cnf.lng.to_downloads}"),
             command=lambda:
-            FinderActions(img_src=path_list, download=True))
+            FinderActions(src=path_list, download=True))
 
     def download_group_tiffs(
             self, title: str,
@@ -123,7 +123,7 @@ class ImgGroup:
                    f"{cnf.lng.from_pretext} \"{title}\" "
                    f"{cnf.lng.to_downloads}"),
             command=lambda:
-            FinderActions(img_src=path_list, tiff=True, download=True))
+            FinderActions(src=path_list, tiff=True, download=True))
 
     def download_group_fullsize(
             self, title: str,
@@ -133,7 +133,7 @@ class ImgGroup:
                    f"{cnf.lng.from_pretext} \"{title}\" "
                    f"{cnf.lng.to_downloads}"),
             command=lambda:
-            FinderActions(img_src=path_list, tiff=True, fullsize=True))
+            FinderActions(src=path_list, tiff=True, fullsize=True))
 
 
 class ImgInfo:

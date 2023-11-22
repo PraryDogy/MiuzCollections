@@ -5,9 +5,11 @@ import subprocess
 from time import sleep
 
 try:
-    from typing_extensions import Literal
+    from typing_extensions import Literal, Callable
 except ImportError:
-    from typing import Literal
+    from typing import Literal, Callable
+
+import threading
 
 import psd_tools
 import tifffile
@@ -17,6 +19,35 @@ from cfg import cnf
 from database import *
 
 from .system import SysUtils
+
+
+utils_task = threading.Thread(target=None)
+
+class FinderThread:
+    def __init__(self, fn: Callable):
+        self.fn = fn
+
+    def __call__(self, *args, **kwargs):
+        global utils_task
+        self.wait_utils_task()
+
+        utils_task = threading.Thread(
+            target=self.fn, args=args, kwargs=kwargs, daemon=True)
+        utils_task.start()
+
+        self.wait_utils_task()
+        cnf.notibar_default()
+        self.wait_utils_task()
+        cnf.notibar_status = True
+
+    def wait_utils_task(self):
+        while utils_task.is_alive():
+            cnf.root.update()
+
+    def cancel_utils_task(self):
+        cnf.notibar_status = False
+        self.wait_utils_task()
+        cnf.notibar_default()
 
 
 class FinderUtils(SysUtils):
@@ -122,9 +153,10 @@ class FinderUtils(SysUtils):
                 return False
 
 
+@FinderThread
 class FinderActions(FinderUtils):
     def __init__(self, src: Literal["path"] | tuple[Literal["path"], ...],
-                 copy_path: bool = False, download: bool = False,
+                 clipboard: bool = False, download: bool = False,
                  fullsize: bool = False, reveal: bool = False,
                  tiff: bool = False):
 
@@ -150,7 +182,7 @@ class FinderActions(FinderUtils):
             self._delay()
             return
         
-        if copy_path:
+        if clipboard:
             cnf.notibar_text(text=cnf.lng.done)
             cnf.root.clipboard_clear()
             cnf.root.clipboard_append("\n".join(src))
