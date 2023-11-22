@@ -21,7 +21,7 @@ from database import *
 from .system import SysUtils
 
 
-class UtilsTask:
+class Tsk:
     task = threading.Thread(target=None)
 
 
@@ -32,8 +32,8 @@ class FinderThread:
     def __call__(self, **kwargs):
         self.wait_utils_task()
 
-        UtilsTask.task = threading.Thread(target=self.fn, kwargs=kwargs, daemon=True)
-        UtilsTask.task.start()
+        Tsk.task = threading.Thread(target=self.fn, kwargs=kwargs, daemon=True)
+        Tsk.task.start()
 
         self.wait_utils_task()
         cnf.notibar_default()
@@ -41,7 +41,7 @@ class FinderThread:
         cnf.notibar_status = True
 
     def wait_utils_task(self):
-        while UtilsTask.task.is_alive():
+        while Tsk.task.is_alive():
             cnf.root.update()
 
     def cancel_utils_task(self):
