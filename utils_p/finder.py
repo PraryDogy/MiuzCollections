@@ -29,11 +29,10 @@ class FinderThread:
     def __init__(self, fn: Callable):
         self.fn = fn
 
-    def __call__(self, *args, **kwargs):
+    def __call__(self, **kwargs):
         self.wait_utils_task()
 
-        UtilsTask.task = threading.Thread(
-            target=self.fn, args=args, kwargs=kwargs, daemon=True)
+        UtilsTask.task = threading.Thread(target=self.fn, kwargs=kwargs, daemon=True)
         UtilsTask.task.start()
 
         self.wait_utils_task()
