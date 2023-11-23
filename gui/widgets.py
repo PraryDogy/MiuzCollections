@@ -10,9 +10,7 @@ except ImportError:
 import customtkinter
 
 from cfg import cnf
-from utils_p import SysUtils
-
-from .utils import *
+from utils import SysUtils
 
 __all__ = (
     "CEntry",

@@ -5,13 +5,13 @@ import sqlalchemy
 
 from cfg import cnf
 from database import Dbase, ThumbsMd
+from utils import SysUtils, ImageUtils
 
-from .utils import *
 
 __all__ = ("scaner",)
 
 
-class Scaner:
+class Scaner(ImageUtils, SysUtils):
     def __init__(self) -> None:
         self.__need_update = False
         self.__scaner_task = None
@@ -104,12 +104,12 @@ class Scaner:
             ln = len(new_images)
 
             values = [
-                {"b_img150": encode_image(src=src),
+                {"b_img150": self.encode_image(src=src),
                  "b_src": src,
                  "b_size": size,
                  "b_created": created,
                  "b_modified": modified,
-                 "b_collection": get_coll_name(src=src),
+                 "b_collection": self.get_coll_name(src=src),
                  "temp": self.__change_live_text(
                         f"{cnf.lng.added} {x} {cnf.lng.from_pretext} "
                         f"{ln} {cnf.lng.new_photo_case}.")

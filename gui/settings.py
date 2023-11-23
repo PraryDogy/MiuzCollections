@@ -5,7 +5,6 @@ from cfg import cnf
 
 from .scaner import scaner
 from .smb_alert import SmbAlert
-from .utils import *
 from .widgets import *
 
 try:
@@ -13,7 +12,7 @@ try:
 except ImportError:
     from typing import Literal
 
-from utils_p import SysUtils
+from utils import SysUtils
 
 __all__ = ("Settings",)
 
@@ -139,7 +138,7 @@ class LangWid(CFrame):
                 return
 
 
-class Settings(CWindow):
+class Settings(CWindow, SysUtils):
     def __init__(self):
         CWindow.__init__(self)
         self.protocol(name="WM_DELETE_WINDOW", func=self.__close_sett)
@@ -148,7 +147,7 @@ class Settings(CWindow):
         self.title(string=cnf.lng.settings)
         w, h = 440, 490
         self.minsize(width=w, height=h)
-        place_center(win=self, width=w, height=h)
+        self.place_center(win=self, width=w, height=h)
 
         pader = 15
 
@@ -210,7 +209,7 @@ class Settings(CWindow):
         if cnf.coll_folder != self.__browse_colls.get_path():
             cnf.coll_folder = self.__browse_colls.get_path()
             cnf.curr_coll = cnf.all_colls
-            if smb_check():
+            if self.smb_check():
                 scaner.scaner_sheldue(1500)
             else:
                 scaner.scaner_sheldue()

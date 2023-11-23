@@ -26,32 +26,7 @@ class Tsk:
     task = threading.Thread(target=None)
 
 
-class FinderThread:
-    def __init__(self, fn: Callable):
-        self.fn = fn
-
-    def __call__(self, **kwargs):
-        self.wait_utils_task()
-
-        Tsk.task = threading.Thread(target=self.fn, kwargs=kwargs, daemon=True)
-        Tsk.task.start()
-
-        self.wait_utils_task()
-        cnf.notibar_default()
-        self.wait_utils_task()
-        cnf.notibar_status = True
-
-    def wait_utils_task(self):
-        while Tsk.task.is_alive():
-            cnf.root.update()
-
-    def cancel_utils_task(self):
-        cnf.notibar_status = False
-        self.wait_utils_task()
-        cnf.notibar_default()
-
-
-class FinderUtils(SysUtils):
+class FinderBase(SysUtils):
     def _delay(self):
         sleep(2)
 
@@ -61,15 +36,6 @@ class FinderUtils(SysUtils):
     def _normalize_name(self, name: str) -> Literal["file name no extention"]:
         name, ext = os.path.splitext(p=name)
         return name.translate(str.maketrans("", "", string.punctuation + " "))
-
-    # def __normalize_name(self, name: str) -> Literal["file name"]:
-    #     name, ext = os.path.splitext(p=name)
-    #     name = name.translate(str.maketrans("", "", string.punctuation))
-
-    #     for i in ("preview", "1x1", "1х1", "crop", "копия", "copy", "small"):
-    #         name = name.replace(i, "")
-
-    #     return name.replace(" ", "")
 
     def _find_tiff(self, src: Literal["file path"]) -> (tuple[Literal["file path tiff"], ...] | list):
         src_path, src_filename = os.path.split(src)
@@ -84,22 +50,6 @@ class FinderUtils(SysUtils):
                     if self._similarity(aa=src_filename, bb=filename) > 0.8:
                         images.append(os.path.join(root, file))
         return images
-
-    # def _find_tiff(self, src: Literal["file path"]) -> (tuple[Literal["file path tiff"], ...] | list):
-    #     path, filename = os.path.split(src)
-    #     src_file_no_ext = self._remove_punct(filename)
-    #     exts = (".tiff", ".TIFF", ".psd", ".PSD", ".psb", ".PSB", ".tif", ".TIF")
-    #     images = []
-
-    #     for root, dirs, files in os.walk(path):
-    #         for file in files:
-    #             if file.endswith(exts):
-    #                 file_no_ext = self._remove_punct(file)
-    #                 if src_file_no_ext in file_no_ext:
-    #                     images.append(os.path.join(root, file))
-    #                 elif file_no_ext in src_file_no_ext and len(file_no_ext) > 5:
-    #                     images.append(os.path.join(root, file))
-    #     return images
 
     def _reveal_files(self, paths: tuple[Literal["file path"], ...]):
         paths = (
@@ -174,9 +124,34 @@ class FinderUtils(SysUtils):
                 self.print_err()
                 return False
 
+    def wait_utils_task(self):
+        while Tsk.task.is_alive():
+            cnf.root.update()
+
+    def cancel_utils_task(self):
+        cnf.notibar_status = False
+        self.wait_utils_task()
+        cnf.notibar_default()
+
+
+class FinderThread(FinderBase):
+    def __init__(self, fn: Callable):
+        self.fn = fn
+
+    def __call__(self, **kwargs):
+        self.wait_utils_task()
+
+        Tsk.task = threading.Thread(target=self.fn, kwargs=kwargs, daemon=True)
+        Tsk.task.start()
+
+        self.wait_utils_task()
+        cnf.notibar_default()
+        self.wait_utils_task()
+        cnf.notibar_status = True
+
 
 @FinderThread
-class FinderActions(FinderUtils):
+class FinderActions(FinderBase):
     def __init__(self, src: Literal["path"] | tuple[Literal["path"], ...],
                  clipboard: bool = False, download: bool = False,
                  fullsize: bool = False, reveal: bool = False,

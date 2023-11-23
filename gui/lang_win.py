@@ -1,13 +1,13 @@
 from cfg import cnf
 from lang import Eng, Rus
+from utils import SysUtils
 
-from .utils import *
 from .widgets import *
 
 __all__ = ("LangWin", )
 
 
-class LangWin(CWindow):
+class LangWin(CWindow, SysUtils):
     def __init__(self, bg=cnf.bg_color, padx=15, pady=15):
 
         en, ru = Eng(), Rus()
@@ -15,7 +15,7 @@ class LangWin(CWindow):
         CWindow.__init__(self, bg=bg, padx=padx, pady=pady)
         w, h = 200, 100
         self.minsize(width=w, height=h)
-        place_center(win=self, width=w, height=h)        
+        self.place_center(win=self, width=w, height=h)        
         self.title(string=en.lang_label)
 
         title = CLabel(master=self, text=en.lang_label)

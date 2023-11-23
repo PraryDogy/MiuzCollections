@@ -1,21 +1,74 @@
+import os
+import subprocess
 import tkinter
 from typing import Literal
 
-from cfg import cnf
+import sqlalchemy
 
-from .utils import *
+from cfg import cnf
+from database import *
+from utils import FinderActions, SysUtils
+
 from .widgets import *
-from utils_p import FinderActions
 
 __all__ = ("Context", )
 
 
-class MenuCollections:
+class ContextUtils(SysUtils):
+    def reveal_coll(self, collname: str):
+        if collname != cnf.all_colls:
+            coll_path = os.path.join(cnf.coll_folder, collname)
+        else:
+            coll_path = cnf.coll_folder
+
+        try:
+            subprocess.check_output(["/usr/bin/open", coll_path])
+        except subprocess.CalledProcessError:
+            subprocess.check_output(["/usr/bin/open", cnf.coll_folder])
+
+    def paste_search(self):
+        try:
+            pasted = cnf.root.clipboard_get().strip()
+            cnf.search_var.set(value=pasted)
+        except tkinter.TclError:
+            self.print_err()
+
+    def apply_filter(self, filter: Literal["all"] | Literal["cnf > filter values key"],
+                     btn: tkinter = None, collname: str = None):
+        if filter == "all":
+            for k, v in cnf.filter_values.items():
+                cnf.filter_values[k] = False
+        else:
+            for k, v in cnf.filter_values.items():
+                cnf.filter_values[k] = False
+            cnf.filter_values[filter] = True
+
+        if collname and btn:
+            cnf.reload_filters()
+            cnf.show_coll(btn=btn, collname=collname)
+        else:
+            cnf.reload_filters()
+            cnf.reload_scroll()
+
+    def copy_text(self, text: str):
+        cnf.root.clipboard_clear()
+        cnf.root.clipboard_append(string=text)
+
+    def db_remove_img(self, img_src: Literal["file path"]):
+        q = (
+            sqlalchemy.delete(ThumbsMd).filter(
+                ThumbsMd.src==img_src
+                ))
+        Dbase.conn.execute(q)
+        cnf.reload_thumbs()
+
+
+class MenuCollections(ContextUtils):
     def reveal_coll(self, collname: str):
         self.add_command(
             label=cnf.lng.reveal_coll,
             command=lambda:
-            reveal_coll(collname=collname))
+            self.reveal_coll(collname=collname))
 
     def show_coll(self, e: tkinter.Event, btn: CButton, collname: str):
         self.add_command(
@@ -30,13 +83,12 @@ class MenuCollections:
         self.add_command(
             label=label,
             command=lambda:
-            apply_filter(filter=filter, collname=collname, btn=btn))
+            self.apply_filter(filter=filter, collname=collname, btn=btn))
 
 
-
-class SearchThumbs:
+class SearchThumbs(ContextUtils):
     def pastesearch(self):
-        self.add_command(label=cnf.lng.paste, command=paste_search)
+        self.add_command(label=cnf.lng.paste, command=self.paste_search)
 
     def clear(self):
         self.add_command(
@@ -136,18 +188,18 @@ class ImgGroup:
             FinderActions(src=path_list, tiff=True, fullsize=True))
 
 
-class ImgInfo:
+class ImgInfo(ContextUtils):
     def copy_text(self, e: tkinter.Event):
         self.add_command(
             label=cnf.lng.copy,
             command=lambda:
-            copy_text(text=e.widget.copy))
+            self.copy_text(text=e.widget.copy))
 
     def copy_all(self, e:tkinter.Event):
         self.add_command(
             label=cnf.lng.copy_all,
             command=lambda:
-            copy_text(text=e.widget.get("1.0",tkinter.END)))
+            self.copy_text(text=e.widget.get("1.0",tkinter.END)))
 
 
 class Context(tkinter.Menu, MenuCollections, SearchThumbs, ImgSingle, ImgGroup, ImgInfo):
@@ -177,12 +229,12 @@ class Context(tkinter.Menu, MenuCollections, SearchThumbs, ImgSingle, ImgGroup, 
     def db_remove_img(self, img_src: Literal["file path"]):
         self.add_command(
             label=cnf.lng.remove_fromapp,
-            command=lambda: db_remove_img(src=img_src)
+            command=lambda: self.db_remove_img(src=img_src)
             )
 
     def apply_filter_thumbs(self, label: str,
                             filter: Literal["cnf > lng > filter_names > name", "all"]):
         self.add_command(
             label=label,
-            command=lambda: apply_filter(filter=filter)
+            command=lambda: self.apply_filter(filter=filter)
             )

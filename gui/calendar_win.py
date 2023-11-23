@@ -5,7 +5,6 @@ from datetime import datetime
 
 from cfg import cnf
 
-from .utils import *
 from .widgets import *
 
 try:
@@ -13,7 +12,7 @@ try:
 except ImportError:
     from typing import Literal
 
-from utils_p import SysUtils
+from utils import SysUtils
 
 __all__ = ("CalendarWin",)
 
@@ -173,7 +172,7 @@ class CalendarBase(CFrame, SysUtils):
         self.fill_days()
 
 
-class CCalendar(CalendarBase):
+class CCalendar(CalendarBase, SysUtils):
     def __init__(self, master: tkinter, my_date: datetime):
         CalendarBase.__init__(self, master=master, my_date=my_date)
         self.title.bind(sequence="<ButtonRelease-1>",
@@ -186,7 +185,7 @@ class CCalendar(CalendarBase):
 
         self.win_entry.title(string=cnf.lng.enter_date)
         self.win_entry.minsize(width=255, height=118)
-        place_center(win=self.win_entry, width=255, height=118,
+        self.place_center(win=self.win_entry, width=255, height=118,
                      parrent_win=master)
         self.win_entry.protocol(name="WM_DELETE_WINDOW",
                                 func=lambda: self.close_entry(parrent=master))
@@ -274,12 +273,12 @@ class CCalendar(CalendarBase):
         parrent.grab_set_global()
 
 
-class CalendarWin(CWindow):
+class CalendarWin(CWindow, SysUtils):
     def __init__(self):
         CWindow.__init__(self)
         self.title(string=cnf.lng.filter)
         self.minsize(width=633, height=490)
-        place_center(win=self, width=633, height=490)
+        self.place_center(win=self, width=633, height=490)
         self.protocol(name="WM_DELETE_WINDOW", func=self.close_filter)
         self.bind(sequence="<Escape>", func=self.close_filter)
         self.bind(sequence="<Return>", func=self.ok_filter)

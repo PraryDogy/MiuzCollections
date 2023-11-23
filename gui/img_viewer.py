@@ -8,9 +8,7 @@ from PIL import ImageTk
 from cfg import cnf
 from database import Dbase, ThumbsMd
 
-from .context import *
-from .utils import *
-from .utils import place_center
+from .context import Context
 from .widgets import *
 
 try:
@@ -18,7 +16,7 @@ try:
 except ImportError:
     from typing import Literal
 
-from utils_p import SysUtils
+from utils import SysUtils, ImageUtils
 
 __all__ = ("ImgViewer",)
 
@@ -47,7 +45,7 @@ class ContextViewer(Context, SysUtils):
         self.do_popup(e=e)
 
 
-class ImgViewer(CWindow, SysUtils):
+class ImgViewer(CWindow, ImageUtils, SysUtils):
     def __init__(self, img_src: Literal["file path"]):
         CWindow.__init__(self, bg="black", pady=0, padx=0)
         self.__img_src = img_src
@@ -56,7 +54,7 @@ class ImgViewer(CWindow, SysUtils):
         self.minsize(width=500, height=300)
         self.resizable(width=1, height=1)
         self.geometry(newGeometry=f"{cnf.imgview_g['w']}x{cnf.imgview_g['h']}")
-        place_center(win=self, width=cnf.imgview_g["w"], height=cnf.imgview_g["h"])
+        self.place_center(win=self, width=cnf.imgview_g["w"], height=cnf.imgview_g["h"])
         self.protocol(name="WM_DELETE_WINDOW", func=self.__close_view)
         self.bind(sequence="<Escape>", func=self.__close_view)
 
@@ -99,8 +97,7 @@ class ImgViewer(CWindow, SysUtils):
             if e.width != cnf.imgview_g["w"] or e.height != cnf.imgview_g["h"]:
 
                 cnf.imgview_g.update({"w": e.width, "h": e.height})
-                self.img.configure(width=cnf.imgview_g["w"],
-                                   height=cnf.imgview_g["h"])
+                self.img.configure(width=cnf.imgview_g["w"], height=cnf.imgview_g["h"])
 
                 self.__load_thumb()
                 cnf.root.after(ms=300, func=self.__load_img)
@@ -111,10 +108,10 @@ class ImgViewer(CWindow, SysUtils):
     def __load_thumb(self):
         img = Dbase.conn.execute(sqlalchemy.select(ThumbsMd.img150).where(
             ThumbsMd.src==self.__img_src)).first()[0]
-        img = decode_image(img=img)
-        img = resize_image(img=img, wid_w=cnf.imgview_g["w"],
+        img = self.decode_image(img=img)
+        img = self.resize_image(img=img, wid_w=cnf.imgview_g["w"],
                            wid_h=cnf.imgview_g["h"], is_thumb=False)
-        img = convert_to_rgb(img=img)
+        img = self.convert_to_rgb(img=img)
         self.__set_tk_img(img=img)
 
     def __load_img(self):
@@ -122,11 +119,11 @@ class ImgViewer(CWindow, SysUtils):
             img = cv2.imread(self.__img_src, cv2.IMREAD_UNCHANGED)
             
             if self.__img_src.endswith(("png", "PNG")):
-                img = replace_bg(img=img, color=cnf.bg_color)
+                img = self.replace_bg(img=img, color=cnf.bg_color)
 
-            img = resize_image(img=img, wid_w=cnf.imgview_g["w"],
+            img = self.resize_image(img=img, wid_w=cnf.imgview_g["w"],
                                wid_h=cnf.imgview_g["h"], is_thumb=False)
-            img = convert_to_rgb(img=img)
+            img = self.convert_to_rgb(img=img)
             self.__set_tk_img(img=img)
 
         except Exception as ex:
@@ -162,7 +159,7 @@ class ImgViewer(CWindow, SysUtils):
 
     def __set_title(self):
         name = self.__img_src.split(os.sep)[-1]
-        collection_name = get_coll_name(src=self.__img_src)
+        collection_name = self.get_coll_name(src=self.__img_src)
         self.title(string=f"{collection_name} - {name}")
 
     def __close_view(self, e: tkinter.Event = None):

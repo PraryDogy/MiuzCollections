@@ -13,11 +13,10 @@ from PIL import Image, ImageTk
 
 from cfg import cnf
 from database import Dbase, ThumbsMd
-from utils_p import SysUtils
+from utils import SysUtils, ImageUtils
 
-from .context import *
+from .context import Context
 from .img_viewer import ImgViewer
-from .utils import *
 from .widgets import *
 
 __all__ = ("Thumbs",)
@@ -76,7 +75,7 @@ class ContextThumbs(Context):
         self.do_popup(e=e)
 
 
-class ThumbsDict(dict, SysUtils):
+class ThumbsDict(dict, ImageUtils, SysUtils):
     def __init__(self) -> dict[str, tuple]:
         """
         dict key: str(month year)
@@ -94,9 +93,9 @@ class ThumbsDict(dict, SysUtils):
         result = []
         for blob, src, modified in thumbs_raw:
             try:
-                decoded = decode_image(img=blob)
-                cropped = crop_image(img=decoded)
-                img = convert_to_rgb(img=cropped)
+                decoded = self.decode_image(img=blob)
+                cropped = self.crop_image(img=decoded)
+                img = self.convert_to_rgb(img=cropped)
                 result.append((img, src, modified))
 
             except Exception:

@@ -2,19 +2,19 @@ import tkinter
 
 from cfg import cnf
 
-from .utils import *
+from utils import SysUtils
 from .widgets import *
 
 __all__ = ("SmbAlert", )
 
 
-class SmbAlert(CWindow):
+class SmbAlert(CWindow, SysUtils):
     def __init__(self):
         CWindow.__init__(self)
         self.minsize(420, 85)
         self.protocol("WM_DELETE_WINDOW", self.__close_smb)
         self.bind("<Escape>", self.__close_smb)
-        place_center(self, 420, 85)
+        self.place_center(self, 420, 85)
 
         title_lbl = CLabel(self, text=cnf.lng.no_connection,
                            font=("San Francisco Pro", 22, "bold"))

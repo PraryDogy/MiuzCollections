@@ -1,25 +1,24 @@
 import platform
 
 from cfg import cnf
+from utils import SysUtils
 
 from .menu import Menu
 from .scaner import scaner
+from .smb_alert import SmbAlert
 from .stbar import StBar
 from .thumbnails import Thumbs
-from .utils import on_exit, run_applescript, smb_check
-from .widgets import *
 from .topbar import TopBar
-from .smb_alert import SmbAlert
-
+from .widgets import *
 
 __all__ = ("Application",)
 
 
-class Application:
+class Application(SysUtils):
     def __init__(self):
         cnf.root.title(string=cnf.app_name)
         cnf.root.configure(bg=cnf.bg_color)
-        cnf.root.createcommand("tk::mac::Quit", on_exit)
+        cnf.root.createcommand("tk::mac::Quit", self.on_exit)
 
         if cnf.root_g["w"] < 700 or cnf.root_g["h"] < 300:
             cnf.root_g.update({"w": 700, "h": 300})
@@ -65,7 +64,7 @@ class Application:
 
         MacMenu()
 
-        if smb_check():
+        if self.smb_check():
             cnf.root.after(ms=100, func=scaner.scaner_start_now)
         else:
             scaner.scaner_sheldue()
@@ -79,7 +78,7 @@ class Application:
             end tell
             """
 
-        run_applescript(applescript)
+        self.run_applescript(applescript)
 
     def maxim(self, e=None):
         applescript = f"""
@@ -88,7 +87,7 @@ class Application:
             end tell
             """
 
-        run_applescript(applescript=applescript)
+        self.run_applescript(applescript=applescript)
         cnf.root.focus_force()
 
 

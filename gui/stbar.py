@@ -1,22 +1,22 @@
 import tkinter
 
 from cfg import cnf
+from utils import SysUtils
 
 from .scaner import scaner
 from .settings import Settings
 from .smb_alert import SmbAlert
-from .utils import *
 from .widgets import *
 
 __all__ = ("StBar",)
 
 
-class ScanerGui(CWindow):
+class ScanerGui(CWindow, SysUtils):
     def __init__(self):
         CWindow.__init__(self)
         self.title(string=cnf.lng.updating)
         self.geometry(newGeometry="300x90")
-        place_center(win=self, width=300, height=90)
+        self.place_center(win=self, width=300, height=90)
         self.protocol(name="WM_DELETE_WINDOW", func=self.__close_scangui)
         self.bind(sequence="<Escape>", func=self.__close_scangui)
 
@@ -57,7 +57,7 @@ class ScanerGui(CWindow):
         cnf.root.focus_force()
 
 
-class StBar(CFrame):
+class StBar(CFrame, SysUtils):
     def __init__(self, master: tkinter):
         CFrame.__init__(self, master=master)
 
@@ -87,7 +87,7 @@ class StBar(CFrame):
 
     def __stbar_run_scan(self, e: tkinter.Event = None):
         if not cnf.scan_status:
-            if smb_check():
+            if self.smb_check():
                 scaner.scaner_start_now()
             else:
                 scaner.scaner_sheldue()

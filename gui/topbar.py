@@ -1,11 +1,10 @@
 import tkinter
 
 from cfg import cnf
-from utils_p import SysUtils
+from utils import SysUtils, FinderBase
 
 from .calendar_win import CalendarWin
-from .context import *
-from .utils import *
+from .context import Context
 from .widgets import *
 
 __all__ = ("TopBar", )
@@ -138,7 +137,7 @@ class FuncBar(CFrame):
         self.__topbar_title.configure(text=coll_title)
    
 
-class NotifyBar(CFrame, SysUtils):
+class NotifyBar(CFrame, FinderBase, SysUtils):
     def __init__(self, master: tkinter, bg: str = cnf.bg_color, **kwargs):
         CFrame.__init__(self, master=master, bg=bg, **kwargs)
 
@@ -154,7 +153,7 @@ class NotifyBar(CFrame, SysUtils):
             if len(self.children) < 2:
                 self._topbar_can = CButton(master=self, text=cnf.lng.cancel,
                                           fg_color=cnf.blue_color)
-                self._topbar_can.cmd(lambda e: cancel_utils_task())
+                self._topbar_can.cmd(lambda e: self.cancel_utils_task())
                 self._topbar_can.pack(side="left", padx=(1, 0))
         except RuntimeError:
             self.print_err()

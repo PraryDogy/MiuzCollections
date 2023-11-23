@@ -7,11 +7,10 @@ from typing import Literal
 from PIL import Image
 
 from cfg import cnf
+from utils import SysUtils
 
-from .context import *
-from .utils import *
+from .context import Context
 from .widgets import *
-from utils_p import SysUtils
 
 __all__ = ("ImageInfo",)
 
@@ -30,7 +29,7 @@ class ImageInfo(CWindow, SysUtils):
         CWindow.__init__(self)
         self.title(string=cnf.lng.info)
         self.minsize(width=416, height=155)
-        place_center(win=self, width=416, height=155, parrent_win=parrent)
+        self.place_center(win=self, width=416, height=155, parrent_win=parrent)
         self.protocol(name="WM_DELETE_WINDOW",
                       func=lambda: self.__close_info(parrent=parrent))
         self.bind(sequence="<Escape>",
@@ -64,7 +63,7 @@ class ImageInfo(CWindow, SysUtils):
             )
         l_path = cnf.lng.file_path + "\n"*r_path.count("\n")
 
-        labels = {cnf.lng.collection: get_coll_name(src=img_src),
+        labels = {cnf.lng.collection: self.get_coll_name(src=img_src),
                   l_name: r_name,
                   cnf.lng.date_changed: filemod,
                   cnf.lng.resolution: f"{w}x{h}",

@@ -5,7 +5,7 @@ import sqlalchemy
 from cfg import cnf
 from database import Dbase, ThumbsMd
 
-from .context import *
+from .context import Context
 from .widgets import *
 
 __all__ = ("Menu",)
