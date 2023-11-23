@@ -15,7 +15,7 @@ class ContextMenu(Context):
     def __init__(self, e: tkinter.Event, btn: CButton, collname: str):
         Context.__init__(self)
         self.show_coll(e=e, btn=btn, collname=collname)
-        self.reveal_coll(collname=collname)
+        self.reveal_coll_context(collname=collname)
         self.sep()
 
         for k, v in cnf.lng.filter_names.items():

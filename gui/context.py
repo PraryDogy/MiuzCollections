@@ -64,7 +64,7 @@ class ContextUtils(SysUtils):
 
 
 class MenuCollections(ContextUtils):
-    def reveal_coll(self, collname: str):
+    def reveal_coll_context(self, collname: str):
         self.add_command(
             label=cnf.lng.reveal_coll,
             command=lambda:

@@ -66,7 +66,7 @@ class FinderBase(SysUtils):
             end tell
             """
 
-        self.run_applescript(applescript)
+        self.run_applescript(script=applescript)
 
     def _copy_img(self, src: str, dest: str, name: str, ext: str):
         try:

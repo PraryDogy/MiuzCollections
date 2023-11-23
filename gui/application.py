@@ -78,7 +78,7 @@ class Application(SysUtils):
             end tell
             """
 
-        self.run_applescript(applescript)
+        self.run_applescript(script=applescript)
 
     def maxim(self, e=None):
         applescript = f"""
@@ -87,7 +87,7 @@ class Application(SysUtils):
             end tell
             """
 
-        self.run_applescript(applescript=applescript)
+        self.run_applescript(script=applescript)
         cnf.root.focus_force()
 
 
