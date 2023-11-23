@@ -13,10 +13,12 @@ try:
 except ImportError:
     from typing import Literal
 
+from utils_p import SysUtils
+
 __all__ = ("Settings",)
 
 
-class BrowsePathFrame(CFrame):
+class BrowsePathFrame(CFrame, SysUtils):
     def __init__(self, master: tkinter, title: str,
                  path: Literal["str pathlike object"]):
 
@@ -51,7 +53,7 @@ class BrowsePathFrame(CFrame):
             self.__path_lbl.configure(text=dialog)
 
 
-class ScanerWid(CFrame):
+class ScanerWid(CFrame, SysUtils):
     def __init__(self, master: tkinter):
         CFrame.__init__(self, master=master)
 
@@ -71,11 +73,13 @@ class ScanerWid(CFrame):
             try:
                 ind = times.index(cnf.scan_time)
             except ValueError:
+                self.print_err()
                 ind = 0
 
         try:
             self.new_scan_time = times[ind+1]
         except IndexError:
+            self.print_err()
             self.new_scan_time = times[0]
 
         btn.configure(text=f"{self.new_scan_time} {cnf.lng.mins}")

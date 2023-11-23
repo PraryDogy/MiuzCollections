@@ -18,10 +18,12 @@ try:
 except ImportError:
     from typing import Literal
 
+from utils_p import SysUtils
+
 __all__ = ("ImgViewer",)
 
 
-class ContextViewer(Context):
+class ContextViewer(Context, SysUtils):
     def __init__(self, e: tkinter.Event, img_src: Literal["file path"]):
         Context.__init__(self)
 
@@ -45,7 +47,7 @@ class ContextViewer(Context):
         self.do_popup(e=e)
 
 
-class ImgViewer(CWindow):
+class ImgViewer(CWindow, SysUtils):
     def __init__(self, img_src: Literal["file path"]):
         CWindow.__init__(self, bg="black", pady=0, padx=0)
         self.__img_src = img_src
@@ -90,7 +92,7 @@ class ImgViewer(CWindow):
             self.__resize_task = cnf.root.after(ms=300, func=lambda:
                                                 self.__resize_win(e=e))
         except tkinter.TclError:
-            print("img viewer > detect resize > no window")
+            self.print_err()
 
     def __resize_win(self, e: tkinter.Event):
         try:
@@ -103,9 +105,8 @@ class ImgViewer(CWindow):
                 self.__load_thumb()
                 cnf.root.after(ms=300, func=self.__load_img)
 
-        except Exception as ex:
-            print("img viewer > resize win > no win")
-            print(ex)
+        except Exception:
+            self.print_err()
 
     def __load_thumb(self):
         img = Dbase.conn.execute(sqlalchemy.select(ThumbsMd.img150).where(
@@ -129,8 +130,7 @@ class ImgViewer(CWindow):
             self.__set_tk_img(img=img)
 
         except Exception as ex:
-            print("img viewer > img place > no win")
-            print(ex)
+            self.print_err()
 
     def __set_tk_img(self, img: Literal["PIL Image"]):
         img_tk = ImageTk.PhotoImage(image=img)
@@ -142,6 +142,7 @@ class ImgViewer(CWindow):
         try:
             self.__img_src = cnf.all_img_src[ind]
         except IndexError:
+            self.print_err()
             self.__img_src = cnf.all_img_src[0]
 
         self.__set_title()

@@ -10,6 +10,7 @@ except ImportError:
 import customtkinter
 
 from cfg import cnf
+from utils_p import SysUtils
 
 from .utils import *
 
@@ -48,7 +49,7 @@ class CEntry(customtkinter.CTkEntry, BaseCWid):
         return self._canvas
 
 
-class CScroll(customtkinter.CTkScrollableFrame, BaseCWid):
+class CScroll(customtkinter.CTkScrollableFrame, BaseCWid, SysUtils):
     def __init__(self, master: tkinter, width: int = 200,
                  corner_radius: int = 0, fg_color: str = cnf.bg_color,
                  scroll_width: int = cnf.scroll_width,):
@@ -74,9 +75,8 @@ class CScroll(customtkinter.CTkScrollableFrame, BaseCWid):
     def moveup(self, e=None):
         try:
             self.get_parrent().yview_moveto("0.0")
-        except Exception as ex:
-            print("widgets > CScroll > cant move up")
-            print(ex)
+        except Exception:
+            self.print_err()
 
     def cancel_scrolltask(self):
         if self.__scrolltask:
@@ -86,7 +86,7 @@ class CScroll(customtkinter.CTkScrollableFrame, BaseCWid):
         try:
             self._scrollbar.configure(button_color=self.__fg_color)
         except tkinter.TclError:
-            print("widgets > scroll > hide scroll > no scroll")
+            self.print_err()
 
     def show_scroll(self, e=None):
         if e:
@@ -162,7 +162,7 @@ class CWindow(tkinter.Toplevel, BaseCWid):
         return self
 
 
-class MacMenu(tkinter.Menu):
+class MacMenu(tkinter.Menu, SysUtils):
     def __init__(self):
         menubar = tkinter.Menu(cnf.root)
         tkinter.Menu.__init__(self, master=menubar)
@@ -176,4 +176,4 @@ class MacMenu(tkinter.Menu):
         try:
             cnf.root.tk.call("tk::mac::standardAboutPanel")
         except Exception:
-            print("no dialog panel")
+            self.print_err()

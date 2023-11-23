@@ -8,7 +8,7 @@ import traceback
 from time import sleep
 
 try:
-    from typing_extensions import Literal, Callable
+    from typing_extensions import Callable, Literal
 except ImportError:
     from typing import Literal, Callable
 
@@ -21,6 +21,7 @@ from PIL import Image, ImageChops
 
 from cfg import cnf
 from database import *
+from utils_p import SysUtils
 
 __all__ = (
     "apply_filter",

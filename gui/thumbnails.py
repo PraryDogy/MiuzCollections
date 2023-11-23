@@ -13,6 +13,7 @@ from PIL import Image, ImageTk
 
 from cfg import cnf
 from database import Dbase, ThumbsMd
+from utils_p import SysUtils
 
 from .context import *
 from .img_viewer import ImgViewer
@@ -75,7 +76,7 @@ class ContextThumbs(Context):
         self.do_popup(e=e)
 
 
-class ThumbsDict(dict):
+class ThumbsDict(dict, SysUtils):
     def __init__(self) -> dict[str, tuple]:
         """
         dict key: str(month year)
@@ -99,7 +100,7 @@ class ThumbsDict(dict):
                 result.append((img, src, modified))
 
             except Exception:
-                print(traceback.format_exc())
+                self.print_err()
 
         return result
 
@@ -260,7 +261,7 @@ class ImgGridTitle(CLabel):
                   ContextTitles(e=e, title=title, path_list=img_src_list))
 
 
-class ImgGrid(CLabel):
+class ImgGrid(CLabel, SysUtils):
     def __init__(self, master: tkinter, grid_w: int, grid_h: int,
                  thumbsize: Literal["cnf.thumbsize + cnf.thumbspad"],
                  bg=cnf.bg_color, fg=cnf.fg_color, anchor="w"):
@@ -293,6 +294,7 @@ class ImgGrid(CLabel):
             row = e.y // self.__thumbsize
             return self.__coords[(clmn, row)]
         except KeyError:
+            self.print_err()
             return False
 
     def __click(self, e: tkinter.Event):

@@ -11,6 +11,7 @@ from cfg import cnf
 from .context import *
 from .utils import *
 from .widgets import *
+from utils_p import SysUtils
 
 __all__ = ("ImageInfo",)
 
@@ -24,7 +25,7 @@ class ContextInfo(Context):
         self.do_popup(e=e)
 
 
-class ImageInfo(CWindow):
+class ImageInfo(CWindow, SysUtils):
     def __init__(self, parrent: tkinter.Toplevel, img_src: Literal["file path"]):
         CWindow.__init__(self)
         self.title(string=cnf.lng.info)
@@ -42,6 +43,7 @@ class ImageInfo(CWindow):
             w, h = Image.open(img_src).size
             filesize = round(os.path.getsize(filename=img_src) / (1024*1024), 2)
         except FileNotFoundError:
+            self.print_err()
             filemod = cnf.lng.no_connection
             filemod = cnf.lng.no_connection
             w, h = cnf.lng.no_connection, cnf.lng.no_connection
@@ -100,8 +102,8 @@ class ImageInfo(CWindow):
         try:
             e.widget.copy = e.widget.selection_get()
         except tkinter.TclError:
+            self.print_err()
             e.widget.copy = e.widget.get("1.0",tkinter.END)
-            print("img_info > ImageInfo > r_click > text not selected")
 
         ContextInfo(e=e)
 

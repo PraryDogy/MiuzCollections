@@ -1,6 +1,7 @@
 import tkinter
 
 from cfg import cnf
+from utils_p import SysUtils
 
 from .calendar_win import CalendarWin
 from .context import *
@@ -137,7 +138,7 @@ class FuncBar(CFrame):
         self.__topbar_title.configure(text=coll_title)
    
 
-class NotifyBar(CFrame):
+class NotifyBar(CFrame, SysUtils):
     def __init__(self, master: tkinter, bg: str = cnf.bg_color, **kwargs):
         CFrame.__init__(self, master=master, bg=bg, **kwargs)
 
@@ -155,9 +156,8 @@ class NotifyBar(CFrame):
                                           fg_color=cnf.blue_color)
                 self._topbar_can.cmd(lambda e: cancel_utils_task())
                 self._topbar_can.pack(side="left", padx=(1, 0))
-        except RuntimeError as e:
-            print("thumbnails > topbar text error")
-            print(e)
+        except RuntimeError:
+            self.print_err()
 
     def notibar_default(self):
         if hasattr(self, "_topbar_can"):

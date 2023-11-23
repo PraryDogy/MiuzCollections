@@ -3,8 +3,9 @@ import os
 import shutil
 import threading
 import tkinter
-from datetime import datetime
 import traceback
+from datetime import datetime
+
 try:
     from typing_extensions import Literal
 except ImportError:
@@ -16,61 +17,60 @@ __all__ = ("cnf",)
 
 class ConfigGui:
     def reload_strbar(self):
-        from gui.application import app
+        from gui import app
         app.stbar.reload_stbar()
 
     def reload_menu(self):
-        from gui.application import app
+        from gui import app
         app.menu.reload_menu()
 
     def show_coll(self, btn, collname):
-        from gui.application import app
+        from gui import app
         app.menu.show_coll(btn, collname)
         self.set_topbar_title()
         self.reload_scroll()
 
     def notibar_text(self, text):
-        from gui.application import app
+        from gui import app
         app.topbar.notibar.notibar_text(text)
 
     def notibar_default(self):
-        from gui.application import app
+        from gui import app
         app.topbar.notibar.notibar_default()
 
     def reload_thumbs(self):
-        from gui.application import app
+        from gui import app
         app.thumbs.reload_thumbs()
 
     def reload_scroll(self):
         try:
-            from gui.application import app
+            from gui import app
             app.thumbs.reload_scroll()
-        except Exception as ex:
-            print("cfg > reload scroll import err")
-            traceback.print_exception(type(ex), ex, ex.__traceback__)
+        except Exception:
+            print(traceback.format_exc())
 
     def load_langwin(self):
         from gui.lang_win import LangWin
         LangWin()
 
     def set_topbar_title(self):
-        from gui.application import app
+        from gui import app
         app.topbar.funcbar.set_topbar_title()
 
     def reload_filters(self):
-        from gui.application import app
+        from gui import app
         app.topbar.funcbar.filters_wid.reload_filters()
 
     def move_up(self):
-        from gui.application import app
+        from gui import app
         app.thumbs.scroll.moveup()
 
     def set_calendar_title(self):
-        from gui.application import app
+        from gui import app
         app.topbar.funcbar.filters_wid.calendar_win.set_calendar_title()
 
     def stbar_btn(self) -> Literal["type: gui > widgets > CButton"]:
-        from gui.application import app
+        from gui import app
         return app.stbar.stbar_btn
 
 
@@ -170,7 +170,7 @@ class Config(ConfigGui, User):
             json.dump(obj=data, fp=file, indent=4, ensure_ascii=False)
 
     def set_language(self, lang_name: Literal["en", "ru"]):
-        from lang import Rus, Eng
+        from lang import Eng, Rus
 
         ru, en = Rus(), Eng()
         if lang_name not in (ru.name, en.name):

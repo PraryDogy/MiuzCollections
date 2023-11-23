@@ -13,10 +13,12 @@ try:
 except ImportError:
     from typing import Literal
 
+from utils_p import SysUtils
+
 __all__ = ("CalendarWin",)
 
 
-class CalendarBase(CFrame):
+class CalendarBase(CFrame, SysUtils):
     def __init__(self, master: tkinter.Frame, my_date: datetime):
         CFrame.__init__(self, master=master)
 
@@ -127,6 +129,7 @@ class CalendarBase(CFrame):
         try:
             self.my_date = datetime(self.yy, self.mm, self.dd).date()
         except ValueError:
+            self.print_err()
             max_day = calendar.monthrange(self.yy, self.mm)[1]
             self.my_date = datetime(self.yy, self.mm, max_day).date()
 
@@ -243,6 +246,7 @@ class CCalendar(CalendarBase):
                                 func=lambda e: self.ok_entry(parrent=parrent))
 
         except ValueError:
+            self.print_err()
             btn.configure(text_color=cnf.dgray_color)
             btn.unbind(sequence="<ButtonRelease-1>")
             self.win_entry.unbind(sequence="<Return>")
@@ -259,7 +263,7 @@ class CCalendar(CalendarBase):
             self.fill_days()
             cnf.set_calendar_title()
         except tkinter.TclError:
-            print("enter custom date widgets calendar error title change")
+            self.print_err()
 
         self.close_entry(parrent=parrent)
 
