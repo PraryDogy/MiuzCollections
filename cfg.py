@@ -43,6 +43,7 @@ class ConfigGui:
         app.thumbs.reload_thumbs()
 
     def reload_scroll(self):
+        print("reload scroll")
         try:
             from gui import app
             app.thumbs.reload_scroll()
