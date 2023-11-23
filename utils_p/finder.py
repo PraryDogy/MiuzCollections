@@ -10,6 +10,7 @@ except ImportError:
     from typing import Literal, Callable
 
 import threading
+from difflib import SequenceMatcher
 
 import psd_tools
 import tifffile
@@ -54,30 +55,51 @@ class FinderUtils(SysUtils):
     def _delay(self):
         sleep(2)
 
-    def __normalize_name(self, name: str) -> Literal["file name"]:
+    def _similarity(self, aa: str, bb: str):
+        return SequenceMatcher(None, aa, bb).ratio()
+
+    def _normalize_name(self, name: str) -> Literal["file name no extention"]:
         name, ext = os.path.splitext(p=name)
-        name = name.translate(str.maketrans("", "", string.punctuation))
+        return name.translate(str.maketrans("", "", string.punctuation + " "))
 
-        for i in ("preview", "1x1", "1х1", "crop", "копия", "copy", "small"):
-            name = name.replace(i, "")
+    # def __normalize_name(self, name: str) -> Literal["file name"]:
+    #     name, ext = os.path.splitext(p=name)
+    #     name = name.translate(str.maketrans("", "", string.punctuation))
 
-        return name.replace(" ", "")
+    #     for i in ("preview", "1x1", "1х1", "crop", "копия", "copy", "small"):
+    #         name = name.replace(i, "")
 
-    def __find_tiff(self, src: Literal["file path"]) -> (tuple[Literal["file path tiff"], ...] | list):
-        path, filename = os.path.split(src)
-        src_file_no_ext = self.__normalize_name(filename)
+    #     return name.replace(" ", "")
+
+    def _find_tiff(self, src: Literal["file path"]) -> (tuple[Literal["file path tiff"], ...] | list):
+        src_path, src_filename = os.path.split(src)
+        src_filename = self._normalize_name(src_filename)
         exts = (".tiff", ".TIFF", ".psd", ".PSD", ".psb", ".PSB", ".tif", ".TIF")
         images = []
 
-        for root, dirs, files in os.walk(path):
+        for root, dirs, files in os.walk(src_path):
             for file in files:
                 if file.endswith(exts):
-                    file_no_ext = self.__normalize_name(file)
-                    if src_file_no_ext in file_no_ext:
-                        images.append(os.path.join(root, file))
-                    elif file_no_ext in src_file_no_ext and len(file_no_ext) > 5:
+                    filename = self._normalize_name(file)
+                    if self._similarity(aa=src_filename, bb=filename) > 0.8:
                         images.append(os.path.join(root, file))
         return images
+
+    # def _find_tiff(self, src: Literal["file path"]) -> (tuple[Literal["file path tiff"], ...] | list):
+    #     path, filename = os.path.split(src)
+    #     src_file_no_ext = self._remove_punct(filename)
+    #     exts = (".tiff", ".TIFF", ".psd", ".PSD", ".psb", ".PSB", ".tif", ".TIF")
+    #     images = []
+
+    #     for root, dirs, files in os.walk(path):
+    #         for file in files:
+    #             if file.endswith(exts):
+    #                 file_no_ext = self._remove_punct(file)
+    #                 if src_file_no_ext in file_no_ext:
+    #                     images.append(os.path.join(root, file))
+    #                 elif file_no_ext in src_file_no_ext and len(file_no_ext) > 5:
+    #                     images.append(os.path.join(root, file))
+    #     return images
 
     def _reveal_files(self, paths: tuple[Literal["file path"], ...]):
         paths = (
@@ -112,7 +134,7 @@ class FinderUtils(SysUtils):
     def _get_tiff(self, path_list: tuple[str, ...]) -> tuple[str, ...]:
         return [tiff
                 for src in path_list
-                for tiff in self.__find_tiff(src=src)
+                for tiff in self._find_tiff(src=src)
                 if cnf.notibar_status]
 
     def _create_downloads(self):
