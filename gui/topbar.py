@@ -43,16 +43,13 @@ class SearchWid(CEntry):
         search_var = cnf.search_var.get()
 
         if search_var != self.__old_search_var:
-            print("search var: ", search_var if search_var else "no", ", old var: ", self.__old_search_var)
             self.__cancel_search_task()
+            self.__old_search_var = search_var
+            cnf.date_start, cnf.date_end = None, None
             self.__search_task = cnf.root.after(ms=1000, func=self.__search_go)
 
 
     def __search_go(self, e=None):
-        self.__cancel_search_task()
-        self.__old_search_var = cnf.search_var.get()
-        cnf.search_var.set(value=self.get())
-        cnf.date_start, cnf.date_end = None, None
         cnf.reload_scroll()
         self.focus_force()
 
