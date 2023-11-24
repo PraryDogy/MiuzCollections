@@ -33,7 +33,7 @@ class SearchWid(CEntry):
         cnf.search_var.trace(mode="w", callback=lambda *args:
                              self.__create_search_task(args))
         self.__search_task = None
-        self.__old_search_var = "hello"
+        self.__old_search_var = None
 
     def __cancel_search_task(self):
         if self.__search_task:

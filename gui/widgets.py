@@ -84,7 +84,8 @@ class CScroll(customtkinter.CTkScrollableFrame, BaseCWid, SysUtils):
         try:
             self._scrollbar.configure(button_color=self.__fg_color)
         except tkinter.TclError:
-            self.print_err()
+            print("hide scroll err")
+            # self.print_err()
 
     def show_scroll(self, e=None):
         if e:
