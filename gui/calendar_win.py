@@ -245,7 +245,7 @@ class CCalendar(CalendarBase, SysUtils):
                                 func=lambda e: self.ok_entry(parrent=parrent))
 
         except ValueError:
-            self.print_err()
+            # self.print_err()
             btn.configure(text_color=cnf.dgray_color)
             btn.unbind(sequence="<ButtonRelease-1>")
             self.win_entry.unbind(sequence="<Return>")

@@ -42,7 +42,7 @@ class SearchWid(CEntry):
     def __create_search_task(self, *args):
         search_var = cnf.search_var.get()
 
-        if search_var != self.__old_search_var:
+        if search_var != self.__old_search_var and search_var:
             self.__cancel_search_task()
             self.__old_search_var = search_var
             cnf.date_start, cnf.date_end = None, None

@@ -76,58 +76,46 @@ class ContextThumbs(Context):
 
 
 class ThumbsDict(dict, ImageUtils, SysUtils):
-    def __init__(self) -> dict[str, tuple]:
-        """
-        dict key: str(month year)
-        dict value: list of tuples(PIL Image, file path)
-        """
-        super().__init__()
-        data = Dbase.conn.execute(self.get_query()).fetchall()
-        decoded = self.decode_thumbs(thumbs_raw=data)
-        self.update(self.create_thumbs_dict(thumbs_raw=decoded))
+    def __init__(self) -> dict[Literal["month year: [(PIL Image, src), ...]"]]:
+        dict.__init__(self)
+        self._thumbsdict_create()
 
-    def decode_thumbs(
-            self,
-            thumbs_raw: tuple[tuple[bytes, str, int], ...]
-            ) -> tuple[tuple[bytes, str, int], ...]:
-        result = []
-        for blob, src, modified in thumbs_raw:
-            try:
-                decoded = self.decode_image(img=blob)
-                cropped = self.crop_image(img=decoded)
-                img = self.convert_to_rgb(img=cropped)
-                result.append((img, src, modified))
-
-            except Exception:
-                self.print_err()
-
-        return result
-
-    def create_thumbs_dict(
-            self,
-            thumbs_raw: tuple[tuple[bytes, str, int], ...]) -> dict:
+    def _thumbsdict_create(self) -> dict:
+        data = Dbase.conn.execute(self._get_query()).fetchall()
         thumbs_dict = {}
 
-        for img, src, modified in thumbs_raw:
-            date_key = datetime.fromtimestamp(modified).date()
+        for img, src, mod in data:
 
-            if not any((cnf.date_start, cnf.date_end)):
-                date_key = f"{cnf.lng.months[date_key.month]} {date_key.year}"
+            mod = datetime.fromtimestamp(mod).date()
+
+            try:
+                img = self.decode_image(img=img)
+                img = self.crop_image(img=img)
+                img = self.convert_to_rgb(img=img)
+            except Exception:
+                self.print_err()
+                continue
+
+            if cnf.date_start or cnf.date_end:
+                mod = f"{cnf.named_start} - {cnf.named_end}"
             else:
-                date_key = f"{cnf.named_start} - {cnf.named_end}"
+                mod = f"{cnf.lng.months[mod.month]} {mod.year}"
 
-            thumbs_dict.setdefault(date_key, [])
-            thumbs_dict[date_key].append((img, src))
+            if mod in thumbs_dict:
+                thumbs_dict[mod].append((img, src))
+            else:
+                thumbs_dict[mod] = []
 
-        return thumbs_dict
+        self.update(thumbs_dict)
 
-    def stamp_dates(self) -> tuple[datetime, datetime]:
-        start = datetime.combine(date=cnf.date_start, time=datetime.min.time())
+    def _stamp_dates(self) -> tuple[datetime, datetime]:
+        start = datetime.combine(date=cnf.date_start,
+                                 time=datetime.min.time())
         end = datetime.combine(date=cnf.date_end,
                                time=datetime.max.time().replace(microsecond=0))
         return (datetime.timestamp(start), datetime.timestamp(end))
 
-    def get_query(self):
+    def _get_query(self):
         q = sqlalchemy.select(ThumbsMd.img150, ThumbsMd.src, ThumbsMd.modified)
 
         search = cnf.search_var.get()
@@ -159,7 +147,7 @@ class ThumbsDict(dict, ImageUtils, SysUtils):
         if not any((cnf.date_start, cnf.date_end)):
             q = q.limit(cnf.limit)
         else:
-            t = self.stamp_dates()
+            t = self._stamp_dates()
             q = q.filter(ThumbsMd.modified > t[0])
             q = q.filter(ThumbsMd.modified < t[1])
 
