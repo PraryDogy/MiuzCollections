@@ -150,7 +150,7 @@ class NotifyBar(CFrame, FinderBase, SysUtils):
                 self._topbar_can = CButton(master=self, text=cnf.lng.cancel,
                                           fg_color=cnf.blue_color)
                 self._topbar_can.cmd(lambda e: self.cancel_utils_task())
-                self._topbar_can.pack(side="left", padx=(5, 0))
+                self._topbar_can.pack(side="left", padx=(2, 0))
         except RuntimeError:
             self.print_err()
 

@@ -103,14 +103,14 @@ class ImgSingle:
         self.add_command(
             label=cnf.lng.view,
             command=lambda:
-            ImgViewer(src=img_src))
+            ImgViewer(img_src=img_src))
 
     def imginfo(self, parrent: CWindow, img_src: Literal["file path"]):
         from .img_info import ImageInfo
         self.add_command(
             label=cnf.lng.info,
             command=lambda:
-            ImageInfo(parrent=parrent, src=img_src))
+            ImageInfo(parrent=parrent, img_src=img_src))
 
     def reveal_jpg(self, img_src: Literal["file path"]):
         self.add_command(
