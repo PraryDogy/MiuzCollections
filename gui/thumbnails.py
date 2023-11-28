@@ -407,14 +407,14 @@ class Thumbs(CFrame):
         self.load_scroll()
         self.load_thumbs()
         self.bind_scroll_thumbs()
-        cnf.root.focus_force()
+        # cnf.root.focus_force()
 
     def reload_thumbs(self):
         for i in (self.__above_thumbs, self.__thumbsframe):
             i.destroy()
         cnf.all_img_src.clear()
         self.load_thumbs()
-        cnf.root.focus_force()
+        # cnf.root.focus_force()
 
     def get_clmns_count(self) -> int:
         w = cnf.root.winfo_width() - cnf.menu_w - cnf.scroll_width
