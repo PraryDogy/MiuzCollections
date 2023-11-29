@@ -12,11 +12,13 @@ from .context import Context
 from .widgets import *
 
 try:
-    from typing_extensions import Literal, Callable
+    from typing_extensions import Callable, Literal
 except ImportError:
     from typing import Literal, Callable
 
-from utils import SysUtils, ImageUtils
+import threading
+
+from utils import ImageUtils, SysUtils
 
 __all__ = ("ImgViewer",)
 
@@ -44,13 +46,15 @@ class ContextViewer(Context, SysUtils):
 
         self.do_popup(e=e)
 
+  
+class ImgSet:
+    def _set_tk_img(self, master: CLabel, img: Literal["PIL Image"]):
+        img_tk = ImageTk.PhotoImage(image=img)
+        master.configure(image=img_tk)
+        master.image_names = img_tk
 
-class ImgLoadThread:
-    def __init__(self, fn: Callable):
-        pass
 
-        
-class ImgLoad(ImageUtils):
+class ThumbLoad(ImageUtils, ImgSet):
     def __init__(self, master: CLabel, img_src: str):
         img = Dbase.conn.execute(sqlalchemy.select(ThumbsMd.img150).where(
             ThumbsMd.src==img_src)).first()[0]
@@ -58,8 +62,11 @@ class ImgLoad(ImageUtils):
         img = self.resize_image(img=img, wid_w=cnf.imgview_g["w"],
                            wid_h=cnf.imgview_g["h"], is_thumb=False)
         img = self.convert_to_rgb(img=img)
-        self.__set_tk_img(master=master, img=img)
+        self._set_tk_img(master=master, img=img)
 
+
+class ImgLoad(ImageUtils, ImgSet):
+    def __init__(self, master: CLabel, img_src: str):
         try:
             img = cv2.imread(img_src, cv2.IMREAD_UNCHANGED)
             
@@ -69,15 +76,23 @@ class ImgLoad(ImageUtils):
             img = self.resize_image(img=img, wid_w=cnf.imgview_g["w"],
                                wid_h=cnf.imgview_g["h"], is_thumb=False)
             img = self.convert_to_rgb(img=img)
-            self.__set_tk_img(master=master, img=img)
-
+            self._set_tk_img(master=master, img=img)
         except Exception as ex:
             self.print_err()
 
-    def __set_tk_img(self, master: CLabel, img: Literal["PIL Image"]):
-        img_tk = ImageTk.PhotoImage(image=img)
-        master.configure(image=img_tk)
-        master.image_names = img_tk
+
+class Tsk:
+    task = threading.Thread(target=None)
+
+
+class ImgLoadThread:
+    def __init__(self, master: CLabel, img_src: str):
+        while Tsk.task.is_alive():
+            cnf.root.update()
+        
+        Tsk.task = threading.Thread(target=self.fn)
+
+
 
 
 class ImgViewer(CWindow, ImageUtils, SysUtils):
