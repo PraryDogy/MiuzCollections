@@ -104,7 +104,8 @@ class ThumbsDict(dict, ImageUtils, SysUtils):
             if mod in thumbs_dict:
                 thumbs_dict[mod].append((img, src))
             else:
-                thumbs_dict[mod] = []
+                thumbs_dict[mod] = [(img, src)]
+
 
         self.update(thumbs_dict)
 
