@@ -12,9 +12,9 @@ from .context import Context
 from .widgets import *
 
 try:
-    from typing_extensions import Literal
+    from typing_extensions import Literal, Callable
 except ImportError:
-    from typing import Literal
+    from typing import Literal, Callable
 
 from utils import SysUtils, ImageUtils
 
@@ -43,6 +43,41 @@ class ContextViewer(Context, SysUtils):
         self.download_fullsize(img_src=img_src)
 
         self.do_popup(e=e)
+
+
+class ImgLoadThread:
+    def __init__(self, fn: Callable):
+        pass
+
+        
+class ImgLoad(ImageUtils):
+    def __init__(self, master: CLabel, img_src: str):
+        img = Dbase.conn.execute(sqlalchemy.select(ThumbsMd.img150).where(
+            ThumbsMd.src==img_src)).first()[0]
+        img = self.decode_image(img=img)
+        img = self.resize_image(img=img, wid_w=cnf.imgview_g["w"],
+                           wid_h=cnf.imgview_g["h"], is_thumb=False)
+        img = self.convert_to_rgb(img=img)
+        self.__set_tk_img(master=master, img=img)
+
+        try:
+            img = cv2.imread(img_src, cv2.IMREAD_UNCHANGED)
+            
+            if img_src.endswith(("png", "PNG")):
+                img = self.replace_bg(img=img, color=cnf.bg_color)
+
+            img = self.resize_image(img=img, wid_w=cnf.imgview_g["w"],
+                               wid_h=cnf.imgview_g["h"], is_thumb=False)
+            img = self.convert_to_rgb(img=img)
+            self.__set_tk_img(master=master, img=img)
+
+        except Exception as ex:
+            self.print_err()
+
+    def __set_tk_img(self, master: CLabel, img: Literal["PIL Image"]):
+        img_tk = ImageTk.PhotoImage(image=img)
+        master.configure(image=img_tk)
+        master.image_names = img_tk
 
 
 class ImgViewer(CWindow, ImageUtils, SysUtils):
@@ -99,40 +134,40 @@ class ImgViewer(CWindow, ImageUtils, SysUtils):
                 cnf.imgview_g.update({"w": e.width, "h": e.height})
                 self.img.configure(width=cnf.imgview_g["w"], height=cnf.imgview_g["h"])
 
-                self.__load_thumb()
-                cnf.root.after(ms=300, func=self.__load_img)
+                # self.__load_thumb()
+                # cnf.root.after(ms=300, func=self.__load_img)
 
         except Exception:
             self.print_err()
 
-    def __load_thumb(self):
-        img = Dbase.conn.execute(sqlalchemy.select(ThumbsMd.img150).where(
-            ThumbsMd.src==self.__img_src)).first()[0]
-        img = self.decode_image(img=img)
-        img = self.resize_image(img=img, wid_w=cnf.imgview_g["w"],
-                           wid_h=cnf.imgview_g["h"], is_thumb=False)
-        img = self.convert_to_rgb(img=img)
-        self.__set_tk_img(img=img)
+    # def __load_thumb(self):
+    #     img = Dbase.conn.execute(sqlalchemy.select(ThumbsMd.img150).where(
+    #         ThumbsMd.src==self.__img_src)).first()[0]
+    #     img = self.decode_image(img=img)
+    #     img = self.resize_image(img=img, wid_w=cnf.imgview_g["w"],
+    #                        wid_h=cnf.imgview_g["h"], is_thumb=False)
+    #     img = self.convert_to_rgb(img=img)
+    #     self.__set_tk_img(img=img)
 
-    def __load_img(self):
-        try:
-            img = cv2.imread(self.__img_src, cv2.IMREAD_UNCHANGED)
+    # def __load_img(self):
+    #     try:
+    #         img = cv2.imread(self.__img_src, cv2.IMREAD_UNCHANGED)
             
-            if self.__img_src.endswith(("png", "PNG")):
-                img = self.replace_bg(img=img, color=cnf.bg_color)
+    #         if self.__img_src.endswith(("png", "PNG")):
+    #             img = self.replace_bg(img=img, color=cnf.bg_color)
 
-            img = self.resize_image(img=img, wid_w=cnf.imgview_g["w"],
-                               wid_h=cnf.imgview_g["h"], is_thumb=False)
-            img = self.convert_to_rgb(img=img)
-            self.__set_tk_img(img=img)
+    #         img = self.resize_image(img=img, wid_w=cnf.imgview_g["w"],
+    #                            wid_h=cnf.imgview_g["h"], is_thumb=False)
+    #         img = self.convert_to_rgb(img=img)
+    #         self.__set_tk_img(img=img)
 
-        except Exception as ex:
-            self.print_err()
+    #     except Exception as ex:
+    #         self.print_err()
 
-    def __set_tk_img(self, img: Literal["PIL Image"]):
-        img_tk = ImageTk.PhotoImage(image=img)
-        self.img.configure(image=img_tk)
-        self.img.image_names = img_tk
+    # def __set_tk_img(self, img: Literal["PIL Image"]):
+    #     img_tk = ImageTk.PhotoImage(image=img)
+    #     self.img.configure(image=img_tk)
+    #     self.img.image_names = img_tk
 
     def __switch_img(self, ind: int):
         cnf.root.after_cancel(id=self.__img_task)
@@ -147,8 +182,8 @@ class ImgViewer(CWindow, ImageUtils, SysUtils):
         self.img.bind(sequence="<ButtonRelease-2>",
                   func=lambda e: ContextViewer(e=e, img_src=self.__img_src))
 
-        self.__load_thumb()
-        self.__img_task = cnf.root.after(ms=500, func=self.__load_img)
+        # self.__load_thumb()
+        # self.__img_task = cnf.root.after(ms=500, func=self.__load_img)
 
     def __l_click(self, e: tkinter.Event):
         if e.x <= cnf.imgview_g["w"] // 2:
