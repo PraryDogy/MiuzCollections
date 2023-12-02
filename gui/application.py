@@ -90,5 +90,4 @@ class Application(SysUtils):
         self.run_applescript(script=applescript)
         cnf.root.focus_force()
 
-
 app = Application()

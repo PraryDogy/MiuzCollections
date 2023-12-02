@@ -282,7 +282,8 @@ class ImgGrid(CLabel, SysUtils):
             row = e.y // self.__thumbsize
             return self.__coords[(clmn, row)]
         except KeyError:
-            self.print_err()
+            # self.print_err()
+            print("no thumbnail for click, it's ok")
             return False
 
     def __click(self, e: tkinter.Event):

@@ -34,8 +34,12 @@ class SysUtils:
             ]
         subprocess.call(args=["osascript"] + args)
 
-    def print_err(self):
+    def print_err(self, write=False):
         print(traceback.format_exc())
+
+        if write:
+            with open(os.path.join(cnf.cfg_dir, "err.txt"), "a") as f:
+                f.write(traceback.format_exc())
 
     def smb_check(self) -> bool:
         return bool(os.path.exists(path=cnf.coll_folder))

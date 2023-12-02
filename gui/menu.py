@@ -33,7 +33,11 @@ class Menu(CScroll):
         CScroll.__init__(self, master=master, fg_color=cnf.bg_color_menu,
                          corner_radius=0, width=cnf.menu_w)
 
-        self.__menu_frame = self.__load_menu_buttons()
+        try:
+            self.__menu_frame = self.__load_menu_buttons()
+        except Exception:
+            self.print_err(write=True)
+
         self.__menu_frame.pack(anchor="w", fill="x")
         self.__bind_scroll_menu()
 
