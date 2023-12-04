@@ -21,4 +21,4 @@ except Exception:
     with open(file=filedir, mode="a") as f:
         f.write("\n\n\n***\n\n\n" + traceback.format_exc())
     
-    subprocess.Popen(args=["open", "-R", filedir])
+    # subprocess.Popen(args=["open", "-R", filedir])
