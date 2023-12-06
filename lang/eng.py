@@ -1,6 +1,6 @@
-from .load_lang import load_lang
+from .load_lang import LoadLang
 
 class Eng:
     def __init__(self):
-        for key, value in load_lang.items():
+        for key, value in LoadLang.load_lang.items():
             setattr(self, key, value[1])
