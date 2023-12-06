@@ -20,7 +20,7 @@ img.write(f"icon.icns")
 
 APP = ["start.py"]
 
-DATA_FILES = [cnf.db_name, cnf.thumb_err]
+DATA_FILES = [cnf.db_name, cnf.thumb_err, "lang.json"]
 
 OPTIONS = {"iconfile": "icon.icns",
            "plist": {"CFBundleName": cnf.app_name,

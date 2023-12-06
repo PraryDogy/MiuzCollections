@@ -2,8 +2,8 @@ import json
 
 
 class LoadLang:
-    with open("lang/lang.json", "r") as file:
-        load_lang = json.load(file)
+    with open(file="lang.json", mode="r", encoding="utf-8") as file:
+        load_lang = json.loads(s=file.read())
 
     def admin():
         print("1 add new key")
@@ -38,7 +38,7 @@ class LoadLang:
         else:
             print("white 1, 2 or 3")
 
-        with open("lang/lang.json", "w") as file:
+        with open(file="lang.json", mode="w", encoding="utf-8") as file:
             json.dump(obj=__class__.load_lang, fp=file, ensure_ascii=False, indent=4)
 
 
