@@ -121,7 +121,7 @@ class CalendarBase(CFrame, SysUtils):
                 self.curr_btn = btn
 
     def change_title(self):
-        t = f"{self.dd} {cnf.lng.months_case[self.mm]} {self.yy}"
+        t = f"{self.dd} {cnf.lng.months_case[str(self.mm)]} {self.yy}"
         self.title.configure(text=t)
 
     def set_my_date(self):
@@ -337,7 +337,7 @@ class CalendarWin(CWindow, SysUtils):
 
     def named_date(self, date: datetime) -> Literal["ex: 10 jan 1991"]:
         day = f"{date.day} "
-        month = f"{cnf.lng.months_case[date.month]} "
+        month = f"{cnf.lng.months_case[str(date.month)]} "
         year = f"{date.year}"
         return day + month + year
 

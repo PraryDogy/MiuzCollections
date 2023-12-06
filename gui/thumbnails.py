@@ -99,7 +99,7 @@ class ThumbsDict(dict, ImageUtils, SysUtils):
             if cnf.date_start or cnf.date_end:
                 mod = f"{cnf.named_start} - {cnf.named_end}"
             else:
-                mod = f"{cnf.lng.months[mod.month]} {mod.year}"
+                mod = f"{cnf.lng.months[str(mod.month)]} {mod.year}"
 
             if mod in thumbs_dict:
                 thumbs_dict[mod].append((img, src))

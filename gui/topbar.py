@@ -72,6 +72,9 @@ class FiltersWid(CFrame):
         self.dates_btn.pack(side="left", fill="x", padx=(0, 5))
         self.dates_btn.cmd(self.open_calendar)
 
+        info = CButton(master=self, text="?", fg_color=cnf.bg_color)
+        # info.pack(side="right", anchor="w", fill="x")
+
         self.reload_filters()
 
     def open_calendar(self, e: tkinter.Event = None):
@@ -122,7 +125,7 @@ class FuncBar(CFrame):
         search.pack(anchor="e", side="right")
 
         self.filters_wid = FiltersWid(master=second_row)
-        self.filters_wid.pack(anchor="w")
+        self.filters_wid.pack(anchor="w", fill="x")
 
     def set_topbar_title(self):
         if cnf.curr_coll == cnf.all_colls:

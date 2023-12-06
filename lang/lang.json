@@ -1,0 +1,432 @@
+{
+    "name": [
+        "ru",
+        "en"
+    ],
+    "filter_names": [
+        {
+            "prod": "Имиджи",
+            "mod": "Модели",
+            "cat": "Каталог",
+            "other": "Другое"
+        },
+        {
+            "prod": "Product",
+            "mod": "Models",
+            "cat": "Catalog",
+            "other": "Other"
+        }
+    ],
+    "language": [
+        "Русский",
+        "English"
+    ],
+    "lang_label": [
+        "Язык/Language",
+        "Language/Язык"
+    ],
+    "up": [
+        "Наверх",
+        "Up"
+    ],
+    "ok": [
+        "Ок",
+        "Ok"
+    ],
+    "cancel": [
+        "Отмена",
+        "Cancel"
+    ],
+    "all_colls": [
+        "Все коллекции",
+        "All collections"
+    ],
+    "close": [
+        "Закрыть",
+        "Close"
+    ],
+    "paste": [
+        "Вставить",
+        "Paste"
+    ],
+    "clear": [
+        "Очистить",
+        "Clear"
+    ],
+    "search": [
+        "Поиск",
+        "Search"
+    ],
+    "view": [
+        "Просмотр",
+        "View"
+    ],
+    "info": [
+        "Инфо",
+        "Info"
+    ],
+    "menu": [
+        "Меню",
+        "Menu"
+    ],
+    "settings": [
+        "Настройки",
+        "Settings"
+    ],
+    "browse": [
+        "Обзор",
+        "Browse"
+    ],
+    "exit": [
+        "Выход",
+        "Exit"
+    ],
+    "reset": [
+        "Сброс",
+        "Reset"
+    ],
+    "mins": [
+        "мин.",
+        "mins."
+    ],
+    "updating": [
+        "Обновляю",
+        "Updating"
+    ],
+    "update": [
+        "Обновить",
+        "Update"
+    ],
+    "filter": [
+        "Фильтр",
+        "Filter"
+    ],
+    "filters": [
+        "Фильтры",
+        "Filters"
+    ],
+    "sort": [
+        "Сортировка",
+        "Sort"
+    ],
+    "photo": [
+        "Фото",
+        "Photo"
+    ],
+    "total": [
+        "Всего",
+        "Total"
+    ],
+    "start": [
+        "Начало",
+        "Start"
+    ],
+    "end": [
+        "Конец",
+        "End"
+    ],
+    "go_out": [
+        "Выйти",
+        "Go out"
+    ],
+    "preparing": [
+        "Подготовка",
+        "Preparing"
+    ],
+    "scaning": [
+        "Сканирую",
+        "Scaning"
+    ],
+    "copying": [
+        "Копирую",
+        "Copying"
+    ],
+    "from_pretext": [
+        "из",
+        "from"
+    ],
+    "added": [
+        "Добавлено",
+        "Added"
+    ],
+    "finishing": [
+        "Завершаю",
+        "Finishing"
+    ],
+    "copy": [
+        "Копировать",
+        "Copy"
+    ],
+    "resolution": [
+        "Разрешение",
+        "Resolution"
+    ],
+    "file_size": [
+        "Размер",
+        "Size"
+    ],
+    "file_path": [
+        "Расположение",
+        "Location"
+    ],
+    "collection": [
+        "Коллеция",
+        "Collection"
+    ],
+    "dates": [
+        "Даты",
+        "Dates"
+    ],
+    "mb": [
+        "мб",
+        "mb"
+    ],
+    "download": [
+        "Скачать",
+        "Download"
+    ],
+    "done": [
+        "Готово",
+        "Done"
+    ],
+    "help": [
+        "Справка",
+        "Помощь"
+    ],
+    "sett_descr": [
+        "Если имя коллекции начинается с _ или . программа проигнорирует ее.",
+        "If the collection name starts with _ or . MiuzCollections app will ignore it."
+    ],
+    "smb_descr": [
+        "- Проверьте подключение к интернету.\n- Откройте любую папку на сетевом диске,\n- Укажите правильный путь к коллекциям в настройках\n- Перезапустите приложение.\n\nПоддержка: loshkarev@miuz.ru\nTelegram: evlosh",
+        "- Check internet connection.\n- Try to open any Miuz network folder.\n- Open settings and select collections folder.\n- Restart app.\nSupport: loshkarev@miuz.ru\nTelegram: evlosh"
+    ],
+    "lang_descr": [
+        "Нажмите ок для смены языка",
+        "Press ok to change language"
+    ],
+    "please_wait": [
+        "Пожалуйста, подождите",
+        "Please, wait"
+    ],
+    "no_tiff": [
+        "Не могу найти tiff",
+        "Can't find tiff"
+    ],
+    "no_jpg": [
+        "Не могу найти jpg",
+        "Can't find jpg"
+    ],
+    "to_downloads": [
+        "в загрузки",
+        "to downloads"
+    ],
+    "copy_all": [
+        "Копировать все",
+        "Copy all"
+    ],
+    "find_jpg": [
+        "Найти jpg",
+        "Find jpg"
+    ],
+    "find_tiff": [
+        "Найти tiff",
+        "Find tiff"
+    ],
+    "copy_path_tiff": [
+        "Копировать путь к tiff",
+        "Copy tiff location"
+    ],
+    "copy_path_jpg": [
+        "Копировать путь к jpg",
+        "Copy jpg location"
+    ],
+    "reveal_coll": [
+        "Открыть папку",
+        "Reveal collection"
+    ],
+    "colls_path": [
+        "Расположение коллекций",
+        "Collections location"
+    ],
+    "down_path": [
+        "Папка загрузок",
+        "Downloads folder"
+    ],
+    "scan_time": [
+        "x",
+        "x"
+    ],
+    "update_every": [
+        "Интервал обновления коллекций",
+        "Collections update interval"
+    ],
+    "show_more": [
+        "Позазать еще",
+        "Show more"
+    ],
+    "no_photo": [
+        "Нет фотографий",
+        "No photos"
+    ],
+    "with_name": [
+        "с именем",
+        "with name"
+    ],
+    "for_all_time": [
+        "За все время",
+        "For all time"
+    ],
+    "date_changed_by": [
+        "По дате изменения",
+        "By date changed"
+    ],
+    "date_created_by": [
+        "По дате создания",
+        "By date created"
+    ],
+    "date_changed": [
+        "Дата изменения",
+        "Date changed"
+    ],
+    "date_created": [
+        "Дата создания",
+        "Date created"
+    ],
+    "reset_dates": [
+        "Сбросить даты",
+        "Dates reset"
+    ],
+    "dates_not_sel": [
+        "Даты не выбраны",
+        "No dates selected"
+    ],
+    "enter_date": [
+        "Введите дату",
+        "Enter date"
+    ],
+    "d_m_y": [
+        "день.месяц.год",
+        "day.month.year"
+    ],
+    "no_connection": [
+        "Нет подключения.",
+        "No connection"
+    ],
+    "file_name": [
+        "Имя файла",
+        "Filename"
+    ],
+    "remove_fromapp": [
+        "Удалить из приложения",
+        "Remove from app"
+    ],
+    "fullsize": [
+        "Скачать полноразмерный jpg",
+        "Download fullsize jpg"
+    ],
+    "group_fullsize": [
+        "Скачать полноразмерные jpg",
+        "Download fullsize jpg"
+    ],
+    "show_all": [
+        "Показать все",
+        "Show all"
+    ],
+    "reset_search": [
+        "Очистить поиск",
+        "Reset search"
+    ],
+    "no_photo_filter": [
+        "Нет фотографий в категории",
+        "No photos in cathegory"
+    ],
+    "colls_case": [
+        "коллекций",
+        "collections"
+    ],
+    "new_photo_case": [
+        "новых фото",
+        "new_photos"
+    ],
+    "calendar_days": [
+        [
+            "Пн",
+            "Вт",
+            "Ср",
+            "Чт",
+            "Пт",
+            "Сб",
+            "Вс"
+        ],
+        [
+            "Mon",
+            "Tue",
+            "Wed",
+            "Thu",
+            "Fri",
+            "Sat",
+            "Sun"
+        ]
+    ],
+    "months_case": [
+        {
+            "1": "января",
+            "2": "февраля",
+            "3": "марта",
+            "4": "апреля",
+            "5": "мая",
+            "6": "июня",
+            "7": "июля",
+            "8": "августа",
+            "9": "сентября",
+            "10": "октября",
+            "11": "ноября",
+            "12": "декабря"
+        },
+        {
+            "1": "january",
+            "2": "february",
+            "3": "march",
+            "4": "april",
+            "5": "may",
+            "6": "june",
+            "7": "july",
+            "8": "august",
+            "9": "september",
+            "10": "october",
+            "11": "november",
+            "12": "december"
+        }
+    ],
+    "months": [
+        {
+            "1": "Январь",
+            "2": "Февраль",
+            "3": "Март",
+            "4": "Апрель",
+            "5": "Май",
+            "6": "Июнь",
+            "7": "Июль",
+            "8": "Август",
+            "9": "Сентябрь",
+            "10": "Октябрь",
+            "11": "Ноябрь",
+            "12": "Декабрь"
+        },
+        {
+            "1": "January",
+            "2": "February",
+            "3": "March",
+            "4": "April",
+            "5": "May",
+            "6": "June",
+            "7": "July",
+            "8": "August",
+            "9": "September",
+            "10": "October",
+            "11": "November",
+            "12": "December"
+        }
+    ]
+}
