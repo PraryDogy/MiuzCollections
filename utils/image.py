@@ -13,6 +13,8 @@ from .system import SysUtils
 
 
 class ImageUtils(SysUtils):
+    ww = 150
+
     def resize_image(self, img: Literal["cv2 image"], wid_w: int, wid_h: int,
                      is_thumb: bool) -> Literal["cv2 image"]:
         h, w = img.shape[:2]
@@ -32,7 +34,6 @@ class ImageUtils(SysUtils):
 
         return cv2.resize(img, (new_w, new_h), interpolation=cv2.INTER_AREA)
 
-
     def replace_bg(self, img: Literal["cv2 image"], color: str) -> Literal["cv2 image"]:
         try:
             trans_mask = img[:,:,3 ] == 0
@@ -44,7 +45,6 @@ class ImageUtils(SysUtils):
             return img
         return img
 
-
     def encode_image(self, src: Literal["file path"]) -> Literal["cv2 image"]:
         image = cv2.imread(src, cv2.IMREAD_UNCHANGED)
 
@@ -52,14 +52,14 @@ class ImageUtils(SysUtils):
             image = self.replace_bg(image, cnf.bg_color)
 
         try:
-            resized = self.resize_image(image, cnf.thumbsize, cnf.thumbsize, True)
+            resized = self.resize_image(img=image, is_thumb=True, 
+                                        wid_w=__class__.ww, wid_h=__class__.ww)
             return cv2.imencode(".jpg", resized)[1].tobytes()
 
         except (cv2.error, UnboundLocalError, AttributeError) as e:
             self.print_err()
             image = cv2.imread("thumb.jpg", cv2.IMREAD_UNCHANGED)
             return cv2.imencode(".jpg", image)[1].tobytes()
-
 
     def decode_image(self, img: bytes) -> Literal["cv2 image"]:
         try:
@@ -69,13 +69,11 @@ class ImageUtils(SysUtils):
             self.print_err()
             return self.decode_image(self.encode_image(cnf.thumb_err))
 
-
     def convert_to_rgb(self, img: Literal["cv2 image"]) -> Image:
         # convert cv2 color to rgb
         image_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         # load numpy array image
         return Image.fromarray(image_rgb)
-
 
     def crop_image(self, img: Literal["cv2 image"]) -> Literal["cv2 image"]:
         width, height = img.shape[1], img.shape[0]
@@ -86,7 +84,9 @@ class ImageUtils(SysUtils):
             delta = (width-height)//2
             cropped = img[0:height, delta:width-delta]
         return cropped[0:cnf.thumbsize, 0:cnf.thumbsize]
-
+    
+    def resize_fast(self, img: Literal["cv2 image"]) -> Literal["cv2 image"]:
+        return cv2.resize(img, (cnf.thumbsize, cnf.thumbsize))
 
     def black_borders(self, img: Image) -> Image:
         try:

@@ -72,10 +72,20 @@ class FiltersWid(CFrame):
         self.dates_btn.pack(side="left", fill="x", padx=(0, 5))
         self.dates_btn.cmd(self.open_calendar)
 
-        info = CButton(master=self, text="?", fg_color=cnf.bg_color)
+        info = CButton(master=self, text=cnf.lng.help, fg_color=cnf.bg_color)
         # info.pack(side="right", anchor="w", fill="x")
 
+        gridsmall, gridbig = "⊞", "▦"
+
+        grid = CButton(master=self, text=gridbig)
+        grid.pack(side="left", anchor="w", fill="x")
+        grid.cmd(lambda e: self.grid_cmd())
+
         self.reload_filters()
+
+    def grid_cmd(self):
+        cnf.thumbsize = 250
+        cnf.reload_thumbs()
 
     def open_calendar(self, e: tkinter.Event = None):
         self.calendar_win = CalendarWin()

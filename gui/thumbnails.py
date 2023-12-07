@@ -91,6 +91,7 @@ class ThumbsDict(dict, ImageUtils, SysUtils):
             try:
                 img = self.decode_image(img=img)
                 img = self.crop_image(img=img)
+                img = self.resize_fast(img=img)
                 img = self.convert_to_rgb(img=img)
             except Exception:
                 self.print_err()
@@ -304,7 +305,6 @@ class Thumbs(CFrame):
         CFrame.__init__(self, master=master)
 
         self.__resize_task = None
-        self.__thumbsize = cnf.thumbsize + cnf.thumbspad
         cnf.root.bind(sequence="<Configure>", func=self.decect_resize)
 
         self.load_scroll()
@@ -320,6 +320,7 @@ class Thumbs(CFrame):
 
     def load_thumbs(self):
         thumbs_dict = ThumbsDict()
+        self.__thumbsize = cnf.thumbsize + cnf.thumbspad
 
         if thumbs_dict:
             self.__above_thumbs = AboveThumbs(master=self.scroll)
