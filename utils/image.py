@@ -87,6 +87,11 @@ class ImageUtils(SysUtils):
     
     def resize_forgrid(self, img: Literal["cv2 image"], size: int) -> Literal["cv2 image"]:
         return cv2.resize(img, (size, size))
+    
+    def add_sharp(self, img: Literal["cv2 img"]) -> Literal["cv2 img"]:
+        kernel = numpy.array([[0, -1, 0], [-1, 5, -1], [0, -1, 0]]) 
+        return cv2.filter2D(img, -1, kernel)
+
 
     def black_borders(self, img: Image) -> Image:
         try:

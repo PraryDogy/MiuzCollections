@@ -98,6 +98,7 @@ class ThumbsDict(dict, ImageUtils, SysUtils):
 
                 if cnf.zoom:
                     img = self.resize_forgrid(img=img, size=Stats.zoomed)
+                    # img = self.add_sharp(img=img)
 
                 img = self.convert_to_rgb(img=img)
             except Exception:
