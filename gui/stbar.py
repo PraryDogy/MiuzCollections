@@ -84,7 +84,8 @@ class StBar(CFrame, SysUtils):
         info = CButton(master=self, text=cnf.lng.help, fg_color=cnf.bg_color)
         # info.pack(side="right", anchor="w", fill="x")
 
-        zoomed, default = "⊞", "▦"
+        # zoomed, default = "⊞", "▦"
+        default, zoomed = "᎒᎒᎒", "⋮⋮⋮"
         self.grid = CButton(master=frame, text=zoomed if cnf.zoom else default,
                             fg_color=cnf.bg_color)
         self.grid.pack(side="right", anchor="w")
@@ -94,7 +95,8 @@ class StBar(CFrame, SysUtils):
 
     def grid_cmd(self):
         cnf.zoom = False if cnf.zoom else True
-        zoomed, default = "⊞", "▦"
+        # zoomed, default = "⊞", "▦"
+        default, zoomed = "᎒᎒᎒", "⋮⋮⋮"
         self.grid.configure(text=zoomed if cnf.zoom else default)
         cnf.reload_thumbs()
 
