@@ -62,10 +62,12 @@ class StBar(CFrame, SysUtils):
         CFrame.__init__(self, master=master)
 
         self.__stbar = self.__load_stbar()
-        self.__stbar.pack(fill="x")
+        self.__stbar.pack(fill="x", expand=1)
 
     def __load_stbar(self):
         frame = CFrame(master=self)
+
+        CLabel(master=frame).pack(fill="x", side="left", expand=1)
 
         btn = CButton(master=frame, text=cnf.lng.settings, width=90)
         btn.cmd(lambda e: self.__open_settings(btn))
@@ -75,11 +77,13 @@ class StBar(CFrame, SysUtils):
         self.stbar_btn.cmd(self.__stbar_run_scan)
         self.stbar_btn.pack(side="left")
 
+        CLabel(master=frame).pack(fill="x", side="left", expand=1)
+
         info = CButton(master=self, text=cnf.lng.help, fg_color=cnf.bg_color)
         # info.pack(side="right", anchor="w", fill="x")
 
         zoomed, default = "⊞", "▦"
-        self.grid = CButton(master=self, text=zoomed if cnf.zoom else default,
+        self.grid = CButton(master=frame, text=zoomed if cnf.zoom else default,
                             fg_color=cnf.bg_color)
         self.grid.pack(side="right", anchor="w")
         self.grid.cmd(lambda e: self.grid_cmd())
