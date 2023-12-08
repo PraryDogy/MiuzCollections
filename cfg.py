@@ -51,7 +51,10 @@ class ConfigGui:
 
     def load_langwin(self):
         from gui.lang_win import LangWin
-        LangWin()
+        try:
+            LangWin()
+        except Exception:
+            print(traceback.format_exc())
 
     def set_topbar_title(self):
         from gui import app

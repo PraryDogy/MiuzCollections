@@ -74,6 +74,8 @@ class StBar(CFrame, SysUtils):
         btn.pack(side="left", padx=(0, 20))
 
         self.stbar_btn = CButton(master=frame, text=cnf.lng.update, width=90)
+        if cnf.scan_status:
+            self.stbar_btn.configure(text=cnf.lng.updating, fg_color=cnf.blue_color)
         self.stbar_btn.cmd(self.__stbar_run_scan)
         self.stbar_btn.pack(side="left")
 
