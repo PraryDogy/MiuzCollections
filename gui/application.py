@@ -56,7 +56,7 @@ class Application(SysUtils):
         sep = CSep(master=r_frame)
         sep.pack(fill="x", padx=1)
         self.stbar = StBar(master=r_frame)
-        self.stbar.pack(pady=10)
+        self.stbar.pack(pady=10, fill="x")
 
         self.menu.pack(side="left", fill="y")
         menusep.pack(side="left", fill="y")

@@ -85,8 +85,8 @@ class ImageUtils(SysUtils):
             cropped = img[0:height, delta:width-delta]
         return cropped[0:cnf.thumbsize, 0:cnf.thumbsize]
     
-    def resize_fast(self, img: Literal["cv2 image"]) -> Literal["cv2 image"]:
-        return cv2.resize(img, (cnf.thumbsize, cnf.thumbsize))
+    def resize_forgrid(self, img: Literal["cv2 image"], size: int) -> Literal["cv2 image"]:
+        return cv2.resize(img, (size, size))
 
     def black_borders(self, img: Image) -> Image:
         try:

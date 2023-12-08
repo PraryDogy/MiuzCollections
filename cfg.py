@@ -81,6 +81,7 @@ class User:
         self.curr_coll = "None"
         self.user_lng = "None"
         self.scan_time = 10
+        self.zoom = False
 
         self.root_g = {"w": 700, "h": 500, "x": 100, "y": 100}
         self.imgview_g = {"w": 700, "h": 500, "x": 100, "y": 100}

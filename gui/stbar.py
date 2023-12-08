@@ -73,9 +73,24 @@ class StBar(CFrame, SysUtils):
 
         self.stbar_btn = CButton(master=frame, text=cnf.lng.update, width=90)
         self.stbar_btn.cmd(self.__stbar_run_scan)
-        self.stbar_btn.pack(side="right")
+        self.stbar_btn.pack(side="left")
+
+        info = CButton(master=self, text=cnf.lng.help, fg_color=cnf.bg_color)
+        # info.pack(side="right", anchor="w", fill="x")
+
+        zoomed, default = "⊞", "▦"
+        self.grid = CButton(master=self, text=zoomed if cnf.zoom else default,
+                            fg_color=cnf.bg_color)
+        self.grid.pack(side="right", anchor="w")
+        self.grid.cmd(lambda e: self.grid_cmd())
 
         return frame
+
+    def grid_cmd(self):
+        cnf.zoom = False if cnf.zoom else True
+        zoomed, default = "⊞", "▦"
+        self.grid.configure(text=zoomed if cnf.zoom else default)
+        cnf.reload_thumbs()
 
     def reload_stbar(self):
         self.__stbar.destroy()
