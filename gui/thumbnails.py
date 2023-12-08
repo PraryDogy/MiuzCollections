@@ -76,7 +76,7 @@ class ContextThumbs(Context):
 
 
 class Stats:
-    zoomed = 230
+    zoomed = 220
 
 
 class ThumbsDict(dict, ImageUtils, SysUtils):
@@ -95,12 +95,12 @@ class ThumbsDict(dict, ImageUtils, SysUtils):
             try:
                 img = self.decode_image(img=img)
                 img = self.crop_image(img=img)
-
                 if cnf.zoom:
                     img = self.resize_forgrid(img=img, size=Stats.zoomed)
-                    # img = self.add_sharp(img=img)
-
                 img = self.convert_to_rgb(img=img)
+                if cnf.zoom:
+                    img = self.add_sharp(img=img, factor=3)
+
             except Exception:
                 self.print_err()
                 continue
