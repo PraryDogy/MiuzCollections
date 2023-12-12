@@ -70,7 +70,7 @@ class FinderBase(SysUtils):
 
     def _copy_img(self, src: str, dest: str, name: str, ext: str):
         try:
-            shutil.copy(src=src, dst=f"{dest}/{name}.{ext}")
+            shutil.copy(src=src, dst=f"{dest}/{name}{ext}")
             return True
         except FileNotFoundError:
             self.print_err()
