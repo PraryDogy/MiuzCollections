@@ -32,16 +32,16 @@ class Application(SysUtils):
         mac_ver, _, _ = platform.mac_ver()
         mac_ver = float(".".join(mac_ver.split(".")[:2]))
 
-        if mac_ver > 12:
-            cnf.root.bind_all(sequence="<Command-w>", func=self.minim)
-            cnf.root.protocol(name="WM_DELETE_WINDOW", func=self.minim)
-            cnf.root.createcommand("tk::mac::ReopenApplication", self.maxim)
+        # if mac_ver > 12:
+        #     cnf.root.bind_all(sequence="<Command-w>", func=self.minim)
+        #     cnf.root.protocol(name="WM_DELETE_WINDOW", func=self.minim)
+        #     cnf.root.createcommand("tk::mac::ReopenApplication", self.maxim)
 
-        else:
-            cnf.root.bind_all(sequence="<Command-w>",
-                              func=lambda e: cnf.root.withdraw())
-            cnf.root.protocol(name="WM_DELETE_WINDOW", func=cnf.root.withdraw)
-            cnf.root.createcommand("tk::mac::ReopenApplication", cnf.root.deiconify)
+        # else:
+        cnf.root.bind_all(sequence="<Command-w>",
+                            func=lambda e: cnf.root.withdraw())
+        cnf.root.protocol(name="WM_DELETE_WINDOW", func=cnf.root.withdraw)
+        cnf.root.createcommand("tk::mac::ReopenApplication", cnf.root.deiconify)
 
         self.menu = Menu(master=cnf.root)
         menusep = CSep(master=cnf.root, bg="black")
