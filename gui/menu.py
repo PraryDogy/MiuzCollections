@@ -31,7 +31,8 @@ class ContextMenu(Context):
 class Menu(CScroll):
     def __init__(self, master: tkinter):
         CScroll.__init__(self, master=master, fg_color=cnf.bg_color_menu,
-                         corner_radius=0, width=cnf.menu_w)
+                         corner_radius=0, width=cnf.menu_w,
+                         scroll_color=cnf.sel_color_menu)
 
         try:
             self.__menu_frame = self.__load_menu_buttons()
@@ -39,7 +40,7 @@ class Menu(CScroll):
             self.print_err(write=True)
 
         self.__menu_frame.pack(anchor="w", fill="x")
-        self.__bind_scroll_menu()
+        # self.__bind_scroll_menu()
 
     def __load_menu_buttons(self):
         frame = CFrame(master=self, bg=cnf.bg_color_menu)
@@ -97,16 +98,16 @@ class Menu(CScroll):
 
         return frame
 
-    def __bind_scroll_menu(self):
-        for i in (self, self.__menu_frame, *self.__menu_frame.winfo_children()):
-            self.set_scrolltag("scroll_menu", i.get_parrent())
-        self.bind_autohide_scroll("scroll_menu")
+    # def __bind_scroll_menu(self):
+    #     for i in (self, self.__menu_frame, *self.__menu_frame.winfo_children()):
+    #         self.set_scrolltag("scroll_menu", i.get_parrent())
+    #     self.bind_autohide_scroll("scroll_menu")
 
     def reload_menu(self):
         self.__menu_frame.destroy()
         self.__menu_frame = self.__load_menu_buttons()
         self.__menu_frame.pack(anchor="w", fill="x")
-        self.__bind_scroll_menu()
+        # self.__bind_scroll_menu()
     
     def show_coll(self, btn: CButton, collname: str):
         cnf.limit = 150

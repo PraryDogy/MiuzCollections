@@ -50,25 +50,29 @@ class CEntry(customtkinter.CTkEntry, BaseCWid):
 class CScroll(customtkinter.CTkScrollableFrame, BaseCWid, SysUtils):
     def __init__(self, master: tkinter, width: int = 200,
                  corner_radius: int = 0, fg_color: str = cnf.bg_color,
-                 scroll_width: int = cnf.scroll_width,):
+                 scroll_width: int = cnf.scroll_width,
+                 scroll_color: str = None):
 
         customtkinter.CTkScrollableFrame.__init__(
             self, master=master, width=width, corner_radius=corner_radius,
             fg_color=fg_color)
 
-        self.__fg_color = fg_color
-        self.__old_scroll_bg = self._scrollbar._button_color
-        self._scrollbar.configure(width=scroll_width, button_color=fg_color)
-        self.__scrolltask = None
+        self._scrollbar.configure(width=scroll_width)
+        if scroll_color:
+            self._scrollbar.configure(button_color=scroll_color)
+
+        # self.__fg_color = fg_color
+        # self.__old_scroll_bg = self._scrollbar._button_color
+        # self.__scrolltask = None
 
     def get_parrent(self):
         return self._parent_canvas
 
-    def set_scrolltag(self, tag: str, widget: tkinter.Label):
-        widget.bindtags((tag,) + widget.bindtags())
+    # def set_scrolltag(self, tag: str, widget: tkinter.Label):
+    #     widget.bindtags((tag,) + widget.bindtags())
 
-    def bind_autohide_scroll(self, tag):
-        self.bind_class(tag, "<MouseWheel>", self.show_scroll)
+    # def bind_autohide_scroll(self, tag):
+    #     self.bind_class(tag, "<MouseWheel>", self.show_scroll)
 
     def moveup(self, e=None):
         try:
@@ -76,24 +80,24 @@ class CScroll(customtkinter.CTkScrollableFrame, BaseCWid, SysUtils):
         except Exception:
             self.print_err()
 
-    def cancel_scrolltask(self):
-        if self.__scrolltask:
-            cnf.root.after_cancel(self.__scrolltask)
+    # def cancel_scrolltask(self):
+    #     if self.__scrolltask:
+    #         cnf.root.after_cancel(self.__scrolltask)
 
-    def hide_scroll(self, e=None):
-        try:
-            self._scrollbar.configure(button_color=self.__fg_color)
-        except tkinter.TclError:
-            print("hide scroll err")
+    # def hide_scroll(self, e=None):
+    #     try:
+    #         self._scrollbar.configure(button_color=self.__fg_color)
+    #     except tkinter.TclError:
+    #         print("hide scroll err")
             # self.print_err()
 
-    def show_scroll(self, e=None):
-        if e:
-            self._mouse_wheel_all(e)
+    # def show_scroll(self, e=None):
+    #     if e:
+    #         self._mouse_wheel_all(e)
 
-        self.cancel_scrolltask()
-        self._scrollbar.configure(button_color=self.__old_scroll_bg)
-        self.__scrolltask = cnf.root.after(cnf.hidescroll_ms, self.hide_scroll)
+    #     self.cancel_scrolltask()
+    #     self._scrollbar.configure(button_color=self.__old_scroll_bg)
+    #     self.__scrolltask = cnf.root.after(cnf.hidescroll_ms, self.hide_scroll)
 
 
 class CSep(tkinter.Frame, BaseCWid):
