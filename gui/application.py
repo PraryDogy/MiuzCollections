@@ -1,4 +1,5 @@
 import platform
+import tkinter
 
 from cfg import cnf
 from utils import SysUtils
@@ -32,8 +33,7 @@ class Application(SysUtils):
         mac_ver, _, _ = platform.mac_ver()
         mac_ver = float(".".join(mac_ver.split(".")[:2]))
 
-        cnf.root.bind(sequence="<Command-w>",
-                            func=lambda e: cnf.root.withdraw())
+        cnf.root.bind(sequence="<Command-Key>", func=self.minimize)
         cnf.root.protocol(name="WM_DELETE_WINDOW", func=cnf.root.withdraw)
         cnf.root.createcommand("tk::mac::ReopenApplication", cnf.root.deiconify)
 
@@ -63,6 +63,10 @@ class Application(SysUtils):
         else:
             scaner.scaner_sheldue()
             SmbAlert()
+
+    def minimize(self, e: tkinter.Event):
+        if e.char == "w":
+            cnf.root.wm_withdraw()
 
     def minim(self, e=None):
         applescript = f"""

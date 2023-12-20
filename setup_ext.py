@@ -31,3 +31,9 @@ class SetupExt:
         shutil.rmtree("dist")
 
         subprocess.Popen(["open", "-R", folder])
+
+
+if __name__ == "__main__":
+    shutil.rmtree("build")
+    shutil.rmtree(".eggs")
+    shutil.rmtree("dist")
