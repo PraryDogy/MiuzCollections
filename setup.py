@@ -4,9 +4,7 @@
     python setup.py py2app
 """
 
-import os
-import shutil
-import subprocess
+import sys
 
 import icnsutil
 from setuptools import setup
@@ -33,13 +31,18 @@ OPTIONS = {"iconfile": "icon.icns",
                          "\nCopyright © 2023 MIUZ Diamonds."
                          "\nAll rights reserved.")}}
 
-setup(
-    app = APP,
-    name = cnf.app_name,
-    data_files = DATA_FILES,
-    options = {"py2app": OPTIONS},
-    setup_requires = ["py2app"],
-    install_requires = []
-    )
 
-SetupExt(py_ver="3.11", appname=cnf.app_name)
+
+if __name__ == "__main__":
+
+    sys.argv.append("py2app")
+
+    setup(
+        app = APP,
+        name = cnf.app_name,
+        data_files = DATA_FILES,
+        options = {"py2app": OPTIONS},
+        setup_requires = ["py2app"],
+        )
+
+    SetupExt(py_ver="3.11", appname=cnf.app_name)
