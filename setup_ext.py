@@ -13,24 +13,15 @@ class SetupExt:
                 os.path.join(f"dist/{appname}.app/Contents/lib", i)
                 )
 
-        folder = os.path.join(os.path.expanduser("~/Desktop"), appname)
+        desktop = os.path.expanduser("~/Desktop")
 
-        if not os.path.exists(folder):
-            os.mkdir(folder)
-        else:
-            shutil.rmtree(folder)
-            os.mkdir(folder)
-
-        subprocess.Popen(
-            ["ln", "-s", "/Applications", os.path.join(folder, "Программы")]
-                )
-        shutil.move(f"dist/{appname}.app", f"{folder}/{appname}.app")
+        shutil.move(f"dist/{appname}.app", f"{desktop}/{appname}.app")
 
         shutil.rmtree("build")
         shutil.rmtree(".eggs")
         shutil.rmtree("dist")
 
-        subprocess.Popen(["open", "-R", folder])
+        subprocess.Popen(["open", "-R", f"{desktop}/{appname}.app"])
 
 
 if __name__ == "__main__":
