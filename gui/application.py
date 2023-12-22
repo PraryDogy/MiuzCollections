@@ -35,7 +35,7 @@ class Application(SysUtils):
 
         cnf.root.bind(sequence="<Command-Key>", func=self.minimize)
         cnf.root.protocol(name="WM_DELETE_WINDOW", func=cnf.root.withdraw)
-        cnf.root.createcommand("tk::mac::ReopenApplication", cnf.root.deiconify)
+        cnf.root.createcommand("tk::mac::ReopenApplication", self.demin)
 
         self.menu = Menu(master=cnf.root)
         menusep = CSep(master=cnf.root, bg="black")
@@ -67,6 +67,11 @@ class Application(SysUtils):
     def minimize(self, e: tkinter.Event):
         if e.char == "w":
             cnf.root.wm_withdraw()
+
+    def demin(self, e: tkinter.Event = None):
+        cnf.root.wm_deiconify()
+        cnf.reload_menu()
+        cnf.reload_thumbs()
 
     def minim(self, e=None):
         applescript = f"""
