@@ -29,6 +29,7 @@ class ConfigGui:
         app.menu.show_coll(btn, collname)
         self.set_topbar_title()
         self.reload_scroll()
+        app.topbar.funcbar.filters_wid.reload_filters()
 
     def notibar_text(self, text):
         from gui import app
