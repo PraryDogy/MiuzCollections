@@ -54,7 +54,7 @@ class ContextUtils(SysUtils):
         cnf.root.clipboard_clear()
         cnf.root.clipboard_append(string=text)
 
-    def db_remove_img(self, img_src: Literal["file path"]):
+    def db_remove_img_cmd(self, img_src: Literal["file path"]):
         q = (
             sqlalchemy.delete(ThumbsMd).filter(
                 ThumbsMd.src==img_src
@@ -229,7 +229,7 @@ class Context(tkinter.Menu, MenuCollections, SearchThumbs, ImgSingle, ImgGroup, 
     def db_remove_img(self, img_src: Literal["file path"]):
         self.add_command(
             label=cnf.lng.remove_fromapp,
-            command=lambda: self.db_remove_img(src=img_src)
+            command=lambda: self.db_remove_img_cmd(img_src=img_src)
             )
 
     def apply_filter_thumbs(self, label: str,

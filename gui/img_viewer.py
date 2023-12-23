@@ -135,7 +135,8 @@ class ImgViewer(CWindow, ImageUtils, SysUtils, FitImg):
         try:
             self.__img_src = cnf.all_img_src[ind]
         except IndexError:
-            self.print_err()
+            # self.print_err()
+            print("repeat images list img view")
             self.__img_src = cnf.all_img_src[0]
 
         self.__set_title()
@@ -152,6 +153,8 @@ class ImgViewer(CWindow, ImageUtils, SysUtils, FitImg):
         else:
             index = cnf.all_img_src.index(self.__img_src) + 1
         self.__switch_img(ind=index)
+
+        print(index)
 
     def __set_title(self):
         name = self.__img_src.split(os.sep)[-1]
