@@ -1,8 +1,4 @@
-colour==0.1.5
-greenlet==2.0.2
 icnsutil==1.1.0
-numpy==1.24.3
-opencv-python==4.6.0.66
 Pillow==9.3.0
 SQLAlchemy==1.4.45
 psd-tools==1.9.28
