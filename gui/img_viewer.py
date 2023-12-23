@@ -154,8 +154,6 @@ class ImgViewer(CWindow, ImageUtils, SysUtils, FitImg):
             index = cnf.all_img_src.index(self.__img_src) + 1
         self.__switch_img(ind=index)
 
-        print(index)
-
     def __set_title(self):
         name = self.__img_src.split(os.sep)[-1]
         collection_name = self.get_coll_name(src=self.__img_src)

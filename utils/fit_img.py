@@ -8,16 +8,22 @@ class FitImg:
         if -3 < imw - imh < 3:
             imw, imh = imw, imw
 
-        if imw > imh:
-            side = max(w, h)
-            delta = side/imw
-            neww, newh = side, int(imh*delta)
-        elif imh > imw:
-            side = min(w, h)
-            delta = side/imh
-            neww, newh = int(imw*delta), side
+        if w > h:
+
+            if imw > imh:
+                delta = imw/imh
+                neww, newh = int(h*delta), h
+            else:
+                delta = imh/imw
+                neww, newh = int(h/delta), h
+        
         else:
-            side = min(w, h)
-            neww, newh = side, side
+
+            if imw > imh:
+                delta = imw/imh
+                neww, newh = w, int(w/delta)
+            else:
+                delta = imh/imw
+                neww, newh = w, int(w*delta)
 
         return img.resize((neww, newh))
