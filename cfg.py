@@ -101,7 +101,7 @@ class Config(ConfigGui, User):
         ConfigGui.__init__(self)
         User.__init__(self)
         self.app_name = "MiuzCollections"
-        self.app_ver = "3.9.3"
+        self.app_ver = "3.9.5"
         self.db_name = "db.db"
         self.cfg_name = "cfg.json"
         self.thumb_err = "thumb.jpg"
