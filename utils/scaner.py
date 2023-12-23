@@ -8,7 +8,7 @@ from database import Dbase, ThumbsMd
 
 from .image import ImageUtils
 from .system import SysUtils
-import sqlite3
+
 __all__ = ("scaner",)
 
 
