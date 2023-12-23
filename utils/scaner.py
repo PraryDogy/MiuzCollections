@@ -5,8 +5,10 @@ import sqlalchemy
 
 from cfg import cnf
 from database import Dbase, ThumbsMd
-from utils import ImageUtils, SysUtils
 
+from .image import ImageUtils
+from .system import SysUtils
+import sqlite3
 __all__ = ("scaner",)
 
 
@@ -37,6 +39,12 @@ class Scaner(ImageUtils, SysUtils):
         if self.__need_update:
             cnf.reload_thumbs()
             cnf.reload_menu()
+
+            try:
+                Dbase.conn.execute("VACUUM")
+            except Exception:
+                print(self.print_err())
+
             self.__need_update = False
 
         cnf.scan_status = False

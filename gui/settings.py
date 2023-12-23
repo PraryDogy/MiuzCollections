@@ -3,7 +3,6 @@ from tkinter import filedialog
 
 from cfg import cnf
 
-from .scaner import scaner
 from .smb_alert import SmbAlert
 from .widgets import *
 
@@ -12,7 +11,7 @@ try:
 except ImportError:
     from typing import Literal
 
-from utils import SysUtils
+from utils import SysUtils, scaner
 
 __all__ = ("Settings",)
 win = {"exists": False}

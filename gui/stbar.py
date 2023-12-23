@@ -1,9 +1,8 @@
 import tkinter
 
 from cfg import cnf
-from utils import SysUtils
+from utils import SysUtils, scaner
 
-from .scaner import scaner
 from .settings import Settings
 from .smb_alert import SmbAlert
 from .widgets import *

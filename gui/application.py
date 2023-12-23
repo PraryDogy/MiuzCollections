@@ -2,10 +2,9 @@ import platform
 import tkinter
 
 from cfg import cnf
-from utils import SysUtils
+from utils import SysUtils, scaner
 
 from .menu import Menu
-from .scaner import scaner
 from .smb_alert import SmbAlert
 from .stbar import StBar
 from .thumbnails import Thumbs

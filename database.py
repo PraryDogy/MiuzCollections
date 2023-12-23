@@ -13,7 +13,7 @@ class Dbase():
     __engine = sqlalchemy.create_engine(
         "sqlite:////" + cnf.db_dir,
         connect_args = {"check_same_thread": False},
-        echo = False
+        echo = True
         )
     conn = __engine.connect()
     base = sqlalchemy.ext.declarative.declarative_base()
