@@ -428,5 +428,9 @@
             "11": "November",
             "12": "December"
         }
+    ],
+    "stop": [
+        "Стоп",
+        "Stop"
     ]
 }

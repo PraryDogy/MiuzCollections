@@ -18,6 +18,7 @@ except ImportError:
 from utils import FitImg, ImageUtils, SysUtils
 
 __all__ = ("ImgViewer",)
+win = {"exists": False}
 
 
 class ContextViewer(Context, SysUtils):
@@ -46,19 +47,25 @@ class ContextViewer(Context, SysUtils):
 
 class ImgViewer(CWindow, ImageUtils, SysUtils, FitImg):
     def __init__(self, img_src: Literal["file path"]):
+        w, h = cnf.imgview_g["w"], cnf.imgview_g["h"]
+
+        if win["exists"]:
+            win["exists"].destroy()
+            win["exists"] = False
+
         CWindow.__init__(self, bg="black", pady=0, padx=0)
+        win["exists"] = self
         self.__img_src = img_src
 
         self.__set_title()
         self.minsize(width=500, height=300)
         self.resizable(width=1, height=1)
-        self.geometry(newGeometry=f"{cnf.imgview_g['w']}x{cnf.imgview_g['h']}")
-        self.place_center(w=cnf.imgview_g["w"], h=cnf.imgview_g["h"])
+        self.geometry(newGeometry=f"{w}x{h}")
+        self.place_center(w=w, h=h)
         self.protocol(name="WM_DELETE_WINDOW", func=self.__close_view)
         self.bind(sequence="<Escape>", func=self.__close_view)
 
-        self.img = CLabel(master=self, bg="black", width=cnf.imgview_g["w"],
-                          height=cnf.imgview_g["h"])
+        self.img = CLabel(master=self, bg="black", width=w,height=h)
         self.img.bind(sequence="<ButtonRelease-1>",
                       func=lambda e: self.__l_click(e=e))
         self.img.bind(sequence="<ButtonRelease-2>",
@@ -72,9 +79,6 @@ class ImgViewer(CWindow, ImageUtils, SysUtils, FitImg):
         self.__img_task = cnf.root.after(300, self.__load_img)
         cnf.root.after(ms=400, func=lambda:
                     self.bind(sequence="<Configure>", func=self.__decect_resize))
-
-        self.wait_visibility()
-        self.grab_set_global()
 
         self.bind(sequence="<Left>", func=lambda e:
                   self.__switch_img(ind=cnf.all_img_src.index(self.__img_src)-1))
@@ -155,5 +159,5 @@ class ImgViewer(CWindow, ImageUtils, SysUtils, FitImg):
         self.title(string=f"{collection_name} - {name}")
 
     def __close_view(self, e: tkinter.Event = None):
-        self.grab_release()
         self.destroy()
+        win["exists"] = False

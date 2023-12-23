@@ -13,7 +13,7 @@ from .context import Context
 from .widgets import *
 
 __all__ = ("ImageInfo",)
-
+win = {"exists": False}
 
 class ContextInfo(Context):
     def __init__(self, e: tkinter.Event):
@@ -26,14 +26,19 @@ class ContextInfo(Context):
 
 class ImageInfo(CWindow, SysUtils):
     def __init__(self, parrent: tkinter.Toplevel, img_src: Literal["file path"]):
+        w, h = 420, 165
+
+        if win["exists"]:
+            win["exists"].destroy()
+            win["exists"] = False
+
         CWindow.__init__(self)
+        win["exists"] = self
         self.title(string=cnf.lng.info)
-        self.minsize(width=416, height=155)
-        self.place_center(w=416, h=155, below_win=parrent)
-        self.protocol(name="WM_DELETE_WINDOW",
-                      func=lambda: self.__close_info(parrent=parrent))
-        self.bind(sequence="<Escape>",
-                  func=lambda e: self.__close_info(parrent=parrent))
+        self.minsize(width=w, height=h)
+        self.place_center(w=w, h=h, below_win=parrent)
+        self.protocol(name="WM_DELETE_WINDOW", func=lambda: self.__close_info())
+        self.bind(sequence="<Escape>", func=lambda e: self.__close_info())
 
         name = img_src.split(os.sep)[-1]
         try:
@@ -94,8 +99,9 @@ class ImageInfo(CWindow, SysUtils):
         right_lbl.configure(state=tkinter.DISABLED)
         right_lbl.pack(anchor="n", side="left")
 
-        cnf.root.update_idletasks()
-        self.grab_set_global()
+        close = CButton(master=self, text=cnf.lng.close)
+        close.pack(pady=(10, 0))
+        close.cmd(lambda e: self.__close_info())
 
     def __r_click(self, e: tkinter.Event):
         try:
@@ -106,8 +112,6 @@ class ImageInfo(CWindow, SysUtils):
 
         ContextInfo(e=e)
 
-    def __close_info(self, parrent: tkinter.Toplevel):
-        self.grab_release()
+    def __close_info(self):
+        win["exists"] = False
         self.destroy()
-        if isinstance(parrent, tkinter.Toplevel):
-            parrent.grab_set_global()

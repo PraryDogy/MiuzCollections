@@ -15,6 +15,8 @@ except ImportError:
 from utils import SysUtils
 
 __all__ = ("CalendarWin",)
+win = {"main": False, "entry": False}
+
 
 
 class CalendarBase(CFrame, SysUtils):
@@ -181,11 +183,18 @@ class CCalendar(CalendarBase, SysUtils):
                         )
 
     def entry_win(self, master: tkinter.Toplevel, e: tkinter.Event = None):
+        w, h = 255, 120
+
+        if win["entry"]:
+            win["entry"].destroy()
+            win["entry"] = False
+
         self.win_entry = CWindow()
+        win["entry"] = self.win_entry
 
         self.win_entry.title(string=cnf.lng.enter_date)
-        self.win_entry.minsize(width=255, height=118)
-        self.win_entry.place_center(w=255, h=118, below_win=master)
+        self.win_entry.minsize(width=w, height=h)
+        self.win_entry.place_center(w=w, h=h, below_win=master)
         self.win_entry.protocol(name="WM_DELETE_WINDOW",
                                 func=lambda: self.close_entry(parrent=master))
         self.win_entry.bind(sequence="<Escape>",
@@ -222,8 +231,6 @@ class CCalendar(CalendarBase, SysUtils):
 
         var.trace(mode="w", callback=lambda *args:
                   self.character_limit(parrent=master, var=var, btn=ok))
-        cnf.root.update_idletasks()
-        self.win_entry.grab_set_global()
 
     def character_limit(self, parrent: tkinter.Toplevel,
                         var:tkinter.StringVar, btn: CButton):
@@ -266,18 +273,25 @@ class CCalendar(CalendarBase, SysUtils):
         self.close_entry(parrent=parrent)
 
     def close_entry(self, parrent: tkinter.Toplevel):
-        self.win_entry.grab_release()
+        win["entry"] = False
         self.win_entry.destroy()
         parrent.focus_force()
-        parrent.grab_set_global()
 
 
 class CalendarWin(CWindow, SysUtils):
     def __init__(self):
+        w, h = 635, 490
+
+        for i in win.values():
+            if i:
+                i.destroy()
+                i = False
+
         CWindow.__init__(self)
+        win["main"] = self
         self.title(string=cnf.lng.filter)
-        self.minsize(width=633, height=490)
-        self.place_center(w=633, h=490)
+        self.minsize(width=w, height=h)
+        self.place_center(w=w, h=h)
         self.protocol(name="WM_DELETE_WINDOW", func=self.close_filter)
         self.bind(sequence="<Escape>", func=self.close_filter)
         self.bind(sequence="<Return>", func=self.ok_filter)
@@ -331,9 +345,6 @@ class CalendarWin(CWindow, SysUtils):
         cancel_btn.pack(side="left")
         cancel_btn.cmd(self.close_filter)
 
-        cnf.root.update_idletasks()
-        self.grab_set_global()
-
     def named_date(self, date: datetime) -> Literal["ex: 10 jan 1991"]:
         day = f"{date.day} "
         month = f"{cnf.lng.months_case[str(date.month)]} "
@@ -365,14 +376,19 @@ class CalendarWin(CWindow, SysUtils):
             cnf.date_start = None
             cnf.date_end = None
 
-        self.grab_release()
         self.destroy()
         cnf.root.focus_force()
         cnf.search_var.set("")
         cnf.reload_filters()
         cnf.reload_scroll()
 
+        for i in win.values():
+            i = False
+
     def close_filter(self, e: tkinter.Event = None):
-        self.grab_release()
+        for i in win.values():
+            if i:
+                i.destroy()
+                i = False
         self.destroy()
         cnf.root.focus_force()

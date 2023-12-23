@@ -14,17 +14,16 @@ win = {"exists": False}
 
 class ScanerGui(CWindow, SysUtils):
     def __init__(self):
+        w, h = 300, 90
         if win["exists"]:
-            win["exists"].place_center(w=300, h=90)
-            win["exists"].lift()
-            win["exists"].focus_force()
-            return
+            win["exists"].destroy()
+            win["exists"] = False
 
         CWindow.__init__(self)
         win["exists"] = self
         self.title(string=cnf.lng.updating)
-        self.geometry(newGeometry="300x90")
-        self.place_center(w=300, h=90)
+        self.geometry(newGeometry=f"{w}x{h}")
+        self.place_center(w=w, h=h)
         self.protocol(name="WM_DELETE_WINDOW", func=self.__close_scangui)
         self.bind(sequence="<Escape>", func=self.__close_scangui)
 
@@ -32,15 +31,19 @@ class ScanerGui(CWindow, SysUtils):
                                  justify="left")
         self.__live_lbl.pack(expand=1, fill="both")
 
-        self.__can_btn = CButton(master=self, text=cnf.lng.cancel)
-        self.__can_btn.pack(pady=(10, 0))
+        btn_frame = CFrame(master=self)
+        btn_frame.pack(pady=(10, 0))
+
+        self.__can_btn = CButton(master=btn_frame, text=cnf.lng.stop)
+        self.__can_btn.pack(side="left", padx=(0, 10))
         self.__can_btn.cmd(self.__cancel_scan)
+
+        self.__close_btn = CButton(master=btn_frame, text=cnf.lng.close)
+        self.__close_btn.pack(side="left")
+        self.__close_btn.cmd(self.__close_scangui)
 
         self.__live_task = False
         self.__update_livelbl()
-
-        # cnf.root.update_idletasks()
-        # self.grab_set_global()
 
     def __cancel_scan(self, e: tkinter.Event = None):
         cnf.scan_status = False
@@ -60,7 +63,6 @@ class ScanerGui(CWindow, SysUtils):
             cnf.root.after(ms=200, func=self.__close_scangui)
 
     def __close_scangui(self, e: tkinter.Event = None):
-        self.grab_release()
         self.destroy()
         cnf.root.focus_force()
         win["exists"] = False
@@ -90,10 +92,6 @@ class StBar(CFrame, SysUtils):
 
         CLabel(master=frame).pack(fill="x", side="left", expand=1)
 
-        info = CButton(master=self, text=cnf.lng.help, fg_color=cnf.bg_color)
-        # info.pack(side="right", anchor="w", fill="x")
-
-        # zoomed, default = "⊞", "▦"
         default, zoomed = "᎒᎒᎒", "⋮⋮⋮"
         self.grid = CButton(master=frame, text=zoomed if cnf.zoom else default,
                             fg_color=cnf.bg_color)
@@ -104,7 +102,6 @@ class StBar(CFrame, SysUtils):
 
     def grid_cmd(self):
         cnf.zoom = False if cnf.zoom else True
-        # zoomed, default = "⊞", "▦"
         default, zoomed = "᎒᎒᎒", "⋮⋮⋮"
         self.grid.configure(text=zoomed if cnf.zoom else default)
         cnf.reload_thumbs()
@@ -118,8 +115,6 @@ class StBar(CFrame, SysUtils):
         Settings()
 
     def __stbar_run_scan(self, e: tkinter.Event = None):
-        ScanerGui()
-        return
         if not cnf.scan_status:
             if self.smb_check():
                 scaner.scaner_start_now()

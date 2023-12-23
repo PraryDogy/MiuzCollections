@@ -15,7 +15,7 @@ except ImportError:
 from utils import SysUtils
 
 __all__ = ("Settings",)
-
+win = {"exists": False}
 
 class BrowsePathFrame(CFrame, SysUtils):
     def __init__(self, master: tkinter, title: str,
@@ -140,12 +140,19 @@ class LangWid(CFrame):
 
 class Settings(CWindow, SysUtils):
     def __init__(self):
+        w, h = 440, 490
+
+        if win["exists"]:
+            win["exists"].destroy()
+            win["exists"] = False
+
         CWindow.__init__(self)
+        win["exists"] = self
+
         self.protocol(name="WM_DELETE_WINDOW", func=self.__close_sett)
         self.bind(sequence="<Escape>", func=self.__close_sett)
         self.bind(sequence="<Return>", func=self.__save_sett)
         self.title(string=cnf.lng.settings)
-        w, h = 440, 490
         self.minsize(width=w, height=h)
         self.place_center(w=w, h=h)
 
@@ -185,11 +192,8 @@ class Settings(CWindow, SysUtils):
         cancel_btn.cmd(self.__close_sett)
         cancel_btn.pack(side="left")
 
-        self.update_idletasks()
-        self.grab_set_global()
-
     def __close_sett(self, e: tkinter.Event = None):
-        self.grab_release()
+        win["exists"] = False
         self.destroy()
         cnf.root.focus_force()
 
@@ -217,7 +221,6 @@ class Settings(CWindow, SysUtils):
 
         cnf.write_cfg()
 
-        self.grab_release()
         self.destroy()
         cnf.root.focus_force()
 
@@ -226,3 +229,5 @@ class Settings(CWindow, SysUtils):
         cnf.reload_menu()
         cnf.reload_strbar()
         cnf.reload_scroll()
+
+        win["exists"] = False
