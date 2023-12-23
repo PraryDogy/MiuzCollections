@@ -21,16 +21,15 @@ class ImageUtils(SysUtils):
             neww, newh = int(h*delta), h
         else:
             neww, newh = w, int(w/delta)
-
         return img.resize((neww, newh))
 
     def encode_image(self, src: Literal["file path"]) -> bytes:
-        image = Image.open(src)
-        image = ImageOps.exif_transpose(image=image)
-        image = self.fit_thumb(img=image, w=150, h=150)
-        image = image.convert('RGB')
+        img = Image.open(src)
+        img = ImageOps.exif_transpose(image=img)
+        img = self.fit_thumb(img=img, w=__class__.ww, h=__class__.ww)
+        img = img.convert('RGB')
         img_byte_arr = io.BytesIO()
-        image.save(img_byte_arr, format='JPEG')
+        img.save(img_byte_arr, format='JPEG')
         return img_byte_arr.getvalue()
 
     def decode_image(self, img: bytes) -> Image:
@@ -38,10 +37,10 @@ class ImageUtils(SysUtils):
 
     def crop_image(self, img: Image) -> Image:
         width, height = img.size   # Get dimensions
-        left = (width - 150)/2
-        top = (height - 150)/2
-        right = (width + 150)/2
-        bottom = (height + 150)/2
+        left = (width - __class__.ww)/2
+        top = (height - __class__.ww)/2
+        right = (width + __class__.ww)/2
+        bottom = (height + __class__.ww)/2
         return img.crop((left, top, right, bottom))
     
     def resize_forgrid(self, img: Image, size: int) -> Image:

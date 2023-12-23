@@ -135,6 +135,14 @@ class CWindow(tkinter.Toplevel, BaseCWid):
     def get_parrent(self):
         return self
 
+    def place_center(self, w: int, h: int, below_win: tkinter.Toplevel = cnf.root):
+        x, y = below_win.winfo_x(), below_win.winfo_y()
+        xx = x + below_win.winfo_width() // 2 - w // 2
+        yy = y + below_win.winfo_height() // 2 - h // 2
+        self.geometry(f"+{xx}+{yy}")
+
+
+
 
 class MacMenu(tkinter.Menu, SysUtils):
     def __init__(self):

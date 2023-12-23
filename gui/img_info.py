@@ -29,7 +29,7 @@ class ImageInfo(CWindow, SysUtils):
         CWindow.__init__(self)
         self.title(string=cnf.lng.info)
         self.minsize(width=416, height=155)
-        self.place_center(win=self, width=416, height=155, parrent_win=parrent)
+        self.place_center(w=416, h=155, below_win=parrent)
         self.protocol(name="WM_DELETE_WINDOW",
                       func=lambda: self.__close_info(parrent=parrent))
         self.bind(sequence="<Escape>",

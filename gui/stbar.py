@@ -9,14 +9,22 @@ from .smb_alert import SmbAlert
 from .widgets import *
 
 __all__ = ("StBar",)
+win = {"exists": False}
 
 
 class ScanerGui(CWindow, SysUtils):
     def __init__(self):
+        if win["exists"]:
+            win["exists"].place_center(w=300, h=90)
+            win["exists"].lift()
+            win["exists"].focus_force()
+            return
+
         CWindow.__init__(self)
+        win["exists"] = self
         self.title(string=cnf.lng.updating)
         self.geometry(newGeometry="300x90")
-        self.place_center(win=self, width=300, height=90)
+        self.place_center(w=300, h=90)
         self.protocol(name="WM_DELETE_WINDOW", func=self.__close_scangui)
         self.bind(sequence="<Escape>", func=self.__close_scangui)
 
@@ -31,8 +39,8 @@ class ScanerGui(CWindow, SysUtils):
         self.__live_task = False
         self.__update_livelbl()
 
-        cnf.root.update_idletasks()
-        self.grab_set_global()
+        # cnf.root.update_idletasks()
+        # self.grab_set_global()
 
     def __cancel_scan(self, e: tkinter.Event = None):
         cnf.scan_status = False
@@ -55,6 +63,7 @@ class ScanerGui(CWindow, SysUtils):
         self.grab_release()
         self.destroy()
         cnf.root.focus_force()
+        win["exists"] = False
 
 
 class StBar(CFrame, SysUtils):
@@ -109,6 +118,8 @@ class StBar(CFrame, SysUtils):
         Settings()
 
     def __stbar_run_scan(self, e: tkinter.Event = None):
+        ScanerGui()
+        return
         if not cnf.scan_status:
             if self.smb_check():
                 scaner.scaner_start_now()

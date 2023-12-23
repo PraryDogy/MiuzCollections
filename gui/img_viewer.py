@@ -53,7 +53,7 @@ class ImgViewer(CWindow, ImageUtils, SysUtils, FitImg):
         self.minsize(width=500, height=300)
         self.resizable(width=1, height=1)
         self.geometry(newGeometry=f"{cnf.imgview_g['w']}x{cnf.imgview_g['h']}")
-        self.place_center(win=self, width=cnf.imgview_g["w"], height=cnf.imgview_g["h"])
+        self.place_center(w=cnf.imgview_g["w"], h=cnf.imgview_g["h"])
         self.protocol(name="WM_DELETE_WINDOW", func=self.__close_view)
         self.bind(sequence="<Escape>", func=self.__close_view)
 

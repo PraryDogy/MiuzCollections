@@ -15,7 +15,7 @@ class LangWin(CWindow, SysUtils):
         CWindow.__init__(self, bg=bg, padx=padx, pady=pady)
         w, h = 200, 100
         self.minsize(width=w, height=h)
-        self.place_center(win=self, width=w, height=h)        
+        self.place_center(w=w, h=h)        
         self.title(string=en.lang_label)
 
         title = CLabel(master=self, text=en.lang_label)

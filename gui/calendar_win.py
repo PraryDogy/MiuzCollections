@@ -185,8 +185,7 @@ class CCalendar(CalendarBase, SysUtils):
 
         self.win_entry.title(string=cnf.lng.enter_date)
         self.win_entry.minsize(width=255, height=118)
-        self.place_center(win=self.win_entry, width=255, height=118,
-                     parrent_win=master)
+        self.win_entry.place_center(w=255, h=118, below_win=master)
         self.win_entry.protocol(name="WM_DELETE_WINDOW",
                                 func=lambda: self.close_entry(parrent=master))
         self.win_entry.bind(sequence="<Escape>",
@@ -278,7 +277,7 @@ class CalendarWin(CWindow, SysUtils):
         CWindow.__init__(self)
         self.title(string=cnf.lng.filter)
         self.minsize(width=633, height=490)
-        self.place_center(win=self, width=633, height=490)
+        self.place_center(w=633, h=490)
         self.protocol(name="WM_DELETE_WINDOW", func=self.close_filter)
         self.bind(sequence="<Escape>", func=self.close_filter)
         self.bind(sequence="<Return>", func=self.ok_filter)

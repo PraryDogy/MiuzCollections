@@ -55,9 +55,9 @@ class SysUtils:
         else:
             return cnf.coll_folder.strip(os.sep).split(os.sep)[-1]
 
-    def place_center(self, win: tkinter.Toplevel, width: int, height: int,
-                     parrent_win: tkinter.Toplevel = cnf.root):
-        x, y = parrent_win.winfo_x(), parrent_win.winfo_y()
-        xx = x + parrent_win.winfo_width() // 2 - width // 2
-        yy = y + parrent_win.winfo_height() // 2 - height // 2
-        win.geometry(f"+{xx}+{yy}")
+    # def place_center(self, win: tkinter.Toplevel, width: int, height: int,
+    #                  parrent_win: tkinter.Toplevel = cnf.root):
+    #     x, y = parrent_win.winfo_x(), parrent_win.winfo_y()
+    #     xx = x + parrent_win.winfo_width() // 2 - width // 2
+    #     yy = y + parrent_win.winfo_height() // 2 - height // 2
+    #     win.geometry(f"+{xx}+{yy}")
