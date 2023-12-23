@@ -32,7 +32,6 @@ OPTIONS = {"iconfile": "icon.icns",
                          "\nAll rights reserved.")}}
 
 
-
 if __name__ == "__main__":
 
     sys.argv.append("py2app")

@@ -5,8 +5,7 @@ import sqlalchemy
 
 from cfg import cnf
 from database import Dbase, ThumbsMd
-from utils import SysUtils, ImageUtils
-
+from utils import ImageUtils, SysUtils
 
 __all__ = ("scaner",)
 

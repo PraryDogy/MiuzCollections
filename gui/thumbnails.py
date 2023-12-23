@@ -97,7 +97,6 @@ class ThumbsDict(dict, ImageUtils, SysUtils):
                 img = self.crop_image(img=img)
                 if cnf.zoom:
                     img = self.resize_forgrid(img=img, size=Stats.zoomed)
-                img = self.convert_to_rgb(img=img)
                 if cnf.zoom:
                     img = self.add_sharp(img=img, factor=3)
 

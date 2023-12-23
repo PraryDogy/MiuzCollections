@@ -1,9 +1,8 @@
 import os
 import tkinter
 
-import cv2
 import sqlalchemy
-from PIL import ImageTk
+from PIL import Image, ImageOps, ImageTk
 
 from cfg import cnf
 from database import Dbase, ThumbsMd
@@ -16,7 +15,7 @@ try:
 except ImportError:
     from typing import Literal
 
-from utils import SysUtils, ImageUtils
+from utils import FitImg, ImageUtils, SysUtils
 
 __all__ = ("ImgViewer",)
 
@@ -45,7 +44,7 @@ class ContextViewer(Context, SysUtils):
         self.do_popup(e=e)
 
 
-class ImgViewer(CWindow, ImageUtils, SysUtils):
+class ImgViewer(CWindow, ImageUtils, SysUtils, FitImg):
     def __init__(self, img_src: Literal["file path"]):
         CWindow.__init__(self, bg="black", pady=0, padx=0)
         self.__img_src = img_src
@@ -109,21 +108,14 @@ class ImgViewer(CWindow, ImageUtils, SysUtils):
         img = Dbase.conn.execute(sqlalchemy.select(ThumbsMd.img150).where(
             ThumbsMd.src==self.__img_src)).first()[0]
         img = self.decode_image(img=img)
-        img = self.resize_image(img=img, wid_w=cnf.imgview_g["w"],
-                           wid_h=cnf.imgview_g["h"], is_thumb=False)
-        img = self.convert_to_rgb(img=img)
+        img = self.fit(img=img, w=cnf.imgview_g["w"], h=cnf.imgview_g["h"])
         self.__set_tk_img(img=img)
 
     def __load_img(self):
         try:
-            img = cv2.imread(self.__img_src, cv2.IMREAD_UNCHANGED)
-            
-            if self.__img_src.endswith(("png", "PNG")):
-                img = self.replace_bg(img=img, color=cnf.bg_color)
-
-            img = self.resize_image(img=img, wid_w=cnf.imgview_g["w"],
-                               wid_h=cnf.imgview_g["h"], is_thumb=False)
-            img = self.convert_to_rgb(img=img)
+            img = Image.open(self.__img_src)
+            img = ImageOps.exif_transpose(image=img)
+            img = self.fit(img=img, w=cnf.imgview_g["w"], h=cnf.imgview_g["h"])
             self.__set_tk_img(img=img)
 
         except Exception as ex:

@@ -1,28 +1,17 @@
 import os
-import shutil
-import string
 import subprocess
-import threading
 import tkinter
 import traceback
-from time import sleep
 
 try:
-    from typing_extensions import Literal, Callable
+    from typing_extensions import Literal
 except ImportError:
-    from typing import Literal, Callable
+    from typing import Literal
 
-import cv2
-import numpy
-import psd_tools
-import sqlalchemy
-import tifffile
-from PIL import Image, ImageChops
+import traceback
 
 from cfg import cnf
 from database import *
-import traceback
-
 
 
 class SysUtils:
