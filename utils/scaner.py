@@ -84,19 +84,15 @@ class Scaner(ImageUtils, SysUtils):
         for x, collection in enumerate(iterable=collections, start=1):
             self.__change_live_text(
                     f"{cnf.lng.scaning} {x} {cnf.lng.from_pretext} "
-                    f"{ln} {cnf.lng.colls_case}."
-                    )
+                    f"{ln} {cnf.lng.colls_case}.")
 
             for root, dirs, files in os.walk(top=collection):
-
                 if not cnf.scan_status:
                     return
 
                 for file in files:
-
                     if not cnf.scan_status:
                         return
-
                     if file.endswith(exts):
                         src = os.path.join(root, file)
                         data = (src,
@@ -121,11 +117,9 @@ class Scaner(ImageUtils, SysUtils):
                  "b_collection": self.get_coll_name(src=src),
                  "temp": self.__change_live_text(
                         f"{cnf.lng.added} {x} {cnf.lng.from_pretext} "
-                        f"{ln} {cnf.lng.new_photo_case}.")
-                        }
+                        f"{ln} {cnf.lng.new_photo_case}.")}
                 for x, (src, size, created, modified) in enumerate(iterable=new_images, start=1)
-                if cnf.scan_status
-                ]
+                if cnf.scan_status]
 
             limit = 300
             values = [values[i : i + limit]
