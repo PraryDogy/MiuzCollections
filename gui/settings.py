@@ -63,7 +63,7 @@ class ScanerWid(CFrame, SysUtils):
         scan_title.pack(side="left", padx=10)
 
     def __scan_time_cmd(self, btn: CButton, e: tkinter.Event = None):
-        times = [5, 10, 30, 60]
+        times = [1, 5, 10, 30, 60]
 
         if hasattr(self, "new_scan_time"):
             ind = times.index(self.new_scan_time)
@@ -71,7 +71,7 @@ class ScanerWid(CFrame, SysUtils):
             try:
                 ind = times.index(cnf.scan_time)
             except ValueError:
-                self.print_err()
+                # self.print_err()
                 ind = 0
 
         try:

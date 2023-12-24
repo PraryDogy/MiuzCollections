@@ -50,13 +50,6 @@ class ConfigGui:
         except Exception:
             print(traceback.format_exc())
 
-    def load_langwin(self):
-        from gui.lang_win import LangWin
-        try:
-            LangWin()
-        except Exception:
-            print(traceback.format_exc())
-
     def set_topbar_title(self):
         from gui import app
         app.topbar.funcbar.set_topbar_title()
@@ -182,7 +175,6 @@ class Config(ConfigGui, User):
         if lang_name not in (ru.name, en.name):
             self.lng = en
             self.user_lng = en.name
-            self.load_langwin()
         else:
             self.lng = [i for i in (ru, en) if i.name==lang_name][0]
             self.user_lng = lang_name
