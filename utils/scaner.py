@@ -60,7 +60,12 @@ class Scaner(ImageUtils, SysUtils):
         self.scandirs.start()
         collections = list(self.scandirs.newdirs) + list(self.scandirs.updatedirs)
 
-        print(self.scandirs.deldirs)
+        if self.scandirs.deldirs:
+            self.__need_update = True
+
+        for i in self.scandirs.deldirs:
+            q = sqlalchemy.delete(ThumbsMd).filter(ThumbsMd.src.like(f"%{i}%"))
+            Dbase.conn.execute(q)
 
         if not collections:
             return
@@ -70,14 +75,6 @@ class Scaner(ImageUtils, SysUtils):
         filters = [ThumbsMd.src.like(f"%{i}%") for i in collections]
         q = q.filter(sqlalchemy.or_(*filters))
         db_images = Dbase.conn.execute(q).fetchall()
-
-        # collections = [os.path.join(cnf.coll_folder, i)
-        #                for i in os.listdir(path=cnf.coll_folder)
-        #                if not i.startswith((".", "_"))]
-
-        # db_images = Dbase.conn.execute(sqlalchemy.select(
-        #     ThumbsMd.src, ThumbsMd.size, ThumbsMd.created, ThumbsMd.modified)
-        #     ).fetchall()
 
         exts = (".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG")
         ln = len(collections)
@@ -193,6 +190,7 @@ class Scaner(ImageUtils, SysUtils):
                     )
                 Dbase.conn.execute(q, vals)
 
+        self.scandirs.delete_dirsmd()
         self.scandirs.update_dirsmd()
 
 

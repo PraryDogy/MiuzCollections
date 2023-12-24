@@ -85,12 +85,14 @@ class ScanDirs:
 
         # print("need delete")
 
-    def update_dirsmd(self):
-        if self.newdirs:
-            self.add_to_db()
-        
+    def delete_dirsmd(self):
+        if self.deldirs:
+            self.delete_db()
+
+    def update_dirsmd(self):        
         if self.updatedirs:
             self.update_db()
 
-        if self.deldirs:
-            self.delete_db()
+        if self.newdirs:
+            self.add_to_db()
+
