@@ -28,3 +28,13 @@ class ThumbsMd(Dbase.base):
     created = sqlalchemy.Column(sqlalchemy.Integer)
     modified = sqlalchemy.Column(sqlalchemy.Integer)
     collection = sqlalchemy.Column(sqlalchemy.Text)
+
+
+class DirsMd(Dbase.base):
+    __tablename__ = "dirs"
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    dirname = sqlalchemy.Column(sqlalchemy.Text)
+    stats = sqlalchemy.Column(sqlalchemy.Text)
+
+
+Dbase.base.metadata.create_all(Dbase.conn)
