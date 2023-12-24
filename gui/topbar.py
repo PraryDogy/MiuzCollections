@@ -86,14 +86,14 @@ class FiltersWid(CFrame):
         for k, v in self.__filter_btns.items():
             k: CButton
             if cnf.filter_values[v]:
-                k.configure(fg_color=cnf.btn_color,
+                k.configure(fg_color=cnf.blue_color,
                             text=cnf.lng.filter_names[v] + " ⨂")
             else:
                 k.configure(fg_color=cnf.bg_color,
                             text=cnf.lng.filter_names[v] + " ⨁")
 
         if any((cnf.date_start, cnf.date_end)):
-            self.dates_btn.configure(fg_color=cnf.btn_color,
+            self.dates_btn.configure(fg_color=cnf.blue_color,
                                      text=cnf.lng.dates + " ⨂")
         else:
             self.dates_btn.configure(fg_color=cnf.bg_color,

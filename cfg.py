@@ -116,7 +116,8 @@ class Config(ConfigGui, User):
         self.fg_color = "#E2E2E2"
         self.bg_color = "#1e1e1e"
         self.btn_color = "#303030"
-        self.blue_color = "#0056D9"
+        self.blue_color = "#3d6a97"
+        # self.blue_color = "#0056D9"
         self.lgray_color = "#4B4B4B"
         self.dgray_color = "#141416"
 
