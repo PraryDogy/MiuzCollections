@@ -2,7 +2,7 @@ import os
 import tkinter
 
 import sqlalchemy
-from PIL import Image, ImageOps, ImageTk
+from PIL import ImageTk
 
 from cfg import cnf
 from database import Dbase, ThumbsMd
@@ -15,7 +15,9 @@ try:
 except ImportError:
     from typing import Literal
 
-from utils import FitImg, ImageUtils, SysUtils
+import cv2
+
+from utils import ImageUtils, SysUtils
 
 __all__ = ("ImgViewer",)
 win = {"exists": False}
@@ -45,7 +47,30 @@ class ContextViewer(Context, SysUtils):
         self.do_popup(e=e)
 
 
-class ImgViewer(CWindow, ImageUtils, SysUtils, FitImg):
+class ViewerUtils:
+    def fit_img_old(self, img: Literal["cv2 image"], wid_w: int, wid_h: int) -> Literal["cv2 image"]:
+        h, w = img.shape[:2]
+        aspect = w/h
+
+        f1 = wid_w / w
+        f2 = wid_h / h
+        f = f2
+        new_w, new_h = (int(w * f), int(h * f))
+
+        return cv2.resize(img, (new_w, new_h), interpolation=cv2.INTER_AREA)
+
+    def fit_img(self, img: Literal["cv2 image"], w: int, h: int) -> Literal["cv2 image"]:
+        h, w = img.shape[:2]
+        aspect = w/h
+
+        f1 = w / w
+        f2 = h / h
+        f = f2
+        new_w, new_h = (int(w * f), int(h * f))
+
+        return cv2.resize(img, (new_w, new_h), interpolation=cv2.INTER_AREA)
+
+class ImgViewer(CWindow, ImageUtils, SysUtils, ViewerUtils):
     def __init__(self, img_src: Literal["file path"]):
         w, h = cnf.imgview_g["w"], cnf.imgview_g["h"]
 
@@ -112,14 +137,19 @@ class ImgViewer(CWindow, ImageUtils, SysUtils, FitImg):
         img = Dbase.conn.execute(sqlalchemy.select(ThumbsMd.img150).where(
             ThumbsMd.src==self.__img_src)).first()[0]
         img = self.decode_image(img=img)
-        img = self.fit(img=img, w=cnf.imgview_g["w"], h=cnf.imgview_g["h"])
+        img = self.fit_img(img=img, w=cnf.imgview_g["w"], h=cnf.imgview_g["h"])
+        img = self.convert_to_rgb(img=img)
         self.__set_tk_img(img=img)
 
     def __load_img(self):
         try:
-            img = Image.open(self.__img_src)
-            img = ImageOps.exif_transpose(image=img)
-            img = self.fit(img=img, w=cnf.imgview_g["w"], h=cnf.imgview_g["h"])
+            img = cv2.imread(self.__img_src, cv2.IMREAD_UNCHANGED)
+
+            if self.__img_src.endswith(("png", "PNG")):
+                img = self.replace_bg(img=img, color=cnf.bg_color)
+
+            img = self.fit_img(img=img, w=cnf.imgview_g["w"], h=cnf.imgview_g["h"])
+            img = self.convert_to_rgb(img=img)
             self.__set_tk_img(img=img)
 
         except Exception as ex:
