@@ -2,7 +2,7 @@ import os
 import tkinter
 
 import sqlalchemy
-from PIL import ImageTk
+from PIL import Image, ImageOps, ImageTk
 
 from cfg import cnf
 from database import Dbase, ThumbsMd
@@ -15,9 +15,7 @@ try:
 except ImportError:
     from typing import Literal
 
-import cv2
-
-from utils import ImageUtils, SysUtils
+from utils import FitImg, ImageUtils, SysUtils
 
 __all__ = ("ImgViewer",)
 win = {"exists": False}
@@ -47,32 +45,7 @@ class ContextViewer(Context, SysUtils):
         self.do_popup(e=e)
 
 
-class ViewerUtils:
-    def fit_img(self, img: Literal["cv2 image"], w: int, h: int) -> Literal["cv2 image"]:
-        imh, imw = img.shape[:2]
-
-        if -3 < imw - imh < 3:
-            imw, imh = imw, imw
-
-        if w > h:
-            if imw > imh:
-                delta = imw/imh
-                # neww, newh = int(h*delta), h
-                neww, newh = w, int(w/delta)
-            else: # img h > img w
-                delta = imh/imw
-                neww, newh = int(h/delta), h
-        else:
-            if imw > imh:
-                delta = imw/imh
-                neww, newh = w, int(w/delta)
-            else: # h > w and h > w
-                delta = imh/imw
-                neww, newh = int(h/delta), h
-
-        return cv2.resize(img, (neww, newh), interpolation=cv2.INTER_AREA)
-
-class ImgViewer(CWindow, ImageUtils, SysUtils, ViewerUtils):
+class ImgViewer(CWindow, ImageUtils, SysUtils, FitImg):
     def __init__(self, img_src: Literal["file path"]):
         w, h = cnf.imgview_g["w"], cnf.imgview_g["h"]
 
@@ -139,19 +112,14 @@ class ImgViewer(CWindow, ImageUtils, SysUtils, ViewerUtils):
         img = Dbase.conn.execute(sqlalchemy.select(ThumbsMd.img150).where(
             ThumbsMd.src==self.__img_src)).first()[0]
         img = self.decode_image(img=img)
-        img = self.fit_img(img=img, w=cnf.imgview_g["w"], h=cnf.imgview_g["h"])
-        img = self.convert_to_rgb(img=img)
+        img = self.fit(img=img, w=cnf.imgview_g["w"], h=cnf.imgview_g["h"])
         self.__set_tk_img(img=img)
 
     def __load_img(self):
         try:
-            img = cv2.imread(self.__img_src, cv2.IMREAD_UNCHANGED)
-
-            if self.__img_src.endswith(("png", "PNG")):
-                img = self.replace_bg(img=img, color=cnf.bg_color)
-
-            img = self.fit_img(img=img, w=cnf.imgview_g["w"], h=cnf.imgview_g["h"])
-            img = self.convert_to_rgb(img=img)
+            img = Image.open(self.__img_src)
+            img = ImageOps.exif_transpose(image=img)
+            img = self.fit(img=img, w=cnf.imgview_g["w"], h=cnf.imgview_g["h"])
             self.__set_tk_img(img=img)
 
         except Exception as ex:
