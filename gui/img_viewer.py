@@ -48,27 +48,29 @@ class ContextViewer(Context, SysUtils):
 
 
 class ViewerUtils:
-    def fit_img_old(self, img: Literal["cv2 image"], wid_w: int, wid_h: int) -> Literal["cv2 image"]:
-        h, w = img.shape[:2]
-        aspect = w/h
-
-        f1 = wid_w / w
-        f2 = wid_h / h
-        f = f2
-        new_w, new_h = (int(w * f), int(h * f))
-
-        return cv2.resize(img, (new_w, new_h), interpolation=cv2.INTER_AREA)
-
     def fit_img(self, img: Literal["cv2 image"], w: int, h: int) -> Literal["cv2 image"]:
-        h, w = img.shape[:2]
-        aspect = w/h
+        imh, imw = img.shape[:2]
 
-        f1 = w / w
-        f2 = h / h
-        f = f2
-        new_w, new_h = (int(w * f), int(h * f))
+        if -3 < imw - imh < 3:
+            imw, imh = imw, imw
 
-        return cv2.resize(img, (new_w, new_h), interpolation=cv2.INTER_AREA)
+        if w > h:
+            if imw > imh:
+                delta = imw/imh
+                # neww, newh = int(h*delta), h
+                neww, newh = w, int(w/delta)
+            else: # img h > img w
+                delta = imh/imw
+                neww, newh = int(h/delta), h
+        else:
+            if imw > imh:
+                delta = imw/imh
+                neww, newh = w, int(w/delta)
+            else: # h > w and h > w
+                delta = imh/imw
+                neww, newh = int(h/delta), h
+
+        return cv2.resize(img, (neww, newh), interpolation=cv2.INTER_AREA)
 
 class ImgViewer(CWindow, ImageUtils, SysUtils, ViewerUtils):
     def __init__(self, img_src: Literal["file path"]):
