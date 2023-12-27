@@ -71,6 +71,7 @@ class ThumbsDict(dict, ImageUtils, SysUtils):
     def __init__(self) -> dict[Literal["month year: [(PIL Image, src), ...]"]]:
         dict.__init__(self)
         self._thumbsdict_create()
+
     def _thumbsdict_create(self) -> dict:
         data = Dbase.conn.execute(self._get_query()).fetchall()
         thumbs_dict = {}
@@ -103,6 +104,7 @@ class ThumbsDict(dict, ImageUtils, SysUtils):
         end = datetime.combine(date=cnf.date_end,
                                time=datetime.max.time().replace(microsecond=0))
         return (datetime.timestamp(start), datetime.timestamp(end))
+
     def _get_query(self):
         q = sqlalchemy.select(ThumbsMd.img150, ThumbsMd.src, ThumbsMd.modified)
         search = cnf.search_var.get()
@@ -134,30 +136,41 @@ class ThumbsDict(dict, ImageUtils, SysUtils):
             q = q.filter(ThumbsMd.modified < t[1])
         q = q.order_by(-ThumbsMd.modified)
         return q
+
+
 class ResetDatesBtn(CButton):
     def __init__(self, master: tkinter):
         CButton.__init__(self, master=master, text=cnf.lng.reset_dates)
         self.cmd(self.reset_dates_cmd)
+
     def reset_dates_cmd(self, e: tkinter.Event):
         cnf.date_start, cnf.date_end = None, None
         cnf.reload_filters()
         cnf.reload_scroll()
+
+
 class ResetSearchBtn(CButton):
     def __init__(self, master: tkinter):
         CButton.__init__(self, master=master, text=cnf.lng.reset_search)
         self.cmd(self.reset_search_cmd)
+
     def reset_search_cmd(self, e: tkinter.Event):
         cnf.search_var.set(value="")
         cnf.reload_scroll()
+
+
 class ResetFiltersBtn(CButton):
     def __init__(self, master: tkinter):
         CButton.__init__(self, master=master, text=cnf.lng.show_all)
         self.cmd(self.reset_filters_cmd)
+
     def reset_filters_cmd(self, e: tkinter.Event):
         for k, v in cnf.filter_values.items():
             cnf.filter_values[k] = False
         cnf.reload_filters()
         cnf.reload_scroll()
+
+
 class NoImages(CFrame):
     def __init__(self, master: tkinter):
         CFrame.__init__(self, master=master)
@@ -183,6 +196,8 @@ class NoImages(CFrame):
             noimg_t = (f"{cnf.lng.no_photo_filter}\n{filters}")
             no_images.configure(text=noimg_t)
             ResetFiltersBtn(master=self).pack(pady=(15, 0))
+
+
 class AboveThumbs(CFrame):
     def __init__(self, master: tkinter):
         CFrame.__init__(self, master=master)
@@ -190,6 +205,8 @@ class AboveThumbs(CFrame):
             ResetDatesBtn(master=self).pack(pady=(15, 0))
         elif cnf.search_var.get():
             ResetSearchBtn(master=self).pack(pady=(15, 0))
+
+
 class ImgGridTitle(CLabel):
     def __init__(self, master: tkinter, title: str,
                  img_src_list: tuple[str, ...],
@@ -204,6 +221,8 @@ class ImgGridTitle(CLabel):
                          justify="left")
         self.bind(sequence="<ButtonRelease-2>", func=lambda e:
                   ContextTitles(e=e, title=title, path_list=img_src_list))
+        
+
 class ImgGrid(CLabel, SysUtils):
     def __init__(self, master: tkinter, grid_w: int, grid_h: int,
                  thumbsize: Literal["cnf.thumbsize + cnf.thumbspad"],
@@ -215,33 +234,39 @@ class ImgGrid(CLabel, SysUtils):
                                       color=bg)
         self.__coords = {}
         self.__thumbsize = thumbsize
+
     def set_tk_img(self):
         img = ImageTk.PhotoImage(image=self.__empty_grid)
         self.configure(image=img)
         self.image_names = img
+
     def grid_paste(self, img: Image, img_src: str, grid_x: int, grid_y: int):
         self.__empty_grid.paste(im=img, box=(grid_x, grid_y))
         coord = (grid_x // self.__thumbsize, grid_y // self.__thumbsize)
         self.__coords[coord] = img_src
         cnf.all_img_src.append(img_src)
+
     def __get_coords(self, e: tkinter.Event) -> Literal["str img src"] | bool:
         try:
             clmn = e.x // self.__thumbsize
             row = e.y // self.__thumbsize
             return self.__coords[(clmn, row)]
         except KeyError:
-            print("no thumbnail for click, it's ok")
             return False
+
     def __click(self, e: tkinter.Event):
         img_src = self.__get_coords(e)
         if img_src:
             ImgViewer(img_src=img_src)
+
     def __r_click(self, e: tkinter.Event):
         img_src = self.__get_coords(e=e)
         if img_src:
             ContextThumbs(e=e, img_src=img_src)
         else:
             ContextFilter(e=e)
+
+
 class Thumbs(CFrame):
     def __init__(self, master: tkinter):
         CFrame.__init__(self, master=master)
@@ -249,11 +274,13 @@ class Thumbs(CFrame):
         cnf.root.bind(sequence="<Configure>", func=self.decect_resize)
         self.load_scroll()
         self.load_thumbs()
+
     def load_scroll(self):
         self.__scroll_parrent = CFrame(master=self)
         self.__scroll_parrent.pack(expand=1, fill="both")
         self.scroll = CScroll(master=self.__scroll_parrent, scroll_color=cnf.btn_color)
         self.scroll.pack(expand=1, fill="both")
+
     def load_thumbs(self):
         thumbs_dict = ThumbsDict()
         self.__thumbsize = (Stats.zoomed if cnf.zoom else cnf.thumbsize) + cnf.thumbspad
@@ -300,30 +327,36 @@ class Thumbs(CFrame):
             more_btn = CButton(master=self.__thumbsframe, text=cnf.lng.show_more)
             more_btn.cmd(lambda e: self.show_more_cmd())
             more_btn.pack(pady=15)
+
     def show_more_cmd(self):
         cnf.limit += 150
         cnf.reload_thumbs()
+
     def decect_resize(self, e: tkinter.Event):
         if self.__resize_task:
             cnf.root.after_cancel(id=self.__resize_task)
         self.__resize_task = cnf.root.after(ms=500, func=self.thumbs_resize)
+
     def thumbs_resize(self):
         if cnf.root.winfo_width() != cnf.root_g["w"]:
             if self.__clmns != self.get_clmns_count():
                 cnf.root_g.update({"w": cnf.root.winfo_width(),
                                    "h": cnf.root.winfo_height()})
                 cnf.reload_thumbs()
+
     def reload_scroll(self):
         for i in (self.__scroll_parrent, self.scroll):
             i.destroy()
         cnf.all_img_src.clear()
         self.load_scroll()
         self.load_thumbs()
+
     def reload_thumbs(self):
         for i in (self.__above_thumbs, self.__thumbsframe):
             i.destroy()
         cnf.all_img_src.clear()
         self.load_thumbs()
+
     def get_clmns_count(self) -> int:
         w = cnf.root.winfo_width() - cnf.menu_w - cnf.scroll_width
         return w // self.__thumbsize
