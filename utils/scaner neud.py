@@ -53,7 +53,7 @@ class Scaner(ImageUtils, SysUtils):
         self.__change_live_text(cnf.lng.preparing)
 
         self.scandirs = ScanDirs()
-        collections = list(self.scandirs.newdirs_dict) + list(self.scandirs.updatedirs_dict)
+        collections = list(self.scandirs.new_dirs_dict) + list(self.scandirs.updatedirs_dict)
 
         # for i in self.scandirs.deldirs_dict:
         #     q = sqlalchemy.delete(ThumbsMd).filter(ThumbsMd.src.like(f"%{i}%"))
@@ -172,7 +172,7 @@ class Scaner(ImageUtils, SysUtils):
                     )
                 Dbase.conn.execute(q, vals)
 
-        self.scandirs.update_db()
+        self.scandirs.update_dirs_db()
         DelColls()
 
     def __change_live_text(self, text):
