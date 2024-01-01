@@ -74,11 +74,11 @@ class ScanImages(ScanDirs):
         res = Dbase.conn.execute(q).fetchall()
         return {i[0]: i[1:None] for i in res}
 
-    def get_finder_images(self, dir: str) -> dict[Literal["img path: list of ints"]]:
+    def get_finder_images(self) -> dict[Literal["img path: list of ints"]]:
         exts = (".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG")
 
         images = {}
-        walk_dirs = self.new_dirs + self.upd_dirs
+        walk_dirs = [i for i in (*self.new_dirs, *self.upd_dirs)]
 
         for walk_dir in walk_dirs:
             for root, dirs, files in os.walk(top=walk_dir):
