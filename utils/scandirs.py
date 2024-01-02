@@ -20,7 +20,7 @@ class ScanDirs:
     def get_db_dirs(self) -> dict[Literal["path: list of ints"]]:
         q = sqlalchemy.select(DirsMd.dirname, DirsMd.stats)
         res = Dbase.conn.execute(q).all()
-        return {k: [int(i) for i in v.split(", ")] for k, v in res}
+        return {k: [int(i) for i in v.split(",")] for k, v in res}
     
     def get_finder_dirs(self) -> dict[Literal["path: list of ints"]]:
         finder_dirs = [os.path.join(cnf.coll_folder, i)
@@ -108,7 +108,7 @@ class ScanImages(ScanDirs):
                 self.upd_images[finder_src] = finder_stats
 
 
-class UpdateDb(ScanImages):
+class Queries(ScanImages):
     def __init__(self):
         ScanImages.__init__(self)
 
@@ -117,36 +117,41 @@ class UpdateDb(ScanImages):
         Update database with new compare result. Run "start_scandirs" first.
         """
 
-        # объедини два словаря на удаление директорий
-        # удали их одним запросом
-        # и добавляй новые директории после этого
+        insert_values = [
+            {"b_dirname": dirname, "b_stats": ",".join(str(i) for i in stats)}
+             for dirname, stats in self.new_dirs.items()]
 
-
-        bindparam_values = [
-            {"b_dirname": k,
-             "b_stats": ", ".join(str(i) for i in v)}
-             for k, v in self.new_dirs.items()
-             ]
-        
-        q_del = sqlalchemy.delete(DirsMd).filter(
-            DirsMd.dirname == sqlalchemy.bindparam("b_dirname"))
-
-        q_ins = sqlalchemy.insert(DirsMd).values(
-                    {"dirname": sqlalchemy.bindparam("b_dirname"),
-                     "stats": sqlalchemy.bindparam("b_stats")}
+        insert_dirs = (
+            sqlalchemy.insert(DirsMd)
+            .values({"dirname": sqlalchemy.bindparam("b_dirname"),
+                     "stats": sqlalchemy.bindparam("b_stats")})
                      )
 
-        if bindparam_values:
-            Dbase.conn.execute(q_del, bindparam_values)
-            Dbase.conn.execute(q_ins, bindparam_values)
+        if insert_values:
+            Dbase.conn.execute(insert_dirs, insert_values)
 
-        bindparam_values = [
-            {"b_dirname": k}
-            for k, v in self.del_dirs.items()
-            ]
+        update_values = [
+            {"b_dirname": dirname, "b_stats": ",".join(str(i) for i in stats)}
+            for dirname, stats in self.upd_dirs.items()]
         
-        q = sqlalchemy.delete(DirsMd).filter(
-            DirsMd.dirname == sqlalchemy.bindparam("b_dirname"))
+        update_dirs = (
+            sqlalchemy.update(DirsMd)
+            .filter(DirsMd.dirname == sqlalchemy.bindparam("b_dirname"))
+            .values({"stats": sqlalchemy.bindparam("b_stats")})
+            )
              
-        if bindparam_values:
-            Dbase.conn.execute(q, bindparam_values)
+        if update_values:
+            print(update_dirs)
+            Dbase.conn.execute(update_dirs, update_values)
+
+        delete_values = [
+            {"b_dirname": dirname}
+            for dirname, stats in self.del_dirs.items()]
+        
+        delete_dirs = (
+            sqlalchemy.delete(DirsMd)
+            .filter(DirsMd.dirname == sqlalchemy.bindparam("b_dirname"))
+            )
+        
+        if delete_values:
+            Dbase.conn.execute(delete_dirs, delete_values)
