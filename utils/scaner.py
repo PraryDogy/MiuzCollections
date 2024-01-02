@@ -200,8 +200,7 @@ class UpdateDb(ScanImages, SysUtils):
                      "stats": sqlalchemy.bindparam("b_stats")})
                      )
 
-        if insert_values:
-            Dbase.conn.execute(insert_dirs, insert_values)
+        Dbase.conn.execute(insert_dirs, insert_values)
 
     def update_dirs_db(self):
 
@@ -215,8 +214,7 @@ class UpdateDb(ScanImages, SysUtils):
             .values({"stats": sqlalchemy.bindparam("b_stats")})
             )
              
-        if update_values:
-            Dbase.conn.execute(update_dirs, update_values)
+        Dbase.conn.execute(update_dirs, update_values)
 
     def delete_dirs_db(self):
         delete_values = [
@@ -228,8 +226,7 @@ class UpdateDb(ScanImages, SysUtils):
             .filter(DirsMd.dirname == sqlalchemy.bindparam("b_dirname"))
             )
         
-        if delete_values:
-            Dbase.conn.execute(delete_dirs, delete_values)
+        Dbase.conn.execute(delete_dirs, delete_values)
 
     def new_images_db(self):
         values = [
