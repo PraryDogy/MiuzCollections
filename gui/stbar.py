@@ -1,70 +1,13 @@
 import tkinter
 
 from cfg import cnf
-from utils import SysUtils, scaner
+from utils import SysUtils, Scaner
 
 from .settings import Settings
 from .smb_alert import SmbAlert
 from .widgets import *
 
 __all__ = ("StBar",)
-win = {"exists": False}
-
-
-class ScanerGui(CWindow, SysUtils):
-    def __init__(self):
-        w, h = 300, 90
-        if win["exists"]:
-            win["exists"].destroy()
-            win["exists"] = False
-
-        CWindow.__init__(self)
-        win["exists"] = self
-        self.title(string=cnf.lng.updating)
-        self.geometry(newGeometry=f"{w}x{h}")
-        self.place_center(w=w, h=h)
-        self.protocol(name="WM_DELETE_WINDOW", func=self.__close_scangui)
-        self.bind(sequence="<Escape>", func=self.__close_scangui)
-
-        self.__live_lbl = CLabel(master=self, text=cnf.scan_win_txt, anchor="w",
-                                 justify="left")
-        self.__live_lbl.pack(expand=1, fill="both")
-
-        btn_frame = CFrame(master=self)
-        btn_frame.pack(pady=(10, 0))
-
-        self.__can_btn = CButton(master=btn_frame, text=cnf.lng.stop)
-        self.__can_btn.pack(side="left", padx=(0, 10))
-        self.__can_btn.cmd(self.__cancel_scan)
-
-        self.__close_btn = CButton(master=btn_frame, text=cnf.lng.close)
-        self.__close_btn.pack(side="left")
-        self.__close_btn.cmd(self.__close_scangui)
-
-        self.__live_task = False
-        self.__update_livelbl()
-
-    def __cancel_scan(self, e: tkinter.Event = None):
-        cnf.scan_status = False
-        cnf.root.after_cancel(id=self.__live_task)
-        self.__live_lbl.configure(text=cnf.lng.please_wait)
-        while cnf.scaner_thread.is_alive():
-            cnf.root.update()
-        self.__close_scangui()
-
-    def __update_livelbl(self):
-        if self.winfo_exists():
-            self.__live_lbl.configure(text=cnf.scan_win_txt)
-            self.__live_task = cnf.root.after(ms=100, func=self.__update_livelbl)
-
-        if not cnf.scan_win_txt:
-            cnf.root.after_cancel(id=self.__live_task)
-            cnf.root.after(ms=200, func=self.__close_scangui)
-
-    def __close_scangui(self, e: tkinter.Event = None):
-        self.destroy()
-        cnf.root.focus_force()
-        win["exists"] = False
 
 
 class StBar(CFrame, SysUtils):
@@ -116,10 +59,7 @@ class StBar(CFrame, SysUtils):
     def __stbar_run_scan(self, e: tkinter.Event = None):
         if not cnf.scan_status:
             if self.smb_check():
-                scaner.scaner_start_now()
+                Scaner()
             else:
-                scaner.scaner_sheldue()
                 SmbAlert()
                 return
-        else:
-            ScanerGui()

@@ -1,7 +1,7 @@
 import tkinter
 
 from cfg import cnf
-from utils import SysUtils, scaner
+from utils import SysUtils, Scaner
 
 from .settings import Settings
 from .smb_alert import SmbAlert
@@ -116,9 +116,8 @@ class StBar(CFrame, SysUtils):
     def __stbar_run_scan(self, e: tkinter.Event = None):
         if not cnf.scan_status:
             if self.smb_check():
-                scaner.scaner_start_now()
+                Scaner()
             else:
-                scaner.scaner_sheldue()
                 SmbAlert()
                 return
         else:

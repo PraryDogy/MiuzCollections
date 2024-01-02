@@ -11,7 +11,7 @@ try:
 except ImportError:
     from typing import Literal
 
-from utils import SysUtils, scaner
+from utils import SysUtils, Scaner
 
 __all__ = ("Settings",)
 win = {"exists": False}
@@ -212,10 +212,10 @@ class Settings(CWindow, SysUtils):
         if cnf.coll_folder != self.__browse_colls.get_path():
             cnf.coll_folder = self.__browse_colls.get_path()
             cnf.curr_coll = cnf.all_colls
+
             if self.smb_check():
-                scaner.scaner_sheldue(1500)
+                cnf.root.after(ms=500, func=Scaner)
             else:
-                scaner.scaner_sheldue()
                 SmbAlert()
 
         cnf.write_cfg()

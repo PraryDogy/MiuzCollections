@@ -87,8 +87,14 @@ class ScanImages(ScanDirs):
         self.upd_images = {} # same above, but update
         self.del_images = {} # same above, but delete
 
-        self.db_images = self.get_db_images()
-        self.finder_images: dict = self.get_finder_images()
+        self.db_images = {}
+        self.finder_images = {}
+
+        self.get_db_images()
+        self.get_finder_images()
+
+        if self.del_dirs:
+            self.get_del_dirs_images()
 
         self.compare_images()
 
@@ -97,22 +103,22 @@ class ScanImages(ScanDirs):
             ScanerGlobs.update = True
 
     def get_db_images(self) -> dict[Literal["img path: list of ints"]]:
-        filters = [ThumbsMd.src.like(f"%{i}%") for i in self.new_dirs]
+        dirs = [i for i in (*self.new_dirs, *self.upd_dirs)]
+        filters = [ThumbsMd.src.like(f"%{i}%") for i in dirs]
         filters = sqlalchemy.or_(*filters)
 
         q = sqlalchemy.select(ThumbsMd.src, ThumbsMd.size, ThumbsMd.created,
                               ThumbsMd.modified).filter(filters)
 
         res = Dbase.conn.execute(q).fetchall()
-        return {i[0]: i[1:None] for i in res}
+        self.db_images.update({i[0]: i[1:None] for i in res})
 
     def get_finder_images(self) -> dict[Literal["img path: list of ints"]]:
         exts = (".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG")
 
-        images = {}
-        walk_dirs = [i for i in (*self.new_dirs, *self.upd_dirs)]
+        dirs = [i for i in (*self.new_dirs, *self.upd_dirs)]
 
-        for walk_dir in walk_dirs:
+        for walk_dir in dirs:
             for root, dirs, files in os.walk(top=walk_dir):
                 for file in files:
 
@@ -121,14 +127,30 @@ class ScanImages(ScanDirs):
 
                     if file.endswith(exts):
                         src = os.path.join(root, file)
-                        images[src] = (int(os.path.getsize(filename=src)),
-                                       int(os.stat(path=src).st_birthtime),
-                                       int(os.stat(path=src).st_mtime))
-        return images
-    
+                        self.finder_images[src] = (
+                            int(os.path.getsize(filename=src)),
+                            int(os.stat(path=src).st_birthtime),
+                            int(os.stat(path=src).st_mtime))
+
+
+    def get_del_dirs_images(self) -> dict[Literal["img path: list of ints"]]:
+        filters = sqlalchemy.or_(
+            ThumbsMd.src.like(f"%{i}%") for i in self.del_dirs)
+
+        q = (sqlalchemy.select(ThumbsMd.src, ThumbsMd.size, ThumbsMd.created,
+                               ThumbsMd.modified).filter(filters))
+
+        res = Dbase.conn.execute(q).fetchall()
+
+        self.del_images.update({i[0]: i[1:None] for i in res})
+
     def compare_images(self):
+        if not self.finder_images:
+            return
+
         for db_src, db_stats in self.db_images.items():
-            if db_src not in self.finder_images:
+            finder_stats = self.finder_images.get(db_src)
+            if not finder_stats:
                 self.del_images[db_src] = db_stats
 
         for finder_src, finder_stats in self.finder_images.items():
@@ -144,12 +166,25 @@ class UpdateDb(ScanImages, SysUtils):
         ScanImages.__init__(self)
         self.limit = 300
 
-        self.new_images_db()
-        self.update_images_db()
-        self.delete_images_db()
-        self.update_dirs_db()
+        if self.new_images:
+            self.new_images_db()
+        
+        if self.upd_images:
+            self.update_images_db()
 
-    def update_dirs_db(self):
+        if self.del_images:
+            self.delete_images_db()
+
+        if self.new_dirs:
+            self.new_dirs_db()
+        
+        if self.upd_dirs:
+            self.update_dirs_db()
+
+        if self.del_dirs:
+            self.delete_dirs_db()
+
+    def new_dirs_db(self):
         insert_values = [
             {"b_dirname": dirname, "b_stats": ",".join(str(i) for i in stats)}
              for dirname, stats in self.new_dirs.items()]
@@ -162,6 +197,8 @@ class UpdateDb(ScanImages, SysUtils):
 
         if insert_values:
             Dbase.conn.execute(insert_dirs, insert_values)
+
+    def update_dirs_db(self):
 
         update_values = [
             {"b_dirname": dirname, "b_stats": ",".join(str(i) for i in stats)}
@@ -176,6 +213,7 @@ class UpdateDb(ScanImages, SysUtils):
         if update_values:
             Dbase.conn.execute(update_dirs, update_values)
 
+    def delete_dirs_db(self):
         delete_values = [
             {"b_dirname": dirname}
             for dirname, stats in self.del_dirs.items()]
@@ -187,6 +225,11 @@ class UpdateDb(ScanImages, SysUtils):
         
         if delete_values:
             Dbase.conn.execute(delete_dirs, delete_values)
+
+        # for i in self.del_dirs:
+        #     delete_images = (sqlalchemy.delete(ThumbsMd)
+        #                      .filter(ThumbsMd.src.like(f"%{i}%")))
+        #     Dbase.conn.execute(delete_images)
 
     def new_images_db(self):
         values = [
@@ -257,7 +300,7 @@ class UpdateDb(ScanImages, SysUtils):
     def delete_images_db(self):
         values = [
             {"b_src": src}
-            for src, stats in self.upd_images.items()
+            for src, stats in self.del_images.items()
             ]
         
         if not values:

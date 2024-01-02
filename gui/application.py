@@ -2,7 +2,7 @@ import platform
 import tkinter
 
 from cfg import cnf
-from utils import SysUtils, scaner
+from utils import SysUtils, Scaner
 
 from .menu import Menu
 from .smb_alert import SmbAlert
@@ -58,9 +58,8 @@ class Application(SysUtils):
         MacMenu()
 
         if self.smb_check():
-            cnf.root.after(ms=100, func=scaner.scaner_start_now)
+            cnf.root.after(ms=100, func=Scaner)
         else:
-            scaner.scaner_sheldue()
             SmbAlert()
 
     def minimize(self, e: tkinter.Event):
