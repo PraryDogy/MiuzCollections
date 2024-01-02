@@ -1,5 +1,6 @@
 try:
     from cfg import cnf
+    from database import *
     from gui import app
 
     cnf.root.mainloop()

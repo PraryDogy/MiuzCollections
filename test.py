@@ -1,9 +1,8 @@
-from utils.scandirs import ScanDirs, ScanImages, Queries
+from utils.scaner_new import Scaner
 import sqlalchemy
 from database import Dbase, DirsMd, ThumbsMd
+from cfg import cnf
+import os
 
 
-a = Queries()
-
-
-# a.update_dirs_db()
+Scaner()

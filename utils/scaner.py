@@ -24,7 +24,6 @@ class Scaner(ImageUtils, SysUtils):
         self.__scaner_task = cnf.root.after(ms=ms, func=self.scaner_start_now)
 
     def scaner_start_now(self):
-
         cnf.scan_status = True
         cnf.stbar_btn().configure(text=cnf.lng.updating, fg_color=cnf.blue_color)
 

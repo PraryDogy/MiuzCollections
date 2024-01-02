@@ -70,7 +70,7 @@ class ContextThumbs(Context):
 
         self.sep()
         self.download_fullsize(img_src=img_src)
-        self.db_remove_img(img_src=img_src)
+        self.remove_from_app(img_src=img_src)
 
         self.do_popup(e=e)
 

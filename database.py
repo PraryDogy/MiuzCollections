@@ -1,11 +1,12 @@
 import sqlalchemy
-import sqlalchemy.ext.declarative
+from sqlalchemy.ext.declarative import declarative_base
 
 from cfg import cnf
 
 __all__ = (
     "Dbase",
     "ThumbsMd",
+    "DirsMd",
     )
 
 
@@ -16,7 +17,7 @@ class Dbase():
         echo = False
         )
     conn = __engine.connect()
-    base = sqlalchemy.ext.declarative.declarative_base()
+    base = declarative_base()
 
 
 class ThumbsMd(Dbase.base):
