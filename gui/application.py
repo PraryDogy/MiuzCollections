@@ -61,6 +61,7 @@ class Application(SysUtils):
             cnf.root.after(ms=100, func=Scaner)
         else:
             SmbAlert()
+            cnf.root.after(ms=100, func=Scaner)
 
     def minimize(self, e: tkinter.Event):
         if e.char == "w":

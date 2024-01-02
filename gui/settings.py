@@ -217,6 +217,7 @@ class Settings(CWindow, SysUtils):
                 cnf.root.after(ms=500, func=Scaner)
             else:
                 SmbAlert()
+                Scaner()
 
         cnf.write_cfg()
 

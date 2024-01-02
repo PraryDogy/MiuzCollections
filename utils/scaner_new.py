@@ -17,6 +17,7 @@ __all__ = ("Scaner", )
 
 class ScanerGlobs:
     scaner_thread = threading.Thread(target=None)
+    scaner_task = None
     scaner_flag = False # for stop thread
     update = False # if true - necessary gui update
 
@@ -167,21 +168,25 @@ class UpdateDb(ScanImages, SysUtils):
         self.limit = 300
 
         if self.new_images:
+            print("new images", self.new_images)
             self.new_images_db()
         
         if self.upd_images:
             self.update_images_db()
 
         if self.del_images:
+            print("del images", self.del_images)
             self.delete_images_db()
 
         if self.new_dirs:
+            print("new dirs", self.new_dirs)
             self.new_dirs_db()
         
         if self.upd_dirs:
             self.update_dirs_db()
 
         if self.del_dirs:
+            print("del dirs", self.del_dirs)
             self.delete_dirs_db()
 
     def new_dirs_db(self):
@@ -322,14 +327,15 @@ class UpdateDb(ScanImages, SysUtils):
 
 
 class ScanerThread(SysUtils):
-    def __init__(self, fn: Callable):
-        self.fn = fn
+    def __init__(self) -> None:
+        ScanerGlobs.scaner_flag = False
+        while ScanerGlobs.scaner_thread.is_alive():
+            cnf.root.update()
 
-    def __call__(self, **kwargs):
         ScanerGlobs.scaner_flag = True
         cnf.stbar_btn().configure(text=cnf.lng.updating, fg_color=cnf.blue_color)
 
-        ScanerGlobs.scaner_thread = threading.Thread(target=self.fn, daemon=True)
+        ScanerGlobs.scaner_thread = threading.Thread(target=UpdateDb, daemon=True)
         ScanerGlobs.scaner_thread.start()
 
         while ScanerGlobs.scaner_thread.is_alive():
@@ -350,7 +356,12 @@ class ScanerThread(SysUtils):
         cnf.stbar_btn().configure(text=cnf.lng.update, fg_color=cnf.btn_color)
 
 
-@ScanerThread
-class Scaner(UpdateDb):
+class Scaner(SysUtils):
     def __init__(self):
-        UpdateDb.__init__(self)
+        if self.smb_check():
+            print("run scaner")
+            ScanerThread()
+
+        if ScanerGlobs.scaner_task:
+            cnf.root.after_cancel(ScanerGlobs.scaner_task)
+        cnf.root.after(ms=3000, func=__class__)

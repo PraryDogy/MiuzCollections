@@ -62,4 +62,5 @@ class StBar(CFrame, SysUtils):
                 Scaner()
             else:
                 SmbAlert()
+                Scaner()
                 return
