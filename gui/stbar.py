@@ -58,8 +58,8 @@ class StBar(CFrame, SysUtils):
 
     def __stbar_run_scan(self, e: tkinter.Event = None):
         if not cnf.scan_status:
-            if self.smb_check():
-                Scaner()
-            else:
+            if not self.smb_check():
                 SmbAlert()
-                Scaner()
+            Scaner()
+        else:
+            "gui with description of scan"

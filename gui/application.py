@@ -57,11 +57,10 @@ class Application(SysUtils):
 
         MacMenu()
 
-        if self.smb_check():
-            cnf.root.after(ms=100, func=Scaner)
-        else:
+        if not self.smb_check():
             SmbAlert()
-            cnf.root.after(ms=100, func=Scaner)
+
+        cnf.root.after(ms=100, func=Scaner)
 
     def minimize(self, e: tkinter.Event):
         if e.char == "w":

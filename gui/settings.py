@@ -213,11 +213,9 @@ class Settings(CWindow, SysUtils):
             cnf.coll_folder = self.__browse_colls.get_path()
             cnf.curr_coll = cnf.all_colls
 
-            if self.smb_check():
-                cnf.root.after(ms=500, func=Scaner)
-            else:
+            if not self.smb_check():
                 SmbAlert()
-                Scaner()
+            cnf.root.after(ms=500, func=Scaner)
 
         cnf.write_cfg()
 
