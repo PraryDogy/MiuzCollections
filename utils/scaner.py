@@ -359,4 +359,4 @@ class Scaner(SysUtils):
             print("run scaner")
             ScanerThread()
 
-        ScanerGlobs.scaner_task = cnf.root.after(ms=3000, func=__class__)
+        ScanerGlobs.scaner_task = cnf.root.after(ms=cnf.scan_time, func=__class__)
