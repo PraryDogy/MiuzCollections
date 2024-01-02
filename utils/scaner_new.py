@@ -14,12 +14,10 @@ from utils import SysUtils
 __all__ = ("Scaner", )
 
 
-
 class ScanerGlobs:
     scaner_thread = threading.Thread(target=None)
     scaner_task = None
-    scaner_flag = False # for stop thread
-    update = False # if true - necessary gui update
+    update = False
 
 
 class CreateThumb(io.BytesIO):
@@ -27,11 +25,17 @@ class CreateThumb(io.BytesIO):
         self.ww = 150
         io.BytesIO.__init__(self)
 
-        img = Image.open(src)
+        try:
+            img = Image.open(src)
+        except Exception:
+            img = Image.open(cnf.thumb_err)
+
         img = ImageOps.exif_transpose(image=img)
         img = self.fit_thumb(img=img, w=self.ww, h=self.ww)
         img = img.convert('RGB')
         img.save(self, format="JPEG")
+
+
 
     def fit_thumb(self, img: Image, w: int, h: int) -> Image:
         imw, imh = img.size
@@ -123,8 +127,8 @@ class ScanImages(ScanDirs):
             for root, dirs, files in os.walk(top=walk_dir):
                 for file in files:
 
-                    if not ScanerGlobs.scaner_flag:
-                        return
+                    if not cnf.scan_status:
+                        raise Exception
 
                     if file.endswith(exts):
                         src = os.path.join(root, file)
@@ -168,25 +172,21 @@ class UpdateDb(ScanImages, SysUtils):
         self.limit = 300
 
         if self.new_images:
-            print("new images", self.new_images)
             self.new_images_db()
         
         if self.upd_images:
             self.update_images_db()
 
         if self.del_images:
-            print("del images", self.del_images)
             self.delete_images_db()
 
         if self.new_dirs:
-            print("new dirs", self.new_dirs)
             self.new_dirs_db()
         
         if self.upd_dirs:
             self.update_dirs_db()
 
         if self.del_dirs:
-            print("del dirs", self.del_dirs)
             self.delete_dirs_db()
 
     def new_dirs_db(self):
@@ -231,11 +231,6 @@ class UpdateDb(ScanImages, SysUtils):
         if delete_values:
             Dbase.conn.execute(delete_dirs, delete_values)
 
-        # for i in self.del_dirs:
-        #     delete_images = (sqlalchemy.delete(ThumbsMd)
-        #                      .filter(ThumbsMd.src.like(f"%{i}%")))
-        #     Dbase.conn.execute(delete_images)
-
     def new_images_db(self):
         values = [
             {"b_img150": CreateThumb(src=src).getvalue(),
@@ -245,7 +240,6 @@ class UpdateDb(ScanImages, SysUtils):
             "b_modified": modified,
             "b_collection": self.get_coll_name(src=src)}
             for src, (size, created, modified) in self.new_images.items()
-            if ScanerGlobs.scaner_flag
             ]
 
         if not values:
@@ -256,8 +250,8 @@ class UpdateDb(ScanImages, SysUtils):
 
         for chunk in values:
 
-            if not ScanerGlobs.scaner_flag:
-                return
+            if not cnf.scan_status:
+                raise Exception
 
             insert_images = (
                 sqlalchemy.insert(ThumbsMd)
@@ -278,7 +272,6 @@ class UpdateDb(ScanImages, SysUtils):
             "b_created": created,
             "b_modified": modified}
             for src, (size, created, modified) in self.upd_images.items()
-            if ScanerGlobs.scaner_flag
             ]
         
         if not values:
@@ -289,8 +282,8 @@ class UpdateDb(ScanImages, SysUtils):
 
         for chunk in values:
 
-            if not ScanerGlobs.scaner_flag:
-                return
+            if not cnf.scan_status:
+                raise Exception
 
             update_images = (
                 sqlalchemy.update(ThumbsMd)
@@ -316,8 +309,8 @@ class UpdateDb(ScanImages, SysUtils):
 
         for chunk in values:
 
-            if not ScanerGlobs.scaner_flag:
-                return
+            if not cnf.scan_status:
+                raise Exception
 
             delete_images = (
                 sqlalchemy.delete(ThumbsMd)
@@ -328,13 +321,13 @@ class UpdateDb(ScanImages, SysUtils):
 
 class ScanerThread(SysUtils):
     def __init__(self) -> None:
-        ScanerGlobs.scaner_flag = False
+        cnf.scan_status = False
         while ScanerGlobs.scaner_thread.is_alive():
             cnf.root.update()
 
-        ScanerGlobs.scaner_flag = True
         cnf.stbar_btn().configure(text=cnf.lng.updating, fg_color=cnf.blue_color)
 
+        cnf.scan_status = True
         ScanerGlobs.scaner_thread = threading.Thread(target=UpdateDb, daemon=True)
         ScanerGlobs.scaner_thread.start()
 
@@ -352,16 +345,18 @@ class ScanerThread(SysUtils):
 
             ScanerGlobs.update = False
 
-        ScanerGlobs.scaner_flag = False
         cnf.stbar_btn().configure(text=cnf.lng.update, fg_color=cnf.btn_color)
+
+        cnf.scan_status = False
 
 
 class Scaner(SysUtils):
     def __init__(self):
+        if ScanerGlobs.scaner_task:
+            cnf.root.after_cancel(ScanerGlobs.scaner_task)
+
         if self.smb_check():
             print("run scaner")
             ScanerThread()
 
-        if ScanerGlobs.scaner_task:
-            cnf.root.after_cancel(ScanerGlobs.scaner_task)
-        cnf.root.after(ms=3000, func=__class__)
+        ScanerGlobs.scaner_task = cnf.root.after(ms=3000, func=__class__)

@@ -143,8 +143,6 @@ class Config(ConfigGui, User):
         self.scan_status = False
         self.notibar_status = True
 
-        self.scan_win_txt = ""
-        self.scaner_thread: threading.Thread = None
         self.all_img_src = []
 
     def load_cfg(self):
