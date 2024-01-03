@@ -78,7 +78,7 @@ class User:
         self.down_folder = f"{os.path.expanduser('~')}/Downloads"
         self.curr_coll = "None"
         self.user_lng = "None"
-        self.scan_time_sec = 10 # in seconds
+        self.scan_time_sec = 60 # in seconds
         self.zoom = False
 
         self.root_g = {"w": 700, "h": 500, "x": 100, "y": 100}
