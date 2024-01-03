@@ -150,11 +150,20 @@ class TrashRemover:
 
         q = (sqlalchemy.select(ThumbsMd.src)
             .filter(ThumbsMd.src.not_like(f"%{coll}%")))
-        res = Dbase.conn.execute(q).first()
+        trash_img = Dbase.conn.execute(q).first()
 
-        if res:
+        if trash_img:
             q = (sqlalchemy.delete(ThumbsMd)
                 .filter(ThumbsMd.src.not_like(f"%{coll}%")))
+            Dbase.conn.execute(q)
+
+        q = (sqlalchemy.select(DirsMd.dirname)
+            .filter(DirsMd.dirname.not_like(f"%{coll}%")))
+        trash_dir = Dbase.conn.execute(q).first()
+
+        if trash_dir:
+            q = (sqlalchemy.delete(DirsMd)
+                .filter(DirsMd.dirname.not_like(f"%{coll}%")))
             Dbase.conn.execute(q)
 
 
