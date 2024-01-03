@@ -9,11 +9,11 @@ except ImportError:
     from typing import Literal
 
 import sqlalchemy
-from PIL import Image, ImageTk
+from PIL import Image, ImageEnhance, ImageTk
 
 from cfg import cnf
 from database import Dbase, ThumbsMd
-from utils import SysUtils, ImageUtils
+from utils import SysUtils
 
 from .context import Context
 from .img_viewer import ImgViewer
@@ -77,6 +77,14 @@ class ContextThumbs(Context):
 
 class Stats:
     zoomed = 220
+
+
+class ImageUtils:
+    def resize_forgrid(self, img: Image, size: int) -> Image:
+        return img.resize((size, size))
+    
+    def add_sharp(self, img: Literal["PIL img"], factor: int) -> Literal["PIL img"]:
+        return ImageEnhance.Sharpness(image=img).enhance(factor=factor)
 
 
 class ThumbsDict(dict, ImageUtils, SysUtils):

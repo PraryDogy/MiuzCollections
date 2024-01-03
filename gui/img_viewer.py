@@ -15,7 +15,7 @@ try:
 except ImportError:
     from typing import Literal
 
-from utils import FitImg, ImageUtils, SysUtils
+from utils import FitImg, SysUtils
 
 __all__ = ("ImgViewer",)
 win = {"exists": False}
@@ -45,7 +45,7 @@ class ContextViewer(Context, SysUtils):
         self.do_popup(e=e)
 
 
-class ImgViewer(CWindow, ImageUtils, SysUtils, FitImg):
+class ImgViewer(CWindow, SysUtils, FitImg):
     def __init__(self, img_src: Literal["file path"]):
         w, h = cnf.imgview_g["w"], cnf.imgview_g["h"]
 
@@ -77,6 +77,7 @@ class ImgViewer(CWindow, ImageUtils, SysUtils, FitImg):
 
         self.__load_thumb()
         self.__img_task = cnf.root.after(300, self.__load_img)
+
         cnf.root.after(ms=400, func=lambda:
                     self.bind(sequence="<Configure>", func=self.__decect_resize))
 
@@ -86,14 +87,11 @@ class ImgViewer(CWindow, ImageUtils, SysUtils, FitImg):
                   self.__switch_img(ind=cnf.all_img_src.index(self.__img_src)+1))
 
     def __decect_resize(self, e: tkinter.Event):
-        try:
-            if self.__resize_task:
-                cnf.root.after_cancel(id=self.__resize_task)
+        if self.__resize_task:
+            cnf.root.after_cancel(id=self.__resize_task)
 
-            self.__resize_task = cnf.root.after(ms=300, func=lambda:
-                                                self.__resize_win(e=e))
-        except tkinter.TclError:
-            self.print_err()
+        self.__resize_task = cnf.root.after(
+            ms=300, func=lambda: self.__resize_win(e=e))
 
     def __resize_win(self, e: tkinter.Event):
         try:
@@ -113,17 +111,16 @@ class ImgViewer(CWindow, ImageUtils, SysUtils, FitImg):
             ThumbsMd.src==self.__img_src)).first()[0]
         img = self.decode_image(img=img)
         img = self.fit(img=img, w=cnf.imgview_g["w"], h=cnf.imgview_g["h"])
-        self.__set_tk_img(img=img)
 
-    def __load_img(self):
-        try:
-            img = Image.open(self.__img_src)
-            img = ImageOps.exif_transpose(image=img)
-            img = self.fit(img=img, w=cnf.imgview_g["w"], h=cnf.imgview_g["h"])
+        if self.winfo_exists():
             self.__set_tk_img(img=img)
 
-        except Exception as ex:
-            self.print_err()
+    def __load_img(self):
+        img = Image.open(self.__img_src)
+        img = ImageOps.exif_transpose(image=img)
+        img = self.fit(img=img, w=cnf.imgview_g["w"], h=cnf.imgview_g["h"])
+        if self.winfo_exists():
+            self.__set_tk_img(img=img)
 
     def __set_tk_img(self, img: Literal["PIL Image"]):
         img_tk = ImageTk.PhotoImage(image=img)

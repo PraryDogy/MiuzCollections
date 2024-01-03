@@ -1,7 +1,7 @@
 import io
 import os
 import threading
-from typing import Callable, Literal
+from typing import Literal
 
 import sqlalchemy
 from PIL import Image, ImageOps
@@ -10,13 +10,12 @@ from cfg import cnf
 from database import Dbase, DirsMd, ThumbsMd
 from utils import SysUtils
 
-
 __all__ = ("Scaner", )
 
 
 class ScanerGlobs:
-    scaner_thread = threading.Thread(target=None)
-    scaner_task = None
+    _thread = threading.Thread(target=None)
+    _task = None
     update = False
 
 
@@ -298,15 +297,15 @@ class UpdateDb(ScanImages, SysUtils):
 class ScanerThread(SysUtils):
     def __init__(self):
         cnf.scan_status = False
-        while ScanerGlobs.scaner_thread.is_alive():
+        while ScanerGlobs._thread.is_alive():
             cnf.root.update()
 
         cnf.stbar_btn().configure(text=cnf.lng.updating, fg_color=cnf.blue_color)
         cnf.scan_status = True
-        ScanerGlobs.scaner_thread = threading.Thread(target=UpdateDb, daemon=True)
-        ScanerGlobs.scaner_thread.start()
+        ScanerGlobs._thread = threading.Thread(target=UpdateDb, daemon=True)
+        ScanerGlobs._thread.start()
 
-        while ScanerGlobs.scaner_thread.is_alive():
+        while ScanerGlobs._thread.is_alive():
             cnf.root.update()
 
         if cnf.curr_coll != cnf.all_colls:
@@ -329,12 +328,12 @@ class ScanerThread(SysUtils):
 
 class Scaner(SysUtils):
     def __init__(self):
-        if ScanerGlobs.scaner_task:
-            cnf.root.after_cancel(ScanerGlobs.scaner_task)
+        if ScanerGlobs._task:
+            cnf.root.after_cancel(ScanerGlobs._task)
 
         if self.smb_check():
             print("run scaner")
             ScanerThread()
 
-        ScanerGlobs.scaner_task = cnf.root.after(
+        ScanerGlobs._task = cnf.root.after(
             ms=cnf.scan_time * 1000, func=__class__)

@@ -8,13 +8,18 @@ try:
 except ImportError:
     from typing import Literal
 
+import io
 import traceback
+
+from PIL import Image
 
 from cfg import cnf
 from database import *
 
 
 class SysUtils:
+    ww = 150
+
     def run_applescript(self, script: Literal["applescript"]):
         args = [
             arg for row in script.split("\n")
@@ -55,9 +60,14 @@ class SysUtils:
         else:
             return cnf.coll_folder.strip(os.sep).split(os.sep)[-1]
 
-    # def place_center(self, win: tkinter.Toplevel, width: int, height: int,
-    #                  parrent_win: tkinter.Toplevel = cnf.root):
-    #     x, y = parrent_win.winfo_x(), parrent_win.winfo_y()
-    #     xx = x + parrent_win.winfo_width() // 2 - width // 2
-    #     yy = y + parrent_win.winfo_height() // 2 - height // 2
-    #     win.geometry(f"+{xx}+{yy}")
+    def decode_image(self, img: bytes) -> Image:
+        return Image.open(fp=io.BytesIO(img))
+
+    def crop_image(self, img: Image) -> Image:
+        width, height = img.size   # Get dimensions
+        left = (width - __class__.ww)/2
+        top = (height - __class__.ww)/2
+        right = (width + __class__.ww)/2
+        bottom = (height + __class__.ww)/2
+        return img.crop((left, top, right, bottom))
+    
