@@ -5,6 +5,7 @@ import threading
 import tkinter
 import traceback
 from datetime import datetime
+from customtkinter import CTkProgressBar
 
 try:
     from typing_extensions import Literal
@@ -95,7 +96,7 @@ class Config(ConfigGui, User):
         ConfigGui.__init__(self)
         User.__init__(self)
         self.app_name = "MiuzCollections"
-        self.app_ver = "3.9.5"
+        self.app_ver = "4.0.0"
         self.db_name = "db.db"
         self.cfg_name = "cfg.json"
         self.thumb_err = "thumb.jpg"
@@ -110,7 +111,6 @@ class Config(ConfigGui, User):
         self.bg_color = "#1e1e1e"
         self.btn_color = "#303030"
         self.blue_color = "#3d6a97"
-        # self.blue_color = "#0056D9"
         self.lgray_color = "#4B4B4B"
         self.dgray_color = "#141416"
 
@@ -134,6 +134,7 @@ class Config(ConfigGui, User):
 
         # global variables
         self.search_var = tkinter.StringVar(value="")
+        self.progressbar_var = tkinter.Variable(value=0)
 
         self.date_start: datetime = None
         self.date_end: datetime = None
@@ -178,8 +179,7 @@ class Config(ConfigGui, User):
             self.user_lng = lang_name
 
     def check_dir(self):
-        if not os.path.exists(path=self.cfg_dir):
-            os.mkdir(path=self.cfg_dir)
+        os.makedirs(name=self.cfg_dir, exist_ok=True)
 
         if not os.path.exists(path=self.json_dir):
             self.write_cfg()

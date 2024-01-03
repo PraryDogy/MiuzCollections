@@ -9,7 +9,7 @@ from PIL import Image, ImageOps
 from cfg import cnf
 from database import Dbase, DirsMd, ThumbsMd
 from utils import SysUtils
-
+from time import sleep
 __all__ = ("Scaner", )
 
 
@@ -47,6 +47,14 @@ class CreateThumb(io.BytesIO):
         return img.resize((neww, newh))
 
 
+class SetProgressbar:
+    def onestep(self):
+        cnf.progressbar_var.set(value=cnf.progressbar_var.get() + 0.16)
+
+    def set(self, value):
+        cnf.progressbar_var.set(value=value)
+
+
 class ScanDirs:
     def __init__(self):
         self.new_dirs = {} # insert DirsMd query
@@ -57,6 +65,8 @@ class ScanDirs:
         self.finder_dirs = self.get_finder_dirs()
 
         self.compare_dirs()
+
+        SetProgressbar().onestep()
 
     def get_db_dirs(self) -> dict[Literal["path: list of ints"]]:
         q = sqlalchemy.select(DirsMd.dirname, DirsMd.stats)
@@ -99,6 +109,8 @@ class ScanImages(ScanDirs):
             self.get_finder_images()
             self.compare_images()
             ScanerGlobs.update = True
+
+        SetProgressbar().onestep()
 
     def get_db_images(self) -> dict[Literal["img path: list of ints"]]:
         dirs = [i for i in (*self.new_dirs, *self.upd_dirs, *self.del_dirs)]
@@ -166,6 +178,8 @@ class TrashRemover:
                 .filter(DirsMd.dirname.not_like(f"%{coll}%")))
             Dbase.conn.execute(q)
 
+        SetProgressbar().onestep()
+
 
 class UpdateDb(ScanImages, SysUtils, TrashRemover):
     def __init__(self):
@@ -175,12 +189,18 @@ class UpdateDb(ScanImages, SysUtils, TrashRemover):
 
         if self.new_images:
             self.new_images_db()
-        
+
+        SetProgressbar().onestep()
+
         if self.upd_images:
             self.update_images_db()
 
+        SetProgressbar().onestep()
+
         if self.del_images:
             self.delete_images_db()
+
+        SetProgressbar().onestep()
 
         if self.new_dirs:
             self.new_dirs_db()
@@ -352,12 +372,16 @@ class ScanerThread(SysUtils):
 
 class Scaner(SysUtils):
     def __init__(self):
+        SetProgressbar().set(value=0)
+
         if ScanerGlobs._task:
             cnf.root.after_cancel(ScanerGlobs._task)
 
         if self.smb_check():
             print("run scaner")
             ScanerThread()
+
+        SetProgressbar().set(value=1)
 
         ScanerGlobs._task = cnf.root.after(
             ms=cnf.scan_time * 1000, func=__class__)

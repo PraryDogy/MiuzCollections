@@ -1,8 +1,9 @@
 import tkinter
 
 from cfg import cnf
-from utils import SysUtils, Scaner
+from utils import Scaner, SysUtils
 
+from .scaner_gui import ScanerGui
 from .settings import Settings
 from .smb_alert import SmbAlert
 from .widgets import *
@@ -62,4 +63,4 @@ class StBar(CFrame, SysUtils):
                 SmbAlert()
             Scaner()
         else:
-            "gui with description of scan"
+            ScanerGui()
