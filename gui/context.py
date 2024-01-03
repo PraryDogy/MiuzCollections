@@ -15,6 +15,15 @@ __all__ = ("Context", )
 
 
 class ContextUtils(SysUtils):
+    def reveal_coll_filtered_cmd(self, collname: str, filter: str):
+        if collname != cnf.all_colls:
+            coll_parrent = os.path.join(cnf.coll_folder, collname)
+            coll_path = os.path.join(coll_parrent, filter)
+        try:
+            subprocess.check_output(["/usr/bin/open", coll_path])
+        except subprocess.CalledProcessError:
+            subprocess.check_output(["/usr/bin/open", coll_parrent])
+
     def reveal_coll(self, collname: str):
         if collname != cnf.all_colls:
             coll_path = os.path.join(cnf.coll_folder, collname)
@@ -90,14 +99,11 @@ class MenuCollections(ContextUtils):
             command=lambda:
             cnf.show_coll(btn=btn, collname=collname))
 
-    def apply_filter_menu(
-            self, label: str, collname: str, btn: CButton,
-            filter: Literal["cnf > lng > filter_names > name", "all"]):
-
+    def reveal_coll_filtered(self, collname: str, label: str, filter: str):
         self.add_command(
-            label=label,
+            label=f"{cnf.lng.open} {label.lower()}",
             command=lambda:
-            self.apply_filter(filter=filter, collname=collname, btn=btn))
+            self.reveal_coll_filtered_cmd(collname=collname, filter=filter))
 
 
 class SearchThumbs(ContextUtils):

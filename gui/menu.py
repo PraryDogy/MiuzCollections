@@ -15,15 +15,14 @@ class ContextMenu(Context):
     def __init__(self, e: tkinter.Event, btn: CButton, collname: str):
         Context.__init__(self)
         self.show_coll(e=e, btn=btn, collname=collname)
-        self.reveal_coll_context(collname=collname)
+
         self.sep()
 
-        for k, v in cnf.lng.filter_names.items():
-            self.apply_filter_menu(label=v, collname=collname, btn=btn,
-                                   filter=k)
+        self.reveal_coll_context(collname=collname)
 
-        self.apply_filter_menu(label=cnf.lng.show_all, collname=collname,
-                               btn=btn, filter="all")
+        for k, v in cnf.filter_true_names.items():
+            self.reveal_coll_filtered(collname=collname, filter=v,
+                                      label=cnf.lng.filter_names[k])
 
         self.do_popup_menu(e=e, btn=btn, collname=collname)
 

@@ -436,5 +436,9 @@
     "scan_gui_text": [
         "Поиск новых фотографий.\nСкорость зависит от сетевого диска.",
         "Searching for new photos.\nSearch speed depends on the network drive."
+    ],
+    "open": [
+        "Открыть",
+        "Open"
     ]
 }
