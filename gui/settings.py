@@ -55,7 +55,7 @@ class ScanerWid(CFrame, SysUtils):
     def __init__(self, master: tkinter):
         CFrame.__init__(self, master=master)
 
-        scan_btn = CButton(master=self, text=f"{cnf.scan_time} {cnf.lng.mins}")
+        scan_btn = CButton(master=self, text=f"{cnf.scan_time_sec} {cnf.lng.mins}")
         scan_btn.cmd(lambda e: self.__scan_time_cmd(btn=scan_btn, e=e))
         scan_btn.pack(side="left")
 
@@ -69,7 +69,7 @@ class ScanerWid(CFrame, SysUtils):
             ind = times.index(self.new_scan_time)
         else:
             try:
-                ind = times.index(cnf.scan_time)
+                ind = times.index(cnf.scan_time_sec)
             except ValueError:
                 # self.print_err()
                 ind = 0
@@ -139,7 +139,7 @@ class LangWid(CFrame):
 
 class Settings(CWindow, SysUtils):
     def __init__(self):
-        w, h = 440, 490
+        w, h = 440, 440
 
         if win["exists"]:
             win["exists"].destroy()
@@ -167,8 +167,8 @@ class Settings(CWindow, SysUtils):
 
         CSep(master=self).pack(fill="x", pady=pader)
 
-        self.__scaner_wid = ScanerWid(master=self)
-        self.__scaner_wid.pack(anchor="w", pady=(0, pader))
+        # self.__scaner_wid = ScanerWid(master=self)
+        # self.__scaner_wid.pack(anchor="w", pady=(0, pader))
 
         self.__lang_wid = LangWid(master=self)
         self.__lang_wid.pack(anchor="w")
@@ -198,7 +198,7 @@ class Settings(CWindow, SysUtils):
 
     def __save_sett(self, e: tkinter.Event = None):
         if hasattr(self.__scaner_wid, "new_scan_time"):
-            cnf.scan_time = self.__scaner_wid.new_scan_time
+            cnf.scan_time_sec = self.__scaner_wid.new_scan_time
 
         if hasattr(self.__lang_wid, "new_lang"):
             cnf.set_language(lang_name=self.__lang_wid.new_lang)

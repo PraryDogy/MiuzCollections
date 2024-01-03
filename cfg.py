@@ -78,7 +78,7 @@ class User:
         self.down_folder = f"{os.path.expanduser('~')}/Downloads"
         self.curr_coll = "None"
         self.user_lng = "None"
-        self.scan_time = 10
+        self.scan_time_sec = 10 # in seconds
         self.zoom = False
 
         self.root_g = {"w": 700, "h": 500, "x": 100, "y": 100}
@@ -125,7 +125,6 @@ class Config(ConfigGui, User):
         self.thumbsize = 150
         self.thumbspad = 3
         self.limit = 150
-        self.hidescroll_ms = 1000
         self.all_colls = "all"
 
         # root

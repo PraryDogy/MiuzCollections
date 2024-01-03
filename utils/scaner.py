@@ -384,4 +384,4 @@ class Scaner(SysUtils):
         SetProgressbar().set(value=1)
 
         ScanerGlobs._task = cnf.root.after(
-            ms=cnf.scan_time * 1000, func=__class__)
+            ms=cnf.scan_time_sec * 1000, func=__class__)

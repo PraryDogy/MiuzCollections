@@ -17,7 +17,7 @@ class Scaner(ImageUtils, SysUtils):
         self.__need_update = False
         self.__scaner_task = None
 
-    def scaner_sheldue(self, default_time: int = cnf.scan_time*60000):
+    def scaner_sheldue(self, default_time: int = cnf.scan_time_sec*60000):
         if self.__scaner_task:
             cnf.root.after_cancel(id=self.__scaner_task)
         ms = default_time
