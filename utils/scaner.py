@@ -95,20 +95,14 @@ class ScanImages(ScanDirs):
         self.db_images = {}
         self.finder_images = {}
 
-        self.get_db_images()
-        self.get_finder_images()
-
-        if self.del_dirs:
-            self.del_dirs_images()
-
-        self.compare_images()
-
-        if any((self.new_dirs, self.upd_dirs, self.del_dirs,
-                self.new_images, self.upd_images, self.del_images)):
+        if any((self.new_dirs, self.upd_dirs, self.del_dirs)):
+            self.get_db_images()
+            self.get_finder_images()
+            self.compare_images()
             ScanerGlobs.update = True
 
     def get_db_images(self) -> dict[Literal["img path: list of ints"]]:
-        dirs = [i for i in (*self.new_dirs, *self.upd_dirs)]
+        dirs = [i for i in (*self.new_dirs, *self.upd_dirs, *self.del_dirs)]
         filters = [ThumbsMd.src.like(f"%{i}%") for i in dirs]
         filters = sqlalchemy.or_(*filters)
 
@@ -137,20 +131,7 @@ class ScanImages(ScanDirs):
                             int(os.stat(path=src).st_birthtime),
                             int(os.stat(path=src).st_mtime))
 
-
-    def del_dirs_images(self) -> dict[Literal["img path: list of ints"]]:
-        filters = sqlalchemy.or_(
-            ThumbsMd.src.like(f"%{i}%") for i in self.del_dirs)
-
-        q = sqlalchemy.select(ThumbsMd.src, ThumbsMd.size, ThumbsMd.created,
-                               ThumbsMd.modified).filter(filters)
-        res = Dbase.conn.execute(q).fetchall()
-        self.del_images.update({i[0]: i[1:None] for i in res})
-
     def compare_images(self):
-        if not self.finder_images:
-            return
-
         for db_src, db_stats in self.db_images.items():
             finder_stats = self.finder_images.get(db_src)
             if not finder_stats:
@@ -297,8 +278,7 @@ class UpdateDb(ScanImages, SysUtils):
     def delete_images_db(self):
         values = [
             {"b_src": src}
-            for src, stats in self.del_images.items()
-            ]
+            for src, stats in self.del_images.items()]
 
         values = [values[i : i + self.limit]
                     for i in range(0, len(values), self.limit)]
@@ -322,7 +302,6 @@ class ScanerThread(SysUtils):
             cnf.root.update()
 
         cnf.stbar_btn().configure(text=cnf.lng.updating, fg_color=cnf.blue_color)
-
         cnf.scan_status = True
         ScanerGlobs.scaner_thread = threading.Thread(target=UpdateDb, daemon=True)
         ScanerGlobs.scaner_thread.start()
@@ -338,16 +317,13 @@ class ScanerThread(SysUtils):
         if ScanerGlobs.update:
             cnf.reload_thumbs()
             cnf.reload_menu()
-
             try:
                 Dbase.conn.execute("VACUUM")
             except Exception:
                 print(self.print_err())
-
             ScanerGlobs.update = False
 
         cnf.stbar_btn().configure(text=cnf.lng.update, fg_color=cnf.btn_color)
-
         cnf.scan_status = False
 
 
