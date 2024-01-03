@@ -99,7 +99,7 @@ class ScanImages(ScanDirs):
         self.get_finder_images()
 
         if self.del_dirs:
-            self.get_del_dirs_images()
+            self.del_dirs_images()
 
         self.compare_images()
 
@@ -138,15 +138,13 @@ class ScanImages(ScanDirs):
                             int(os.stat(path=src).st_mtime))
 
 
-    def get_del_dirs_images(self) -> dict[Literal["img path: list of ints"]]:
+    def del_dirs_images(self) -> dict[Literal["img path: list of ints"]]:
         filters = sqlalchemy.or_(
             ThumbsMd.src.like(f"%{i}%") for i in self.del_dirs)
 
-        q = (sqlalchemy.select(ThumbsMd.src, ThumbsMd.size, ThumbsMd.created,
-                               ThumbsMd.modified).filter(filters))
-
+        q = sqlalchemy.select(ThumbsMd.src, ThumbsMd.size, ThumbsMd.created,
+                               ThumbsMd.modified).filter(filters)
         res = Dbase.conn.execute(q).fetchall()
-
         self.del_images.update({i[0]: i[1:None] for i in res})
 
     def compare_images(self):
@@ -203,7 +201,6 @@ class UpdateDb(ScanImages, SysUtils):
         Dbase.conn.execute(insert_dirs, insert_values)
 
     def update_dirs_db(self):
-
         update_values = [
             {"b_dirname": dirname, "b_stats": ",".join(str(i) for i in stats)}
             for dirname, stats in self.upd_dirs.items()]
@@ -229,19 +226,22 @@ class UpdateDb(ScanImages, SysUtils):
         Dbase.conn.execute(delete_dirs, delete_values)
 
     def new_images_db(self):
-        values = [
-            {"b_img150": CreateThumb(src=src).getvalue(),
-            "b_src": src,
-            "b_size": size,
-            "b_created": created,
-            "b_modified": modified,
-            "b_collection": self.get_coll_name(src=src)}
-            for src, (size, created, modified) in self.new_images.items()
-            ]
+        values = []
+        
+        for src, (size, created, modified) in self.new_images.items():
 
-        if not values:
-            return
+            if not cnf.scan_status:
+                raise Exception
 
+            values.append(
+                {"b_img150": CreateThumb(src=src).getvalue(),
+                 "b_src": src,
+                 "b_size": size,
+                 "b_created": created,
+                 "b_modified": modified,
+                 "b_collection": self.get_coll_name(src=src)})
+
+ 
         values = [values[i : i + self.limit]
                     for i in range(0, len(values), self.limit)]
 
@@ -262,17 +262,19 @@ class UpdateDb(ScanImages, SysUtils):
             Dbase.conn.execute(insert_images, chunk)
 
     def update_images_db(self):
-        values = [
-            {"b_img150": CreateThumb(src=src).getvalue(),
-            "b_src": src,
-            "b_size": size,
-            "b_created": created,
-            "b_modified": modified}
-            for src, (size, created, modified) in self.upd_images.items()
-            ]
-        
-        if not values:
-            return
+        values = []
+
+        for src, (size, created, modified) in self.upd_images.items():
+
+            if not cnf.scan_status:
+                raise Exception
+            
+            values.append(
+                {"b_img150": CreateThumb(src=src).getvalue(),
+                 "b_src": src,
+                 "b_size": size,
+                 "b_created": created,
+                 "b_modified": modified})
 
         values = [values[i : i + self.limit]
                     for i in range(0, len(values), self.limit)]
@@ -297,9 +299,6 @@ class UpdateDb(ScanImages, SysUtils):
             {"b_src": src}
             for src, stats in self.del_images.items()
             ]
-        
-        if not values:
-            return
 
         values = [values[i : i + self.limit]
                     for i in range(0, len(values), self.limit)]
@@ -317,7 +316,7 @@ class UpdateDb(ScanImages, SysUtils):
 
 
 class ScanerThread(SysUtils):
-    def __init__(self) -> None:
+    def __init__(self):
         cnf.scan_status = False
         while ScanerGlobs.scaner_thread.is_alive():
             cnf.root.update()
@@ -330,6 +329,11 @@ class ScanerThread(SysUtils):
 
         while ScanerGlobs.scaner_thread.is_alive():
             cnf.root.update()
+
+        if cnf.curr_coll != cnf.all_colls:
+            coll = os.path.join(cnf.coll_folder, cnf.curr_coll)
+            if not os.path.exists(coll):
+                cnf.curr_coll = cnf.all_colls
 
         if ScanerGlobs.update:
             cnf.reload_thumbs()
@@ -356,4 +360,5 @@ class Scaner(SysUtils):
             print("run scaner")
             ScanerThread()
 
-        ScanerGlobs.scaner_task = cnf.root.after(ms=cnf.scan_time, func=__class__)
+        ScanerGlobs.scaner_task = cnf.root.after(
+            ms=cnf.scan_time * 1000, func=__class__)
