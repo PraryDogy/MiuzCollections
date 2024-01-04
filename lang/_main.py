@@ -78,6 +78,7 @@ class TrashKeys:
                         trash_keys_count[lng_key] = +1
 
         trash_keys_count = [k for k, v in trash_keys_count.items() if v == 0]
+        trash_keys_count.remove("name")
 
         print("unused lang keys: ", trash_keys_count)
 

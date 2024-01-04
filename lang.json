@@ -1,4 +1,8 @@
 {
+    "name": [
+        "ru",
+        "en"
+    ],
     "filter_names": [
         {
             "prod": "Имиджи",
