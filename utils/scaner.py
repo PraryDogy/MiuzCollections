@@ -49,7 +49,7 @@ class CreateThumb(io.BytesIO):
 
 class SetProgressbar:
     def onestep(self):
-        cnf.progressbar_var.set(value=cnf.progressbar_var.get() + 0.16)
+        cnf.progressbar_var.set(value=cnf.progressbar_var.get() + 0.12)
 
     def set(self, value):
         cnf.progressbar_var.set(value=value)

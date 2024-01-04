@@ -201,8 +201,8 @@ class Settings(CWindow, SysUtils):
         cnf.root.focus_force()
 
     def __save_sett(self, e: tkinter.Event = None):
-        if hasattr(self.__scaner_wid, "new_scan_time"):
-            cnf.scan_time_sec = self.__scaner_wid.new_scan_time
+        # if hasattr(self.__scaner_wid, "new_scan_time"):
+            # cnf.scan_time_sec = self.__scaner_wid.new_scan_time
 
         if hasattr(self.__lang_wid, "new_lang"):
             cnf.set_language(lang_name=self.__lang_wid.new_lang)
