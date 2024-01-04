@@ -13,7 +13,11 @@ from .context import Context
 from .widgets import *
 
 __all__ = ("ImageInfo",)
-win = {"exists": False}
+
+
+class Win:
+    win: CWindow = False
+
 
 class ContextInfo(Context):
     def __init__(self, e: tkinter.Event):
@@ -28,12 +32,12 @@ class ImageInfo(CWindow, SysUtils):
     def __init__(self, parrent: tkinter.Toplevel, img_src: Literal["file path"]):
         w, h = 420, 165
 
-        if win["exists"]:
-            win["exists"].destroy()
-            win["exists"] = False
+        if Win.win:
+            Win.win.destroy()
+            Win.win = False
 
         CWindow.__init__(self)
-        win["exists"] = self
+        Win.win = self
         self.title(string=cnf.lng.info)
         self.minsize(width=w, height=h)
         self.place_center(w=w, h=h, below_win=parrent)
@@ -113,5 +117,5 @@ class ImageInfo(CWindow, SysUtils):
         ContextInfo(e=e)
 
     def __close_info(self):
-        win["exists"] = False
+        Win.win = False
         self.destroy()

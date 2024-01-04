@@ -14,7 +14,11 @@ except ImportError:
 from utils import SysUtils, Scaner
 
 __all__ = ("Settings",)
-win = {"exists": False}
+
+
+class Win:
+    win: CWindow = False
+
 
 class BrowsePathFrame(CFrame, SysUtils):
     def __init__(self, master: tkinter, title: str,
@@ -141,12 +145,12 @@ class Settings(CWindow, SysUtils):
     def __init__(self):
         w, h = 440, 440
 
-        if win["exists"]:
-            win["exists"].destroy()
-            win["exists"] = False
+        if Win.win:
+            Win.win.destroy()
+            Win.win = False
 
         CWindow.__init__(self)
-        win["exists"] = self
+        Win.win = self
 
         self.protocol(name="WM_DELETE_WINDOW", func=self.__close_sett)
         self.bind(sequence="<Escape>", func=self.__close_sett)
@@ -192,7 +196,7 @@ class Settings(CWindow, SysUtils):
         cancel_btn.pack(side="left")
 
     def __close_sett(self, e: tkinter.Event = None):
-        win["exists"] = False
+        Win.win = False
         self.destroy()
         cnf.root.focus_force()
 
@@ -228,4 +232,4 @@ class Settings(CWindow, SysUtils):
         cnf.reload_strbar()
         cnf.reload_scroll()
 
-        win["exists"] = False
+        Win.win = False

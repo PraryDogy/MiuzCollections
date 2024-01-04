@@ -9,6 +9,7 @@ from .widgets import *
 
 __all__ = ("ScanerGui", )
 
+
 class Win:
     win: CWindow = False
 

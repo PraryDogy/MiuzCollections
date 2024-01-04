@@ -6,18 +6,21 @@ from utils import SysUtils
 from .widgets import *
 
 __all__ = ("SmbAlert", )
-win = {"exists": False}
+
+
+class Win:
+    win = False
 
 
 class SmbAlert(CWindow, SysUtils):
     def __init__(self):
         w, h = 420, 85
-        if win["exists"]:
-            win["exists"].destroy()
-            win["exists"] = False
+        if Win.win:
+            Win.win.destroy()
+            Win.win = False
 
         CWindow.__init__(self)
-        win["exists"] = self
+        Win.win = self
         self.minsize(width=w, height=h)
         self.protocol("WM_DELETE_WINDOW", self.__close_smb)
         self.bind("<Escape>", self.__close_smb)
@@ -37,4 +40,4 @@ class SmbAlert(CWindow, SysUtils):
     def __close_smb(self, e: tkinter.Event = None):
         self.destroy()
         cnf.root.focus_force()
-        win["exists"] = False
+        Win.win = False

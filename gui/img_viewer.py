@@ -18,7 +18,10 @@ except ImportError:
 from utils import FitImg, SysUtils
 
 __all__ = ("ImgViewer",)
-win = {"exists": False}
+
+
+class Win:
+    win: CWindow = False
 
 
 class ContextViewer(Context, SysUtils):
@@ -49,12 +52,12 @@ class ImgViewer(CWindow, SysUtils, FitImg):
     def __init__(self, img_src: Literal["file path"]):
         w, h = cnf.imgview_g["w"], cnf.imgview_g["h"]
 
-        if win["exists"]:
-            win["exists"].destroy()
-            win["exists"] = False
+        if Win.win:
+            Win.win.destroy()
+            Win.win = False
 
         CWindow.__init__(self, bg="black", pady=0, padx=0)
-        win["exists"] = self
+        Win.win = self
         self.__img_src = img_src
 
         self.__set_title()
@@ -158,4 +161,4 @@ class ImgViewer(CWindow, SysUtils, FitImg):
 
     def __close_view(self, e: tkinter.Event = None):
         self.destroy()
-        win["exists"] = False
+        Win.win = False

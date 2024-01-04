@@ -15,8 +15,11 @@ except ImportError:
 from utils import SysUtils
 
 __all__ = ("CalendarWin",)
-win = {"main": False, "entry": False}
 
+
+class Win:
+    main: CWindow = False
+    entry: CWindow = False
 
 
 class CalendarBase(CFrame, SysUtils):
@@ -185,12 +188,12 @@ class CCalendar(CalendarBase, SysUtils):
     def entry_win(self, master: tkinter.Toplevel, e: tkinter.Event = None):
         w, h = 255, 120
 
-        if win["entry"]:
-            win["entry"].destroy()
-            win["entry"] = False
+        if Win.entry:
+            Win.entry.destroy()
+            Win.entry = False
 
         self.win_entry = CWindow()
-        win["entry"] = self.win_entry
+        Win.entry = self.win_entry
 
         self.win_entry.title(string=cnf.lng.enter_date)
         self.win_entry.minsize(width=w, height=h)
@@ -273,7 +276,7 @@ class CCalendar(CalendarBase, SysUtils):
         self.close_entry(parrent=parrent)
 
     def close_entry(self, parrent: tkinter.Toplevel):
-        win["entry"] = False
+        Win.entry = False
         self.win_entry.destroy()
         parrent.focus_force()
 
@@ -282,13 +285,16 @@ class CalendarWin(CWindow, SysUtils):
     def __init__(self):
         w, h = 635, 490
 
-        for i in win.values():
-            if i:
-                i.destroy()
-                i = False
+        if Win.main:
+            Win.main.destroy()
+            Win.main = False
+
+        if Win.entry:
+            Win.entry.destroy()
+            Win.entry = False
 
         CWindow.__init__(self)
-        win["main"] = self
+        Win.main = self
         self.title(string=cnf.lng.filter)
         self.minsize(width=w, height=h)
         self.place_center(w=w, h=h)
@@ -382,13 +388,16 @@ class CalendarWin(CWindow, SysUtils):
         cnf.reload_filters()
         cnf.reload_scroll()
 
-        for i in win.values():
-            i = False
+        Win.main, Win.entry = False, False
 
     def close_filter(self, e: tkinter.Event = None):
-        for i in win.values():
-            if i:
-                i.destroy()
-                i = False
+        if Win.main:
+            Win.main.destroy()
+            Win.main = False
+
+        if Win.entry:
+            Win.entry.destroy()
+            Win.entry = False
+
         self.destroy()
         cnf.root.focus_force()
