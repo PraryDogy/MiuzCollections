@@ -1,8 +1,14 @@
 import json
 import os
 
+
+class LangPath:
+    parrent = os.path.dirname(__file__)
+    path = os.path.join(parrent, "lang.json")
+
+
 class LoadLang:
-    with open(file="lang.json", mode="r", encoding="utf-8") as file:
+    with open(file=LangPath.path, mode="r", encoding="utf-8") as file:
         load_lang: dict = json.loads(s=file.read())
 
 
@@ -45,7 +51,7 @@ class Admin:
             print("white 1, 2 or 3")
             return
 
-        with open(file="lang.json", mode="w", encoding="utf-8") as file:
+        with open(file=LangPath.path, mode="w", encoding="utf-8") as file:
             json.dump(obj=LoadLang.load_lang, fp=file, ensure_ascii=False, indent=4)
 
 
@@ -62,7 +68,7 @@ class TrashKeys:
                     pyfiles.append(os.path.join(root, file))
 
         ex = "lng"
-        with open(file="lang.json", mode="r", encoding="utf-8") as file:
+        with open(file=LangPath.path, mode="r", encoding="utf-8") as file:
             data = json.loads(s=file.read())
 
 
