@@ -121,7 +121,7 @@ class ScanImages(ScanDirs):
                               ThumbsMd.modified).filter(filters)
 
         res = Dbase.conn.execute(q).fetchall()
-        self.db_images.update({i[0]: i[1:None] for i in res})
+        self.db_images.update({i[0]: i[1:] for i in res})
 
     def get_finder_images(self) -> dict[Literal["img path: list of ints"]]:
         exts = (".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG")
