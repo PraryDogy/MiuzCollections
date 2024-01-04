@@ -18,3 +18,4 @@ venv39/
 env/
 db.db
 _test gallery*
+__MACOSX*
