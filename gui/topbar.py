@@ -25,15 +25,16 @@ class SearchWid(CEntry):
                         textvariable=textvariable, **kw)
 
         self.bind(sequence="<Escape>", command=lambda e: cnf.root.focus_force())
-        cnf.root.bind(sequence="<Command-f>", func=lambda e: self.focus_force())
-
         self.bind(sequence="<Return>", command=self.__search_go)
         self.bind(sequence="<ButtonRelease-2>", command=ContextSearch)
+        cnf.root.bind(sequence="<Command-f>", func=lambda e: self.focus_force())
 
-        cnf.search_var.trace(mode="w", callback=lambda *args:
-                             self.__create_search_task(args))
+        cnf.search_var.trace_add(mode="write", callback=lambda *args:
+                                self.__create_search_task(args))
+
         self.__search_task = None
         self.__old_search_var = None
+        self.search_flag = False
 
     def __cancel_search_task(self):
         if self.__search_task:
@@ -47,7 +48,12 @@ class SearchWid(CEntry):
             self.__old_search_var = search_var
             cnf.date_start, cnf.date_end = None, None
             self.__search_task = cnf.root.after(ms=1000, func=self.__search_go)
+            self.search_flag = True
 
+        if self.search_flag and not search_var:
+            cnf.reload_thumbs()
+            self.search_flag = False
+            cnf.root.focus_force()
 
     def __search_go(self, e=None):
         cnf.reload_scroll()

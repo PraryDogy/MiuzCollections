@@ -1,11 +1,9 @@
 import json
 import os
 import shutil
-import threading
 import tkinter
 import traceback
 from datetime import datetime
-from customtkinter import CTkProgressBar
 
 try:
     from typing_extensions import Literal
