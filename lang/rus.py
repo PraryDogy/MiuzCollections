@@ -1,4 +1,4 @@
-from .load_lang import LoadLang
+from ._main import LoadLang
 
 class Rus:
     def __init__(self):
