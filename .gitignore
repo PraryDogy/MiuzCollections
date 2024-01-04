@@ -6,16 +6,8 @@ _Collections/
 dist/
 build/
 __Dist/
-database.db
-venv/
 .vscode/
-lib/
-_test_coll/
-venv39/
-lib2/
-venv311/
 venv39/
 env/
 db.db
-_test gallery*
 __MACOSX*
