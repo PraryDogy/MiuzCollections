@@ -9,7 +9,7 @@ from PIL import Image, ImageOps
 from cfg import cnf
 from database import Dbase, DirsMd, ThumbsMd
 from utils import SysUtils
-from time import sleep
+
 __all__ = ("Scaner", )
 
 
@@ -31,9 +31,12 @@ class CreateThumb(io.BytesIO):
 
         img = ImageOps.exif_transpose(image=img)
         img = self.fit_thumb(img=img, w=self.ww, h=self.ww)
-        img = img.convert('RGB')
-        img.save(self, format="JPEG")
 
+        newimg = img.copy()
+        img.close()
+
+        newimg = newimg.convert('RGB')
+        newimg.save(self, format="JPEG")
 
 
     def fit_thumb(self, img: Image, w: int, h: int) -> Image:
