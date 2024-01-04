@@ -4,7 +4,9 @@
     python setup.py py2app
 """
 
+import shutil
 import sys
+import traceback
 
 import icnsutil
 from setuptools import setup
@@ -19,7 +21,7 @@ img.write(f"icon.icns")
 
 APP = ["start.py"]
 
-DATA_FILES = [cnf.db_name, cnf.thumb_err, "lang.json"]
+DATA_FILES = [cnf.db_name, cnf.thumb_err, "lang/lang.json"]
 
 OPTIONS = {"iconfile": "icon.icns",
            "plist": {"CFBundleName": cnf.app_name,
@@ -36,12 +38,18 @@ if __name__ == "__main__":
 
     sys.argv.append("py2app")
 
-    setup(
-        app = APP,
-        name = cnf.app_name,
-        data_files = DATA_FILES,
-        options = {"py2app": OPTIONS},
-        setup_requires = ["py2app"],
-        )
+    try:
+        setup(
+            app = APP,
+            name = cnf.app_name,
+            data_files = DATA_FILES,
+            options = {"py2app": OPTIONS},
+            setup_requires = ["py2app"],
+            )
+    except Exception:
+        print(traceback.format_exc())
+        shutil.rmtree("build")
+        shutil.rmtree(".eggs")
+        shutil.rmtree("dist")
 
     SetupExt(py_ver="3.11", appname=cnf.app_name)
