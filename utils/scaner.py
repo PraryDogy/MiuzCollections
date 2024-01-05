@@ -7,7 +7,7 @@ import sqlalchemy
 from PIL import Image, ImageOps
 
 from cfg import cnf
-from database import Dbase, DirsMd, ThumbsMd
+from database import Dbase, DirsMd, ThumbsMd, CollMd
 from utils import SysUtils
 
 __all__ = ("Scaner", )
@@ -58,8 +58,38 @@ class SetProgressbar:
         cnf.progressbar_var.set(value=value)
 
 
-class ScanDirs:
+class ScanMain:
     def __init__(self):
+        q = (sqlalchemy.select(CollMd.stats)
+             .filter(CollMd.name==cnf.coll_folder))
+        
+        self.db_coll_stats = Dbase.conn.execute(q).first()
+        self.finder_coll_stats = ",".join(
+            str(i) for i in os.stat(cnf.coll_folder))
+
+        if self.db_coll_stats:
+            if self.db_coll_stats[0] == self.finder_coll_stats:
+                raise Exception("\n\nMain check: no scan needed\n\n")
+
+    def update_main(self):
+        if not self.db_coll_stats:
+            Dbase.conn.execute(sqlalchemy.delete(CollMd))
+            q = (sqlalchemy.insert(CollMd)
+                 .values({"name": cnf.coll_folder,
+                          "stats": self.finder_coll_stats}))
+            Dbase.conn.execute(q)
+
+        else:
+            q = (sqlalchemy.update(CollMd)
+                 .filter(CollMd.name==cnf.coll_folder)
+                 .values({"stats": self.finder_coll_stats}))
+            Dbase.conn.execute(q)
+
+
+class ScanDirs(ScanMain):
+    def __init__(self):
+        ScanMain.__init__(self)
+
         self.new_dirs = {} # insert DirsMd query
         self.upd_dirs = {} # same above, but update
         self.del_dirs = {} # same above, but delete
@@ -70,6 +100,9 @@ class ScanDirs:
         self.compare_dirs()
 
         SetProgressbar().onestep()
+
+        if not any((self.new_dirs, self.upd_dirs, self.del_dirs)):
+            raise Exception("\n\nDirs check: no scan needed\n\n")
 
     def get_db_dirs(self) -> dict[Literal["path: list of ints"]]:
         q = sqlalchemy.select(DirsMd.dirname, DirsMd.stats)
@@ -107,12 +140,11 @@ class ScanImages(ScanDirs):
         self.db_images = {}
         self.finder_images = {}
 
-        if any((self.new_dirs, self.upd_dirs, self.del_dirs)):
-            self.get_db_images()
-            self.get_finder_images()
-            self.compare_images()
-            ScanerGlobs.update = True
+        self.get_db_images()
+        self.get_finder_images()
+        self.compare_images()
 
+        ScanerGlobs.update = True
         SetProgressbar().onestep()
 
     def get_db_images(self) -> dict[Literal["img path: list of ints"]]:
@@ -136,7 +168,7 @@ class ScanImages(ScanDirs):
                 for file in files:
 
                     if not cnf.scan_status:
-                        raise Exception
+                        raise Exception("\n\nScaner stopped by scan_status")
 
                     if file.endswith(exts):
                         src = os.path.join(root, file)
@@ -181,6 +213,13 @@ class TrashRemover:
                 .filter(DirsMd.dirname.not_like(f"%{coll}%")))
             Dbase.conn.execute(q)
 
+        q = sqlalchemy.select(CollMd).filter(CollMd.name!=cnf.coll_folder)
+        trash_main = Dbase.conn.execute(q).first()
+
+        if trash_main:
+            q = sqlalchemy.delete(CollMd).filter(CollMd.name!=cnf.coll_folder)
+            Dbase.conn.execute(q)
+
         SetProgressbar().onestep()
 
 
@@ -213,6 +252,8 @@ class UpdateDb(ScanImages, SysUtils, TrashRemover):
 
         if self.del_dirs:
             self.delete_dirs_db()
+
+        self.update_main()
 
     def new_dirs_db(self):
         insert_values = [
@@ -258,7 +299,7 @@ class UpdateDb(ScanImages, SysUtils, TrashRemover):
         for src, (size, created, modified) in self.new_images.items():
 
             if not cnf.scan_status:
-                raise Exception
+                raise Exception("\n\nScaner stopped by scan_status")
 
             values.append(
                 {"b_img150": CreateThumb(src=src).getvalue(),
@@ -275,7 +316,7 @@ class UpdateDb(ScanImages, SysUtils, TrashRemover):
         for chunk in values:
 
             if not cnf.scan_status:
-                raise Exception
+                raise Exception("\n\nScaner stopped by scan_status")
 
             insert_images = (
                 sqlalchemy.insert(ThumbsMd)
@@ -294,7 +335,7 @@ class UpdateDb(ScanImages, SysUtils, TrashRemover):
         for src, (size, created, modified) in self.upd_images.items():
 
             if not cnf.scan_status:
-                raise Exception
+                raise Exception("\n\nScaner stopped by scan_status")
             
             values.append(
                 {"b_img150": CreateThumb(src=src).getvalue(),
@@ -309,7 +350,7 @@ class UpdateDb(ScanImages, SysUtils, TrashRemover):
         for chunk in values:
 
             if not cnf.scan_status:
-                raise Exception
+                raise Exception("\n\nScaner stopped by scan_status")
 
             update_images = (
                 sqlalchemy.update(ThumbsMd)
@@ -332,7 +373,7 @@ class UpdateDb(ScanImages, SysUtils, TrashRemover):
         for chunk in values:
 
             if not cnf.scan_status:
-                raise Exception
+                raise Exception("\n\nScaner stopped by scan_status")
 
             delete_images = (
                 sqlalchemy.delete(ThumbsMd)

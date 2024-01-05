@@ -3,11 +3,7 @@ from sqlalchemy.ext.declarative import declarative_base
 
 from cfg import cnf
 
-__all__ = (
-    "Dbase",
-    "ThumbsMd",
-    "DirsMd",
-    )
+__all__ = ("Dbase", "ThumbsMd", "DirsMd", "CollMd",)
 
 
 class Dbase():
@@ -37,5 +33,11 @@ class DirsMd(Dbase.base):
     dirname = sqlalchemy.Column(sqlalchemy.Text)
     stats = sqlalchemy.Column(sqlalchemy.Text)
 
+
+class CollMd(Dbase.base):
+    __tablename__ = "coll"
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    name = sqlalchemy.Column(sqlalchemy.Text)
+    stats = sqlalchemy.Column(sqlalchemy.Text)
 
 Dbase.base.metadata.create_all(Dbase.conn)
