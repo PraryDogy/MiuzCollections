@@ -381,10 +381,9 @@ class Scaner(SysUtils):
             cnf.root.after_cancel(ScanerGlobs._task)
 
         if self.smb_check():
-            print("run scaner")
             ScanerThread()
-
-        SetProgressbar().set(value=1)
 
         ScanerGlobs._task = cnf.root.after(
             ms=cnf.scan_time_sec * 1000, func=__class__)
+
+        SetProgressbar().set(value=1)
