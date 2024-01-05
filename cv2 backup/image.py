@@ -80,26 +80,3 @@ class ImageUtils(SysUtils):
 
     def resize_forgrid(self, img: Literal["cv2 image"], size: int) -> Literal["cv2 image"]:
         return cv2.resize(img, (size, size))
-
-    def add_sharp(self, img: Literal["PIL img"], factor: int) -> Literal["PIL img"]:
-        # return img.filter(ImageFilter.SHARPEN)
-        return ImageEnhance.Sharpness(image=img).enhance(factor=factor)
-
-    def black_borders(self, img: Image) -> Image:
-        try:
-            bg = Image.new(img.mode, img.size, img.getpixel((0,0)))
-            diff = ImageChops.difference(img, bg)
-            diff = ImageChops.add(diff, diff, 2.0, -100)
-            bbox = diff.getbbox()
-
-            if bbox:
-                img = img.crop(bbox)
-
-            return img
-
-        except Exception as e:
-            self.print_err()
-            return img
-
-
-
