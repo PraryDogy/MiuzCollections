@@ -22,17 +22,6 @@ from .widgets import *
 __all__ = ("Thumbs",)
 
 
-class ContextFilter(Context):
-    def __init__(self, e: tkinter.Event):
-        Context.__init__(self)
-
-        for k, v in cnf.lng.filter_names.items():
-            self.apply_filter_thumbs(label=v, filter=k)
-
-        self.apply_filter_thumbs(label=cnf.lng.show_all, filter="all")
-        self.do_popup(e=e)
-
-
 class ContextTitles(Context):
     def __init__(self, e: tkinter.Event, title: str,
                  path_list: tuple[Literal["file path"], ...]):
@@ -310,7 +299,7 @@ class ImgGrid(CLabel, SysUtils):
         if img_src:
             ContextThumbs(e=e, img_src=img_src)
         else:
-            ContextFilter(e=e)
+            print("context with empty space, 313 thumbnnails")
 
 
 class Thumbs(CFrame):
@@ -345,7 +334,8 @@ class Thumbs(CFrame):
         self.__thumbsframe.pack(anchor="w", padx=5)
 
         for i in (self.scroll, self.__thumbsframe, self.__above_thumbs):
-            i.bind(sequence="<ButtonRelease-2>", func=ContextFilter)
+            "************CONTEXT EMPTY SPACE"
+            pass
 
         grid_limit = 500
         self.__clmns = self.get_clmns_count()

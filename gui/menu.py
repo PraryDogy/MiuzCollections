@@ -1,19 +1,85 @@
+import os
+import subprocess
 import tkinter
 
 import sqlalchemy
 
 from cfg import cnf
 from database import Dbase, ThumbsMd
+from utils import SysUtils
 
-from .context import Context
 from .widgets import *
 
 __all__ = ("Menu",)
 
 
-class ContextMenu(Context):
-    def __init__(self, e: tkinter.Event, btn: CButton, collname: str):
+class Context(tkinter.Menu):
+    def __init__(self):
+        tkinter.Menu.__init__(self)
+
+    def sep(self):
+        self.add_separator()
+
+    def do_popup(self, e: tkinter.Event, btn: CButton, collname: str):
+        try:
+            btn.configure(fg_color=cnf.blue_color)
+            self.tk_popup(x=e.x_root, y=e.y_root)
+        finally:
+            if collname == cnf.curr_coll:
+                btn.configure(fg_color=cnf.lgray_color)
+            else:
+                btn.configure(fg_color=cnf.bg_color_menu)
+            self.grab_release()
+
+
+class ContextUtils(SysUtils):
+    def reveal_coll_filtered_cmd(self, collname: str, filter: str):
+        if collname != cnf.all_colls:
+            coll_parrent = os.path.join(cnf.coll_folder, collname)
+            coll_path = os.path.join(coll_parrent, filter)
+        try:
+            subprocess.check_output(["/usr/bin/open", coll_path])
+        except subprocess.CalledProcessError:
+            subprocess.check_output(["/usr/bin/open", coll_parrent])
+
+    def reveal_coll(self, collname: str):
+        if collname != cnf.all_colls:
+            coll_path = os.path.join(cnf.coll_folder, collname)
+        else:
+            coll_path = cnf.coll_folder
+
+        try:
+            subprocess.check_output(["/usr/bin/open", coll_path])
+        except subprocess.CalledProcessError:
+            subprocess.check_output(["/usr/bin/open", cnf.coll_folder])
+
+
+class ContextMenuBase(Context, ContextUtils):
+    def __init__(self):
         Context.__init__(self)
+
+    def show_coll(self, e: tkinter.Event, btn: CButton, collname: str):
+        self.add_command(
+            label=cnf.lng.view,
+            command=lambda:
+            cnf.show_coll(btn=btn, collname=collname))
+
+    def reveal_coll_context(self, collname: str):
+        self.add_command(
+            label=cnf.lng.reveal_coll,
+            command=lambda:
+            self.reveal_coll(collname=collname))
+
+    def reveal_coll_filtered(self, collname: str, label: str, filter: str):
+        self.add_command(
+            label=f"{cnf.lng.open} {label.lower()}",
+            command=lambda:
+            self.reveal_coll_filtered_cmd(collname=collname, filter=filter))
+
+
+class ContextMenu(ContextMenuBase):
+    def __init__(self, e: tkinter.Event, btn: CButton, collname: str):
+        ContextMenuBase.__init__(self)
         self.show_coll(e=e, btn=btn, collname=collname)
 
         self.sep()
@@ -24,7 +90,7 @@ class ContextMenu(Context):
             self.reveal_coll_filtered(collname=collname, filter=v,
                                       label=cnf.lng.filter_names[k])
 
-        self.do_popup_menu(e=e, btn=btn, collname=collname)
+        self.do_popup(e=e, btn=btn, collname=collname)
 
 
 class Menu(CScroll):

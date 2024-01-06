@@ -15,49 +15,12 @@ __all__ = ("Context", )
 
 
 class ContextUtils(SysUtils):
-    def reveal_coll_filtered_cmd(self, collname: str, filter: str):
-        if collname != cnf.all_colls:
-            coll_parrent = os.path.join(cnf.coll_folder, collname)
-            coll_path = os.path.join(coll_parrent, filter)
-        try:
-            subprocess.check_output(["/usr/bin/open", coll_path])
-        except subprocess.CalledProcessError:
-            subprocess.check_output(["/usr/bin/open", coll_parrent])
-
-    def reveal_coll(self, collname: str):
-        if collname != cnf.all_colls:
-            coll_path = os.path.join(cnf.coll_folder, collname)
-        else:
-            coll_path = cnf.coll_folder
-
-        try:
-            subprocess.check_output(["/usr/bin/open", coll_path])
-        except subprocess.CalledProcessError:
-            subprocess.check_output(["/usr/bin/open", cnf.coll_folder])
-
     def paste_search(self):
         try:
             pasted = cnf.root.clipboard_get().strip()
             cnf.search_var.set(value=pasted)
         except tkinter.TclError:
             self.print_err()
-
-    def apply_filter(self, filter: Literal["all"] | Literal["cnf > filter values key"],
-                     btn: tkinter = None, collname: str = None):
-        if filter == "all":
-            for k, v in cnf.filter_values.items():
-                cnf.filter_values[k] = False
-        else:
-            for k, v in cnf.filter_values.items():
-                cnf.filter_values[k] = False
-            cnf.filter_values[filter] = True
-
-        if collname and btn:
-            cnf.reload_filters()
-            cnf.show_coll(btn=btn, collname=collname)
-        else:
-            cnf.reload_filters()
-            cnf.reload_scroll()
 
     def copy_text(self, text: str):
         cnf.root.clipboard_clear()
@@ -84,26 +47,6 @@ class ContextUtils(SysUtils):
         Dbase.conn.execute(upd_dirs)
         Dbase.conn.execute(rem_thumb)
         cnf.reload_thumbs()
-
-
-class MenuCollections(ContextUtils):
-    def reveal_coll_context(self, collname: str):
-        self.add_command(
-            label=cnf.lng.reveal_coll,
-            command=lambda:
-            self.reveal_coll(collname=collname))
-
-    def show_coll(self, e: tkinter.Event, btn: CButton, collname: str):
-        self.add_command(
-            label=cnf.lng.view,
-            command=lambda:
-            cnf.show_coll(btn=btn, collname=collname))
-
-    def reveal_coll_filtered(self, collname: str, label: str, filter: str):
-        self.add_command(
-            label=f"{cnf.lng.open} {label.lower()}",
-            command=lambda:
-            self.reveal_coll_filtered_cmd(collname=collname, filter=filter))
 
 
 class SearchThumbs(ContextUtils):
@@ -222,7 +165,7 @@ class ImgInfo(ContextUtils):
             self.copy_text(text=e.widget.get("1.0",tkinter.END)))
 
 
-class Context(tkinter.Menu, MenuCollections, SearchThumbs, ImgSingle, ImgGroup, ImgInfo):
+class Context(tkinter.Menu, SearchThumbs, ImgSingle, ImgGroup, ImgInfo):
     def __init__(self):
         tkinter.Menu.__init__(self)
 
@@ -235,26 +178,10 @@ class Context(tkinter.Menu, MenuCollections, SearchThumbs, ImgSingle, ImgGroup, 
         finally:
             self.grab_release()
         
-    def do_popup_menu(self, e: tkinter.Event, btn: CButton, collname: str):
-        try:
-            btn.configure(fg_color=cnf.blue_color)
-            self.tk_popup(x=e.x_root, y=e.y_root)
-        finally:
-            if collname == cnf.curr_coll:
-                btn.configure(fg_color=cnf.lgray_color)
-            else:
-                btn.configure(fg_color=cnf.bg_color_menu)
-            self.grab_release()
+
 
     def remove_from_app(self, img_src: Literal["file path"]):
         self.add_command(
             label=cnf.lng.remove_fromapp,
             command=lambda: self.remove_from_app_cmd(img_src=img_src)
-            )
-
-    def apply_filter_thumbs(self, label: str,
-                            filter: Literal["cnf > lng > filter_names > name", "all"]):
-        self.add_command(
-            label=label,
-            command=lambda: self.apply_filter(filter=filter)
             )
