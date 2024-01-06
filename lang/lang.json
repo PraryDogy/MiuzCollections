@@ -198,12 +198,12 @@
         "Copy all"
     ],
     "find_jpg": [
-        "Найти jpg",
-        "Find jpg"
+        "Показать jpg в Finder",
+        "Reveal jpg in Finder"
     ],
     "find_tiff": [
-        "Найти tiff",
-        "Find tiff"
+        "Показать tiff в Finder",
+        "Reveal tiff in Finder"
     ],
     "copy_path_tiff": [
         "Копировать путь к tiff",

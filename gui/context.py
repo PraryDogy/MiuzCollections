@@ -44,6 +44,13 @@ class ContextUtils(SysUtils):
             .values({"stats": "0"})
             )
 
+        upd_main = (
+            sqlalchemy.update(CollMd)
+            .filter(CollMd.name==cnf.coll_folder)
+            .values({"stats": "0"})
+            )
+
+        Dbase.conn.execute(upd_main)
         Dbase.conn.execute(upd_dirs)
         Dbase.conn.execute(rem_thumb)
         cnf.reload_thumbs()
@@ -89,13 +96,13 @@ class ImgSingle:
 
     def download_jpg(self, img_src: Literal["file path"]):
         self.add_command(
-            label=f"{cnf.lng.download} jpg {cnf.lng.to_downloads}",
+            label=f"{cnf.lng.download} jpg",
             command=lambda:
             FinderActions(src=img_src, download=True))
 
     def download_tiff(self, img_src: Literal["file path"]):
         self.add_command(
-            label=f"{cnf.lng.download} tiff {cnf.lng.to_downloads}",
+            label=f"{cnf.lng.download} tiff",
             command=lambda:
             FinderActions(src=img_src, tiff=True, download=True))
 

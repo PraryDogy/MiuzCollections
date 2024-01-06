@@ -184,6 +184,9 @@ class Config(ConfigGui, User):
         if not os.path.exists(path=self.db_dir):
             shutil.copyfile(src=self.db_name, dst=self.db_dir)
 
+    def set_scantime(self):
+        self.scan_time_sec = 15
+
     def __fix_dict(self, namedict: str, userdict: dict):
         cnf_dict: dict = getattr(self, namedict)
 
@@ -199,4 +202,5 @@ class Config(ConfigGui, User):
 cnf = Config()
 cnf.check_dir()
 cnf.load_cfg()
+cnf.set_scantime()
 cnf.write_cfg()
