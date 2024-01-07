@@ -19,6 +19,7 @@ from PIL import Image
 from cfg import cnf
 from database import *
 
+from .scaner import ResetDirStats, Scaner
 from .system import SysUtils
 
 
@@ -161,6 +162,8 @@ class FinderActions(FinderBase):
             src = [src]
 
         if not self._jpg_check(path_list=src):
+            ResetDirStats(src=src[0])
+            Scaner()
             cnf.notibar_text(cnf.lng.no_jpg)
             self._delay()
             return

@@ -7,7 +7,7 @@ import sqlalchemy
 
 from cfg import cnf
 from database import *
-from utils import FinderActions, SysUtils
+from utils import FinderActions, SysUtils, ResetDirStats, Scaner
 
 from .widgets import *
 
@@ -27,33 +27,13 @@ class ContextUtils(SysUtils):
         cnf.root.clipboard_append(string=text)
 
     def remove_from_app_cmd(self, img_src: Literal["file path"]):
+        ResetDirStats(src=img_src)
+
         rem_thumb = sqlalchemy.delete(ThumbsMd).filter(ThumbsMd.src==img_src)
-
-        try:
-            coll = img_src.replace(cnf.coll_folder, "")
-            coll = coll.strip(os.sep).split(os.sep)[0]
-        except Exception:
-            self.print_err()
-            return
-
-        collpath = os.path.join(cnf.coll_folder, coll)
-
-        upd_dirs = (
-            sqlalchemy.update(DirsMd)
-            .filter(DirsMd.dirname==collpath)
-            .values({"stats": "0"})
-            )
-
-        upd_main = (
-            sqlalchemy.update(CollMd)
-            .filter(CollMd.name==cnf.coll_folder)
-            .values({"stats": "0"})
-            )
-
-        Dbase.conn.execute(upd_main)
-        Dbase.conn.execute(upd_dirs)
         Dbase.conn.execute(rem_thumb)
+
         cnf.reload_thumbs()
+        Scaner()
 
 
 class SearchThumbs(ContextUtils):
