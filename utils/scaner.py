@@ -418,11 +418,6 @@ class ScanerThread(SysUtils):
         while ScanerGlobs._thread.is_alive():
             cnf.root.update()
 
-        # if cnf.curr_coll != cnf.all_colls:
-        #     coll = os.path.join(cnf.coll_folder, cnf.curr_coll)
-        #     if not os.path.exists(coll):
-        #         cnf.curr_coll = cnf.all_colls
-
         if ScanerGlobs.update:
             cnf.reload_thumbs()
             cnf.reload_menu()
