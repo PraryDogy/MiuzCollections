@@ -11,10 +11,12 @@ except ImportError:
 import io
 import traceback
 
-from PIL import Image
+from PIL import Image, ImageOps
 
 from cfg import cnf
 from database import *
+
+__all__ = ("SysUtils", "CreateThumb", )
 
 
 class SysUtils:
@@ -71,3 +73,33 @@ class SysUtils:
         bottom = (height + __class__.ww)/2
         return img.crop((left, top, right, bottom))
     
+
+class CreateThumb(io.BytesIO):
+    def __init__(self, src: str):
+        self.ww = 150
+        io.BytesIO.__init__(self)
+
+        try:
+            img = Image.open(src)
+        except Exception:
+            img = Image.open(cnf.thumb_err)
+
+        img = ImageOps.exif_transpose(image=img)
+        img = self.fit_thumb(img=img, w=self.ww, h=self.ww)
+
+        newimg = img.copy()
+        img.close()
+
+        newimg = newimg.convert('RGB')
+        newimg.save(self, format="JPEG")
+
+
+    def fit_thumb(self, img: Image, w: int, h: int) -> Image:
+        imw, imh = img.size
+        delta = imw/imh
+
+        if delta > 1:
+            neww, newh = int(h*delta), h
+        else:
+            neww, newh = w, int(w/delta)
+        return img.resize((neww, newh))

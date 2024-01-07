@@ -2,7 +2,7 @@ import platform
 import tkinter
 
 from cfg import cnf
-from utils import SysUtils, Scaner
+from utils import SysUtils, FullScaner, Watcher
 
 from .menu import Menu
 from .smb_alert import SmbAlert
@@ -60,7 +60,8 @@ class Application(SysUtils):
         if not self.smb_check():
             SmbAlert()
 
-        cnf.root.after(ms=100, func=Scaner)
+        cnf.root.after(ms=100, func=FullScaner)
+        cnf.root.after(ms=200, func=Watcher)
 
     def minimize(self, e: tkinter.Event):
         if e.char == "w":

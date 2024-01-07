@@ -7,16 +7,69 @@ import sqlalchemy
 from PIL import Image, ImageOps
 
 from cfg import cnf
-from database import CollMd, Dbase, DirsMd, ThumbsMd
+from database import Dbase, DirsMd, ThumbsMd, CollMd
+from utils import SysUtils
 
-from .system import CreateThumb, SysUtils
+__all__ = ("Scaner", "ResetDirStats", )
 
-__all__ = ("FullScaner", "ScanerGlobs", )
+
+class ResetDirStats:
+    def __init__(self, src: str):
+        coll = src.split(os.sep)
+        parrent = cnf.coll_folder.split(os.sep)
+        collpath = os.path.join(*coll[:len(parrent) + 1])
+
+        upd_dirs = (
+            sqlalchemy.update(DirsMd)
+            .filter(DirsMd.dirname.like(f"%{collpath}"))
+            .values({"stats": "0"})
+            )
+
+        upd_main = (
+            sqlalchemy.update(CollMd)
+            .filter(CollMd.name.like(f"%{cnf.coll_folder}"))
+            .values({"stats": "0"})
+            )
+
+        Dbase.conn.execute(upd_main)
+        Dbase.conn.execute(upd_dirs)
 
 
 class ScanerGlobs:
-    thread = threading.Thread(target=None)
+    _thread = threading.Thread(target=None)
+    _task = None
     update = False
+
+
+class CreateThumb(io.BytesIO):
+    def __init__(self, src: str):
+        self.ww = 150
+        io.BytesIO.__init__(self)
+
+        try:
+            img = Image.open(src)
+        except Exception:
+            img = Image.open(cnf.thumb_err)
+
+        img = ImageOps.exif_transpose(image=img)
+        img = self.fit_thumb(img=img, w=self.ww, h=self.ww)
+
+        newimg = img.copy()
+        img.close()
+
+        newimg = newimg.convert('RGB')
+        newimg.save(self, format="JPEG")
+
+
+    def fit_thumb(self, img: Image, w: int, h: int) -> Image:
+        imw, imh = img.size
+        delta = imw/imh
+
+        if delta > 1:
+            neww, newh = int(h*delta), h
+        else:
+            neww, newh = w, int(w/delta)
+        return img.resize((neww, newh))
 
 
 class SetProgressbar:
@@ -27,8 +80,81 @@ class SetProgressbar:
         cnf.progressbar_var.set(value=value)
 
 
-class ScanImages:
+class ScanMain:
     def __init__(self):
+        q = (sqlalchemy.select(CollMd.stats)
+             .filter(CollMd.name==cnf.coll_folder))
+        
+        self.db_coll_stats = Dbase.conn.execute(q).first()
+        self.finder_coll_stats = ",".join(
+            str(i) for i in os.stat(cnf.coll_folder))
+
+        if self.db_coll_stats:
+            if self.db_coll_stats[0] == self.finder_coll_stats:
+                raise Exception("\n\nMain check: no scan needed\n\n")
+
+    def update_main(self):
+        if not self.db_coll_stats:
+            Dbase.conn.execute(sqlalchemy.delete(CollMd))
+            q = (sqlalchemy.insert(CollMd)
+                 .values({"name": cnf.coll_folder,
+                          "stats": self.finder_coll_stats}))
+            Dbase.conn.execute(q)
+
+        else:
+            q = (sqlalchemy.update(CollMd)
+                 .filter(CollMd.name==cnf.coll_folder)
+                 .values({"stats": self.finder_coll_stats}))
+            Dbase.conn.execute(q)
+
+
+class ScanDirs(ScanMain):
+    def __init__(self):
+        ScanMain.__init__(self)
+
+        self.new_dirs = {} # insert DirsMd query
+        self.upd_dirs = {} # same above, but update
+        self.del_dirs = {} # same above, but delete
+
+        self.db_dirs = self.get_db_dirs()
+        self.finder_dirs = self.get_finder_dirs()
+
+        self.compare_dirs()
+
+        SetProgressbar().onestep()
+
+        if not any((self.new_dirs, self.upd_dirs, self.del_dirs)):
+            raise Exception("\n\nDirs check: no scan needed\n\n")
+
+    def get_db_dirs(self) -> dict[Literal["path: list of ints"]]:
+        q = sqlalchemy.select(DirsMd.dirname, DirsMd.stats)
+        res = Dbase.conn.execute(q).all()
+        return {k: [int(i) for i in v.split(",")] for k, v in res}
+    
+    def get_finder_dirs(self) -> dict[Literal["path: list of ints"]]:
+        finder_dirs = [os.path.join(cnf.coll_folder, i)
+                   for i in os.listdir(cnf.coll_folder)
+                   if os.path.isdir(os.path.join(cnf.coll_folder, i))]
+    
+        return {i: list(os.stat(i)) for i in finder_dirs}
+
+    def compare_dirs(self):
+        for db_src, db_stats in self.db_dirs.items():
+            if db_src not in self.finder_dirs:
+                self.del_dirs[db_src] = db_stats
+
+        for finder_src, finder_stats in self.finder_dirs.items():
+            db_stats = self.db_dirs.get(finder_src)
+            if not db_stats:
+                self.new_dirs[finder_src] = finder_stats
+            if db_stats and finder_stats != db_stats:
+                self.upd_dirs[finder_src] = finder_stats
+
+
+class ScanImages(ScanDirs):
+    def __init__(self):
+        ScanDirs.__init__(self)
+
         self.new_images = {} # insert ThumbsMd query
         self.upd_images = {} # same above, but update
         self.del_images = {} # same above, but delete
@@ -44,8 +170,12 @@ class ScanImages:
         SetProgressbar().onestep()
 
     def get_db_images(self) -> dict[Literal["img path: list of ints"]]:
+        dirs = [i for i in (*self.new_dirs, *self.upd_dirs, *self.del_dirs)]
+        filters = [ThumbsMd.src.like(f"%{i}%") for i in dirs]
+        filters = sqlalchemy.or_(*filters)
+
         q = sqlalchemy.select(ThumbsMd.src, ThumbsMd.size, ThumbsMd.created,
-                              ThumbsMd.modified)
+                              ThumbsMd.modified).filter(filters)
 
         res = Dbase.conn.execute(q).fetchall()
         self.db_images.update({i[0]: i[1:] for i in res})
@@ -53,18 +183,21 @@ class ScanImages:
     def get_finder_images(self) -> dict[Literal["img path: list of ints"]]:
         exts = (".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG")
 
-        for root, dirs, files in os.walk(top=cnf.coll_folder):
-            for file in files:
+        dirs = [i for i in (*self.new_dirs, *self.upd_dirs)]
 
-                if not cnf.scan_status:
-                    raise Exception("\n\nScaner stopped by scan_status")
+        for walk_dir in dirs:
+            for root, dirs, files in os.walk(top=walk_dir):
+                for file in files:
 
-                if file.endswith(exts):
-                    src = os.path.join(root, file)
-                    self.finder_images[src] = (
-                        int(os.path.getsize(filename=src)),
-                        int(os.stat(path=src).st_birthtime),
-                        int(os.stat(path=src).st_mtime))
+                    if not cnf.scan_status:
+                        raise Exception("\n\nScaner stopped by scan_status")
+
+                    if file.endswith(exts):
+                        src = os.path.join(root, file)
+                        self.finder_images[src] = (
+                            int(os.path.getsize(filename=src)),
+                            int(os.stat(path=src).st_birthtime),
+                            int(os.stat(path=src).st_mtime))
 
     def compare_images(self):
         for db_src, db_stats in self.db_images.items():
@@ -132,6 +265,17 @@ class UpdateDb(ScanImages, SysUtils, TrashRemover):
             self.delete_images_db()
 
         SetProgressbar().onestep()
+
+        if self.new_dirs:
+            self.new_dirs_db()
+        
+        if self.upd_dirs:
+            self.update_dirs_db()
+
+        if self.del_dirs:
+            self.delete_dirs_db()
+
+        self.update_main()
 
     def new_dirs_db(self):
         insert_values = [
@@ -260,18 +404,18 @@ class UpdateDb(ScanImages, SysUtils, TrashRemover):
             Dbase.conn.execute(delete_images, chunk)
 
 
-class FullScanThread(SysUtils):
+class ScanerThread(SysUtils):
     def __init__(self):
         cnf.scan_status = False
-        while ScanerGlobs.thread.is_alive():
+        while ScanerGlobs._thread.is_alive():
             cnf.root.update()
 
         cnf.stbar_btn().configure(text=cnf.lng.updating, fg_color=cnf.blue_color)
         cnf.scan_status = True
-        ScanerGlobs.thread = threading.Thread(target=UpdateDb, daemon=True)
-        ScanerGlobs.thread.start()
+        ScanerGlobs._thread = threading.Thread(target=UpdateDb, daemon=True)
+        ScanerGlobs._thread.start()
 
-        while ScanerGlobs.thread.is_alive():
+        while ScanerGlobs._thread.is_alive():
             cnf.root.update()
 
         if ScanerGlobs.update:
@@ -287,11 +431,17 @@ class FullScanThread(SysUtils):
         cnf.scan_status = False
 
 
-class FullScaner(SysUtils):
+class Scaner(SysUtils):
     def __init__(self):
         SetProgressbar().set(value=0)
 
+        if ScanerGlobs._task:
+            cnf.root.after_cancel(ScanerGlobs._task)
+
         if self.smb_check():
-            FullScanThread()
+            ScanerThread()
+
+        ScanerGlobs._task = cnf.root.after(
+            ms=cnf.scan_time_sec * 1000, func=__class__)
 
         SetProgressbar().set(value=1)

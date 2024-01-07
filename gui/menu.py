@@ -102,12 +102,8 @@ class Menu(CScroll):
                          corner_radius=0, width=cnf.menu_w,
                          scroll_color=cnf.sel_color_menu)
 
-        try:
-            self.__menu_frame = self.__load_menu_buttons()
-        except Exception:
-            self.print_err(write=True)
-
-        self.__menu_frame.pack(anchor="w", fill="x")
+        self.menu_frame = self.__load_menu_buttons()
+        self.menu_frame.pack(anchor="w", fill="x")
 
     def __load_menu_buttons(self):
         frame = CFrame(master=self, bg=cnf.bg_color_menu)
@@ -119,15 +115,17 @@ class Menu(CScroll):
                         anchor="w")
         title.pack(pady=(15,15), padx=10, anchor="w", fill="x")
 
-        colls_list = Dbase.conn.execute(
-            sqlalchemy.select(ThumbsMd.collection)
-            .distinct()
-            ).fetchall()
-        colls_list = (i[0] for i in colls_list)
+        colls_list = (i
+                      for i in os.listdir(cnf.coll_folder)
+                      if os.path.isdir(os.path.join(cnf.coll_folder, i)))
 
         menus = {coll.lstrip('0123456789').strip(): coll
                  for coll in colls_list
                  }
+        
+        a = {v for k, v in menus.items() if not k}
+
+        print(a)
 
         sort_keys = sorted(menus.keys())
 
@@ -166,9 +164,9 @@ class Menu(CScroll):
         return frame
 
     def reload_menu(self):
-        self.__menu_frame.destroy()
-        self.__menu_frame = self.__load_menu_buttons()
-        self.__menu_frame.pack(anchor="w", fill="x")
+        self.menu_frame.destroy()
+        self.menu_frame = self.__load_menu_buttons()
+        self.menu_frame.pack(anchor="w", fill="x")
     
     def show_coll(self, btn: CButton, collname: str):
         cnf.limit = 150

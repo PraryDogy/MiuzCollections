@@ -15,7 +15,7 @@ try:
 except ImportError:
     from typing import Literal
 
-from utils import FitImg, ResetDirStats, Scaner, SysUtils
+from utils import FitImg, SysUtils
 
 __all__ = ("ImgViewer",)
 
@@ -122,9 +122,8 @@ class ImgViewer(CWindow, SysUtils, FitImg):
         try:
             img = Image.open(self.__img_src)
         except FileNotFoundError:
-            ResetDirStats(src=self.__img_src)
-            Scaner()
-            return
+            self.print_err()
+
         img = ImageOps.exif_transpose(image=img)
         img = self.fit(img=img, w=cnf.imgview_g["w"], h=cnf.imgview_g["h"])
         if self.winfo_exists():
