@@ -39,8 +39,11 @@ class ContextUtils(SysUtils):
             coll_path = os.path.join(coll_parrent, filter)
         try:
             subprocess.check_output(["/usr/bin/open", coll_path])
-        except subprocess.CalledProcessError:
-            subprocess.check_output(["/usr/bin/open", coll_parrent])
+        except (subprocess.CalledProcessError, UnboundLocalError):
+            try:
+                subprocess.check_output(["/usr/bin/open", coll_parrent])
+            except UnboundLocalError:
+                subprocess.check_output(["/usr/bin/open", cnf.coll_folder])
 
     def reveal_coll(self, collname: str):
         if collname != cnf.all_colls:
@@ -170,8 +173,10 @@ class Menu(CScroll):
     def show_coll(self, btn: CButton, collname: str):
         cnf.limit = 150
 
-        if hasattr(self, "sel_btn"):
+        try:
             self.sel_btn.configure(fg_color=cnf.bg_color_menu)
+        except tkinter.TclError:
+            self.print_err()
 
         btn.configure(fg_color=cnf.sel_color_menu)
         self.sel_btn = btn
