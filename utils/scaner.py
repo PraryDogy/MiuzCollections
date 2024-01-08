@@ -81,17 +81,17 @@ class ScanImages:
                 self.upd_images[finder_src] = finder_stats
 
 
-class TrashRemover:
+class OldCollFolderRemover:
     def __init__(self):
-        coll = cnf.coll_folder + os.sep
+        coll_folder = cnf.coll_folder + os.sep
 
         q = (sqlalchemy.select(ThumbsMd.src)
-            .filter(ThumbsMd.src.not_like(f"%{coll}%")))
+            .filter(ThumbsMd.src.not_like(f"%{coll_folder}%")))
         trash_img = Dbase.conn.execute(q).first()
 
         if trash_img:
             q = (sqlalchemy.delete(ThumbsMd)
-                .filter(ThumbsMd.src.not_like(f"%{coll}%")))
+                .filter(ThumbsMd.src.not_like(f"%{coll_folder}%")))
             Dbase.conn.execute(q)
 
 
@@ -128,7 +128,7 @@ class DublicateRemover:
 class UpdateDb(ScanImages, SysUtils):
     def __init__(self):
         ScanImages.__init__(self)
-        TrashRemover()
+        OldCollFolderRemover()
         DublicateRemover()
         self.limit = 300
 
