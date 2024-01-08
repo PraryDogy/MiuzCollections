@@ -31,19 +31,19 @@ class ContextViewer(Context, SysUtils):
         self.imginfo(parrent=e.widget.winfo_toplevel(), img_src=img_src)
 
         self.sep()
-        self.reveal_jpg(img_src=img_src)
-        self.reveal_tiff(img_src=img_src)
-
-        self.sep()
-        self.copy_jpg_path(img_src=img_src)
-        self.copy_tiff_path(img_src=img_src)
-
-        self.sep()
         self.download_jpg(img_src=img_src)
+        self.download_fullsize(img_src=img_src)
+
+        self.sep()
         self.download_tiff(img_src=img_src)
 
         self.sep()
-        self.download_fullsize(img_src=img_src)
+        self.reveal_jpg(img_src=img_src)
+        self.reveal_tiff(img_src=img_src)
+
+        self.sep()  
+        self.copy_jpg_path(img_src=img_src)
+        self.copy_tiff_path(img_src=img_src)
 
         self.do_popup(e=e)
 
