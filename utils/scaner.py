@@ -17,11 +17,12 @@ __all__ = ("FullScaner", "ScanerGlobs", )
 class ScanerGlobs:
     thread = threading.Thread(target=None)
     update = False
+    task = False
 
 
 class SetProgressbar:
     def onestep(self):
-        cnf.progressbar_var.set(value=cnf.progressbar_var.get() + 0.12)
+        cnf.progressbar_var.set(value=cnf.progressbar_var.get() + 0.25)
 
     def set(self, value):
         cnf.progressbar_var.set(value=value)
@@ -240,5 +241,10 @@ class FullScaner(SysUtils):
 
         if self.smb_check():
             FullScanThread()
+
+        else:
+            if ScanerGlobs.task:
+                cnf.root.after_cancel(ScanerGlobs.task)
+            ScanerGlobs.task = cnf.root.after(ms=10000, func=__class__)
 
         SetProgressbar().set(value=1)

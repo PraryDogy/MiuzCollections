@@ -112,20 +112,22 @@ class Handler(FileSystemEventHandler):
 
 
 class WatcherBase:
+    observer = None
+
     def __init__(self):
-        observer = Observer()
-        observer.schedule(Handler(), path=cnf.coll_folder, recursive=True)
-        observer.start()
+        __class__.observer = Observer()
+        __class__.observer.schedule(Handler(), path=cnf.coll_folder, recursive=True)
+        __class__.observer.start()
 
         try:
             while True:
                 time.sleep(1)
         except KeyboardInterrupt:
-            observer.stop()
-        observer.join()
+            __class__.observer.stop()
+        __class__.observer.join()
 
 
-class Watcher:
+class Watcher(WatcherBase):
     def __init__(self):
         WaitScaner()
         t1 = threading.Thread(target=WatcherBase, daemon=True)
