@@ -48,6 +48,7 @@ class ReloadGui:
         cnf.reload_menu()
         cnf.reload_thumbs()
 
+
 class Exts:
     lst = (".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG")
 
