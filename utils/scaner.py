@@ -128,8 +128,6 @@ class DublicateRemover:
 class UpdateDb(ScanImages, SysUtils):
     def __init__(self):
         ScanImages.__init__(self)
-        OldCollFolderRemover()
-        DublicateRemover()
         self.limit = 300
 
         if self.new_images:
@@ -146,6 +144,9 @@ class UpdateDb(ScanImages, SysUtils):
             self.delete_images_db()
 
         SetProgressbar().onestep()
+
+        OldCollFolderRemover()
+        DublicateRemover()
 
     def new_images_db(self):
         values = []
