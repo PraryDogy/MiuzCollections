@@ -22,6 +22,8 @@ class WatcherTask:
 
 class WaitScaner:
     def __init__(self):
+        print("don't wait scaner")
+        return
         while ScanerGlobs.thread.is_alive():
             cnf.root.update()
 
