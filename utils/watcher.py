@@ -16,6 +16,10 @@ from .system import CreateThumb, SysUtils
 __all__ = ("Watcher", )
 
 
+class WatcherTask:
+    task = False
+
+
 class WaitScaner:
     def __init__(self):
         while ScanerGlobs.thread.is_alive():
@@ -127,8 +131,13 @@ class WatcherBase:
         __class__.observer.join()
 
 
-class Watcher(WatcherBase):
+class Watcher(WatcherBase, SysUtils):
     def __init__(self):
-        WaitScaner()
-        t1 = threading.Thread(target=WatcherBase, daemon=True)
-        t1.start()
+        if self.smb_check():
+            WaitScaner()
+            t1 = threading.Thread(target=WatcherBase, daemon=True)
+            t1.start()
+        else:
+            if WatcherTask.task:
+                cnf.root.after_cancel(WatcherTask.task)
+            WatcherTask.task = cnf.root.after(ms=12000, func=__class__)
