@@ -159,10 +159,6 @@ class Menu(CScroll):
             self.sel_btn = last
             cnf.curr_coll == cnf.all_colls
 
-            print("ypu here")
-
-        print("load menu")
-
         return frame
 
     def reload_menu(self):

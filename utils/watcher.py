@@ -63,6 +63,13 @@ class DeletedFile:
         Dbase.conn.execute(q)
 
 
+class DeleteDir:
+    def __init__(self, src: str):
+        q = (sqlalchemy.delete(ThumbsMd)
+             .filter(ThumbsMd.src.like(f"%{src}%")))
+        Dbase.conn.execute(q)
+
+
 class NewFile(SysUtils):
     def __init__(self, src: str):
         q = (sqlalchemy.insert(ThumbsMd)
@@ -92,6 +99,9 @@ class Handler(FileSystemEventHandler):
             if event.src_path.endswith(Exts.lst):
                 DeletedFile(src=event.src_path)
                 ReloadGui()
+        else:
+            DeleteDir(src=event.src_path)
+            ReloadGui()
 
     def on_moved(self, event):
         WaitScaner()
