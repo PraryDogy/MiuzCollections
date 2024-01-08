@@ -10,6 +10,7 @@ except ImportError:
 
 import io
 import traceback
+from pathlib import Path
 
 from PIL import Image, ImageOps
 
@@ -74,14 +75,15 @@ class SysUtils:
         return img.crop((left, top, right, bottom))
     
 
-class CreateThumb(io.BytesIO):
+class CreateThumb(io.BytesIO,  SysUtils):
     def __init__(self, src: str):
         self.ww = 150
         io.BytesIO.__init__(self)
 
         try:
             img = Image.open(src)
-        except Exception:
+        except Exception as e:
+            self.print_err()
             img = Image.open(cnf.thumb_err)
 
         img = ImageOps.exif_transpose(image=img)

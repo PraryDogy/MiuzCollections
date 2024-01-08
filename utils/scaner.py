@@ -7,7 +7,7 @@ import sqlalchemy
 from PIL import Image, ImageOps
 
 from cfg import cnf
-from database import CollMd, Dbase, DirsMd, ThumbsMd
+from database import Dbase, ThumbsMd
 
 from .system import CreateThumb, SysUtils
 
@@ -93,21 +93,6 @@ class TrashRemover:
                 .filter(ThumbsMd.src.not_like(f"%{coll}%")))
             Dbase.conn.execute(q)
 
-        q = (sqlalchemy.select(DirsMd.dirname)
-            .filter(DirsMd.dirname.not_like(f"%{coll}%")))
-        trash_dir = Dbase.conn.execute(q).first()
-
-        if trash_dir:
-            q = (sqlalchemy.delete(DirsMd)
-                .filter(DirsMd.dirname.not_like(f"%{coll}%")))
-            Dbase.conn.execute(q)
-
-        q = sqlalchemy.select(CollMd).filter(CollMd.name!=cnf.coll_folder)
-        trash_main = Dbase.conn.execute(q).first()
-
-        if trash_main:
-            q = sqlalchemy.delete(CollMd).filter(CollMd.name!=cnf.coll_folder)
-            Dbase.conn.execute(q)
 
         SetProgressbar().onestep()
 
@@ -132,44 +117,6 @@ class UpdateDb(ScanImages, SysUtils, TrashRemover):
             self.delete_images_db()
 
         SetProgressbar().onestep()
-
-    def new_dirs_db(self):
-        insert_values = [
-            {"b_dirname": dirname, "b_stats": ",".join(str(i) for i in stats)}
-             for dirname, stats in self.new_dirs.items()]
-
-        insert_dirs = (
-            sqlalchemy.insert(DirsMd)
-            .values({"dirname": sqlalchemy.bindparam("b_dirname"),
-                     "stats": sqlalchemy.bindparam("b_stats")})
-                     )
-
-        Dbase.conn.execute(insert_dirs, insert_values)
-
-    def update_dirs_db(self):
-        update_values = [
-            {"b_dirname": dirname, "b_stats": ",".join(str(i) for i in stats)}
-            for dirname, stats in self.upd_dirs.items()]
-        
-        update_dirs = (
-            sqlalchemy.update(DirsMd)
-            .filter(DirsMd.dirname == sqlalchemy.bindparam("b_dirname"))
-            .values({"stats": sqlalchemy.bindparam("b_stats")})
-            )
-             
-        Dbase.conn.execute(update_dirs, update_values)
-
-    def delete_dirs_db(self):
-        delete_values = [
-            {"b_dirname": dirname}
-            for dirname, stats in self.del_dirs.items()]
-        
-        delete_dirs = (
-            sqlalchemy.delete(DirsMd)
-            .filter(DirsMd.dirname == sqlalchemy.bindparam("b_dirname"))
-            )
-        
-        Dbase.conn.execute(delete_dirs, delete_values)
 
     def new_images_db(self):
         values = []

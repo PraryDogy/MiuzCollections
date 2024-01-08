@@ -1,6 +1,7 @@
 import os
 import threading
 import time
+from time import sleep
 
 import sqlalchemy
 from watchdog.events import FileSystemEventHandler
@@ -21,15 +22,30 @@ class WaitScaner:
             cnf.root.update()
 
 
+class WaitWriteFinish:
+    value = 0.1
+
+    def __init__(self, src: str):
+        last_size, size = -1, 0
+        while size != last_size:
+            sleep(__class__.value)
+            last_size, size = size, os.stat(src).st_size
+
+
 class ReloadGui:
+    task = False
+
     def __init__(self) -> None:
+        if __class__.task:
+            cnf.root.after_cancel(id=__class__.task)
+        __class__.task = cnf.root.after(ms=2000, func=self.start)
+
+    def start(self):
         cnf.reload_menu()
         cnf.reload_thumbs()
 
-
 class Exts:
     lst = (".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG")
-
 
 
 class MovedFile:
@@ -37,7 +53,6 @@ class MovedFile:
         q = (sqlalchemy.update(ThumbsMd)
              .filter(ThumbsMd.src==src)
              .values({"src": dest}))
-        
         Dbase.conn.execute(q)
 
 
@@ -50,17 +65,12 @@ class DeletedFile:
 
 class NewFile(SysUtils):
     def __init__(self, src: str):
-        thumb = CreateThumb(src=src).getvalue()
-        size = int(os.path.getsize(filename=src))
-        birth = int(os.stat(path=src).st_birthtime)
-        mod = int(os.stat(path=src).st_mtime)
-
         q = (sqlalchemy.insert(ThumbsMd)
-             .values({"img150": thumb,
+             .values({"img150": CreateThumb(src=src).getvalue(),
                       "src": src,
-                      "size": size,
-                      "created": birth,
-                      "modified": mod,
+                      "size": int(os.path.getsize(filename=src)),
+                      "created": int(os.stat(path=src).st_birthtime),
+                      "modified": int(os.stat(path=src).st_mtime),
                       "collection": self.get_coll_name(src=src)}))
 
         Dbase.conn.execute(q)
@@ -69,28 +79,26 @@ class NewFile(SysUtils):
 class Handler(FileSystemEventHandler):
     def on_created(self, event):
         WaitScaner()
+        WaitWriteFinish(src=event.src_path)
+
         if not event.is_directory:
             if event.src_path.endswith(Exts.lst):
-                NewFile(src=event.src_path.strip())
-                print("done")
-                cnf.root.after(ms=100, func=ReloadGui)
+                NewFile(src=event.src_path)
+                ReloadGui()
 
     def on_deleted(self, event):
         WaitScaner()
         if not event.is_directory:
             if event.src_path.endswith(Exts.lst):
-                DeletedFile(src=event.src_path.strip())
-                print("done")
-                cnf.root.after(ms=100, func=ReloadGui)
+                DeletedFile(src=event.src_path)
+                ReloadGui()
 
     def on_moved(self, event):
         WaitScaner()
         if not event.is_directory:
             if event.src_path.endswith(Exts.lst):
-                MovedFile(src=event.src_path.strip(),
-                          dest=event.dest_path.strip())
-                print("done")
-                cnf.root.after(ms=100, func=ReloadGui)
+                MovedFile(src=event.src_path, dest=event.dest_path)
+                ReloadGui()
 
 
 class WatcherBase:

@@ -217,7 +217,7 @@ class NoImages(CFrame):
             no_images.configure(text=noimg_t)
             ResetDatesBtn(master=self).pack(pady=(15, 0))
 
-        else:
+        elif any((i for i in cnf.filter_values.values())):
             filters = (f"\"{cnf.lng.filter_names[k].lower()}\""
                        for k, v in cnf.filter_values.items()
                        if v)
@@ -225,7 +225,9 @@ class NoImages(CFrame):
             noimg_t = (f"{cnf.lng.no_photo_filter}\n{filters}")
             no_images.configure(text=noimg_t)
             ResetFiltersBtn(master=self).pack(pady=(15, 0))
-
+        
+        else:
+            ResetFiltersBtn(master=self).pack(pady=(15, 0))
 
 class AboveThumbs(CFrame):
     def __init__(self, master: tkinter):

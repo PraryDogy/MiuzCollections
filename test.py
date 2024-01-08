@@ -1,13 +1,11 @@
-import os
+from database import ThumbsMd, Dbase
+import sqlalchemy
 
 
-cll = "/Volumes/Untitled/_Collections 3"
-
-colls = (os.path.join(cll, i)
-         for i in os.listdir(cll)
-         if os.path.isdir(os.path.join(cll, i))
-         )
 
 
-for i in colls:
-    print(i)
+q = sqlalchemy.select(ThumbsMd.collection).distinct()
+res = Dbase.conn.execute(q).fetchall()
+res = (i[0] for i in res)
+
+print(res)

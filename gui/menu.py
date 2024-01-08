@@ -115,18 +115,15 @@ class Menu(CScroll):
                         anchor="w")
         title.pack(pady=(15,15), padx=10, anchor="w", fill="x")
 
-        colls_list = (i
-                      for i in os.listdir(cnf.coll_folder)
-                      if os.path.isdir(os.path.join(cnf.coll_folder, i)))
+        menus = {}
 
-        menus = {coll.lstrip('0123456789').strip(): coll
-                 for coll in colls_list
-                 }
+        q = sqlalchemy.select(ThumbsMd.collection).distinct()
+
+        for i in Dbase.conn.execute(q).fetchall():
+            fakename = i[0].lstrip("0123456789").strip()
+            fakename = fakename if fakename else i[0]
+            menus[fakename] = i[0]
         
-        a = {v for k, v in menus.items() if not k}
-
-        print(a)
-
         sort_keys = sorted(menus.keys())
 
         menus = {fake_name: menus[fake_name]
@@ -157,14 +154,20 @@ class Menu(CScroll):
                 btn.configure(fg_color=cnf.sel_color_menu)
                 self.sel_btn = btn
     
-        if cnf.curr_coll == cnf.all_colls:
+        if cnf.curr_coll == cnf.all_colls or not hasattr(self, "sel_btn"):
             last.configure(fg_color=cnf.sel_color_menu)
             self.sel_btn = last
+            cnf.curr_coll == cnf.all_colls
+
+            print("ypu here")
+
+        print("load menu")
 
         return frame
 
     def reload_menu(self):
         self.menu_frame.destroy()
+        delattr(self, "sel_btn")
         self.menu_frame = self.__load_menu_buttons()
         self.menu_frame.pack(anchor="w", fill="x")
     
@@ -174,7 +177,8 @@ class Menu(CScroll):
         try:
             self.sel_btn.configure(fg_color=cnf.bg_color_menu)
         except tkinter.TclError:
-            self.print_err()
+            # self.print_err()
+            print("menu > show_coll error")
 
         btn.configure(fg_color=cnf.sel_color_menu)
         self.sel_btn = btn
