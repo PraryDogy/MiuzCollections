@@ -86,9 +86,9 @@ class ContextMenu(ContextMenuBase):
         self.show_coll(e=e, btn=btn, collname=collname)
 
         self.sep()
-
         self.reveal_coll_context(collname=collname)
 
+        self.sep()
         for k, v in cnf.filter_true_names.items():
             self.reveal_coll_filtered(collname=collname, filter=v,
                                       label=cnf.lng.filter_names[k])

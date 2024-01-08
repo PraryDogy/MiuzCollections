@@ -77,9 +77,6 @@ class User:
         self.curr_coll = "None"
         self.user_lng = "None"
 
-        self.set_scantime_value = True
-        self.scan_time_sec = 60 # in seconds
-
         self.zoom = False
 
         self.root_g = {"w": 700, "h": 500, "x": 100, "y": 100}
@@ -187,10 +184,6 @@ class Config(ConfigGui, User):
         if not os.path.exists(path=self.db_dir):
             shutil.copyfile(src=self.db_name, dst=self.db_dir)
 
-    def set_scantime(self):
-        if self.set_scantime_value:
-            self.scan_time_sec = 15
-
     def __fix_dict(self, namedict: str, userdict: dict):
         cnf_dict: dict = getattr(self, namedict)
 
@@ -206,5 +199,4 @@ class Config(ConfigGui, User):
 cnf = Config()
 cnf.check_dir()
 cnf.load_cfg()
-cnf.set_scantime()
 cnf.write_cfg()
