@@ -113,14 +113,6 @@
         "Конец",
         "End"
     ],
-    "preparing": [
-        "Подготовка",
-        "Preparing"
-    ],
-    "scaning": [
-        "Сканирую",
-        "Scaning"
-    ],
     "copying": [
         "Копирую",
         "Copying"
@@ -128,14 +120,6 @@
     "from_pretext": [
         "из",
         "from"
-    ],
-    "added": [
-        "Добавлено",
-        "Added"
-    ],
-    "finishing": [
-        "Завершаю",
-        "Finishing"
     ],
     "copy": [
         "Копировать",
@@ -213,10 +197,6 @@
         "Копировать путь к jpg",
         "Copy jpg location"
     ],
-    "reveal_coll": [
-        "Открыть папку",
-        "Reveal collection"
-    ],
     "colls_path": [
         "Расположение коллекций",
         "Collections location"
@@ -292,14 +272,6 @@
     "no_photo_filter": [
         "Нет фотографий в категории",
         "No photos in cathegory"
-    ],
-    "colls_case": [
-        "коллекций",
-        "collections"
-    ],
-    "new_photo_case": [
-        "новых фото",
-        "new_photos"
     ],
     "calendar_days": [
         [
@@ -389,8 +361,12 @@
         "Поиск новых фотографий.\nСкорость зависит от сетевого диска.",
         "Searching for new photos.\nSearch speed depends on the network drive."
     ],
-    "open": [
-        "Открыть",
-        "Open"
+    "reveal": [
+        "Показать",
+        "Reveal"
+    ],
+    "in_finder": [
+        "в Finder",
+        "in Finder"
     ]
 }

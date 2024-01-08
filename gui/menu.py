@@ -69,13 +69,13 @@ class ContextMenuBase(Context, ContextUtils):
 
     def reveal_coll_context(self, collname: str):
         self.add_command(
-            label=cnf.lng.reveal_coll,
+            label=f"{cnf.lng.reveal} \"{collname}\" {cnf.lng.in_finder}",
             command=lambda:
             self.reveal_coll(collname=collname))
 
     def reveal_coll_filtered(self, collname: str, label: str, filter: str):
         self.add_command(
-            label=f"{cnf.lng.open} {label.lower()}",
+            label=f"{label}: {cnf.lng.reveal.lower()} {cnf.lng.in_finder}",
             command=lambda:
             self.reveal_coll_filtered_cmd(collname=collname, filter=filter))
 
