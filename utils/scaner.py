@@ -21,11 +21,14 @@ class ScanerGlobs:
 
 
 class SetProgressbar:
-    def onestep(self):
-        cnf.progressbar_var.set(value=cnf.progressbar_var.get() + 0.25)
+    def onestep(self, value=0.1):
+        cnf.progressbar_var.set(value=cnf.progressbar_var.get() + value)
 
-    def set(self, value):
-        cnf.progressbar_var.set(value=value)
+    def to_start(self):
+        cnf.progressbar_var.set(value=0.0)
+
+    def to_end(self):
+        cnf.progressbar_var.set(value=1.0)
 
 
 class ScanImages:
@@ -64,7 +67,10 @@ class ScanImages:
                 continue
             collections.append(collection)
 
+        steps_count = 0.5 / len(collections)
+
         for collection_walk in collections:
+            SetProgressbar().onestep(value=steps_count)
             for root, dirs, files in os.walk(top=collection_walk):
                 for file in files:
 
@@ -277,17 +283,17 @@ class FullScanThread(SysUtils):
 
 class FullScaner(SysUtils):
     def __init__(self):
-        SetProgressbar().set(value=0)
+        SetProgressbar().to_start()
 
         if self.smb_check():
             FullScanThread()
             if ScanerGlobs.task:
                 cnf.root.after_cancel(ScanerGlobs.task)
-            ScanerGlobs.task = cnf.root.after(ms=3600000, func=__class__)
+            ScanerGlobs.task = cnf.root.after(ms=10000, func=__class__)
 
         else:
             if ScanerGlobs.task:
                 cnf.root.after_cancel(ScanerGlobs.task)
             ScanerGlobs.task = cnf.root.after(ms=10000, func=__class__)
 
-        SetProgressbar().set(value=1)
+        SetProgressbar().to_end()
