@@ -70,9 +70,15 @@ class ScanerGui(CWindow, SysUtils):
 
     def prog_callback(self, *args):
         if cnf.progressbar_var.get() >= 0.9:
-            self.can_btn.configure(state="disabled")
+            try:
+                self.can_btn.configure(state="disabled")
+            except tkinter.TclError:
+                pass
             self.progressbar.configure(progress_color=Colors.prog_color)
 
         if cnf.progressbar_var.get() < 0.9:
-            self.can_btn.configure(state="normal")
+            try:
+                self.can_btn.configure(state="normal")
+            except tkinter.TclError:
+                pass
             self.progressbar.configure(progress_color=cnf.blue_color)

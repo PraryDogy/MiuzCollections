@@ -12,6 +12,8 @@ from database import Dbase, ThumbsMd
 
 from .scaner import ScanerGlobs
 from .system import CreateThumb, SysUtils
+from PIL import Image
+
 
 __all__ = ("Watcher", )
 
@@ -22,7 +24,6 @@ class WatcherTask:
 
 class WaitScaner:
     def __init__(self):
-        print("don't wait scaner")
         return
         while ScanerGlobs.thread.is_alive():
             cnf.root.update()
@@ -32,10 +33,15 @@ class WaitWriteFinish:
     value = 0.1
 
     def __init__(self, src: str):
-        last_size, size = -1, 0
-        while size != last_size:
-            sleep(__class__.value)
-            last_size, size = size, os.stat(src).st_size
+        file = None
+
+        while not file:
+            try:
+                file = Image.open(src)
+            except Exception:
+                file = None
+                sleep(__class__.value)
+                continue
 
 
 class ReloadGui:
@@ -93,10 +99,9 @@ class NewFile(SysUtils):
 class Handler(FileSystemEventHandler):
     def on_created(self, event):
         WaitScaner()
-        WaitWriteFinish(src=event.src_path)
-
         if not event.is_directory:
             if event.src_path.endswith(Exts.lst):
+                WaitWriteFinish(src=event.src_path)
                 NewFile(src=event.src_path)
                 ReloadGui()
 

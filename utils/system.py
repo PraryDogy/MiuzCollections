@@ -84,6 +84,7 @@ class CreateThumb(io.BytesIO,  SysUtils):
             img = Image.open(src)
         except Exception as e:
             # self.print_err()
+            print(e)
             print("utils > system > CreateThumb error. Replaced with def. thumb")
             img = Image.open(cnf.thumb_err)
 
