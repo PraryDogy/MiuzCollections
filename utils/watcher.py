@@ -4,16 +4,15 @@ import time
 from time import sleep
 
 import sqlalchemy
+from PIL import Image
 from watchdog.events import FileSystemEventHandler
-from watchdog.observers import Observer
+from watchdog.observers.polling import PollingObserver
 
 from cfg import cnf
 from database import Dbase, ThumbsMd
 
 from .scaner import ScanerGlobs
 from .system import CreateThumb, SysUtils
-from PIL import Image
-
 
 __all__ = ("Watcher", )
 
@@ -128,8 +127,9 @@ class WatcherBase:
     observer = None
 
     def __init__(self):
-        __class__.observer = Observer()
-        __class__.observer.schedule(Handler(), path=cnf.coll_folder, recursive=True)
+        __class__.observer = PollingObserver()
+        __class__.observer.schedule(Handler(), path=cnf.coll_folder,
+                                    recursive=True)
         __class__.observer.start()
 
         try:
