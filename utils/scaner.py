@@ -289,7 +289,7 @@ class FullScaner(SysUtils):
             FullScanThread()
             if ScanerGlobs.task:
                 cnf.root.after_cancel(ScanerGlobs.task)
-            ScanerGlobs.task = cnf.root.after(ms=10000, func=__class__)
+            ScanerGlobs.task = cnf.root.after(ms=3600000, func=__class__)
 
         else:
             if ScanerGlobs.task:
