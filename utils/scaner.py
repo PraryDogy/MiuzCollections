@@ -38,11 +38,11 @@ class ScanImages:
         self.finder_images = {}
 
         self.get_db_images()
+        SetProgressbar().onestep()
         self.get_finder_images()
         self.compare_images()
 
         ScanerGlobs.update = True
-        SetProgressbar().onestep()
 
     def get_db_images(self) -> dict[Literal["img path: list of ints"]]:
         q = sqlalchemy.select(ThumbsMd.src, ThumbsMd.size, ThumbsMd.created,
@@ -54,18 +54,29 @@ class ScanImages:
     def get_finder_images(self) -> dict[Literal["img path: list of ints"]]:
         exts = (".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG")
 
-        for root, dirs, files in os.walk(top=cnf.coll_folder):
-            for file in files:
+        collections = []
 
-                if not cnf.scan_status:
-                    raise Exception("\n\nScaner stopped by scan_status")
+        for i in os.listdir(cnf.coll_folder):
+            collection = os.path.join(cnf.coll_folder, i)
+            if not os.path.isdir(collection):
+                continue
+            if i.startswith("_"):
+                continue
+            collections.append(collection)
 
-                if file.endswith(exts):
-                    src = os.path.join(root, file)
-                    self.finder_images[src] = (
-                        int(os.path.getsize(filename=src)),
-                        int(os.stat(path=src).st_birthtime),
-                        int(os.stat(path=src).st_mtime))
+        for collection_walk in collections:
+            for root, dirs, files in os.walk(top=collection_walk):
+                for file in files:
+
+                    if not cnf.scan_status:
+                        raise Exception("\n\nScaner stopped by scan_status")
+
+                    if file.endswith(exts):
+                        src = os.path.join(root, file)
+                        self.finder_images[src] = (
+                            int(os.path.getsize(filename=src)),
+                            int(os.stat(path=src).st_birthtime),
+                            int(os.stat(path=src).st_mtime))
 
     def compare_images(self):
         for db_src, db_stats in self.db_images.items():
@@ -270,6 +281,9 @@ class FullScaner(SysUtils):
 
         if self.smb_check():
             FullScanThread()
+            if ScanerGlobs.task:
+                cnf.root.after_cancel(ScanerGlobs.task)
+            ScanerGlobs.task = cnf.root.after(ms=3600000, func=__class__)
 
         else:
             if ScanerGlobs.task:

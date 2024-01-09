@@ -10,6 +10,10 @@ from .widgets import *
 __all__ = ("ScanerGui", )
 
 
+class Trace:
+    trace = None
+
+
 class Win:
     win: CWindow = False
 
@@ -22,6 +26,7 @@ class ScanerGui(CWindow, SysUtils):
     def __init__(self):
         w, h = 300, 150
         if Win.win:
+            cnf.progressbar_var.trace_remove(mode="read", cbname=Trace.trace)
             Win.win.destroy()
             Win.win = False
 
@@ -54,7 +59,7 @@ class ScanerGui(CWindow, SysUtils):
 
         self.prog_callback()
 
-        self.tra = cnf.progressbar_var.trace_add(
+        Trace.trace = cnf.progressbar_var.trace_add(
             mode="read", callback=self.prog_callback)
 
     def cancel_scan(self, e: tkinter.Event = None):
@@ -63,7 +68,7 @@ class ScanerGui(CWindow, SysUtils):
         self.prog_callback()
 
     def close_scangui(self, e: tkinter.Event = None):
-        cnf.progressbar_var.trace_remove(mode="read", cbname=self.tra)
+        cnf.progressbar_var.trace_remove(mode="read", cbname=Trace.trace)
         self.destroy()
         cnf.root.focus_force()
         Win.win = False
@@ -72,13 +77,13 @@ class ScanerGui(CWindow, SysUtils):
         if cnf.progressbar_var.get() >= 0.9:
             try:
                 self.can_btn.configure(state="disabled")
+                self.progressbar.configure(progress_color=Colors.prog_color)
             except tkinter.TclError:
                 pass
-            self.progressbar.configure(progress_color=Colors.prog_color)
 
         if cnf.progressbar_var.get() < 0.9:
             try:
                 self.can_btn.configure(state="normal")
+                self.progressbar.configure(progress_color=cnf.blue_color)
             except tkinter.TclError:
                 pass
-            self.progressbar.configure(progress_color=cnf.blue_color)
