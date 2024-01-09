@@ -38,6 +38,7 @@ class WaitWriteFinish:
         while not file:
             try:
                 file = Image.open(src)
+                file.close()
             except Exception:
                 file = None
                 sleep(__class__.value)
