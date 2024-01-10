@@ -41,7 +41,6 @@ class ScanImages:
         self.finder_images = {}
 
         self.get_db_images()
-        SetProgressbar().onestep()
         self.get_finder_images()
         self.compare_images()
 
@@ -67,7 +66,7 @@ class ScanImages:
                 continue
             collections.append(collection)
 
-        steps_count = 0.5 / len(collections)
+        steps_count = 0.8 / len(collections)
 
         for collection_walk in collections:
             SetProgressbar().onestep(value=steps_count)
@@ -112,9 +111,6 @@ class OldCollFolderRemover:
             Dbase.conn.execute(q)
 
 
-        SetProgressbar().onestep()
-
-
 class DublicateRemover:
     def __init__(self):
         q = sqlalchemy.select(ThumbsMd.id, ThumbsMd.src)
@@ -149,8 +145,6 @@ class UpdateDb(ScanImages, SysUtils):
 
         if self.new_images:
             self.new_images_db()
-
-        SetProgressbar().onestep()
 
         if self.upd_images:
             self.update_images_db()
@@ -262,11 +256,13 @@ class FullScanThread(SysUtils):
 
         cnf.stbar_btn().configure(text=cnf.lng.updating, fg_color=cnf.blue_color)
         cnf.scan_status = True
+        SetProgressbar().to_start()
         ScanerGlobs.thread = threading.Thread(target=UpdateDb, daemon=True)
         ScanerGlobs.thread.start()
 
         while ScanerGlobs.thread.is_alive():
             cnf.root.update()
+        SetProgressbar().to_end()
 
         if ScanerGlobs.update:
             cnf.reload_thumbs()
@@ -283,7 +279,6 @@ class FullScanThread(SysUtils):
 
 class FullScaner(SysUtils):
     def __init__(self):
-        SetProgressbar().to_start()
 
         if self.smb_check():
             FullScanThread()
@@ -296,4 +291,3 @@ class FullScaner(SysUtils):
                 cnf.root.after_cancel(ScanerGlobs.task)
             ScanerGlobs.task = cnf.root.after(ms=10000, func=__class__)
 
-        SetProgressbar().to_end()

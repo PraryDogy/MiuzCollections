@@ -222,7 +222,7 @@ class Settings(CWindow, SysUtils):
 
             Watcher.observer.stop()
             cnf.root.after(ms=500, func=FullScaner)
-            cnf.root.after(ms=600, func=Watcher)
+            cnf.root.after(ms=500, func=Watcher)
 
         cnf.write_cfg()
 

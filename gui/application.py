@@ -61,7 +61,7 @@ class Application(SysUtils):
             SmbAlert()
 
         cnf.root.after(ms=100, func=FullScaner)
-        cnf.root.after(ms=200, func=Watcher)
+        cnf.root.after(ms=100, func=Watcher)
 
     def minimize(self, e: tkinter.Event):
         if e.char == "w":
