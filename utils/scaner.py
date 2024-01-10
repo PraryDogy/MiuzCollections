@@ -254,7 +254,7 @@ class FullScanThread(SysUtils):
         while ScanerGlobs.thread.is_alive():
             cnf.root.update()
 
-        cnf.stbar_btn().configure(fg_color=cnf.blue_color)
+        cnf.stbar_btn().configure(fg_color=cnf.blue_color, text=cnf.lng.updating)
         cnf.scan_status = True
         SetProgressbar().to_start()
         ScanerGlobs.thread = threading.Thread(target=UpdateDb, daemon=True)
@@ -273,7 +273,7 @@ class FullScanThread(SysUtils):
                 print(self.print_err())
             ScanerGlobs.update = False
 
-        cnf.stbar_btn().configure(fg_color=cnf.btn_color)
+        cnf.stbar_btn().configure(fg_color=cnf.bg_color, text=cnf.lng.update)
         cnf.scan_status = False
 
 
