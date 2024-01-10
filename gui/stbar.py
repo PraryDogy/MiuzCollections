@@ -28,10 +28,10 @@ class StBar(CFrame, SysUtils):
         btn.cmd(lambda e: self.__open_settings(btn))
         btn.pack(side="left", padx=(0, 20))
 
-        self.stbar_btn = CButton(master=frame, text=cnf.lng.update,
-                                 width=80, height=30, fg_color=cnf.bg_color)
-        self.stbar_btn.cmd(self.__stbar_run_scan)
-        self.stbar_btn.pack(side="left")
+        self.updating_btn = CButton(master=frame, text=cnf.lng.update,
+                                 width=80, fg_color=cnf.bg_color)
+        self.updating_btn.cmd(self.__stbar_run_scan)
+        self.updating_btn.pack(side="left")
 
         CLabel(master=frame).pack(fill="x", side="left", expand=1)
 

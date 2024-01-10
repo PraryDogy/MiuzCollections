@@ -67,7 +67,7 @@ class ConfigGui:
 
     def stbar_btn(self) -> Literal["type: gui > widgets > CButton"]:
         from gui import app
-        return app.stbar.stbar_btn
+        return app.stbar.updating_btn
 
 
 class User:
