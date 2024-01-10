@@ -74,8 +74,7 @@ class ScanerGui(CWindow, SysUtils):
         Win.win = False
 
     def prog_callback(self, *args):
-        print(cnf.progressbar_var.get())
-        if cnf.progressbar_var.get() > 0.88:
+        if cnf.progressbar_var.get() > 0.85:
             try:
                 self.can_btn.configure(state="disabled")
                 self.progressbar.configure(progress_color=Colors.prog_color)

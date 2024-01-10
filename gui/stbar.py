@@ -23,11 +23,11 @@ class StBar(CFrame, SysUtils):
 
         CLabel(master=frame).pack(fill="x", side="left", expand=1)
 
-        btn = CButton(master=frame, text=cnf.lng.settings, width=100)
+        btn = CButton(master=frame, text="⚙", width=80)
         btn.cmd(lambda e: self.__open_settings(btn))
         btn.pack(side="left", padx=(0, 20))
 
-        self.stbar_btn = CButton(master=frame, text=cnf.lng.update, width=100)
+        self.stbar_btn = CButton(master=frame, text="↺", width=80)
         if cnf.scan_status:
             self.stbar_btn.configure(text=cnf.lng.updating, fg_color=cnf.blue_color)
         self.stbar_btn.cmd(self.__stbar_run_scan)
@@ -37,8 +37,8 @@ class StBar(CFrame, SysUtils):
 
         default, zoomed = "᎒᎒᎒", "⋮⋮⋮"
         self.grid = CButton(master=frame, text=zoomed if cnf.zoom else default,
-                            fg_color=cnf.bg_color)
-        self.grid.pack(side="right", anchor="w")
+                            width=50, fg_color=cnf.bg_color)
+        self.grid.pack(side="right", anchor="w", padx=(0, 15))
         self.grid.cmd(lambda e: self.grid_cmd())
 
         return frame
