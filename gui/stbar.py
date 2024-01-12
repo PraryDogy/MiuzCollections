@@ -31,7 +31,7 @@ class StBar(CFrame, SysUtils):
         self.sett_btn = CButton(master=frame, text=cnf.lng.settings,
                       width=90, fg_color=cnf.bg_color)
         self.sett_btn.cmd(self.__open_settings)
-        self.sett_btn.pack(side="left", padx=(0, 20))
+        self.sett_btn.pack(side="left", padx=(0, 5))
 
         if Trace.settings:
             cnf.settings_var.trace_remove(mode="read", cbname=Trace.settings)

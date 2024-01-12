@@ -156,9 +156,9 @@ class Settings(CWindow, SysUtils):
             Win.win = False
             SettingsVar().set(value=0)
 
+        SettingsVar().set(value=1)
         CWindow.__init__(self)
         Win.win = self
-        SettingsVar().set(value=1)
 
         self.protocol(name="WM_DELETE_WINDOW", func=self.__close_sett)
         self.bind(sequence="<Escape>", func=self.__close_sett)
