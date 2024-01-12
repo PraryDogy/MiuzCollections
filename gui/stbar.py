@@ -11,6 +11,11 @@ from .widgets import *
 __all__ = ("StBar",)
 
 
+class Trace:
+    settings = None
+
+
+
 class StBar(CFrame, SysUtils):
     def __init__(self, master: tkinter):
         CFrame.__init__(self, master=master)
@@ -23,13 +28,18 @@ class StBar(CFrame, SysUtils):
 
         CLabel(master=frame).pack(fill="x", side="left", expand=1)
 
-        btn = CButton(master=frame, text=cnf.lng.settings, width=80,
-                      fg_color=cnf.bg_color)
-        btn.cmd(lambda e: self.__open_settings(btn))
-        btn.pack(side="left", padx=(0, 20))
+        self.sett_btn = CButton(master=frame, text=cnf.lng.settings,
+                      width=90, fg_color=cnf.bg_color)
+        self.sett_btn.cmd(self.__open_settings)
+        self.sett_btn.pack(side="left", padx=(0, 20))
+
+        if Trace.settings:
+            cnf.settings_var.trace_remove(mode="read", cbname=Trace.settings)
+        Trace.settings = cnf.settings_var.trace_add(
+            mode="read", callback=self.setttings_callback)
 
         self.updating_btn = CButton(master=frame, text=cnf.lng.update,
-                                 width=80, fg_color=cnf.bg_color)
+                                 width=90, fg_color=cnf.bg_color)
         self.updating_btn.cmd(self.__stbar_run_scan)
         self.updating_btn.pack(side="left")
 
@@ -42,6 +52,12 @@ class StBar(CFrame, SysUtils):
         self.grid.cmd(lambda e: self.grid_cmd())
 
         return frame
+
+    def setttings_callback(self, *args):
+        if cnf.settings_var.get() == 1:
+            self.sett_btn.configure(fg_color=cnf.blue_color)
+        else:
+            self.sett_btn.configure(fg_color=cnf.bg_color)
 
     def grid_cmd(self):
         cnf.zoom = False if cnf.zoom else True

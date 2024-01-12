@@ -89,10 +89,15 @@ class User:
                                   "cat": "5 Обтравка"}
 
 
-class Config(ConfigGui, User):
+class StringVars:
     def __init__(self):
-        ConfigGui.__init__(self)
-        User.__init__(self)
+        self.search_var = tkinter.StringVar(value="")
+        self.progressbar_var = tkinter.Variable(value=0)
+        self.settings_var = tkinter.Variable(value=0)
+
+
+class Config(ConfigGui, User, StringVars):
+    def __init__(self):
         self.app_name = "MiuzCollections"
         self.app_ver = "4.1.0"
         self.db_name = "db.db"
@@ -129,10 +134,6 @@ class Config(ConfigGui, User):
         self.root = tkinter.Tk()
         self.root.withdraw()
 
-        # global variables
-        self.search_var = tkinter.StringVar(value="")
-        self.progressbar_var = tkinter.Variable(value=0)
-
         self.date_start: datetime = None
         self.date_end: datetime = None
         self.named_start: str = None # datetime as readable text
@@ -142,6 +143,10 @@ class Config(ConfigGui, User):
         self.notibar_status = True
 
         self.all_img_src = []
+
+        ConfigGui.__init__(self)
+        User.__init__(self)
+        StringVars.__init__(self)
 
     def load_cfg(self):
         with open(file=self.json_dir, encoding="utf8", mode="r") as file:

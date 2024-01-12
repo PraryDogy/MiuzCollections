@@ -141,6 +141,12 @@ class LangWid(CFrame):
                 return
 
 
+class SettingsVar:
+    def set(self, value: int):
+        cnf.settings_var.set(value=value)
+        cnf.settings_var.get()
+
+
 class Settings(CWindow, SysUtils):
     def __init__(self):
         w, h = 440, 440
@@ -148,9 +154,11 @@ class Settings(CWindow, SysUtils):
         if Win.win:
             Win.win.destroy()
             Win.win = False
+            SettingsVar().set(value=0)
 
         CWindow.__init__(self)
         Win.win = self
+        SettingsVar().set(value=1)
 
         self.protocol(name="WM_DELETE_WINDOW", func=self.__close_sett)
         self.bind(sequence="<Escape>", func=self.__close_sett)
@@ -199,11 +207,9 @@ class Settings(CWindow, SysUtils):
         Win.win = False
         self.destroy()
         cnf.root.focus_force()
+        SettingsVar().set(value=0)
 
     def __save_sett(self, e: tkinter.Event = None):
-        # if hasattr(self.__scaner_wid, "new_scan_time"):
-            # cnf.scan_time_sec = self.__scaner_wid.new_scan_time
-
         if hasattr(self.__lang_wid, "new_lang"):
             cnf.set_language(lang_name=self.__lang_wid.new_lang)
 
@@ -236,3 +242,4 @@ class Settings(CWindow, SysUtils):
         cnf.reload_scroll()
 
         Win.win = False
+        SettingsVar().set(value=0)
