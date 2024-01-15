@@ -11,7 +11,7 @@ from database import Dbase, ThumbsMd
 
 from .system import CreateThumb, SysUtils
 
-__all__ = ("FullScaner", "ScanerGlobs", )
+__all__ = ("Scaner", "ScanerGlobs", )
 
 
 class ScanerGlobs:
@@ -147,20 +147,7 @@ class UpdateDb(CompareImages, SysUtils):
 
         for k, v in self.images.items():
             if v:
-                values = self.create_bindparam(key=k)
-
-        # if self.new_images:
-            # self.new_images_db()
-
-        # if self.upd_images:
-            # self.update_images_db()
-
-        # SetProgressbar().onestep()
-
-        # if self.del_images:
-            # self.delete_images_db()
-
-        # SetProgressbar().onestep()
+                self.create_bindparam(key=k)
 
         # OldCollFolderRemover()
         # DublicateRemover()
@@ -169,36 +156,31 @@ class UpdateDb(CompareImages, SysUtils):
         values = []
 
         for src, (size, created, modified) in self.images[key].items():
-
             if not cnf.scan_status:
                     raise Exception("Scaner stopped by scan_status")
-
             data = {"b_src": src}
-
             if key != "delete":
                 data.update({"b_img150": CreateThumb(src=src).getvalue(),
                              "b_size": size,
                              "b_created": created,
                              "b_modified": modified,
                              "b_collection": self.get_coll_name(src=src)})
-                
             values.append(data)
 
         chunks = [values[i : i + self.limit]
                     for i in range(0, len(values), self.limit)]
 
-        queries = []
-
-        if key == "insert":
-            q = sqlalchemy.insert(ThumbsMd)
-        elif key == "update":
-            q = sqlalchemy.update(ThumbsMd)
-        else:
-            q = sqlalchemy.delete(ThumbsMd)
-
         for chunk in chunks:
+            if not cnf.scan_status:
+                    raise Exception("Scaner stopped by scan_status")
+            if key == "insert":
+                query = sqlalchemy.insert(ThumbsMd)
+            elif key == "update":
+                query = sqlalchemy.update(ThumbsMd)
+            else:
+                query = sqlalchemy.delete(ThumbsMd)
             if key in ("insert", "update"):
-                query = q.values(
+                query = query.values(
                     {"img150": sqlalchemy.bindparam("b_img150"),
                     "src": sqlalchemy.bindparam("b_src"),
                     "size": sqlalchemy.bindparam("b_size"),
@@ -206,86 +188,14 @@ class UpdateDb(CompareImages, SysUtils):
                     "modified": sqlalchemy.bindparam("b_modified"),
                     "collection": sqlalchemy.bindparam("b_collection")}
                     )
-            
             if key in ("update", "delete"):
-                query = q.filter(ThumbsMd.src == sqlalchemy.bindparam("b_src"))
-            
-
-    def new_images_db(self):
-        values = [] 
-        values = [values[i : i + self.limit]
-                    for i in range(0, len(values), self.limit)]
-
-        for chunk in values:
-
-            if not cnf.scan_status:
-                raise Exception("\n\nScaner stopped by scan_status")
-
-            insert_images = (
-                sqlalchemy.insert(ThumbsMd)
-                .values({"img150": sqlalchemy.bindparam("b_img150"),
-                         "src": sqlalchemy.bindparam("b_src"),
-                         "size": sqlalchemy.bindparam("b_size"),
-                         "created": sqlalchemy.bindparam("b_created"),
-                         "modified": sqlalchemy.bindparam("b_modified"),
-                         "collection": sqlalchemy.bindparam("b_collection")})
-                         )
-            Dbase.conn.execute(insert_images, chunk)
-
-    def update_images_db(self):
-        values = []
-
-        for src, (size, created, modified) in self.upd_images.items():
-
-            if not cnf.scan_status:
-                raise Exception("\n\nScaner stopped by scan_status")
-            
-            values.append(
-                {"b_img150": CreateThumb(src=src).getvalue(),
-                 "b_src": src,
-                 "b_size": size,
-                 "b_created": created,
-                 "b_modified": modified})
-
-        values = [values[i : i + self.limit]
-                    for i in range(0, len(values), self.limit)]
-
-        for chunk in values:
-
-            if not cnf.scan_status:
-                raise Exception("\n\nScaner stopped by scan_status")
-
-            update_images = (
-                sqlalchemy.update(ThumbsMd)
-                .values({"img150": sqlalchemy.bindparam("b_img150"),
-                         "size": sqlalchemy.bindparam("b_size"),
-                         "created": sqlalchemy.bindparam("b_created"),
-                         "modified": sqlalchemy.bindparam("b_modified")})
-                .filter(ThumbsMd.src == sqlalchemy.bindparam("b_src"))
-                )
-            Dbase.conn.execute(update_images, chunk)
-
-    def delete_images_db(self):
-        values = [
-            {"b_src": src}
-            for src, stats in self.del_images.items()]
-
-        values = [values[i : i + self.limit]
-                    for i in range(0, len(values), self.limit)]
-
-        for chunk in values:
-
-            if not cnf.scan_status:
-                raise Exception("\n\nScaner stopped by scan_status")
-
-            delete_images = (
-                sqlalchemy.delete(ThumbsMd)
-                .filter(ThumbsMd.src == sqlalchemy.bindparam("b_src"))
-                )
-            Dbase.conn.execute(delete_images, chunk)
+                query = query.filter(
+                    ThumbsMd.src == sqlalchemy.bindparam("b_src"))
+                
+            Dbase.conn.execute(query, chunk)
 
 
-class FullScanThread(SysUtils):
+class ScanerThread(SysUtils):
     def __init__(self):
         cnf.scan_status = False
         while ScanerGlobs.thread.is_alive():
@@ -314,11 +224,11 @@ class FullScanThread(SysUtils):
         cnf.scan_status = False
 
 
-class FullScaner(SysUtils):
+class Scaner(SysUtils):
     def __init__(self):
 
         if self.smb_check():
-            FullScanThread()
+            ScanerThread()
             if ScanerGlobs.task:
                 cnf.root.after_cancel(ScanerGlobs.task)
             ScanerGlobs.task = cnf.root.after(ms=3600000, func=__class__)
