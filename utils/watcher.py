@@ -11,7 +11,6 @@ from watchdog.observers.polling import PollingObserver
 from cfg import cnf
 from database import Dbase, ThumbsMd
 
-from .scaner import ScanerGlobs
 from .system import CreateThumb, SysUtils
 
 __all__ = ("Watcher", )
