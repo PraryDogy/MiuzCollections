@@ -168,51 +168,51 @@ class UpdateDb(CompareImages, SysUtils):
     def create_bindparam(self, key: Literal["insert", "update", "delete"]):
         values = []
 
-        if key == "delete":
-            for src, (size, created, modified) in self.images[key].items():
-                if not cnf.scan_status:
-                    raise Exception("Scaner stopped by scan_status")
-                values.append(
-                    {"b_img150": CreateThumb(src=src).getvalue(),
-                    "b_src": src,
-                    "b_size": size,
-                    "b_created": created,
-                    "b_modified": modified,
-                    "b_collection": self.get_coll_name(src=src)})
-        else:
-            for src, (size, created, modified) in self.images[key].items():
-                if not cnf.scan_status:
-                    raise Exception("Scaner stopped by scan_status")
-                values.append({"b_src": src})
+        for src, (size, created, modified) in self.images[key].items():
 
-        values = [values[i : i + self.limit]
+            if not cnf.scan_status:
+                    raise Exception("Scaner stopped by scan_status")
+
+            data = {"b_src": src}
+
+            if key != "delete":
+                data.update({"b_img150": CreateThumb(src=src).getvalue(),
+                             "b_size": size,
+                             "b_created": created,
+                             "b_modified": modified,
+                             "b_collection": self.get_coll_name(src=src)})
+                
+            values.append(data)
+
+        chunks = [values[i : i + self.limit]
                     for i in range(0, len(values), self.limit)]
-    
+
+        queries = []
+
         if key == "insert":
             q = sqlalchemy.insert(ThumbsMd)
         elif key == "update":
             q = sqlalchemy.update(ThumbsMd)
         else:
             q = sqlalchemy.delete(ThumbsMd)
+
+        for chunk in chunks:
+            if key in ("insert", "update"):
+                query = q.values(
+                    {"img150": sqlalchemy.bindparam("b_img150"),
+                    "src": sqlalchemy.bindparam("b_src"),
+                    "size": sqlalchemy.bindparam("b_size"),
+                    "created": sqlalchemy.bindparam("b_created"),
+                    "modified": sqlalchemy.bindparam("b_modified"),
+                    "collection": sqlalchemy.bindparam("b_collection")}
+                    )
+            
+            if key in ("update", "delete"):
+                query = q.filter(ThumbsMd.src == sqlalchemy.bindparam("b_src"))
             
 
     def new_images_db(self):
-        values = []
-        
-        for src, (size, created, modified) in self.new_images.items():
-
-            if not cnf.scan_status:
-                raise Exception("\n\nScaner stopped by scan_status")
-
-            values.append(
-                {"b_img150": CreateThumb(src=src).getvalue(),
-                 "b_src": src,
-                 "b_size": size,
-                 "b_created": created,
-                 "b_modified": modified,
-                 "b_collection": self.get_coll_name(src=src)})
-
- 
+        values = [] 
         values = [values[i : i + self.limit]
                     for i in range(0, len(values), self.limit)]
 
