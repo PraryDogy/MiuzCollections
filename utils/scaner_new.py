@@ -11,13 +11,13 @@ from database import Dbase, ThumbsMd
 
 from .system import CreateThumb, SysUtils
 
-__all__ = ("Scaner", "ScanerGlobs", )
+__all__ = ("Scaner", "Storage", )
 
 
-class ScanerGlobs:
-    thread = threading.Thread(target=None)
-    update = False
-    task = False
+class Storage:
+    scaner_thread = threading.Thread(target=None)
+    scaner_schedule = False
+    need_gui_reload = False
 
 
 class SetProgressbar:
@@ -29,6 +29,22 @@ class SetProgressbar:
 
     def to_end(self):
         cnf.progressbar_var.set(value=1.0)
+
+
+class StopScaner:
+    def __init__(self) -> None:
+        if not cnf.scan_status:
+            raise Exception("Scaner stopped by cnf.scan_status")
+
+
+class StBarBtn:
+    def set_updating(self):
+        cnf.stbar_btn().configure(fg_color=cnf.blue_color,
+                                  text=cnf.lng.updating)
+        
+    def set_normal(self):
+        cnf.stbar_btn().configure(fg_color=cnf.bg_color,
+                                  text=cnf.lng.update)
 
 
 class OldCollFolderRemover:
@@ -79,7 +95,6 @@ class GetImages:
 
         self.get_db_images()
         self.get_finder_images()
-        # ScanerGlobs.update = True
 
     def get_db_images(self) -> dict[Literal["img path: list of ints"]]:
         q = sqlalchemy.select(ThumbsMd.src, ThumbsMd.size, ThumbsMd.created,
@@ -108,8 +123,7 @@ class GetImages:
             for root, dirs, files in os.walk(top=collection_walk):
                 for file in files:
 
-                    if not cnf.scan_status:
-                        raise Exception("\n\nScaner stopped by scan_status")
+                    StopScaner()
 
                     if file.endswith(exts):
                         src = os.path.join(root, file)
@@ -121,58 +135,61 @@ class GetImages:
 
 class CompareImages(GetImages):
     def __init__(self):
-        CompareImages.__init__(self)
+        GetImages.__init__(self)
         self.images = {"insert": {}, "update": {}, "delete": {}}
 
         for db_src, db_stats in self.db_images.items():
             finder_stats = self.finder_images.get(db_src)
             if not finder_stats:
-                # self.del_images[db_src] = db_stats
                 self.images["delete"][db_src] = db_stats
 
         for finder_src, finder_stats in self.finder_images.items():
             db_stats = self.db_images.get(finder_src)
             if not db_stats:
-                # self.new_images[finder_src] = finder_stats
                 self.images["insert"][finder_src] = finder_stats
             if db_stats and finder_stats != db_stats:
-                # self.upd_images[finder_src] = finder_stats
                 self.images["update"][finder_src] = finder_stats
 
 
-class UpdateDb(CompareImages, SysUtils):
+class SetUpdateStatus(CompareImages):
     def __init__(self):
         CompareImages.__init__(self)
+
+        for k, v in self.images.items():
+            if v:
+                Storage.need_gui_reload = True
+                return
+
+
+class UpdateDb(SetUpdateStatus, SysUtils):
+    def __init__(self):
+        SetUpdateStatus.__init__(self)
         self.limit = 300
 
         for k, v in self.images.items():
             if v:
                 self.create_bindparam(key=k)
-
-        # OldCollFolderRemover()
-        # DublicateRemover()
                 
     def create_bindparam(self, key: Literal["insert", "update", "delete"]):
         values = []
 
         for src, (size, created, modified) in self.images[key].items():
-            if not cnf.scan_status:
-                    raise Exception("Scaner stopped by scan_status")
+            StopScaner()
             data = {"b_src": src}
             if key != "delete":
-                data.update({"b_img150": CreateThumb(src=src).getvalue(),
-                             "b_size": size,
-                             "b_created": created,
-                             "b_modified": modified,
-                             "b_collection": self.get_coll_name(src=src)})
+                data.update(
+                    {"b_img150": CreateThumb(src=src).getvalue(),
+                     "b_size": size,
+                     "b_created": created,
+                     "b_modified": modified,
+                     "b_collection": self.get_coll_name(src=src)})
             values.append(data)
 
         chunks = [values[i : i + self.limit]
                     for i in range(0, len(values), self.limit)]
 
         for chunk in chunks:
-            if not cnf.scan_status:
-                    raise Exception("Scaner stopped by scan_status")
+            StopScaner()
             if key == "insert":
                 query = sqlalchemy.insert(ThumbsMd)
             elif key == "update":
@@ -186,8 +203,7 @@ class UpdateDb(CompareImages, SysUtils):
                     "size": sqlalchemy.bindparam("b_size"),
                     "created": sqlalchemy.bindparam("b_created"),
                     "modified": sqlalchemy.bindparam("b_modified"),
-                    "collection": sqlalchemy.bindparam("b_collection")}
-                    )
+                    "collection": sqlalchemy.bindparam("b_collection")})
             if key in ("update", "delete"):
                 query = query.filter(
                     ThumbsMd.src == sqlalchemy.bindparam("b_src"))
@@ -195,32 +211,39 @@ class UpdateDb(CompareImages, SysUtils):
             Dbase.conn.execute(query, chunk)
 
 
+class ScanerBase(UpdateDb):
+    def __init__(self):
+        UpdateDb.__init__(self)
+        OldCollFolderRemover()
+        DublicateRemover()
+
+
 class ScanerThread(SysUtils):
     def __init__(self):
         cnf.scan_status = False
-        while ScanerGlobs.thread.is_alive():
+        while Storage.scaner_thread.is_alive():
             cnf.root.update()
 
-        cnf.stbar_btn().configure(fg_color=cnf.blue_color, text=cnf.lng.updating)
+        StBarBtn.set_updating()
         cnf.scan_status = True
         SetProgressbar().to_start()
-        ScanerGlobs.thread = threading.Thread(target=UpdateDb, daemon=True)
-        ScanerGlobs.thread.start()
+        Storage.scaner_thread = threading.Thread(target=UpdateDb, daemon=True)
+        Storage.scaner_thread.start()
 
-        while ScanerGlobs.thread.is_alive():
+        while Storage.scaner_thread.is_alive():
             cnf.root.update()
         SetProgressbar().to_end()
 
-        if ScanerGlobs.update:
+        if Storage.need_gui_reload:
             cnf.reload_thumbs()
             cnf.reload_menu()
             try:
                 Dbase.conn.execute("VACUUM")
             except Exception:
                 print(self.print_err())
-            ScanerGlobs.update = False
+            Storage.need_gui_reload = False
 
-        cnf.stbar_btn().configure(fg_color=cnf.bg_color, text=cnf.lng.update)
+        StBarBtn.set_normal()
         cnf.scan_status = False
 
 
@@ -229,12 +252,11 @@ class Scaner(SysUtils):
 
         if self.smb_check():
             ScanerThread()
-            if ScanerGlobs.task:
-                cnf.root.after_cancel(ScanerGlobs.task)
-            ScanerGlobs.task = cnf.root.after(ms=3600000, func=__class__)
+            if Storage.scaner_schedule:
+                cnf.root.after_cancel(Storage.scaner_schedule)
+            Storage.scaner_schedule = cnf.root.after(ms=3600000, func=__class__)
 
         else:
-            if ScanerGlobs.task:
-                cnf.root.after_cancel(ScanerGlobs.task)
-            ScanerGlobs.task = cnf.root.after(ms=10000, func=__class__)
-
+            if Storage.scaner_schedule:
+                cnf.root.after_cancel(Storage.scaner_schedule)
+            Storage.scaner_schedule = cnf.root.after(ms=10000, func=__class__)

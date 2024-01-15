@@ -1,7 +1,7 @@
 import tkinter
 
 from cfg import cnf
-from utils import FullScaner, SysUtils
+from utils import Scaner, SysUtils
 
 from .scaner_gui import ScanerGui
 from .settings import Settings
@@ -77,6 +77,6 @@ class StBar(CFrame, SysUtils):
         if not cnf.scan_status:
             if not self.smb_check():
                 SmbAlert()
-            FullScaner()
+            Scaner()
         else:
             ScanerGui()

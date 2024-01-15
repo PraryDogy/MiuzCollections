@@ -11,7 +11,7 @@ try:
 except ImportError:
     from typing import Literal
 
-from utils import FullScaner, SysUtils, Watcher
+from utils import Scaner, SysUtils, Watcher
 
 __all__ = ("Settings",)
 
@@ -227,7 +227,7 @@ class Settings(CWindow, SysUtils):
                 SmbAlert()
 
             Watcher.observer.stop()
-            cnf.root.after(ms=500, func=FullScaner)
+            cnf.root.after(ms=500, func=Scaner)
             cnf.root.after(ms=500, func=Watcher)
 
         cnf.write_cfg()

@@ -11,7 +11,7 @@ from database import Dbase, ThumbsMd
 
 from .system import CreateThumb, SysUtils
 
-__all__ = ("FullScaner", "ScanerGlobs", )
+__all__ = ("Scaner", "ScanerGlobs", )
 
 
 class ScanerGlobs:
@@ -248,7 +248,7 @@ class UpdateDb(ScanImages, SysUtils):
             Dbase.conn.execute(delete_images, chunk)
 
 
-class FullScanThread(SysUtils):
+class ScanThread(SysUtils):
     def __init__(self):
         cnf.scan_status = False
         while ScanerGlobs.thread.is_alive():
@@ -277,11 +277,11 @@ class FullScanThread(SysUtils):
         cnf.scan_status = False
 
 
-class FullScaner(SysUtils):
+class Scaner(SysUtils):
     def __init__(self):
 
         if self.smb_check():
-            FullScanThread()
+            ScanThread()
             if ScanerGlobs.task:
                 cnf.root.after_cancel(ScanerGlobs.task)
             ScanerGlobs.task = cnf.root.after(ms=3600000, func=__class__)
