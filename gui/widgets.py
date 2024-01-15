@@ -85,13 +85,14 @@ class CButton(customtkinter.CTkButton, BaseCWid):
     def __init__(self, master: tkinter, text_color: str = cnf.fg_color,
                  fg_color: str = cnf.btn_color, corner_radius: int = cnf.corner,
                  width: int = 75, hover: bool = 0, border_spacing: int = 2,
+                 anchor="center",
                  font: tuple[str, int, str] = ("San Francisco Pro", 13, "normal"),
                  **kw):
 
         customtkinter.CTkButton.__init__(
             self, master=master, text_color=text_color, fg_color=fg_color,
             corner_radius=corner_radius, width=width, hover=hover,
-            border_spacing=border_spacing, font=font, **kw)
+            border_spacing=border_spacing, font=font, anchor=anchor, **kw)
 
     def get_parrent(self):
         return self._canvas
