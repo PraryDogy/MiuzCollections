@@ -116,7 +116,7 @@ class GetImages:
                 continue
             collections.append(collection)
 
-        steps_count = 1 / len(collections)
+        steps_count = 0.7 / len(collections)
 
         for collection_walk in collections:
             SetProgressbar().onestep(value=steps_count)
@@ -167,6 +167,7 @@ class UpdateDb(SetUpdateStatus, SysUtils):
         self.limit = 300
 
         for k, v in self.images.items():
+            SetProgressbar().onestep()
             if v:
                 self.create_bindparam(key=k)
                 
