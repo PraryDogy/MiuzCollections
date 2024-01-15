@@ -31,72 +31,6 @@ class SetProgressbar:
         cnf.progressbar_var.set(value=1.0)
 
 
-class ScanImages:
-    def __init__(self):
-        self.new_images = {} # insert ThumbsMd query
-        self.upd_images = {} # same above, but update
-        self.del_images = {} # same above, but delete
-
-        self.db_images = {}
-        self.finder_images = {}
-
-        self.get_db_images()
-        self.get_finder_images()
-        self.compare_images()
-
-        ScanerGlobs.update = True
-
-    def get_db_images(self) -> dict[Literal["img path: list of ints"]]:
-        q = sqlalchemy.select(ThumbsMd.src, ThumbsMd.size, ThumbsMd.created,
-                              ThumbsMd.modified)
-
-        res = Dbase.conn.execute(q).fetchall()
-        self.db_images.update({i[0]: i[1:] for i in res})
-
-    def get_finder_images(self) -> dict[Literal["img path: list of ints"]]:
-        exts = (".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG")
-
-        collections = []
-
-        for i in os.listdir(cnf.coll_folder):
-            collection = os.path.join(cnf.coll_folder, i)
-            if not os.path.isdir(collection):
-                continue
-            if i.startswith("_"):
-                continue
-            collections.append(collection)
-
-        steps_count = 0.8 / len(collections)
-
-        for collection_walk in collections:
-            SetProgressbar().onestep(value=steps_count)
-            for root, dirs, files in os.walk(top=collection_walk):
-                for file in files:
-
-                    if not cnf.scan_status:
-                        raise Exception("\n\nScaner stopped by scan_status")
-
-                    if file.endswith(exts):
-                        src = os.path.join(root, file)
-                        self.finder_images[src] = (
-                            int(os.path.getsize(filename=src)),
-                            int(os.stat(path=src).st_birthtime),
-                            int(os.stat(path=src).st_mtime))
-
-    def compare_images(self):
-        for db_src, db_stats in self.db_images.items():
-            finder_stats = self.finder_images.get(db_src)
-            if not finder_stats:
-                self.del_images[db_src] = db_stats
-
-        for finder_src, finder_stats in self.finder_images.items():
-            db_stats = self.db_images.get(finder_src)
-            if not db_stats:
-                self.new_images[finder_src] = finder_stats
-            if db_stats and finder_stats != db_stats:
-                self.upd_images[finder_src] = finder_stats
-
-
 class OldCollFolderRemover:
     def __init__(self):
         coll_folder = cnf.coll_folder + os.sep
@@ -138,26 +72,129 @@ class DublicateRemover:
         Dbase.conn.execute(q, values)
 
 
-class UpdateDb(ScanImages, SysUtils):
+class GetImages:
     def __init__(self):
-        ScanImages.__init__(self)
+        self.db_images = {}
+        self.finder_images = {}
+
+        self.get_db_images()
+        self.get_finder_images()
+        # ScanerGlobs.update = True
+
+    def get_db_images(self) -> dict[Literal["img path: list of ints"]]:
+        q = sqlalchemy.select(ThumbsMd.src, ThumbsMd.size, ThumbsMd.created,
+                              ThumbsMd.modified)
+
+        res = Dbase.conn.execute(q).fetchall()
+        self.db_images.update({i[0]: i[1:] for i in res})
+
+    def get_finder_images(self) -> dict[Literal["img path: list of ints"]]:
+        exts = (".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG")
+
+        collections = []
+
+        for i in os.listdir(cnf.coll_folder):
+            collection = os.path.join(cnf.coll_folder, i)
+            if not os.path.isdir(collection):
+                continue
+            if i.startswith("_"):
+                continue
+            collections.append(collection)
+
+        steps_count = 0.8 / len(collections)
+
+        for collection_walk in collections:
+            SetProgressbar().onestep(value=steps_count)
+            for root, dirs, files in os.walk(top=collection_walk):
+                for file in files:
+
+                    if not cnf.scan_status:
+                        raise Exception("\n\nScaner stopped by scan_status")
+
+                    if file.endswith(exts):
+                        src = os.path.join(root, file)
+                        self.finder_images[src] = (
+                            int(os.path.getsize(filename=src)),
+                            int(os.stat(path=src).st_birthtime),
+                            int(os.stat(path=src).st_mtime))
+
+
+class CompareImages(GetImages):
+    def __init__(self):
+        CompareImages.__init__(self)
+        self.images = {"insert": {}, "update": {}, "delete": {}}
+
+        for db_src, db_stats in self.db_images.items():
+            finder_stats = self.finder_images.get(db_src)
+            if not finder_stats:
+                # self.del_images[db_src] = db_stats
+                self.images["delete"][db_src] = db_stats
+
+        for finder_src, finder_stats in self.finder_images.items():
+            db_stats = self.db_images.get(finder_src)
+            if not db_stats:
+                # self.new_images[finder_src] = finder_stats
+                self.images["insert"][finder_src] = finder_stats
+            if db_stats and finder_stats != db_stats:
+                # self.upd_images[finder_src] = finder_stats
+                self.images["update"][finder_src] = finder_stats
+
+
+class UpdateDb(CompareImages, SysUtils):
+    def __init__(self):
+        CompareImages.__init__(self)
         self.limit = 300
 
-        if self.new_images:
-            self.new_images_db()
+        for k, v in self.images.items():
+            if v:
+                values = self.create_bindparam(key=k)
 
-        if self.upd_images:
-            self.update_images_db()
+        # if self.new_images:
+            # self.new_images_db()
 
-        SetProgressbar().onestep()
+        # if self.upd_images:
+            # self.update_images_db()
 
-        if self.del_images:
-            self.delete_images_db()
+        # SetProgressbar().onestep()
 
-        SetProgressbar().onestep()
+        # if self.del_images:
+            # self.delete_images_db()
 
-        OldCollFolderRemover()
-        DublicateRemover()
+        # SetProgressbar().onestep()
+
+        # OldCollFolderRemover()
+        # DublicateRemover()
+                
+    def create_bindparam(self, key: Literal["insert", "update", "delete"]):
+        values = []
+
+        if key == "delete":
+            for src, (size, created, modified) in self.images[key].items():
+                if not cnf.scan_status:
+                    raise Exception("Scaner stopped by scan_status")
+                values.append(
+                    {"b_img150": CreateThumb(src=src).getvalue(),
+                    "b_src": src,
+                    "b_size": size,
+                    "b_created": created,
+                    "b_modified": modified,
+                    "b_collection": self.get_coll_name(src=src)})
+        else:
+            for src, (size, created, modified) in self.images[key].items():
+                if not cnf.scan_status:
+                    raise Exception("Scaner stopped by scan_status")
+                values.append({"b_src": src})
+
+        values = [values[i : i + self.limit]
+                    for i in range(0, len(values), self.limit)]
+    
+        if key == "insert":
+            q = sqlalchemy.insert(ThumbsMd)
+        elif key == "update":
+            q = sqlalchemy.update(ThumbsMd)
+        else:
+            q = sqlalchemy.delete(ThumbsMd)
+            
 
     def new_images_db(self):
         values = []

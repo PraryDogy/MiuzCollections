@@ -21,13 +21,6 @@ class WatcherTask:
     task = False
 
 
-class WaitScaner:
-    def __init__(self):
-        return
-        while ScanerGlobs.thread.is_alive():
-            cnf.root.update()
-
-
 class WaitWriteFinish:
     value = 0.1
 
@@ -98,7 +91,6 @@ class NewFile(SysUtils):
 
 class Handler(FileSystemEventHandler):
     def on_created(self, event):
-        WaitScaner()
         if not event.is_directory:
             if event.src_path.endswith(Exts.lst):
                 WaitWriteFinish(src=event.src_path)
@@ -106,7 +98,6 @@ class Handler(FileSystemEventHandler):
                 ReloadGui()
 
     def on_deleted(self, event):
-        WaitScaner()
         if not event.is_directory:
             if event.src_path.endswith(Exts.lst):
                 DeletedFile(src=event.src_path)
@@ -116,7 +107,6 @@ class Handler(FileSystemEventHandler):
             ReloadGui()
 
     def on_moved(self, event):
-        WaitScaner()
         if not event.is_directory:
             if event.src_path.endswith(Exts.lst):
                 MovedFile(src=event.src_path, dest=event.dest_path)
@@ -143,7 +133,6 @@ class WatcherBase:
 class Watcher(WatcherBase, SysUtils):
     def __init__(self):
         if self.smb_check():
-            WaitScaner()
             t1 = threading.Thread(target=WatcherBase, daemon=True)
             t1.start()
         else:
