@@ -116,7 +116,7 @@ class GetImages:
                 continue
             collections.append(collection)
 
-        steps_count = 0.8 / len(collections)
+        steps_count = 1 / len(collections)
 
         for collection_walk in collections:
             SetProgressbar().onestep(value=steps_count)
@@ -224,7 +224,7 @@ class ScanerThread(SysUtils):
         while Storage.scaner_thread.is_alive():
             cnf.root.update()
 
-        StBarBtn.set_updating()
+        StBarBtn().set_updating()
         cnf.scan_status = True
         SetProgressbar().to_start()
         Storage.scaner_thread = threading.Thread(target=UpdateDb, daemon=True)
@@ -243,7 +243,7 @@ class ScanerThread(SysUtils):
                 print(self.print_err())
             Storage.need_gui_reload = False
 
-        StBarBtn.set_normal()
+        StBarBtn().set_normal()
         cnf.scan_status = False
 
 
