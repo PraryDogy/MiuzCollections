@@ -22,7 +22,7 @@ class WatcherTask:
 
 
 class WaitWriteFinish:
-    value = 0.1
+    value = 1
 
     def __init__(self, src: str):
         file = None
@@ -138,4 +138,4 @@ class Watcher(WatcherBase, SysUtils):
         else:
             if WatcherTask.task:
                 cnf.root.after_cancel(WatcherTask.task)
-            WatcherTask.task = cnf.root.after(ms=12000, func=__class__)
+            WatcherTask.task = cnf.root.after(ms=11000, func=__class__)
