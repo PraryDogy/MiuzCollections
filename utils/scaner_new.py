@@ -68,16 +68,16 @@ class DublicateRemover:
         res = {i[0]: i[1] for i in res}
 
         dublicates = {}
-        for k, v in res.items():
-            if not dublicates.get(v):
-                dublicates[v] = [k]
+        for thumb_id, thumb_src in res.items():
+            if not dublicates.get(thumb_src):
+                dublicates[thumb_src] = [thumb_id]
             else:
-                dublicates[v].append(k)
+                dublicates[thumb_src].append(thumb_id)
 
-        dublicates = [row_id
-                      for _, id_list in dublicates.items()
-                      for row_id in id_list[1:]
-                      if len(v) > 1]
+        dublicates = [thumb_id
+                      for _, thumb_id_list in dublicates.items()
+                      for thumb_id in thumb_id_list[1:]
+                      if len(thumb_id_list) > 1]
         
         if not dublicates:
             return
