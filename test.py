@@ -5,18 +5,19 @@ path = "smb://sbc01/shares/Marketing/Photo/_Collections/1 Solo/1 IMG/2023-09-22 
 
 class PathFinder:
     def __init__(self, path: str):
-        marketing = "/Volumes/Shares/Marketing"
+        pre_paths = ["/Volumes/Shares/Marketing", ] # from json
 
         path = path.replace("\\", os.sep).strip().strip(os.sep)
         path_list = path.split(os.sep)
         path_versions = []
 
-        for i in range(len(path_list)):
-            path_versions.append(
-                os.path.join(marketing, *path_list[i:])
-                )
+        for pre_path in pre_paths:
+            for i in range(len(path_list)):
+                path_versions.append(os.path.join(pre_path, *path_list[i:]))
 
         for i in path_versions:
             if os.path.exists(i):
                 print(i)
                 break
+
+PathFinder(path=path)
