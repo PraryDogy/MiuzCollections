@@ -7,7 +7,7 @@ import sqlalchemy
 from cfg import cnf
 from database import Dbase, ThumbsMd
 from utils import SysUtils
-
+from typing import Literal
 from .widgets import *
 
 __all__ = ("Menu",)
@@ -130,18 +130,7 @@ class Menu(CScroll):
         self.menu_frame = self.load_menu_buttons()
         self.menu_frame.pack(anchor="w", fill="x")
 
-    def load_menu_buttons(self):
-        MenuBtns.btns.clear()
-
-        frame = CFrame(master=self, bg=cnf.bg_color_menu)
-
-        title = CButton(master=frame, text=cnf.lng.menu,
-                        font=("San Francisco Pro", 14, "bold"),
-                        fg_color=cnf.bg_color_menu,
-                        text_color=cnf.tit_color_menu,
-                        anchor="w")
-        title.pack(pady=(15,15), padx=10, anchor="w", fill="x")
-
+    def load_colls_list(self) -> Literal["improved collection name: true collection name"]:
         menus = {}
 
         q = sqlalchemy.select(ThumbsMd.collection).distinct()
@@ -153,8 +142,20 @@ class Menu(CScroll):
         
         sort_keys = sorted(menus.keys())
 
-        menus = {fake_name: menus[fake_name]
-                 for fake_name in sort_keys}
+        return {fake_name: menus[fake_name] for fake_name in sort_keys}
+
+    def load_menu_buttons(self):
+        MenuBtns.btns.clear()
+        menus = self.load_colls_list()
+
+        frame = CFrame(master=self, bg=cnf.bg_color_menu)
+
+        title = CButton(master=frame, text=cnf.lng.menu,
+                        font=("San Francisco Pro", 14, "bold"),
+                        fg_color=cnf.bg_color_menu,
+                        text_color=cnf.tit_color_menu,
+                        anchor="w")
+        title.pack(pady=(15,15), padx=10, anchor="w", fill="x")
 
         last = CButton(master=frame, text=cnf.lng.all_colls, anchor="w",
                        fg_color=cnf.bg_color_menu,
