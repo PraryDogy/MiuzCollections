@@ -27,5 +27,4 @@ class PathFinder(list):
         except Exception:
             return False
 
-a = PathFinder(path=path)
-print(str(a))
+print(PathFinder(path=path))
