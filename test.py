@@ -2,7 +2,7 @@ import os
 
 path = "smb://sbc01/shares/Marketing/Photo/_Collections/1 Solo/1 IMG/2023-09-22 11-27-28 рабочий файл.tif/"
 # path = "\\192.168.10.105\\shares\\Marketing\\General\\9. ТЕКСТЫ\\2023\\7. PR-рассылка\\10. Октябрь\\Royal"
-path = "/Users/Morkowik/Downloads/Геохимия видео"
+# path = "/Users/Morkowik/Downloads/Геохимия видео"
 
 
 class PathFinder(object):
@@ -15,21 +15,37 @@ class PathFinder(object):
 
         path_list = path.split(os.sep)
 
-        path_versions = (os.path.join(pre_path, *path_list[i:])
-                         for pre_path in pre_paths
-                         for i in range(len(path_list)))
+        path_versions = [
+            os.path.join(pre_path, *path_list[i:])
+            for pre_path in pre_paths
+            for i in range(len(path_list))
+            ]
 
         self.path_exists = None
         for i in path_versions:
             if os.path.exists(i):
                 self.path_exists = i
                 return
-            
+
+        new_paths = []
+        for path_ver in path_versions:
+            path_ver = path_ver.split(os.sep)
+            for i in reversed(range(len(path_ver))):
+                try:
+                    new_paths.append(os.path.join(*path_ver[:i]))
+                except TypeError:
+                    pass
+
+        self.path_exists = None
+        for i in new_paths:
+            if os.path.exists(i):
+                self.path_exists = i
+                return
+
     def normalize_path(self, path: str):
         path = path.replace("\\", os.sep).strip().strip(os.sep)
         path = path.split(os.sep)
         return os.path.join(os.sep, *path)
-
 
 
 a = PathFinder(path=path)
