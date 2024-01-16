@@ -96,6 +96,9 @@ class GetImages:
         self.get_db_images()
         self.get_finder_images()
 
+        if not self.finder_images:
+            raise Exception("scaner > GetImages > no finder images")
+
     def get_db_images(self) -> dict[Literal["img path: list of ints"]]:
         q = sqlalchemy.select(ThumbsMd.src, ThumbsMd.size, ThumbsMd.created,
                               ThumbsMd.modified)
