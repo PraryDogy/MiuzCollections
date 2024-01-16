@@ -13,6 +13,22 @@ from .widgets import *
 __all__ = ("Menu",)
 
 
+class ShowColl:
+    def __init__(self, e=tkinter.Event):
+        from .application import app
+        app.menu.show_coll(e=e)
+
+
+class MenuBtns:
+    btns = {}
+
+
+class BtnInfo:
+    def __init__(self, e: tkinter.Event) -> None:
+        self.btn: CButton = e.widget.__dict__["master"]
+        self.collname = MenuBtns.btns[self.btn.cget("text")]
+
+
 class Context(tkinter.Menu):
     def __init__(self):
         tkinter.Menu.__init__(self)
@@ -20,15 +36,20 @@ class Context(tkinter.Menu):
     def sep(self):
         self.add_separator()
 
-    def do_popup(self, e: tkinter.Event, btn: CButton, collname: str):
+    def do_popup(self, e: tkinter.Event):
+        btn_info = BtnInfo(e=e)
+
         try:
-            btn.configure(fg_color=cnf.blue_color)
+            btn_info.btn.configure(fg_color=cnf.blue_color)
             self.tk_popup(x=e.x_root, y=e.y_root)
         finally:
-            if collname == cnf.curr_coll:
-                btn.configure(fg_color=cnf.lgray_color)
-            else:
-                btn.configure(fg_color=cnf.bg_color_menu)
+            try:
+                if btn_info.collname == cnf.curr_coll:
+                    btn_info.btn.configure(fg_color=cnf.lgray_color)
+                else:
+                    btn_info.btn.configure(fg_color=cnf.bg_color_menu)
+            except tkinter.TclError:
+                print("menu > Context > do_popup > finally > no btn")
             self.grab_release()
 
 
@@ -61,11 +82,10 @@ class ContextMenuBase(Context, ContextUtils):
     def __init__(self):
         Context.__init__(self)
 
-    def show_coll(self, e: tkinter.Event, btn: CButton, collname: str):
+    def show_coll_context(self, e: tkinter.Event):
         self.add_command(
             label=cnf.lng.view,
-            command=lambda:
-            cnf.show_coll(btn=btn, collname=collname))
+            command=lambda: ShowColl(e=e))
 
     def reveal_coll_context(self, collname: str):
         self.add_command(
@@ -81,23 +101,24 @@ class ContextMenuBase(Context, ContextUtils):
 
 
 class ContextMenu(ContextMenuBase):
-    def __init__(self, e: tkinter.Event, btn: CButton, collname: str):
+    def __init__(self, e: tkinter.Event):
+        btn_info = BtnInfo(e=e)
+
         ContextMenuBase.__init__(self)
-        self.show_coll(e=e, btn=btn, collname=collname)
+        self.show_coll_context(e=e)
 
         self.sep()
-        if collname != cnf.all_colls:
-            self.reveal_coll_context(collname=collname)
+        if btn_info.collname != cnf.all_colls:
+            self.reveal_coll_context(collname=btn_info.collname)
 
             self.sep()
             for k, v in cnf.filter_true_names.items():
-                self.reveal_coll_filtered(collname=collname, filter=v,
+                self.reveal_coll_filtered(collname=btn_info.collname, filter=v,
                                         label=cnf.lng.filter_names[k])
         else:
             self.reveal_coll_context(collname=cnf.lng.all_colls)
 
-
-        self.do_popup(e=e, btn=btn, collname=collname)
+        self.do_popup(e=e)
 
 
 class Menu(CScroll):
@@ -106,10 +127,12 @@ class Menu(CScroll):
                          corner_radius=0, width=cnf.menu_w,
                          scroll_color=cnf.sel_color_menu)
 
-        self.menu_frame = self.__load_menu_buttons()
+        self.menu_frame = self.load_menu_buttons()
         self.menu_frame.pack(anchor="w", fill="x")
 
-    def __load_menu_buttons(self):
+    def load_menu_buttons(self):
+        MenuBtns.btns.clear()
+
         frame = CFrame(master=self, bg=cnf.bg_color_menu)
 
         title = CButton(master=frame, text=cnf.lng.menu,
@@ -137,52 +160,43 @@ class Menu(CScroll):
                        fg_color=cnf.bg_color_menu,
                        text_color=cnf.fg_color_menu)
         last.pack(pady=(0, 15), fill="x", padx=10, anchor="w")
-
-        last.cmd(lambda e: cnf.show_coll(btn=last, collname=cnf.all_colls))
+        last.cmd(self.show_coll)
         last.bind(sequence="<Button-2>", command=lambda e:
-                  ContextMenu(e=e, btn=last, collname=cnf.all_colls))
+                  ContextMenu(e=e, widget=last))
+        MenuBtns.btns[cnf.lng.all_colls] = cnf.all_colls
 
         for fakename, collname in menus.items():
-            btn = CButton(master=frame, text=fakename[:23],
+            btn_text = fakename[:23]
+            btn = CButton(master=frame, text=btn_text,
                           fg_color=cnf.bg_color_menu, 
                           text_color=cnf.fg_color_menu, anchor="w")
             btn.pack(fill="x", padx=10, anchor="w")
-
-            btn.cmd(lambda e, btn=btn, collname=collname:
-                    cnf.show_coll(btn=btn, collname=collname))
+            btn.cmd(self.show_coll)
             btn.bind(sequence="<Button-2>",
-                     command=lambda e, btn=btn, collname=collname:
-                     ContextMenu(e=e, btn=btn, collname=collname))
+                     command=lambda e: ContextMenu(e=e))
+            MenuBtns.btns[btn_text] = collname
 
             if collname == cnf.curr_coll:
                 btn.configure(fg_color=cnf.sel_color_menu)
-                self.sel_btn = btn
     
-        if cnf.curr_coll == cnf.all_colls or not hasattr(self, "sel_btn"):
+        if cnf.curr_coll == cnf.all_colls:
             last.configure(fg_color=cnf.sel_color_menu)
-            self.sel_btn = last
-            cnf.curr_coll == cnf.all_colls
 
         return frame
 
     def reload_menu(self):
         self.menu_frame.destroy()
-        delattr(self, "sel_btn")
-        self.menu_frame = self.__load_menu_buttons()
+        self.menu_frame = self.load_menu_buttons()
         self.menu_frame.pack(anchor="w", fill="x")
-    
-    def show_coll(self, btn: CButton, collname: str):
-        cnf.limit = 150
 
-        try:
-            self.sel_btn.configure(fg_color=cnf.bg_color_menu)
-        except tkinter.TclError:
-            # self.print_err()
-            print("menu > show_coll error")
+    def show_coll(self, e: tkinter.Event):
+        btn_info = BtnInfo(e=e)
 
-        btn.configure(fg_color=cnf.sel_color_menu)
-        self.sel_btn = btn
-        cnf.curr_coll = collname
-
+        cnf.curr_coll = btn_info.collname
         cnf.date_start, cnf.date_end = None, None
         cnf.search_var.set(value="")
+
+        cnf.set_topbar_title()
+        cnf.reload_scroll()
+        cnf.reload_filters()
+        self.reload_menu()
