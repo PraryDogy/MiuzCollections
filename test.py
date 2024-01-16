@@ -3,8 +3,9 @@ import os
 path = "smb://sbc01/shares/Marketing/Photo/_Collections/1 Solo/1 IMG/2023-09-22 11-27-28 рабочий файл.tif/"
 # path = "\\192.168.10.105\\shares\\Marketing\\General\\9. ТЕКСТЫ\\2023\\7. PR-рассылка\\10. Октябрь\\Royal"
 
-class PathFinder:
+class PathFinder(list):
     def __init__(self, path: str):
+        list.__init__(self)
         pre_paths = ["/Volumes/Shares/Marketing", ] # from json
 
         path = path.replace("\\", os.sep).strip().strip(os.sep)
@@ -17,7 +18,14 @@ class PathFinder:
 
         for i in path_versions:
             if os.path.exists(i):
-                print(i)
+                self.append(i)
                 break
 
-PathFinder(path=path)
+    def __str__(self) -> str:
+        try:
+            return self[0]
+        except Exception:
+            return False
+
+a = PathFinder(path=path)
+print(str(a))
