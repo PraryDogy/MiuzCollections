@@ -1,13 +1,13 @@
 import os
 
 path = "smb://sbc01/shares/Marketing/Photo/_Collections/1 Solo/1 IMG/2023-09-22 11-27-28 рабочий файл.tif/"
-# path = "\\192.168.10.105\\shares\\Marketing\\General\\9. ТЕКСТЫ\\2023\\7. PR-рассылка\\10. Октябрь\\Royal"
+path = "\\192.168.10.105\\shares\\Marketing\\General\\9. ТЕКСТЫ\\2023\\7. PR-рассылка\\10. Октябрь\\Royal"
 # path = "/Users/Morkowik/Downloads/Геохимия видео"
 
 
 class PathFinder(object):
     def __init__(self, path: str):
-        pre_paths = ["/Volumes/Shares/Marketing", ] # from json
+        pre_paths = ["/Volumes/Shares/Marketing", ""] # from json
         pre_paths = [self.normalize_path(path=i)
                     for i in pre_paths]
 
@@ -32,10 +32,11 @@ class PathFinder(object):
             path_ver = path_ver.split(os.sep)
             for i in reversed(range(len(path_ver))):
                 try:
-                    new_paths.append(os.path.join(*path_ver[:i]))
+                    new_paths.append(os.path.join(os.sep, *path_ver[:i]))
                 except TypeError:
                     pass
 
+        new_paths.sort(key=len, reverse=True)
         self.path_exists = None
         for i in new_paths:
             if os.path.exists(i):
@@ -50,4 +51,5 @@ class PathFinder(object):
 
 a = PathFinder(path=path)
 
+print()
 print(a.path_exists)
