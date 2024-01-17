@@ -32,9 +32,6 @@ class ContextTitles(Context):
         self.sep()
         self.download_group_tiffs(title=title, path_list=path_list)
 
-        self.sep()
-        self.download_group_fullsize(title=title, path_list=path_list)
-
         self.do_popup(e=e)
 
 
@@ -47,7 +44,6 @@ class ContextThumbs(Context):
 
         self.sep()
         self.download_jpg(img_src=img_src)
-        self.download_fullsize(img_src=img_src)
 
         self.sep()
         self.download_tiff(img_src=img_src)

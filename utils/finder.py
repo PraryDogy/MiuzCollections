@@ -12,10 +12,6 @@ except ImportError:
 import threading
 from difflib import SequenceMatcher
 
-import psd_tools
-import tifffile
-from PIL import Image
-
 from cfg import cnf
 from database import *
 
@@ -92,37 +88,37 @@ class FinderBase(SysUtils):
         os.makedirs(name=downloads, exist_ok=True)
         return downloads
 
-    def _fullsize_img(self, src: str, dest: str, name: str):
-        if src.endswith((".psd", ".PSD", ".psb", ".PSB")):
+    # def _fullsize_img(self, src: str, dest: str, name: str):
+    #     if src.endswith((".psd", ".PSD", ".psb", ".PSB")):
 
-            try:
-                img = psd_tools.PSDImage.open(fp=src).composite()
-            except Exception:
-                try:
-                    img = Image.open(fp=src)
-                except Exception:
-                    self.print_err()
-                    return False
+    #         try:
+    #             img = psd_tools.PSDImage.open(fp=src).composite()
+    #         except Exception:
+    #             try:
+    #                 img = Image.open(fp=src)
+    #             except Exception:
+    #                 self.print_err()
+    #                 return False
 
-            try:
-                img = img.convert(mode="RGB", colors=8)
-                # img = black_borders(img)
-                img.save(fp=f"{dest}/psd {name}.jpg")
-            except Exception:
-                self.print_err()
-                return False
+    #         try:
+    #             img = img.convert(mode="RGB", colors=8)
+    #             # img = black_borders(img)
+    #             img.save(fp=f"{dest}/psd {name}.jpg")
+    #         except Exception:
+    #             self.print_err()
+    #             return False
 
-        else:
-            try:
-                img = tifffile.imread(files=src)[:,:,:3]
-                if str(object=img.dtype) != "uint8":
-                    img = (img/256).astype(dtype="uint8")
-                img = Image.fromarray(obj=img.astype("uint8"), mode="RGB")
-                # img = black_borders(img)
-                img.save(fp=f"{dest}/tiff {name}.jpg")
-            except Exception as e:
-                self.print_err()
-                return False
+    #     else:
+    #         try:
+    #             img = tifffile.imread(files=src)[:,:,:3]
+    #             if str(object=img.dtype) != "uint8":
+    #                 img = (img/256).astype(dtype="uint8")
+    #             img = Image.fromarray(obj=img.astype("uint8"), mode="RGB")
+    #             # img = black_borders(img)
+    #             img.save(fp=f"{dest}/tiff {name}.jpg")
+    #         except Exception as e:
+    #             self.print_err()
+    #             return False
 
     def wait_utils_task(self):
         while Tsk.task.is_alive():
@@ -154,8 +150,7 @@ class FinderThread(FinderBase):
 class FinderActions(FinderBase):
     def __init__(self, src: Literal["path"] | tuple[Literal["path"], ...],
                  clipboard: bool = False, download: bool = False,
-                 fullsize: bool = False, reveal: bool = False,
-                 tiff: bool = False):
+                 reveal: bool = False, tiff: bool = False):
 
         if not isinstance(src, list):
             src = [src]
@@ -186,7 +181,7 @@ class FinderActions(FinderBase):
             self._delay()
             return
         
-        if any((download, fullsize)):
+        if download:
             downloads = self._create_downloads()
             ln_src = len(src)
 
@@ -199,12 +194,7 @@ class FinderActions(FinderBase):
                 cnf.notibar_text(text=t)
                 name, ext = os.path.splitext(p=img_src.split("/")[-1])
 
-                if download:
-                    if not self._copy_img(src=img_src, dest=downloads, name=name, ext=ext):
-                        continue
-
-                else:
-                    if not self._fullsize_img(src=img_src, dest=downloads, name=name):
-                        continue
+                if not self._copy_img(src=img_src, dest=downloads, name=name, ext=ext):
+                    continue
                 
             subprocess.Popen(args=["open", downloads])

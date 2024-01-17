@@ -93,11 +93,7 @@ class ImgSingle:
             command=lambda:
             FinderActions(src=img_src, tiff=True, clipboard=True))
 
-    def download_fullsize(self, img_src: Literal["file path"]):
-        self.add_command(
-            label=cnf.lng.fullsize,
-            command=lambda:
-            FinderActions(src=img_src, tiff=True, fullsize=True))
+
 
 class ImgGroup:
     def download_group(
@@ -121,16 +117,6 @@ class ImgGroup:
                    f"{cnf.lng.to_downloads}"),
             command=lambda:
             FinderActions(src=path_list, tiff=True, download=True))
-
-    def download_group_fullsize(
-            self, title: str,
-            path_list=tuple[Literal["file path"], ...]):
-        self.add_command(
-            label=(f"{cnf.lng.group_fullsize}\n"
-                   f"{cnf.lng.from_pretext} \"{title}\" "
-                   f"{cnf.lng.to_downloads}"),
-            command=lambda:
-            FinderActions(src=path_list, tiff=True, fullsize=True))
 
 
 class ImgInfo(ContextUtils):

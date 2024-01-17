@@ -32,7 +32,6 @@ class ContextViewer(Context, SysUtils):
 
         self.sep()
         self.download_jpg(img_src=img_src)
-        self.download_fullsize(img_src=img_src)
 
         self.sep()
         self.download_tiff(img_src=img_src)
