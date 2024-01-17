@@ -218,7 +218,7 @@ class UpdateDb(SetUpdateStatus, SysUtils):
 class ScanerBase(UpdateDb):
     def __init__(self):
         UpdateDb.__init__(self)
-        OldCollFolderRemover()
+        # OldCollFolderRemover()
         DublicateRemover()
 
 
