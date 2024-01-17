@@ -92,7 +92,7 @@ class StringVars:
 class Config(ConfigGui, User, StringVars):
     def __init__(self):
         self.app_name = "MiuzCollections"
-        self.app_ver = "4.1.0"
+        self.app_ver = "4.1.2"
         self.db_name = "db.db"
         self.cfg_name = "cfg.json"
         self.thumb_err = "thumb.jpg"
