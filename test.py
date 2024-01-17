@@ -49,7 +49,15 @@ class PathFinder(object):
         return os.path.join(os.sep, *path)
 
 
-a = PathFinder(path=path)
+# a = PathFinder(path=path)
 
-print()
-print(a.path_exists)
+# from PIL import Image, UnidentifiedImageError
+
+
+# for root, dirs, files in os.walk("/Applications"):
+#     for file in files:
+#         if file.endswith((".png", ".PNG")):
+#             try:
+#                 img = Image.open(os.path.join(root, file))
+#             except UnidentifiedImageError as ex:
+#                 print(ex)

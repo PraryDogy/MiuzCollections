@@ -31,7 +31,7 @@ class SetProgressbar:
         cnf.progressbar_var.set(value=1.0)
 
 
-class StopScaner:
+class CheckScanStatus:
     def __init__(self) -> None:
         if not cnf.scan_status:
             raise Exception("Scaner stopped by cnf.scan_status")
@@ -94,7 +94,11 @@ class GetImages:
         self.finder_images = {}
 
         self.get_db_images()
-        self.get_finder_images()
+
+        try:
+            self.get_finder_images()
+        except FileNotFoundError as ex:
+            raise Exception("GetImages > get_finder_images > FileNotFoundErr")
 
         if not self.finder_images:
             raise Exception("scaner > GetImages > no finder images")
@@ -126,7 +130,7 @@ class GetImages:
             for root, dirs, files in os.walk(top=collection_walk):
                 for file in files:
 
-                    StopScaner()
+                    CheckScanStatus()
 
                     if file.endswith(exts):
                         src = os.path.join(root, file)
@@ -167,18 +171,22 @@ class SetUpdateStatus(CompareImages):
 class UpdateDb(SetUpdateStatus, SysUtils):
     def __init__(self):
         SetUpdateStatus.__init__(self)
+
         self.limit = 300
 
         for k, v in self.images.items():
             SetProgressbar().onestep()
             if v:
-                self.create_bindparam(key=k)
+                try:
+                    self.create_bindparam(key=k)
+                except FileNotFoundError:
+                    raise Exception("UpdateDb > create bindparam > FileNotFoundErr")
                 
     def create_bindparam(self, key: Literal["insert", "update", "delete"]):
         values = []
 
         for src, (size, created, modified) in self.images[key].items():
-            StopScaner()
+            CheckScanStatus()
             data = {"b_src": src}
             if key != "delete":
                 data.update(
@@ -193,7 +201,7 @@ class UpdateDb(SetUpdateStatus, SysUtils):
                     for i in range(0, len(values), self.limit)]
 
         for chunk in chunks:
-            StopScaner()
+            CheckScanStatus()
             if key == "insert":
                 query = sqlalchemy.insert(ThumbsMd)
             elif key == "update":
@@ -218,7 +226,7 @@ class UpdateDb(SetUpdateStatus, SysUtils):
 class ScanerBase(UpdateDb):
     def __init__(self):
         UpdateDb.__init__(self)
-        # OldCollFolderRemover()
+        OldCollFolderRemover()
         DublicateRemover()
 
 

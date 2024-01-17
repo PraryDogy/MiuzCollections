@@ -102,8 +102,9 @@ class Handler(FileSystemEventHandler):
                 DeletedFile(src=event.src_path)
                 ReloadGui()
         else:
-            DeleteDir(src=event.src_path)
-            ReloadGui()
+            if os.path.exists(event.src_path):
+                DeleteDir(src=event.src_path)
+                ReloadGui()
 
     def on_moved(self, event):
         if not event.is_directory:

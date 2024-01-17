@@ -12,7 +12,7 @@ import io
 import traceback
 from pathlib import Path
 
-from PIL import Image, ImageOps
+from PIL import Image, ImageOps, UnidentifiedImageError
 
 from cfg import cnf
 from database import *
@@ -82,10 +82,7 @@ class CreateThumb(io.BytesIO,  SysUtils):
 
         try:
             img = Image.open(src)
-        except Exception as e:
-            # self.print_err()
-            print(e)
-            print("utils > system > CreateThumb error. Replaced with def. thumb")
+        except UnidentifiedImageError:
             img = Image.open(cnf.thumb_err)
 
         img = ImageOps.exif_transpose(image=img)
