@@ -273,7 +273,7 @@ class Scaner(SysUtils):
 
         if self.smb_check():
             hour = 3600000
-            fifty = hour/4
+            fifty = int(hour/4)
 
             ScanerThread()
             if Storage.scaner_schedule:
