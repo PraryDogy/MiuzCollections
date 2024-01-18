@@ -35,7 +35,7 @@ class ResetDirStats:
         Dbase.conn.execute(upd_dirs)
 
 
-class ScanerGlobs:
+class Storage:
     _thread = threading.Thread(target=None)
     _task = None
     update = False
@@ -166,7 +166,7 @@ class ScanImages(ScanDirs):
         self.get_finder_images()
         self.compare_images()
 
-        ScanerGlobs.update = True
+        Storage.update = True
         SetProgressbar().onestep()
 
     def get_db_images(self) -> dict[Literal["img path: list of ints"]]:
@@ -407,25 +407,25 @@ class UpdateDb(ScanImages, SysUtils, TrashRemover):
 class ScanerThread(SysUtils):
     def __init__(self):
         cnf.scan_status = False
-        while ScanerGlobs._thread.is_alive():
+        while Storage._thread.is_alive():
             cnf.root.update()
 
         cnf.stbar_btn().configure(text=cnf.lng.updating, fg_color=cnf.blue_color)
         cnf.scan_status = True
-        ScanerGlobs._thread = threading.Thread(target=UpdateDb, daemon=True)
-        ScanerGlobs._thread.start()
+        Storage._thread = threading.Thread(target=UpdateDb, daemon=True)
+        Storage._thread.start()
 
-        while ScanerGlobs._thread.is_alive():
+        while Storage._thread.is_alive():
             cnf.root.update()
 
-        if ScanerGlobs.update:
+        if Storage.update:
             cnf.reload_thumbs()
             cnf.reload_menu()
             try:
                 Dbase.conn.execute("VACUUM")
             except Exception:
                 print(self.print_err())
-            ScanerGlobs.update = False
+            Storage.update = False
 
         cnf.stbar_btn().configure(text=cnf.lng.update, fg_color=cnf.btn_color)
         cnf.scan_status = False
@@ -435,13 +435,13 @@ class Scaner(SysUtils):
     def __init__(self):
         SetProgressbar().set(value=0)
 
-        if ScanerGlobs._task:
-            cnf.root.after_cancel(ScanerGlobs._task)
+        if Storage._task:
+            cnf.root.after_cancel(Storage._task)
 
         if self.smb_check():
             ScanerThread()
 
-        ScanerGlobs._task = cnf.root.after(
+        Storage._task = cnf.root.after(
             ms=cnf.scan_time_sec * 1000, func=__class__)
 
         SetProgressbar().set(value=1)

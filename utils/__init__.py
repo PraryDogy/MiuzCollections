@@ -1,4 +1,4 @@
-from .system import SysUtils, CreateThumb
+from .system import SysUtils
 from .finder import FinderActions, FinderBase
 from .fit_img import FitImg
 from .watcher import Watcher

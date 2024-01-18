@@ -4,12 +4,12 @@ import threading
 from typing import Literal
 
 import sqlalchemy
-from PIL import Image, ImageOps
+from PIL import UnidentifiedImageError
 
 from cfg import cnf
 from database import Dbase, ThumbsMd
 
-from .system import CreateThumb, SysUtils
+from .system import CreateThumb, SysUtils, UndefinedThumb
 
 __all__ = ("Scaner", "Storage", )
 
@@ -177,10 +177,7 @@ class UpdateDb(SetUpdateStatus, SysUtils):
         for k, v in self.images.items():
             SetProgressbar().onestep()
             if v:
-                try:
-                    self.create_bindparam(key=k)
-                except FileNotFoundError:
-                    raise Exception("UpdateDb > create bindparam > FileNotFoundErr")
+                self.create_bindparam(key=k)
                 
     def create_bindparam(self, key: Literal["insert", "update", "delete"]):
         values = []
@@ -188,13 +185,25 @@ class UpdateDb(SetUpdateStatus, SysUtils):
         for src, (size, created, modified) in self.images[key].items():
             CheckScanStatus()
             data = {"b_src": src}
+
             if key != "delete":
-                data.update(
-                    {"b_img150": CreateThumb(src=src).getvalue(),
-                     "b_size": size,
-                     "b_created": created,
-                     "b_modified": modified,
-                     "b_collection": self.get_coll_name(src=src)})
+
+                try:
+                    data.update(
+                        {"b_img150": CreateThumb(src=src).getvalue(),
+                        "b_size": size,
+                        "b_created": created,
+                        "b_modified": modified,
+                        "b_collection": self.get_coll_name(src=src)})
+
+                except (UnidentifiedImageError, FileNotFoundError):
+                    data = {"img150": UndefinedThumb().getvalue(),
+                            "src": src,
+                            "size": 66666,
+                            "created": 66666,
+                            "modified": 66666,
+                            "collection": str(66666)}
+
             values.append(data)
 
         chunks = [values[i : i + self.limit]
@@ -263,10 +272,13 @@ class Scaner(SysUtils):
     def __init__(self):
 
         if self.smb_check():
+            hour = 3600000
+            fifty = hour/4
+
             ScanerThread()
             if Storage.scaner_schedule:
                 cnf.root.after_cancel(Storage.scaner_schedule)
-            Storage.scaner_schedule = cnf.root.after(ms=3600000, func=__class__)
+            Storage.scaner_schedule = cnf.root.after(ms=fifty, func=__class__)
 
         else:
             if Storage.scaner_schedule:

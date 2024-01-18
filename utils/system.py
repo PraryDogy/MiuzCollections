@@ -10,14 +10,13 @@ except ImportError:
 
 import io
 import traceback
-from pathlib import Path
 
-from PIL import Image, ImageOps, UnidentifiedImageError
+from PIL import Image, ImageOps
 
 from cfg import cnf
 from database import *
 
-__all__ = ("SysUtils", "CreateThumb", )
+__all__ = ("SysUtils", "CreateThumb", "UndefinedThumb")
 
 
 class SysUtils:
@@ -80,11 +79,7 @@ class CreateThumb(io.BytesIO,  SysUtils):
         self.ww = 150
         io.BytesIO.__init__(self)
 
-        try:
-            img = Image.open(src)
-        except UnidentifiedImageError:
-            img = Image.open(cnf.thumb_err)
-
+        img = Image.open(src)
         img = ImageOps.exif_transpose(image=img)
         img = self.fit_thumb(img=img, w=self.ww, h=self.ww)
 
@@ -93,7 +88,6 @@ class CreateThumb(io.BytesIO,  SysUtils):
 
         newimg = newimg.convert('RGB')
         newimg.save(self, format="JPEG")
-
 
     def fit_thumb(self, img: Image, w: int, h: int) -> Image:
         imw, imh = img.size
@@ -104,3 +98,10 @@ class CreateThumb(io.BytesIO,  SysUtils):
         else:
             neww, newh = w, int(w/delta)
         return img.resize((neww, newh))
+
+
+class UndefinedThumb(io.BytesIO,  SysUtils):
+    def __init__(self):
+        io.BytesIO.__init__(self)
+        img = Image.open(cnf.thumb_err)
+        img.save(self, format="JPEG")

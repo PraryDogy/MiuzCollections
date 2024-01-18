@@ -4,14 +4,14 @@ import time
 from time import sleep
 
 import sqlalchemy
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers.polling import PollingObserver
 
 from cfg import cnf
 from database import Dbase, ThumbsMd
 
-from .system import CreateThumb, SysUtils
+from .system import CreateThumb, SysUtils, UndefinedThumb
 
 __all__ = ("Watcher", )
 
@@ -77,14 +77,23 @@ class DeleteDir:
 
 class NewFile(SysUtils):
     def __init__(self, src: str):
-        q = (sqlalchemy.insert(ThumbsMd)
-             .values({"img150": CreateThumb(src=src).getvalue(),
-                      "src": src,
-                      "size": int(os.path.getsize(filename=src)),
-                      "created": int(os.stat(path=src).st_birthtime),
-                      "modified": int(os.stat(path=src).st_mtime),
-                      "collection": self.get_coll_name(src=src)}))
+        try:
+            data = {"img150": CreateThumb(src=src).getvalue(),
+                    "src": src,
+                    "size": int(os.path.getsize(filename=src)),
+                    "created": int(os.stat(path=src).st_birthtime),
+                    "modified": int(os.stat(path=src).st_mtime),
+                    "collection": self.get_coll_name(src=src)}
 
+        except (UnidentifiedImageError, FileNotFoundError):
+            data = {"img150": UndefinedThumb().getvalue(),
+                    "src": src,
+                    "size": 66666,
+                    "created": 66666,
+                    "modified": 66666,
+                    "collection": str(66666)}
+
+        q = (sqlalchemy.insert(ThumbsMd).values(data))
         Dbase.conn.execute(q)
 
 
