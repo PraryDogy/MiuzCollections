@@ -1,5 +1,5 @@
 import os
-
+import string
 
 # path = "\\192.168.10.105\\shares\\Marketing\\General\\9. ТЕКСТЫ\\2023\\7. PR-рассылка\\10. Октябрь\\Royal"
 # path = "/Users/Morkowik/Downloads/Геохимия видео"
@@ -9,12 +9,12 @@ class Prepaths:
 
 
 class PathFinderBase(object):
-    def __init__(self, path: str):
+    def __init__(self, src_path: str):
         pre_paths = [self.normalize_path(path=i)
                     for i in Prepaths.lst]
 
-        path = self.normalize_path(path=path)
-        path_list = path.split(os.sep)
+        src_path = self.normalize_path(path=src_path)
+        path_list = src_path.split(os.sep)
 
         self.path_versions = [
             os.path.join(pre_path, *path_list[i:])
@@ -22,7 +22,6 @@ class PathFinderBase(object):
             for i in range(len(path_list))
             ]
 
-        self.path = None
         for i in self.path_versions:
             if os.path.exists(i):
                 self.path = i
@@ -35,10 +34,10 @@ class PathFinderBase(object):
 
 
 class NearlyPath(PathFinderBase):
-    def __init__(self, path: str):
-        PathFinderBase.__init__(self, path=path)
+    def __init__(self, src_path: str):
+        PathFinderBase.__init__(self, src_path=src_path)
 
-        if self.path:
+        if hasattr(self, "path"):
             return
 
         new_paths = []
@@ -51,29 +50,45 @@ class NearlyPath(PathFinderBase):
                     pass
         new_paths.sort(key=len, reverse=True)
 
-        self.path = None
         for i in new_paths:
             if os.path.exists(i):
-                self.path = i
-                self.nearly = True
+                self.nearly_path = i
                 return
    
 
 class MistakeFinder(NearlyPath):
-    def __init__(self, path: str):
-        NearlyPath.__init__(self, path=path)
+    def __init__(self, src_path: str):
+        NearlyPath.__init__(self, src_path=src_path)
+        
+        tail_with_mistake = None
+        for i in range(len(self.nearly_path)):
+            if self.nearly_path[i:] in src_path:
+                tail_with_mistake = src_path.split(self.nearly_path[i:])[-1]
+                break
+        tail_with_mistake = [i for i in tail_with_mistake.split(os.sep) if i]
+        mistake = self.normalize_name(tail_with_mistake[0])
 
-        if hasattr(self, "nearly"):
-            print("nearly")
+        dirs = {self.normalize_name(i): i
+                for i in os.listdir(self.nearly_path)}
 
+        new_dir = None
+        if mistake in dirs:
+            new_dir = os.path.join(self.nearly_path, dirs[mistake])
+
+        if os.path.exists(new_dir):
+            ...
+
+    def normalize_name(self, name: str):
+        name, ext = os.path.splitext(p=name)
+        return name.translate(str.maketrans("", "", string.punctuation + " "))
 
 
 class PathFinder(MistakeFinder):
     def __init__(self, path: str):
-        MistakeFinder.__init__(self, path=path)
+        MistakeFinder.__init__(self, src_path=path)
 
     def __str__(self) -> str:
-        return self.path
+        return self.nearly_path
 
 path = "smb://sbc01/shares/Marketing/Photo/_Collections/1 Solo/1 IMG/2023-09-22 11-27-28 рабочий файл.tif/"
 path = "smb://sbc01/shares/Marketing/Photo/_Collections/_____1 Solo/1 IMG/2023-09-22 11-27-28 рабочий файл.tif/"
