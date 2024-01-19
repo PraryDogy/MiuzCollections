@@ -22,10 +22,10 @@ class PathFinderBase(object):
             for i in range(len(src_path_split))
             ]
 
-        for i in self.src_path_versions:
-            if os.path.exists(i):
-                self.path = i
-                return
+        for path_ver in self.src_path_versions:
+            if os.path.exists(path_ver):
+                self.path = path_ver
+                break
 
     def normalize_path(self, path: str):
         path = path.replace("\\", os.sep).strip().strip(os.sep)
@@ -40,21 +40,22 @@ class NearlyPath(PathFinderBase):
         if hasattr(self, "path"):
             return
 
-        new_paths = []
+        new_paths_versions = []
         for path_ver in self.src_path_versions:
-            path_ver = path_ver.split(os.sep)
-            for i in reversed(range(len(path_ver))):
+            path_ver_split = path_ver.split(os.sep)
+
+            for i in reversed(range(len(path_ver_split))):
                 try:
-                    new_paths.append(os.path.join(os.sep, *path_ver[:i]))
+                    new_paths_versions.append(
+                        os.path.join(os.sep, *path_ver_split[:i]))
                 except TypeError:
                     pass
-        new_paths.sort(key=len, reverse=True)
-
-        for i in new_paths:
+        
+        new_paths_versions.sort(key=len, reverse=True)
+        for i in new_paths_versions:
             if os.path.exists(i):
-                self.nearly_path = i
-                self.path = i
-                return
+                self.path = self.nearly_path = i
+                break
    
 
 class MistakeFinder(NearlyPath):
@@ -105,10 +106,22 @@ class PathFinder(MistakeFinder):
 
 path = "smb://sbc01/shares/Marketing/Photo/_Collections/1 Solo/1 IMG/2023-09-22 11-27-28 рабочий файл.tif/"
 path = "smb://sbc031/shares/Marketing/Photo/_Collections/_____1 Solo/1 IMG/__2023-09-22 11-27-28 рабочий файл.tif/"
+path = "\\192.168.10.105\\shares\\Marketing\\General\\9. ТЕКСТЫ\\2023\\7. PR-рассылка\\10. Октябрь\\Royal"
 
 
 a = PathFinder(path=path)
 
-print()
-print(a)
-print()
+# print()
+# print(a)
+# print()
+
+# a = "6PRрассылка"
+# b = "7PRрассылка"
+
+# from difflib import SequenceMatcher
+
+# def similar(a, b):
+#     return SequenceMatcher(None, a, b).ratio()
+
+# c = similar(a, b)
+# print(c)
