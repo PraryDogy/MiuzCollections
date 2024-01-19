@@ -4,25 +4,25 @@ import string
 # path = "\\192.168.10.105\\shares\\Marketing\\General\\9. ТЕКСТЫ\\2023\\7. PR-рассылка\\10. Октябрь\\Royal"
 # path = "/Users/Morkowik/Downloads/Геохимия видео"
 
-class Prepaths:
+class PrePaths:
     lst = ["/Volumes/Shares/Marketing", ""] # from json
 
 
 class PathFinderBase(object):
     def __init__(self, src_path: str):
         pre_paths = [self.normalize_path(path=i)
-                    for i in Prepaths.lst]
+                    for i in PrePaths.lst]
 
         src_path = self.normalize_path(path=src_path)
-        path_list = src_path.split(os.sep)
+        src_path_split = src_path.split(os.sep)
 
-        self.path_versions = [
-            os.path.join(pre_path, *path_list[i:])
+        self.src_path_versions = [
+            os.path.join(pre_path, *src_path_split[i:])
             for pre_path in pre_paths
-            for i in range(len(path_list))
+            for i in range(len(src_path_split))
             ]
 
-        for i in self.path_versions:
+        for i in self.src_path_versions:
             if os.path.exists(i):
                 self.path = i
                 return
@@ -41,7 +41,7 @@ class NearlyPath(PathFinderBase):
             return
 
         new_paths = []
-        for path_ver in self.path_versions:
+        for path_ver in self.src_path_versions:
             path_ver = path_ver.split(os.sep)
             for i in reversed(range(len(path_ver))):
                 try:
