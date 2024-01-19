@@ -64,31 +64,36 @@ class MistakeFinder(NearlyPath):
         if not hasattr(self, "nearly_path"):
             return
         
-        improved_path = self.improve_path(src_path=src_path)
+        mistaked_tail = self.find_tail(src_path=src_path,
+                                       nearly_path=self.nearly_path)
 
-        if os.path.exists(improved_path):
-            self.nearly_path = improved_path
-
-
-    def improve_path(self, src_path: str):
-        mistaked_tail = None
-        for i in range(len(self.nearly_path)):
-            if self.nearly_path[i:] in src_path:
-                mistaked_tail = src_path.split(self.nearly_path[i:])[-1]
+        for i in mistaked_tail:
+            improved = self.improve_chunk(
+                path_chunk=i, nearly_path=self.nearly_path)
+            if improved:
+                self.nearly_path = os.path.join(self.nearly_path, improved)
+            else:
                 break
-        mistaked_tail = [i for i in mistaked_tail.split(os.sep) if i]
+        self.path = self.nearly_path
 
-        mistake = self.normalize_name(mistaked_tail[0])
+    def find_tail(self, src_path: str, nearly_path: str):
+        for i in range(len(nearly_path)):
+            if nearly_path[i:] in src_path:
+                mistaked_tail = src_path.split(nearly_path[i:])[-1]
+                return [i for i in mistaked_tail.split(os.sep) if i]
 
+    def improve_chunk(self, path_chunk: str, nearly_path: str):
+        mistake = self.normalize_name(path_chunk)
         dirs = {self.normalize_name(i): i
-                for i in os.listdir(self.nearly_path)}
+                for i in os.listdir(nearly_path)}
 
         if mistake in dirs:
-            return os.path.join(self.nearly_path, dirs[mistake])
+            return dirs[mistake]
 
     def normalize_name(self, name: str):
         name, ext = os.path.splitext(p=name)
-        return name.translate(str.maketrans("", "", string.punctuation + " "))
+        name = name.translate(str.maketrans("", "", string.punctuation + " "))
+        return f"{name}{ext}"
 
 
 class PathFinder(MistakeFinder):
@@ -99,6 +104,10 @@ class PathFinder(MistakeFinder):
         return self.path
 
 path = "smb://sbc01/shares/Marketing/Photo/_Collections/1 Solo/1 IMG/2023-09-22 11-27-28 рабочий файл.tif/"
-path = "smb://sbc01/shares/Marketing/Photo/_Collections/_____1 Solo/1 IMG/2023-09-22 11-27-28 рабочий файл.tif/"
+path = "smb://sbc01/shares/Marketing/Photo/_Collections/_____1 Solo/1 IMG/__2023-09-22 11-27-28 рабочий файл.tif/"
 
 a = PathFinder(path=path)
+
+print()
+print(a)
+print()
