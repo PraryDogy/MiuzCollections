@@ -72,15 +72,17 @@ class MistakeFinder(NearlyPath):
             improved = self.improve_chunk(
                 path_chunk=i, nearly_path=self.nearly_path)
             if improved:
-                self.nearly_path = os.path.join(self.nearly_path, improved)
+                self.path = os.path.join(self.nearly_path, improved)
             else:
                 break
-        self.path = self.nearly_path
+
+        # self.path = self.nearly_path
 
     def find_tail(self, src_path: str, nearly_path: str):
         for i in range(len(nearly_path)):
             if nearly_path[i:] in src_path:
                 mistaked_tail = src_path.split(nearly_path[i:])[-1]
+                mistaked_tail = self.normalize_path(path=mistaked_tail)
                 return [i for i in mistaked_tail.split(os.sep) if i]
 
     def improve_chunk(self, path_chunk: str, nearly_path: str):
@@ -106,14 +108,14 @@ class PathFinder(MistakeFinder):
 
 path = "smb://sbc01/shares/Marketing/Photo/_Collections/1 Solo/1 IMG/2023-09-22 11-27-28 рабочий файл.tif/"
 path = "smb://sbc031/shares/Marketing/Photo/_Collections/_____1 Solo/1 IMG/__2023-09-22 11-27-28 рабочий файл.tif/"
-path = "\\192.168.10.105\\shares\\Marketing\\General\\9. ТЕКСТЫ\\2023\\7. PR-рассылка\\10. Октябрь\\Royal"
-
+path = "\\192.168.10.105\\shares\\Marketing\\General\\9. ТЕКСТЫ\\)2023\\7. PR-рассылка\\10. Октябрь\\Royal"
+path = "fafdgfagrf"
 
 a = PathFinder(path=path)
 
-# print()
-# print(a)
-# print()
+print()
+print(a)
+print()
 
 # a = "6PRрассылка"
 # b = "7PRрассылка"
