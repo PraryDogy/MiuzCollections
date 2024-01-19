@@ -78,4 +78,4 @@ class PathFinder(MistakeFinder):
 path = "smb://sbc01/shares/Marketing/Photo/_Collections/1 Solo/1 IMG/2023-09-22 11-27-28 рабочий файл.tif/"
 # path = "smb://sbc01/shares/Marketing/Photo/_Collections/_____1 Solo/1 IMG/2023-09-22 11-27-28 рабочий файл.tif/"
 
-a = str(PathFinder(path=path))
+a = PathFinder(path=path)
