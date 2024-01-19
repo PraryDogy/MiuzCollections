@@ -53,6 +53,7 @@ class NearlyPath(PathFinderBase):
         for i in new_paths:
             if os.path.exists(i):
                 self.nearly_path = i
+                self.path = i
                 return
    
 
@@ -63,6 +64,13 @@ class MistakeFinder(NearlyPath):
         if not hasattr(self, "nearly_path"):
             return
         
+        improved_path = self.improve_path(src_path=src_path)
+
+        if os.path.exists(improved_path):
+            self.nearly_path = improved_path
+
+
+    def improve_path(self, src_path: str):
         mistaked_tail = None
         for i in range(len(self.nearly_path)):
             if self.nearly_path[i:] in src_path:
@@ -76,33 +84,21 @@ class MistakeFinder(NearlyPath):
                 for i in os.listdir(self.nearly_path)}
 
         if mistake in dirs:
-            new_dir = os.path.join(self.nearly_path, dirs[mistake])
-            if os.path.exists(new_dir):
-                self.dir_no_mistake = new_dir
+            return os.path.join(self.nearly_path, dirs[mistake])
 
     def normalize_name(self, name: str):
         name, ext = os.path.splitext(p=name)
         return name.translate(str.maketrans("", "", string.punctuation + " "))
 
 
-class IterateMistakes(MistakeFinder):
-    def __init__(self, src_path: str):
-        MistakeFinder.__init__(self, src_path=src_path)
-
-        if not hasattr(self, "dir_no_mistake"):
-            return
-
-
-
-
-class PathFinder(IterateMistakes):
+class PathFinder(MistakeFinder):
     def __init__(self, path: str):
-        IterateMistakes.__init__(self, src_path=path)
+        MistakeFinder.__init__(self, src_path=path)
 
     def __str__(self) -> str:
-        return self.nearly_path
+        return self.path
 
 path = "smb://sbc01/shares/Marketing/Photo/_Collections/1 Solo/1 IMG/2023-09-22 11-27-28 рабочий файл.tif/"
-# path = "smb://sbc01/shares/Marketing/Photo/_Collections/_____1 Solo/1 IMG/2023-09-22 11-27-28 рабочий файл.tif/"
+path = "smb://sbc01/shares/Marketing/Photo/_Collections/_____1 Solo/1 IMG/2023-09-22 11-27-28 рабочий файл.tif/"
 
 a = PathFinder(path=path)
