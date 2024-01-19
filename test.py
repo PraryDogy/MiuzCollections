@@ -64,8 +64,8 @@ class MistakeFinder(NearlyPath):
         if not hasattr(self, "nearly_path"):
             return
         
-        mistaked_tail = self.find_tail(src_path=src_path,
-                                       nearly_path=self.nearly_path)
+        mistaked_tail = self.find_tail(
+            src_path=src_path, nearly_path=self.nearly_path)
 
         for i in mistaked_tail:
             improved = self.improve_chunk(
