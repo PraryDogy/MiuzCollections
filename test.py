@@ -59,38 +59,50 @@ class NearlyPath(PathFinderBase):
 class MistakeFinder(NearlyPath):
     def __init__(self, src_path: str):
         NearlyPath.__init__(self, src_path=src_path)
+
+        if not hasattr(self, "nearly_path"):
+            return
         
-        tail_with_mistake = None
+        mistaked_tail = None
         for i in range(len(self.nearly_path)):
             if self.nearly_path[i:] in src_path:
-                tail_with_mistake = src_path.split(self.nearly_path[i:])[-1]
+                mistaked_tail = src_path.split(self.nearly_path[i:])[-1]
                 break
-        tail_with_mistake = [i for i in tail_with_mistake.split(os.sep) if i]
-        mistake = self.normalize_name(tail_with_mistake[0])
+        mistaked_tail = [i for i in mistaked_tail.split(os.sep) if i]
+
+        mistake = self.normalize_name(mistaked_tail[0])
 
         dirs = {self.normalize_name(i): i
                 for i in os.listdir(self.nearly_path)}
 
-        new_dir = None
         if mistake in dirs:
             new_dir = os.path.join(self.nearly_path, dirs[mistake])
-
-        if os.path.exists(new_dir):
-            ...
+            if os.path.exists(new_dir):
+                self.dir_no_mistake = new_dir
 
     def normalize_name(self, name: str):
         name, ext = os.path.splitext(p=name)
         return name.translate(str.maketrans("", "", string.punctuation + " "))
 
 
-class PathFinder(MistakeFinder):
+class IterateMistakes(MistakeFinder):
+    def __init__(self, src_path: str):
+        MistakeFinder.__init__(self, src_path=src_path)
+
+        if not hasattr(self, "dir_no_mistake"):
+            return
+
+
+
+
+class PathFinder(IterateMistakes):
     def __init__(self, path: str):
-        MistakeFinder.__init__(self, src_path=path)
+        IterateMistakes.__init__(self, src_path=path)
 
     def __str__(self) -> str:
         return self.nearly_path
 
 path = "smb://sbc01/shares/Marketing/Photo/_Collections/1 Solo/1 IMG/2023-09-22 11-27-28 рабочий файл.tif/"
-path = "smb://sbc01/shares/Marketing/Photo/_Collections/_____1 Solo/1 IMG/2023-09-22 11-27-28 рабочий файл.tif/"
+# path = "smb://sbc01/shares/Marketing/Photo/_Collections/_____1 Solo/1 IMG/2023-09-22 11-27-28 рабочий файл.tif/"
 
 a = PathFinder(path=path)
