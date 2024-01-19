@@ -51,7 +51,6 @@ class NearlyPath(PathFinderBase):
                     pass
         new_paths.sort(key=len, reverse=True)
 
-        self.nearly = False
         self.path = None
         for i in new_paths:
             if os.path.exists(i):
@@ -64,7 +63,8 @@ class MistakeFinder(NearlyPath):
     def __init__(self, path: str):
         NearlyPath.__init__(self, path=path)
 
-        print(self.nearly)
+        if hasattr(self, "nearly"):
+            print("nearly")
 
 
 
@@ -76,6 +76,6 @@ class PathFinder(MistakeFinder):
         return self.path
 
 path = "smb://sbc01/shares/Marketing/Photo/_Collections/1 Solo/1 IMG/2023-09-22 11-27-28 рабочий файл.tif/"
-# path = "smb://sbc01/shares/Marketing/Photo/_Collections/_____1 Solo/1 IMG/2023-09-22 11-27-28 рабочий файл.tif/"
+path = "smb://sbc01/shares/Marketing/Photo/_Collections/_____1 Solo/1 IMG/2023-09-22 11-27-28 рабочий файл.tif/"
 
 a = PathFinder(path=path)
