@@ -1,5 +1,7 @@
 import os
 import string
+from typing import Literal
+from difflib import SequenceMatcher
 
 # path = "\\192.168.10.105\\shares\\Marketing\\General\\9. ТЕКСТЫ\\2023\\7. PR-рассылка\\10. Октябрь\\Royal"
 # path = "/Users/Morkowik/Downloads/Геохимия видео"
@@ -9,7 +11,7 @@ class PrePaths:
 
 
 class PathFinderBase(object):
-    def __init__(self, src_path: str):
+    def __init__(self, src_path: str) -> Literal["converted path for mac"]:
         pre_paths = [self.normalize_path(path=i)
                     for i in PrePaths.lst]
 
@@ -27,7 +29,7 @@ class PathFinderBase(object):
                 self.path = path_ver
                 break
 
-    def normalize_path(self, path: str):
+    def normalize_path(self, path: Literal["path"]) -> Literal["path without trash"]:
         path = path.replace("\\", os.sep).strip().strip(os.sep)
         path = path.split(os.sep)
         return os.path.join(os.sep, *path)
@@ -69,24 +71,24 @@ class MistakeFinder(NearlyPath):
             src_path=src_path, nearly_path=self.nearly_path)
 
         for i in mistaked_tail:
-            improved = self.improve_chunk(
+            true_name = self.find_true_name(
                 path_chunk=i, nearly_path=self.nearly_path)
-            if improved:
-                self.nearly_path = os.path.join(self.nearly_path, improved)
+            if true_name:
+                self.nearly_path = os.path.join(self.nearly_path, true_name)
                 continue
             else:
                 break
 
         self.path = self.nearly_path
 
-    def find_tail(self, src_path: str, nearly_path: str):
+    def find_tail(self, src_path: str, nearly_path: str) -> tuple:
         for i in range(len(nearly_path)):
             if nearly_path[i:] in src_path:
                 mistaked_tail = src_path.split(nearly_path[i:])[-1]
                 mistaked_tail = self.normalize_path(path=mistaked_tail)
                 return [i for i in mistaked_tail.split(os.sep) if i]
 
-    def improve_chunk(self, path_chunk: str, nearly_path: str):
+    def find_true_name(self, path_chunk: str, nearly_path: str):
         mistake = self.normalize_name(path_chunk)
         dirs = {self.normalize_name(i): i
                 for i in os.listdir(nearly_path)}
@@ -94,7 +96,10 @@ class MistakeFinder(NearlyPath):
         if mistake in dirs:
             return dirs[mistake]
 
-    def normalize_name(self, name: str):
+    def similar(self, a: str, b: str):
+        return SequenceMatcher(None, a, b).ratio()
+        
+    def normalize_name(self, name: str) -> Literal["str with letters and digits only"]:
         name, ext = os.path.splitext(p=name)
         name = name.translate(str.maketrans("", "", string.punctuation + " "))
         return f"{name}{ext}"
@@ -117,14 +122,3 @@ a = PathFinder(path=path)
 print()
 print(a)
 print()
-
-# a = "6PRрассылка"
-# b = "7PRрассылка"
-
-# from difflib import SequenceMatcher
-
-# def similar(a, b):
-#     return SequenceMatcher(None, a, b).ratio()
-
-# c = similar(a, b)
-# print(c)
