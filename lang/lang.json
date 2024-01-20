@@ -3,17 +3,23 @@
         "ru",
         "en"
     ],
-    "filter_names": [
+    "cust_fltr_names": [
         {
             "prod": "Имиджи",
             "mod": "Модели",
-            "cat": "Каталог",
-            "other": "Другое"
+            "cat": "Каталог"
         },
         {
             "prod": "Product",
             "mod": "Models",
-            "cat": "Catalog",
+            "cat": "Catalog"
+        }
+    ],
+    "sys_fltr_names": [
+        {
+            "other": "Другое"
+        },
+        {
             "other": "Other"
         }
     ],

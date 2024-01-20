@@ -110,11 +110,12 @@ class ContextMenu(ContextMenuBase):
         self.sep()
         if btn_info.collname != cnf.all_colls:
             self.reveal_coll_context(collname=btn_info.collname)
-
             self.sep()
-            for k, v in cnf.filter_true_names.items():
-                self.reveal_coll_filtered(collname=btn_info.collname, filter=v,
-                                        label=cnf.lng.filter_names[k])
+
+            for code_name, true_name in cnf.cust_fltr_names.items():
+                self.reveal_coll_filtered(
+                    collname=btn_info.collname, filter=true_name,
+                    label=cnf.lng.cust_fltr_names[code_name])
         else:
             self.reveal_coll_context(collname=cnf.lng.all_colls)
 

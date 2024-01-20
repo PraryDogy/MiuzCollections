@@ -14,7 +14,7 @@ except ImportError:
 __all__ = ("cnf",)
 
 
-class ConfigGui:
+class GuiUtils:
     def reload_strbar(self):
         from gui import app
         app.stbar.reload_stbar()
@@ -74,12 +74,12 @@ class User:
 
         self.root_g = {"w": 700, "h": 500, "x": 100, "y": 100}
         self.imgview_g = {"w": 700, "h": 500, "x": 100, "y": 100}
+        
+        self.cust_fltr_vals = {"prod": False, "mod": False, "cat": False}
+        self.sys_fltr_vals = {"other" : False}
 
-        self.filter_values = {"prod": False, "mod": False, "cat": False,
-                              "other": False}
-
-        self.filter_true_names = {"prod": "1 IMG", "mod": "2 Model IMG",
-                                  "cat": "5 Обтравка"}
+        self.cust_fltr_names = {"prod": "1 IMG", "mod": "2 Model IMG",
+                                  "cat": "5 Обтравка"}        
 
 
 class StringVars:
@@ -89,20 +89,8 @@ class StringVars:
         self.settings_var = tkinter.Variable(value=0)
 
 
-class Config(ConfigGui, User, StringVars):
-    def __init__(self):
-        self.app_name = "MiuzCollections"
-        self.app_ver = "4.1.2"
-        self.db_name = "db.db"
-        self.cfg_name = "cfg.json"
-        self.thumb_err = "thumb.jpg"
-        self.lng = None
-
-        self.cfg_dir = os.path.join(os.path.expanduser("~"),
-            f"Library", "Application Support", self.app_name)
-        self.json_dir = os.path.join(self.cfg_dir, self.cfg_name)
-        self.db_dir = os.path.join(self.cfg_dir, self.db_name)
-
+class Colors:
+    def __init__(self) -> None:
         self.fg_color = "#E2E2E2"
         self.bg_color = "#1e1e1e"
         self.btn_color = "#303030"
@@ -115,6 +103,9 @@ class Config(ConfigGui, User, StringVars):
         self.tit_color_menu = "#7b7b7b"
         self.fg_color_menu = "#e9e9e9"
 
+
+class GuiDigits:
+    def __init__(self):
         self.corner = 8
         self.scroll_width = 17
         self.menu_w = 200
@@ -123,21 +114,44 @@ class Config(ConfigGui, User, StringVars):
         self.limit = 150
         self.all_colls = "all"
 
-        # root
-        self.root = tkinter.Tk()
-        self.root.withdraw()
 
+class Dates:
+    def __init__(self):
         self.date_start: datetime = None
         self.date_end: datetime = None
         self.named_start: str = None # datetime as readable text
         self.named_end: str = None # datetime as readable text
 
+
+class Storage:
+    def __init__(self):
         self.scan_status = False
         self.notibar_status = True
-
         self.all_img_src = []
 
-        ConfigGui.__init__(self)
+
+class Config(Colors, Dates, GuiUtils, GuiDigits, User, Storage, StringVars):
+    def __init__(self):
+        self.root = tkinter.Tk()
+        self.root.withdraw()
+
+        self.app_name = "MiuzCollections"
+        self.app_ver = "4.1.2"
+        self.db_name = "db.db"
+        self.cfg_name = "cfg.json"
+        self.thumb_err = "thumb.jpg"
+        self.lng = None
+
+        self.cfg_dir = os.path.join(os.path.expanduser("~"),
+            f"Library", "Application Support", self.app_name)
+        self.json_dir = os.path.join(self.cfg_dir, self.cfg_name)
+        self.db_dir = os.path.join(self.cfg_dir, self.db_name)
+
+        Colors.__init__(self)
+        GuiDigits.__init__(self)
+        Dates.__init__(self)
+        Storage.__init__(self)
+        GuiUtils.__init__(self)
         User.__init__(self)
         StringVars.__init__(self)
 

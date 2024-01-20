@@ -64,15 +64,18 @@ class FiltersWid(CFrame):
     def __init__(self, master: tkinter, bg: str = cnf.bg_color, **kwargs):
         CFrame.__init__(self, master=master, bg=bg, **kwargs)
 
-        self.__filter_btns = {}
+        self.fltr_btns_dict = {}
+        merg_fltr_lng = {**cnf.lng.cust_fltr_names, **cnf.lng.sys_fltr_names}
 
-        for k, v in cnf.lng.filter_names.items():
-            btn = CButton(master=self, text=cnf.lng.filter_names[k])
+        for code_name, name in merg_fltr_lng.items():
+            btn = CButton(master=self, text=name)
             btn.pack(side="left", fill="x", padx=(0, 5))
-            self.__filter_btns[btn] = k
+            self.fltr_btns_dict[btn] = code_name
 
-        for k, v in self.__filter_btns.items():
-            k.cmd(lambda e, v=v: self.__filter_btn_cmd(v=v))
+        for widget, code_name in self.fltr_btns_dict.items():
+            widget: CButton
+            widget.cmd(lambda e, code_name=code_name:
+                       self.__filter_btn_cmd(code_name=code_name))
 
         self.dates_btn = CButton(master=self, text=cnf.lng.dates)
         self.dates_btn.pack(side="left", fill="x", padx=(0, 5))
@@ -83,20 +86,26 @@ class FiltersWid(CFrame):
     def open_calendar(self, e: tkinter.Event = None):
         self.calendar_win = CalendarWin()
 
-    def __filter_btn_cmd(self, v):
-        cnf.filter_values[v] = False if cnf.filter_values[v] else True
+    def __filter_btn_cmd(self, code_name: str):
+        if code_name in cnf.cust_fltr_vals:
+            cnf.cust_fltr_vals[code_name] = not cnf.cust_fltr_vals[code_name]
+        else:
+            cnf.sys_fltr_vals[code_name] = not cnf.sys_fltr_vals[code_name]
         self.reload_filters()
         cnf.reload_scroll()
 
     def reload_filters(self):
-        for k, v in self.__filter_btns.items():
-            k: CButton
-            if cnf.filter_values[v]:
-                k.configure(fg_color=cnf.blue_color,
-                            text=cnf.lng.filter_names[v] + " ⨂")
+        merg_fltr_vals = {**cnf.cust_fltr_vals, **cnf.sys_fltr_vals}
+        merg_fltr_lng = {**cnf.lng.cust_fltr_names, **cnf.lng.sys_fltr_names}
+
+        for widget, code_name in self.fltr_btns_dict.items():
+            widget: CButton
+            if merg_fltr_vals[code_name]:
+                widget.configure(fg_color=cnf.blue_color,
+                            text=merg_fltr_lng[code_name] + " ⨂")
             else:
-                k.configure(fg_color=cnf.bg_color,
-                            text=cnf.lng.filter_names[v] + " ⨁")
+                widget.configure(fg_color=cnf.bg_color,
+                            text=merg_fltr_lng[code_name] + " ⨁")
 
         if any((cnf.date_start, cnf.date_end)):
             self.dates_btn.configure(fg_color=cnf.blue_color,

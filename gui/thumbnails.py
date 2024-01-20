@@ -130,19 +130,31 @@ class ThumbsDict(dict, ImageUtils, SysUtils):
         if cnf.curr_coll != cnf.all_colls:
             q = q.filter(ThumbsMd.collection == cnf.curr_coll)
 
+        # filters = []
+        # for k, v in cnf.filter_true_names.items():
+        #     if cnf.filter_values[k]:
+        #         if cnf.filter_true_names[k]:
+        #             examp = f"%/{cnf.filter_true_names[k]}/%"
+        #             filters.append(ThumbsMd.src.like(examp))
+        # filters = sqlalchemy.or_(*filters)       
+
+        # other_filter = []
+        # if cnf.filter_values["other"]:
+        #     for k, v in cnf.filter_true_names.items():
+        #         examp = f"%/{cnf.filter_true_names[k]}/%"
+        #         other_filter.append(ThumbsMd.src.not_like(examp))
+        # other_filter = sqlalchemy.and_(*other_filter)
+            
         filters = []
-        for k, v in cnf.filter_true_names.items():
-            if cnf.filter_values[k]:
-                if cnf.filter_true_names[k]:
-                    examp = f"%/{cnf.filter_true_names[k]}/%"
-                    filters.append(ThumbsMd.src.like(examp))
+        for code_name, true_name in cnf.cust_fltr_names.items():
+            if cnf.cust_fltr_vals[code_name]:
+                filters.append(ThumbsMd.src.like(f"%/{true_name}/%"))        
         filters = sqlalchemy.or_(*filters)
 
         other_filter = []
-        if cnf.filter_values["other"]:
-            for k, v in cnf.filter_true_names.items():
-                examp = f"%/{cnf.filter_true_names[k]}/%"
-                other_filter.append(ThumbsMd.src.not_like(examp))
+        if cnf.sys_fltr_vals["other"]:
+            for code_name, true_name in cnf.cust_fltr_names.items():
+                other_filter.append(ThumbsMd.src.not_like(f"%/{true_name}/%"))
         other_filter = sqlalchemy.and_(*other_filter)
 
         if any((str(filters), str(other_filter))):
@@ -186,8 +198,12 @@ class ResetFiltersBtn(CButton):
         self.cmd(self.reset_filters_cmd)
 
     def reset_filters_cmd(self, e: tkinter.Event):
-        for k, v in cnf.filter_values.items():
-            cnf.filter_values[k] = False
+        # for k, v in cnf.filter_values.items():
+        #     cnf.filter_values[k] = False
+        for code_name, _ in cnf.cust_fltr_vals.items():
+            cnf.cust_fltr_vals[code_name] = False
+        for code_name, _ in cnf.sys_fltr_vals.items():
+            cnf.sys_fltr_vals[code_name] = False
         cnf.reload_filters()
         cnf.reload_scroll()
 
@@ -201,6 +217,9 @@ class NoImages(CFrame):
                            font=("San Francisco Pro", 18, "bold"))
         no_images.pack(pady=(15, 0))
 
+        merg_fltr_vals = {**cnf.cust_fltr_vals, **cnf.sys_fltr_vals}
+        merg_fltr_lng = {**cnf.lng.cust_fltr_names, **cnf.lng.sys_fltr_names}
+
         if str_var:
             noimg_t = (f"{cnf.lng.no_photo} {cnf.lng.with_name}"
                        f"\n\"{str_var}\"")
@@ -213,10 +232,10 @@ class NoImages(CFrame):
             no_images.configure(text=noimg_t)
             ResetDatesBtn(master=self).pack(pady=(15, 0))
 
-        elif any((i for i in cnf.filter_values.values())):
-            filters = (f"\"{cnf.lng.filter_names[k].lower()}\""
-                       for k, v in cnf.filter_values.items()
-                       if v)
+        elif any(merg_fltr_vals.values()):
+            filters = (f"\"{merg_fltr_lng[code_name].lower()}\""
+                       for code_name, val in merg_fltr_vals.items()
+                       if val)
             filters = ",  ".join(filters)
             noimg_t = (f"{cnf.lng.no_photo_filter}\n{filters}")
             no_images.configure(text=noimg_t)

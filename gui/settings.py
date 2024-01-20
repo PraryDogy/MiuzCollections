@@ -96,27 +96,27 @@ class FiltersWid(CFrame):
         title = CLabel(master=self, text=cnf.lng.filters)
         title.pack(anchor="w")
 
-        self.__filter_entries = {}
+        self.filter_entries = {}
 
-        for k, v in cnf.filter_true_names.items():
+        for code_name, true_name in cnf.cust_fltr_names.items():
             row = CFrame(master=self)
             row.pack(pady=(10, 0), anchor="w")
 
-            lbl = CLabel(master=row, text=cnf.lng.filter_names[k], width=9,
-                anchor="w", justify="left")
+            lbl = CLabel(master=row, text=cnf.lng.cust_fltr_names[code_name],
+                         width=9, anchor="w", justify="left")
             lbl.pack(side="left")
 
-            ent = CEntry(master=row, textvariable=tkinter.StringVar(self, v))
+            ent = CEntry(master=row, textvariable=tkinter.StringVar(self, true_name))
             ent.pack(side="left")
-            self.__filter_entries[k] = ent
+            self.filter_entries[code_name] = ent
 
     def filter_entries_values(self) -> dict[str, str]:
         """
         dict keys: cnf > filter_true names > keys
         dict values: text from entry
         """
-        return {k: v.get()
-                for k, v in self.__filter_entries.items()}
+        return {code_name: widget.get()
+                for code_name, widget in self.filter_entries.items()}
 
 
 class LangWid(CFrame):
@@ -160,9 +160,9 @@ class Settings(CWindow, SysUtils):
         CWindow.__init__(self)
         Win.win = self
 
-        self.protocol(name="WM_DELETE_WINDOW", func=self.__close_sett)
-        self.bind(sequence="<Escape>", func=self.__close_sett)
-        self.bind(sequence="<Return>", func=self.__save_sett)
+        self.protocol(name="WM_DELETE_WINDOW", func=self.close_sett)
+        self.bind(sequence="<Escape>", func=self.close_sett)
+        self.bind(sequence="<Return>", func=self.save_sett)
         self.title(string=cnf.lng.settings)
         self.minsize(width=w, height=h)
         self.place_center(w=w, h=h)
@@ -173,22 +173,22 @@ class Settings(CWindow, SysUtils):
             master=self, title=cnf.lng.colls_path, path=cnf.coll_folder)
         self.__browse_colls.pack(anchor="w", pady=(0, pader))
 
-        self.__browse_down = BrowsePathFrame(
+        self.browse_down = BrowsePathFrame(
             master=self, title=cnf.lng.down_path, path=cnf.down_folder)
-        self.__browse_down.pack(anchor="w")
+        self.browse_down.pack(anchor="w")
 
         CSep(master=self).pack(fill="x", pady=pader)
 
         # self.__scaner_wid = ScanerWid(master=self)
         # self.__scaner_wid.pack(anchor="w", pady=(0, pader))
 
-        self.__lang_wid = LangWid(master=self)
-        self.__lang_wid.pack(anchor="w")
+        self.lang_wid = LangWid(master=self)
+        self.lang_wid.pack(anchor="w")
 
         CSep(master=self).pack(fill="x", pady=pader)
 
-        self.__filters = FiltersWid(master=self)
-        self.__filters.pack(anchor="w")
+        self.filters = FiltersWid(master=self)
+        self.filters.pack(anchor="w")
 
         CSep(master=self).pack(fill="x", pady=pader)
 
@@ -196,28 +196,28 @@ class Settings(CWindow, SysUtils):
         cancel_frame.pack()
 
         save_btn = CButton(master=cancel_frame, text=cnf.lng.ok)
-        save_btn.cmd(self.__save_sett)
+        save_btn.cmd(self.save_sett)
         save_btn.pack(padx=(0, 15), side="left")
 
         cancel_btn = CButton(master=cancel_frame, text=cnf.lng.cancel)
-        cancel_btn.cmd(self.__close_sett)
+        cancel_btn.cmd(self.close_sett)
         cancel_btn.pack(side="left")
 
-    def __close_sett(self, e: tkinter.Event = None):
+    def close_sett(self, e: tkinter.Event = None):
         Win.win = False
         self.destroy()
         cnf.root.focus_force()
         SettingsVar().set(value=0)
 
-    def __save_sett(self, e: tkinter.Event = None):
-        if hasattr(self.__lang_wid, "new_lang"):
-            cnf.set_language(lang_name=self.__lang_wid.new_lang)
+    def save_sett(self, e: tkinter.Event = None):
+        if hasattr(self.lang_wid, "new_lang"):
+            cnf.set_language(lang_name=self.lang_wid.new_lang)
 
-        cnf.down_folder = self.__browse_down.get_path()
+        cnf.down_folder = self.browse_down.get_path()
 
-        entries = self.__filters.filter_entries_values()
+        entries = self.filters.filter_entries_values()
         for k, v in entries.items():
-            cnf.filter_true_names[k] = v
+            cnf.cust_fltr_names[k] = v
 
         if cnf.coll_folder != self.__browse_colls.get_path():
             cnf.coll_folder = self.__browse_colls.get_path()

@@ -117,8 +117,17 @@ path = "smb://sbc031/shares/Marketing/Photo/_Collections/_____1 Solo/1 IMG/__202
 # path = "\\192.168.10.105\\shares\\Marketing\\General\\9. ТЕКСТЫ\\)2023\\7. PR-рассылка\\10. Октябрь\\Royal"
 path = "fafdgfagrf"
 
-a = PathFinder(path=path)
+# a = PathFinder(path=path)
 
-print()
-print(a)
-print()
+# print()
+# print(a)
+# print()
+
+
+a = {"A": 0, "B": 0, "C": 0}
+b = {"OTHER": 1}
+
+merged = {**a, **b}
+
+if any(merged.values()):
+    print(111)
