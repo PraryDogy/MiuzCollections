@@ -1,44 +1,48 @@
-import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QGridLayout
-from PyQt5.QtGui import QPixmap
-import os
+import tkinter as tk
+from threading import Thread
+import random
 
+def long_running_task():
+    # Задача, которая занимает много времени
+    for i in range(5):
+        import time
+        time.sleep(1)
+        print("Task", i)
+    print("fin")
 
-class ImageGridApp(QWidget):
-    def __init__(self):
-        super().__init__()
+def run_task_in_thread():
+    # Создаем и запускаем новый поток для выполнения задачи
+    thread = Thread(target=long_running_task)
+    thread.start()
+    # Планируем обновление интерфейса после завершения задачи
+    root.after(100, check_task_completion, thread)
 
-        self.initUI()
+def check_task_completion(thread):
+    # Проверяем, завершился ли поток
+    if not thread.is_alive():
+        "выполняем какой-нибудь класс, переданный аргументом"
+        print("Task completed")
+    else:
+        # Планируем новую проверку через 100 миллисекунд
+        root.after(100, check_task_completion, thread)
 
-    def initUI(self):
-        # Создаем сетку
-        grid_layout = QGridLayout()
+def show_random_number():
+    random_number = random.randint(1, 100)
+    result_label.config(text=f"Random Number: {random_number}")
 
-        # Пример изображений (замените путями к вашим изображениям)
-        p = "/Users/Loshkarev/Downloads/MiuzCollections"
-        image_paths = [os.path.join(p, i) for i in os.listdir(p)]
+def on_button_click():
+    print("Button clicked")
+    run_task_in_thread()
 
-        row, col = 0, 0
+root = tk.Tk()
 
-        # Добавляем изображения в сетку
-        for image_path in image_paths:
-            pixmap = QPixmap(image_path)
-            label = QLabel(self)
-            label.setPixmap(pixmap)
-            grid_layout.addWidget(label, row, col)
+button_run_task = tk.Button(root, text="Run Task", command=on_button_click)
+button_run_task.pack()
 
-            col += 1
-            if col == 3:  # Устанавливаем количество столбцов
-                col = 0
-                row += 1
+button_show_random = tk.Button(root, text="Show Random Number", command=show_random_number)
+button_show_random.pack()
 
-        self.setLayout(grid_layout)
+result_label = tk.Label(root, text="")
+result_label.pack()
 
-        self.setWindowTitle('Image Grid')
-        self.setGeometry(100, 100, 600, 400)
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    window = ImageGridApp()
-    window.show()
-    sys.exit(app.exec_())
+root.mainloop()
