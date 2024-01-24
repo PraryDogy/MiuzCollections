@@ -337,7 +337,7 @@ class Thumbs(CFrame):
 
         self.scroll = CScroll(master=self.__scroll_parrent, scroll_color=cnf.btn_color)
         self.scroll.pack(expand=1, fill="both")
-        self.scroll.set_scroll_speed(scroll_speed=20)
+        self.scroll.set_scroll_speed(scroll_speed=13)
 
     def load_thumbs(self):
         thumbs_dict = ThumbsDict()
