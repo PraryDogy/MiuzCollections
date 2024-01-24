@@ -127,6 +127,8 @@ class Menu(CScroll):
         CScroll.__init__(self, master=master, fg_color=cnf.bg_color_menu,
                          corner_radius=0, width=cnf.menu_w,
                          scroll_color=cnf.sel_color_menu)
+        
+        self.set_scroll_speed(scroll_speed=15)
 
         self.menu_frame = self.load_menu_buttons()
         self.menu_frame.pack(anchor="w", fill="x")

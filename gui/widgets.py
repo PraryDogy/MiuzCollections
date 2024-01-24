@@ -58,8 +58,12 @@ class CScroll(customtkinter.CTkScrollableFrame, BaseCWid, SysUtils):
             fg_color=fg_color)
 
         self._scrollbar.configure(width=scroll_width)
+
         if scroll_color:
             self._scrollbar.configure(button_color=scroll_color)
+
+    def set_scroll_speed(self, scroll_speed: int):
+        self._parent_canvas.configure(yscrollincrement=scroll_speed)
 
     def get_parrent(self):
         return self._parent_canvas
