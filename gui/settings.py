@@ -226,7 +226,10 @@ class Settings(CWindow, SysUtils):
             if not self.smb_check():
                 SmbAlert()
 
-            Watcher.observer.stop()
+            try:
+                Watcher.observer.stop()
+            except AttributeError:
+                print("save settings no watchdog observer")
             cnf.root.after(ms=500, func=Scaner)
             cnf.root.after(ms=500, func=Watcher)
 
