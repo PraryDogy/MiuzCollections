@@ -16,24 +16,34 @@ from .system import CreateThumb, SysUtils, UndefinedThumb
 __all__ = ("Watcher", )
 
 
-class WatcherTask:
+class WatcherManager:
     task = False
+    watchdog_wait_time = 10
+    img_wait_time = 5
+    img_timeout = 300
 
 
 class WaitWriteFinish:
-    value = 1
 
     def __init__(self, src: str):
         file = None
+        current_timeout = 0
 
         while not file:
             try:
                 file = Image.open(src)
                 file.close()
+                current_timeout = 0
+
             except Exception:
                 file = None
-                sleep(__class__.value)
-                continue
+                sleep(WatcherManager.img_wait_time)
+                current_timeout += 1
+
+                if current_timeout == WatcherManager.img_timeout:
+                    return
+                else:
+                    continue
 
 
 class ReloadGui:
@@ -110,10 +120,6 @@ class Handler(FileSystemEventHandler):
             if event.src_path.endswith(Exts.lst):
                 DeletedFile(src=event.src_path)
                 ReloadGui()
-        # else:
-        #     if os.path.exists(event.src_path):
-        #         DeleteDir(src=event.src_path)
-        #         ReloadGui()
 
     def on_moved(self, event):
         if not event.is_directory:
@@ -133,7 +139,7 @@ class WatcherBase:
 
         try:
             while True:
-                time.sleep(1)
+                time.sleep(WatcherManager.watchdog_wait_time)
         except KeyboardInterrupt:
             __class__.observer.stop()
         __class__.observer.join()
@@ -145,6 +151,6 @@ class Watcher(WatcherBase, SysUtils):
             t1 = threading.Thread(target=WatcherBase, daemon=True)
             t1.start()
         else:
-            if WatcherTask.task:
-                cnf.root.after_cancel(WatcherTask.task)
-            WatcherTask.task = cnf.root.after(ms=11000, func=__class__)
+            if WatcherManager.task:
+                cnf.root.after_cancel(WatcherManager.task)
+            WatcherManager.task = cnf.root.after(ms=11000, func=__class__)
