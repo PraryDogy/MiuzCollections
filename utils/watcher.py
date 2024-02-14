@@ -153,6 +153,5 @@ class Watcher(WatcherBase, SysUtils):
         if self.smb_check():
             t1 = threading.Thread(target=WatcherBase, daemon=True)
             t1.start()
-            WatcherManager.task = cnf.root.after(ms=900000, func=__class__)
         else:
             WatcherManager.task = cnf.root.after(ms=15000, func=__class__)
